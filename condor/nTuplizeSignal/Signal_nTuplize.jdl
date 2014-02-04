@@ -1,0 +1,12 @@
+universe = vanilla
+Executable = Signal_nTuplize.sh
+transfer_input_files=../../src.tgz, fileList.txt, runOverAOD.py
+should_transfer_files = YES
+WhenToTransferOutput = ON_EXIT
+notification = error
+Output = JobOut/batch_$(cluster)_$(process).stdout
+Error  = JobOut/batch_$(cluster)_$(process).stderr
+Log    = JobOut/batch_$(cluster)_$(process).condor
+Requirements          = Memory >= 199 && OpSys == "LINUX" && (Arch != "DUMMY") && ( TARGET.FileSystemDomain == "fnal.gov" )
+Arguments = $(process)
+Queue 332

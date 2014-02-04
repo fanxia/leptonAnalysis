@@ -1,0 +1,17 @@
+
+=================================================================================================================================
+You are running this job staged, which means that only PileupWeights and CalculateBtagEfficiency are running.
+You need to do the following in the base output directory of this job:
+
+        1. Allow all of the newly-submitted jobs to finish.
+        2. Once all these are done, combine them with:
+                ./combineStagedInput.sh
+        3. Submit the acceptance jobs:
+                condor_submit acceptance_go_mc.jdl
+        4. Finally when these jobs are all done, combine them with:
+                ./combineStagedOutput.sh
+
+This whole hassle is because you can't split the pileup distributions into pieces and expect to get the same error on pileup weights.
+If you dislike this, run with --njobs=1 and don't use --runStaged next time!
+=================================================================================================================================
+

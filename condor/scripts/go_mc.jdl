@@ -1,0 +1,12 @@
+Universe = vanilla
+Executable = SCRIPT
+Requirements = Memory >= 199 &&OpSys == "LINUX"&& (Arch != "DUMMY" )&& Disk > 1000000 && ( TARGET.FileSystemDomain == "fnal.gov" )
+Should_Transfer_Files = YES
+transfer_input_files = ../../src.tgz, fileLists.tgz, ANALYZER
+WhenToTransferOutput = ON_EXIT
+Output = JobOut/job_$(Cluster)_$(Process).stdout
+Error  = JobOut/job_$(Cluster)_$(Process).stderr
+Log    = JobOut/job_$(Cluster)_$(Process).log
+notification = Never
+Arguments = $(process) STAGING
+Queue NJOBS

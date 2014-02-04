@@ -1,0 +1,96 @@
+\documentclass[landscape]{article}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+
+\begin{document}
+
+\begin{small}
+  
+  \begin{center}
+    \resizebox{16cm}{!} {
+      \begin{tabular}{ | l | c | c | c | c | c | }
+        \hline
+        Type & 
+        MET $<$ 20 & 
+        MET $<$ 50 & 
+        MET $\ge$ 50 & 
+        MET $\ge$ 80 & 
+        MET $\ge$ 100 \\ 
+        \hline
+        \hline
+        
+        $\gamma\gamma$ & 
+        \begin{tabular}{@{}c@{}} ggval1x \\ $\pm$ ggstat1x(stat.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ggval2x \\ $\pm$ ggstat2x(stat.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ggval3x \\ $\pm$ ggstat3x(stat.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ggval4x \\ $\pm$ ggstat4x(stat.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ggval5x \\ $\pm$ ggstat5x(stat.) \\ \end{tabular} \\ 
+        \hline
+        \hline
+        
+        ff QCD & 
+        \begin{tabular}{@{}c@{}} ffval1x \\ $\pm$ ffstat1x(stat.) \\ $\pm$ ffnorm1x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ffval2x \\ $\pm$ ffstat2x(stat.) \\ $\pm$ ffnorm2x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ffval3x \\ $\pm$ ffstat3x(stat.) \\ $\pm$ ffnorm3x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ffval4x \\ $\pm$ ffstat4x(stat.) \\ $\pm$ ffnorm4x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ffval5x \\ $\pm$ ffstat5x(stat.) \\ $\pm$ ffnorm5x(norm.) \\ \end{tabular} \\ 
+        \hline
+        
+        $\gamma$f QCD & 
+        \begin{tabular}{@{}c@{}} gfval1x \\ $\pm$ gfstat1x(stat.) \\ $\pm$ gfnorm1x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} gfval2x \\ $\pm$ gfstat2x(stat.) \\ $\pm$ gfnorm2x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} gfval3x \\ $\pm$ gfstat3x(stat.) \\ $\pm$ gfnorm3x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} gfval4x \\ $\pm$ gfstat4x(stat.) \\ $\pm$ gfnorm4x(norm.) \\ \end{tabular} &
+        \begin{tabular}{@{}c@{}} gfval5x \\ $\pm$ gfstat5x(stat.) \\ $\pm$ gfnorm5x(norm.) \\ \end{tabular} \\ 
+        \hline
+        
+        ee QCD & 
+        \begin{tabular}{@{}c@{}} eeval1x \\ $\pm$ eestat1x(stat.) \\ $\pm$ eenorm1x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} eeval2x \\ $\pm$ eestat2x(stat.) \\ $\pm$ eenorm2x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} eeval3x \\ $\pm$ eestat3x(stat.) \\ $\pm$ eenorm3x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} eeval4x \\ $\pm$ eestat4x(stat.) \\ $\pm$ eenorm4x(norm.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} eeval5x \\ $\pm$ eestat5x(stat.) \\ $\pm$ eenorm5x(norm.) \\ \end{tabular} \\
+        \hline
+        
+        Electroweak & 
+        \begin{tabular}{@{}c@{}} ewkval1x \\ $\pm$ ewkstat1x(stat.) \\ $\pm$ ewknorm1x(norm.) \\ $\pm$ ewksyst1x(syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ewkval2x \\ $\pm$ ewkstat2x(stat.) \\ $\pm$ ewknorm2x(norm.) \\ $\pm$ ewksyst2x(syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ewkval3x \\ $\pm$ ewkstat3x(stat.) \\ $\pm$ ewknorm3x(norm.) \\ $\pm$ ewksyst3x(syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ewkval4x \\ $\pm$ ewkstat4x(stat.) \\ $\pm$ ewknorm4x(norm.) \\ $\pm$ ewksyst4x(syst.) \\ \end{tabular} &
+        \begin{tabular}{@{}c@{}} ewkval5x \\ $\pm$ ewkstat5x(stat.) \\ $\pm$ ewknorm5x(norm.) \\ $\pm$ ewksyst5x(syst.) \\ \end{tabular} \\ 
+        \hline
+	\hline
+        
+        Total Background (ff) & 
+        \begin{tabular}{@{}c@{}} fftotalval1x \\ $\pm$ fftotalstat1x(stat.) \\ $\pm$ fftotalnorm1x(norm.) \\ $\pm$ fftotalsyst1x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} fftotalval2x \\ $\pm$ fftotalstat2x(stat.) \\ $\pm$ fftotalnorm2x(norm.) \\ $\pm$ fftotalsyst2x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} fftotalval3x \\ $\pm$ fftotalstat3x(stat.) \\ $\pm$ fftotalnorm3x(norm.) \\ $\pm$ fftotalsyst3x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} fftotalval4x \\ $\pm$ fftotalstat4x(stat.) \\ $\pm$ fftotalnorm4x(norm.) \\ $\pm$ fftotalsyst4x(ewk syst.) \\ \end{tabular} &
+        \begin{tabular}{@{}c@{}} fftotalval5x \\ $\pm$ fftotalstat5x(stat.) \\ $\pm$ fftotalnorm5x(norm.) \\ $\pm$ fftotalsyst5x(ewk syst.) \\ \end{tabular} \\ 
+        \hline
+        
+        Total Background ($\gamma$f) & 
+        \begin{tabular}{@{}c@{}} gftotalval1x \\ $\pm$ gftotalstat1x(stat.) \\ $\pm$ gftotalnorm1x(norm.) \\ $\pm$ gftotalsyst1x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} gftotalval2x \\ $\pm$ gftotalstat2x(stat.) \\ $\pm$ gftotalnorm2x(norm.) \\ $\pm$ gftotalsyst2x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} gftotalval3x \\ $\pm$ gftotalstat3x(stat.) \\ $\pm$ gftotalnorm3x(norm.) \\ $\pm$ gftotalsyst3x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} gftotalval4x \\ $\pm$ gftotalstat4x(stat.) \\ $\pm$ gftotalnorm4x(norm.) \\ $\pm$ gftotalsyst4x(ewk syst.) \\ \end{tabular} &
+        \begin{tabular}{@{}c@{}} gftotalval5x \\ $\pm$ gftotalstat5x(stat.) \\ $\pm$ gftotalnorm5x(norm.) \\ $\pm$ gftotalsyst5x(ewk syst.) \\ \end{tabular} \\ 
+        \hline
+        
+        Total Background (ee) & 
+        \begin{tabular}{@{}c@{}} eetotalval1x \\ $\pm$ eetotalstat1x(stat.) \\ $\pm$ eetotalnorm1x(norm.) \\ $\pm$ eetotalsyst1x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} eetotalval2x \\ $\pm$ eetotalstat2x(stat.) \\ $\pm$ eetotalnorm2x(norm.) \\ $\pm$ eetotalsyst2x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} eetotalval3x \\ $\pm$ eetotalstat3x(stat.) \\ $\pm$ eetotalnorm3x(norm.) \\ $\pm$ eetotalsyst3x(ewk syst.) \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} eetotalval4x \\ $\pm$ eetotalstat4x(stat.) \\ $\pm$ eetotalnorm4x(norm.) \\ $\pm$ eetotalsyst4x(ewk syst.) \\ \end{tabular} &
+        \begin{tabular}{@{}c@{}} eetotalval5x \\ $\pm$ eetotalstat5x(stat.) \\ $\pm$ eetotalnorm5x(norm.) \\ $\pm$ eetotalsyst5x(ewk syst.) \\ \end{tabular} \\ 
+        \hline
+        
+      \end{tabular}
+      }
+    \end{center}
+    
+  \end{small}
+  
+\end{document}
+
+
