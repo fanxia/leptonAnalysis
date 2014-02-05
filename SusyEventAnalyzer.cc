@@ -128,7 +128,7 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
 
     nCnt[0][0]++; // events
 
-    vector<susy::Photon*> candidate_pair;
+    vector<susy::Photon*> photons;
     vector<susy::PFJet*> pfJets, btags;
     vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
     vector<float> csvValues;
@@ -171,7 +171,7 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
 	     sf,
 	     tagInfos, csvValues, 
 	     pfJets_corrP4, btags_corrP4, 
-	     HT_jets_, hadronicSystem);
+	     HT, hadronicSystem);
 
     ////////////////////
 
@@ -1529,6 +1529,7 @@ void SusyEventAnalyzer::Acceptance() {
 
     nPhotons_ = photons.size();
 
+    HT_jets_ = 0.;
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
 
     findJets(event, 
