@@ -228,7 +228,7 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
 }
 
 void SusyEventAnalyzer::Data() {
-
+  /*
   TFile* out = new TFile("hist_"+outputName+"_"+btagger+".root", "RECREATE");
   out->cd();
 
@@ -1261,6 +1261,7 @@ void SusyEventAnalyzer::Data() {
   out->Close();
 
 }
+  */
 
 void SusyEventAnalyzer::Acceptance() {
 
@@ -1500,8 +1501,10 @@ void SusyEventAnalyzer::Acceptance() {
     susy::MET* pfMVAMet      = &(event.metMap.find("pfMVAMet")->second);
     susy::MET* genMet        = &(event.metMap.find("genMetTrue")->second);
 
-    findMuons(event, isoMuons, looseMuons);
-    findElectrons(event, isoMuons, looseMuons, isoEles, looseEles);
+    float HT = 0.;
+
+    findMuons(event, isoMuons, looseMuons, HT);
+    findElectrons(event, isoMuons, looseMuons, isoEles, looseEles, HT);
 
     if(isoMuons.size() + isoEles.size() != 1) continue;
 
@@ -1516,28 +1519,33 @@ void SusyEventAnalyzer::Acceptance() {
 
     if(scan == "stop-bino") ttbarDecayMode_ = FigureTTbarDecayMode(event);
     
-    float HT = 0.;
+    findPhotons(event, 
+		photons,
+		isoMuons, looseMuons,
+		isoEles, looseEles,
+		HT);
+
+    nPhotons_ = photons.size();
+
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
 
     findJets(event, 
+	     photons,
 	     isoMuons, looseMuons,
 	     isoEles, looseEles,
 	     pfJets, btags,
 	     sf,
 	     tagInfos, csvValues, 
 	     pfJets_corrP4, btags_corrP4, 
-	     HT, hadronicSystem);
+	     HT_jets_, hadronicSystem);
 
-    HT_jets_ = HT;
+    HT_ = HT + HT_jets_; // wrong
     hadronic_pt_ = hadronicSystem.Pt();
 
     max_csv_ = (csvValues.size() >= 1) ? csvValues[0] : -1.;
     submax_csv_ = (csvValues.size() >= 2) ? csvValues[1] : -1.;
     min_csv_ = (csvValues.size() >= 1) ? csvValues.back() : -1.;
     
-    if(isoEles.size() == 1) HT += isoEles[0]->momentum.Pt();
-    if(isoMuons.size() == 1) HT += isoMuons[0]->momentum.Pt();
-
     jet1_pt_ = (pfJets_corrP4.size() >= 1) ? pfJets_corrP4[0].Pt() : -1.;
     jet2_pt_ = (pfJets_corrP4.size() >= 2) ? pfJets_corrP4[1].Pt() : -1.;
     jet3_pt_ = (pfJets_corrP4.size() >= 3) ? pfJets_corrP4[2].Pt() : -1.;
@@ -1611,11 +1619,6 @@ void SusyEventAnalyzer::Acceptance() {
     isoMuon_pt_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Pt() : -1.;
     isoMuon_phi_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Phi() : -10.;
     isoMuon_eta_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Eta() : -10.;
-
-    findPhotons(event, photons,
-		isoMuons, looseMuons,
-		isoEles, looseEles,
-		pfJets, HT);
 
     lead_Et_ = (photons.size() > 0) ? photons[0]->momentum.Et() : -1.;
     lead_Eta_ = (photons.size() > 0) ? photons[0]->momentum.Eta() : -1.;
