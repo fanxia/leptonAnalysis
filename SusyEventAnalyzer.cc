@@ -1262,8 +1262,9 @@ void SusyEventAnalyzer::Data() {
   out->Write();
   out->Close();
 
-}
   */
+
+}
 
 void SusyEventAnalyzer::Acceptance() {
 
