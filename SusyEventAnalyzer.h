@@ -127,7 +127,10 @@ class SusyEventAnalyzer {
   void CopyEvents(bool v) { copyEvents = v; }
 
   // major analysis logic
-  void findPhotons_prioritizeCount(susy::Event& ev, vector<susy::Photon*>& candidates, int& event_type, bool doDPhiCut);
+  void findPhotons(susy::Event& ev, vector<susy::Photon*>& candidates,
+		   vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
+		   vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
+		   vector<susy::PFJet*>& pfJets, float& HT)
   void findPhotons_prioritizeEt(susy::Event& ev, vector<susy::Photon*>& candidates, int& event_type, bool doDPhiCut);
   void findPhotons_simple(susy::Event& ev, vector<susy::Photon*>& candidates, int& event_type, int wp, bool doDPhiCut);
   void findPhotons_fakesWithSeeds(susy::Event& ev, vector<susy::Photon*>& candidates, int& event_type, int wp, bool doDPhiCut);
@@ -413,355 +416,79 @@ double SusyEventAnalyzer::dZcorrection(TVector3& beamSpot, susy::Track& track) c
   return dz;
 }
 
-void SusyEventAnalyzer::findPhotons_prioritizeCount(susy::Event& ev, vector<susy::Photon*>& candidates, int& event_type, bool doDPhiCut) {
-
-  vector<susy::Photon*> g_photons, ef_photons;
-
+void SusyEventAnalyzer::findPhotons(susy::Event& ev, vector<susy::Photon*>& candidates,
+				    vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
+				    vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
+				    vector<susy::PFJet*>& pfJets, float& HT) {
+  
   map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
   if(phoMap != event.photons.end()) {
     for(vector<susy::Photon>::iterator it = phoMap->second.begin();
 	it != phoMap->second.end(); it++) {
       
       if(is_egf(*it, event.rho25)) {
-	if(is_eg(*it, event.rho25) || is_f(*it, event.rho25)) {
-	  if(is_eg(*it, event.rho25) && it->nPixelSeeds == 0) g_photons.push_back(&*it);
-	  else ef_photons.push_back(&*it);
+
+	bool overlap = false;
+	
+	for(unsigned int i = 0; i < isoMuons.size(); i++) {
+	  if(deltaR(isoMuons[i]->momentum, it->caloPosition) <= 0.5) {
+	    overlap = true;
+	    break;
+	  }
 	}
+
+	for(unsigned int i = 0; i < looseMuons.size(); i++) {
+	  if(deltaR(looseMuons[i]->momentum, it->caloPosition) <= 0.5) {
+	    overlap = true;
+	    break;
+	  }
+	}
+
+	for(unsigned int i = 0; i < isoEles.size(); i++) {
+	  if(deltaR(isoEles[i]->momentum, it->caloPosition) <= 0.5) {
+	    overlap = true;
+	    break;
+	  }
+	}
+
+	for(unsigned int i = 0; i < looseEles.size(); i++) {
+	  if(deltaR(looseEles[i]->momentum, it->caloPosition) <= 0.5) {
+	    overlap = true;
+	    break;
+	  }
+	}
+
+	for(unsigned int i = 0; i < pfJets.size(); i++) {
+	  if(deltaR(pfJets[i]->momentum, it->caloPosition) <= 0.5) {
+	    overlap = true;
+	    break;
+	  }
+	}
+
+	if(overlap) continue;
+
+	photons.push_back(&*it);
+	HT += it->momentum.Pt();
+	
       }
       
     } // for photon
   } // if
-  sort(g_photons.begin(), g_photons.end(), EtGreater<susy::Photon>);
-  sort(ef_photons.begin(), ef_photons.end(), EtGreater<susy::Photon>);
 
-  if(g_photons.size() >= 2) {
+  sortphotons.begin(), photons.end(), EtGreater<susy::Photon>);
     
-    for(unsigned int i = 0; i < g_photons.size(); i++) {
-      if(g_photons[i]->momentum.Et() > 40.0) {
-	
-	for(unsigned int j = i+1; j < g_photons.size(); j++) {
-	  float dEta = g_photons[i]->caloPosition.Eta() - g_photons[j]->caloPosition.Eta();
-	  float dPhi = TVector2::Phi_mpi_pi(g_photons[i]->caloPosition.Phi() - g_photons[j]->caloPosition.Phi());
-	  float dR = sqrt(dEta*dEta + dPhi*dPhi);
-	  
-	  if(dR > 0.6 && (!doDPhiCut || fabs(dPhi) > 0.05)) {
-	    event_type = cGG;
-	    candidates.push_back(g_photons[i]);
-	    candidates.push_back(g_photons[j]);
-	    
-	    break; // break out of trailing loop, you found one!
-	  }
-	  
-	} // loop through trailing
-	
-	if(event_type != 0) break; // if you have a pair, stop
-      } // if leading et is valid
-    } // loop through leading 
-    
-  } // if 2 photons
-  
-  if(g_photons.size() >= 1 && ef_photons.size() >= 1 && event_type == 0) { // if no gg, look for ge or gf
-    for(unsigned int i = 0; i < g_photons.size(); i++) {
-      for(unsigned int j = 0; j < ef_photons.size(); j++) {
-	
-	if(g_photons[i]->momentum.Et() <= 40.0 && ef_photons[j]->momentum.Et() <= 40.0) continue;
-	float dEta = g_photons[i]->caloPosition.Eta() - ef_photons[j]->caloPosition.Eta();
-	float dPhi = TVector2::Phi_mpi_pi(g_photons[i]->caloPosition.Phi() - ef_photons[j]->caloPosition.Phi());
-	float dR = sqrt(dEta*dEta + dPhi*dPhi);
-	
-	if(dR > 0.6 && (!doDPhiCut || fabs(dPhi) > 0.05)) {
-	  
-	  if(ef_photons[j]->nPixelSeeds == 0) event_type = cGF;
-	  else event_type = cEG;
-	  
-	  if(g_photons[i]->momentum.Et() >= ef_photons[j]->momentum.Et()) event_type *= -1;
-	  candidates.push_back(g_photons[i]);
-	  candidates.push_back(ef_photons[j]);
-	  sort(candidates.begin(), candidates.end(), EtGreater<susy::Photon>);
-	  
-	  break; // break out of trailing loop, you found one!
-	  
-	} // loop through trailing
-	
-	if(event_type != 0) break; // if you have a pair, stop
-      } // if leading et is valid
-    } // loop through leading 
-    
-  } // if 1 photon and 1 something-else and you didn't find a gg
-  
-  if(ef_photons.size() >= 2 && event_type == 0) { // if you still haven't found a gg or an eg, now try to look for ee and ff
-    for(unsigned int i = 0; i < ef_photons.size(); i++) {
-      
-      if(ef_photons[i]->momentum.Et() > 40.0) {
-	for(unsigned int j = i+1; j < ef_photons.size(); j++) {
-	  float dEta = ef_photons[i]->caloPosition.Eta() - ef_photons[j]->caloPosition.Eta();
-	  float dPhi = TVector2::Phi_mpi_pi(ef_photons[i]->caloPosition.Phi() - ef_photons[j]->caloPosition.Phi());
-	  float dR = sqrt(dEta*dEta + dPhi*dPhi);
-	  
-	  if(dR > 0.6 && (!doDPhiCut || fabs(dPhi) > 0.05)) {
-	    
-	    if(!(ef_photons[i]->nPixelSeeds == 0) && !(ef_photons[j]->nPixelSeeds == 0)) {
-	      event_type = cEE;
-	      candidates.push_back(ef_photons[i]);
-	      candidates.push_back(ef_photons[j]);
-	    }
-	    
-	    else if(ef_photons[i]->nPixelSeeds == 0 && ef_photons[j]->nPixelSeeds == 0) {
-	      event_type = cFF;
-	      candidates.push_back(ef_photons[i]);
-	      candidates.push_back(ef_photons[j]);
-	    }
-
-	    else if(!(ef_photons[i]->nPixelSeeds == 0) && ef_photons[j]->nPixelSeeds == 0) {
-	      event_type = cEF; // ef
-	      candidates.push_back(ef_photons[i]);
-	      candidates.push_back(ef_photons[j]);
-	    }
-
-	    else if(ef_photons[i]->nPixelSeeds == 0 && !(ef_photons[j]->nPixelSeeds == 0)) {
-	      event_type = -1 * cEF; // fe
-	      candidates.push_back(ef_photons[i]);
-	      candidates.push_back(ef_photons[j]);
-	    }
-	    
-	    break; // break out of trailing loop, you found one!
-	    
-	  } // if dR is good
-	  
-	} // loop through trailing
-	
-	if(event_type != 0) break; // if you have a pair, stop
-      } // if leading et is valid
-    } // loop through leading 
-    
-  } // if you didn't find a gg or an eg, and you still have two e's or f's
-  
   return;
 
 }
 
-void SusyEventAnalyzer::findPhotons_prioritizeEt(susy::Event& ev, vector<susy::Photon*>& candidates, int& event_type, bool doDPhiCut) {
-
-  vector<susy::Photon*> em_objects;
-  
-  map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
-  if(phoMap != event.photons.end()) {
-    
-    for(vector<susy::Photon>::iterator it = phoMap->second.begin();
-	it != phoMap->second.end(); it++) {
-      
-      if(is_egf(*it, event.rho25)) {
-	if(is_eg(*it, event.rho25) || is_f(*it, event.rho25)) {
-	  em_objects.push_back(&*it);
-	}
-      }
-      
-    } // for photon
-  } // if
-  
-  sort(em_objects.begin(), em_objects.end(), EtGreater<susy::Photon>);
-  
-  if(em_objects.size() >= 2) {
-    for(unsigned int i = 0; i < em_objects.size(); i++) {
-      
-      if(em_objects[i]->momentum.Et() > 40.0) {
-	for(unsigned int j = i + 1; j < em_objects.size(); j++) {
-	  
-	  // take all combinations except fe, ef
-	  if((is_f(*em_objects[i], event.rho25) && is_eg(*em_objects[j], event.rho25) && em_objects[j]->nPixelSeeds != 0) ||
-	     (is_f(*em_objects[j], event.rho25) && is_eg(*em_objects[i], event.rho25) && em_objects[i]->nPixelSeeds != 0)) continue;
-
-	  float dEta = em_objects[i]->caloPosition.Eta() - em_objects[j]->caloPosition.Eta();
-	  float dPhi = TVector2::Phi_mpi_pi(em_objects[i]->caloPosition.Phi() - em_objects[j]->caloPosition.Phi());
-	  float dR = sqrt(dEta*dEta + dPhi*dPhi);
-	    
-	  if(dR > 0.6 && (!doDPhiCut || fabs(dPhi) > 0.05)) {
-	      
-	    if(is_eg(*em_objects[i], event.rho25) && is_eg(*em_objects[j], event.rho25)) {
-	      if(em_objects[i]->nPixelSeeds == 0 &&
-		 em_objects[j]->nPixelSeeds == 0) event_type = cGG;
-		
-	      if(em_objects[i]->nPixelSeeds == 0 &&
-		 !(em_objects[j]->nPixelSeeds == 0)) event_type = cEG;
-		
-	      if(!(em_objects[i]->nPixelSeeds == 0) &&
-		 em_objects[j]->nPixelSeeds == 0) event_type = -1 * cEG;
-		
-	      if(!(em_objects[i]->nPixelSeeds == 0) &&
-		 !(em_objects[j]->nPixelSeeds == 0)) event_type = cEE;
-		
-	      candidates.push_back(em_objects[i]);
-	      candidates.push_back(em_objects[j]);
-	    }
-	      
-	    if(is_f(*em_objects[i], event.rho25) && is_f(*em_objects[j], event.rho25)) {
-	      event_type = cFF;
-	      candidates.push_back(em_objects[i]);
-	      candidates.push_back(em_objects[j]);
-	    }
-	      
-	    if(is_eg(*em_objects[i], event.rho25) && em_objects[i]->nPixelSeeds == 0 && is_f(*em_objects[j], event.rho25)) {
-	      event_type = cGF;
-	      candidates.push_back(em_objects[i]);
-	      candidates.push_back(em_objects[j]);
-	    }
-	      
-	    if(is_f(*em_objects[i], event.rho25) && is_eg(*em_objects[j], event.rho25) && em_objects[j]->nPixelSeeds == 0) {
-	      event_type = -1 * cGF;
-	      candidates.push_back(em_objects[i]);
-	      candidates.push_back(em_objects[j]);
-	    }
-
-	    if(is_eg(*em_objects[i], event.rho25) && !(em_objects[i]->nPixelSeeds == 0) && is_f(*em_objects[j], event.rho25)) {
-	      event_type = cEF;
-	      candidates.push_back(em_objects[i]);
-	      candidates.push_back(em_objects[j]);
-	    }
-
-	    if(is_eg(*em_objects[j], event.rho25) && !(em_objects[j]->nPixelSeeds == 0) && is_f(*em_objects[i], event.rho25)) {
-	      event_type = -1 * cEF;
-	      candidates.push_back(em_objects[i]);
-	      candidates.push_back(em_objects[j]);
-	    }
-	      
-	    if(candidates.size() == 2) break; // break out of trailing loop
-	      
-	  } // if dR is good
-	  
-	} // loop through trailing
-	
-	if(event_type != 0) break; // if you have a pair, stop
-      } // if leading et is valid
-    } // loop through leading    
-    
-  } // if at least 2 good photons
-  
-  return;
-}
-
-void SusyEventAnalyzer::findPhotons_simple(susy::Event& ev, vector<susy::Photon*>& candidates, int& event_type, int wp, bool doDPhiCut) {
-
-  vector<susy::Photon*> photons;
-  
-  map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
-  if(phoMap != event.photons.end()) {
-    
-    for(vector<susy::Photon>::iterator it = phoMap->second.begin();
-	it != phoMap->second.end(); it++) {
-      
-      if(fabs(it->caloPosition.Eta()) < 1.4442 && passCutBasedPhotonID(*it, event.rho25, wp)) photons.push_back(&*it);
-      
-    } // for photon
-  } // if
-  
-  sort(photons.begin(), photons.end(), EtGreater<susy::Photon>);
-  
-  if(photons.size() >= 2) {
-    for(unsigned int i = 0; i < photons.size(); i++) {
-      
-      if(photons[i]->momentum.Et() > 40.0) {
-	for(unsigned int j = i + 1; j < photons.size(); j++) {
-
-	  float dEta = photons[i]->caloPosition.Eta() - photons[j]->caloPosition.Eta();
-	  float dPhi = TVector2::Phi_mpi_pi(photons[i]->caloPosition.Phi() - photons[j]->caloPosition.Phi());
-	  float dR = sqrt(dEta*dEta + dPhi*dPhi);
-	    
-	  if(dR > 0.6 && (!doDPhiCut || fabs(dPhi) > 0.05)) {
-	    event_type = cGG;
-	    candidates.push_back(photons[i]);
-	    candidates.push_back(photons[j]);
-	  }
-	      
-	  if(candidates.size() == 2) break; // break out of trailing loop
-	      
-	} // loop through trailing
-	
-	if(event_type != 0) break; // if you have a pair, stop
-      } // if leading et is valid
-    } // loop through leading    
-    
-  } // if at least 2 good photons
-  
-  return;
-}
-  
-void SusyEventAnalyzer::findPhotons_fakesWithSeeds(susy::Event& ev, vector<susy::Photon*>& candidates, int& event_type, int wp, bool doDPhiCut) {
-
-  vector<susy::Photon*> photons;
-  
-  map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
-  if(phoMap != event.photons.end()) {
-    
-    for(vector<susy::Photon>::iterator it = phoMap->second.begin();
-	it != phoMap->second.end(); it++) {
-      
-      if(is_egf(*it, event.rho25) && !(it->nPixelSeeds == 0)) photons.push_back(&*it);
-
-    } // for photon
-  } // if
-  
-  sort(photons.begin(), photons.end(), EtGreater<susy::Photon>);
-  
-  if(photons.size() >= 2) {
-    for(unsigned int i = 0; i < photons.size(); i++) {
-      
-      if(photons[i]->momentum.Et() > 40.0) {
-	for(unsigned int j = i + 1; j < photons.size(); j++) {
-
-	  float dEta = photons[i]->caloPosition.Eta() - photons[j]->caloPosition.Eta();
-	  float dPhi = TVector2::Phi_mpi_pi(photons[i]->caloPosition.Phi() - photons[j]->caloPosition.Phi());
-	  float dR = sqrt(dEta*dEta + dPhi*dPhi);
-	    
-	  if(dR > 0.6 && (!doDPhiCut || fabs(dPhi) > 0.05)) {
-
-	    if(is_eg(*photons[i], event.rho25) && is_eg(*photons[j], event.rho25)) {
-	      event_type = cEE;
-	      candidates.push_back(photons[i]);
-	      candidates.push_back(photons[j]);
-	    }
-
-	    else if(is_eg(*photons[i], event.rho25) && !is_eg(*photons[j], event.rho25)) {
-	      event_type = cEF;
-	      candidates.push_back(photons[i]);
-	      candidates.push_back(photons[j]);
-	    }
-
-	    else if(!is_eg(*photons[i], event.rho25) && is_eg(*photons[j], event.rho25)) {
-	      event_type = -1 * cEF;
-	      candidates.push_back(photons[i]);
-	      candidates.push_back(photons[j]);
-	    }
-
-	    else if(!is_eg(*photons[i], event.rho25) && !is_eg(*photons[j], event.rho25)) {
-	      event_type = cFF;
-	      candidates.push_back(photons[i]);
-	      candidates.push_back(photons[j]);
-	    }
-
-	  }
-	      
-	  if(candidates.size() == 2) break; // break out of trailing loop
-	      
-	} // loop through trailing
-	
-	if(event_type != 0) break; // if you have a pair, stop
-      } // if leading et is valid
-    } // loop through leading    
-    
-  } // if at least 2 good photons
-  
-  return;
-}
-
-void SusyEventAnalyzer::findJets(susy::Event& ev, vector<susy::Photon*> candidates, 
+void SusyEventAnalyzer::findJets(susy::Event& ev, 
 				 vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
 				 vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
 				 vector<susy::PFJet*>& pfJets, vector<susy::PFJet*>& btags, 
 				 ScaleFactorInfo sf,
 				 vector<BtagInfo>& tagInfos, vector<float>& csvValues, 
 				 vector<TLorentzVector>& pfJets_corrP4, vector<TLorentzVector>& btags_corrP4, 
-				 float& HT, TLorentzVector& hadronicSystem,
-				 TH2F*& h_DR_jet_gg) {
+				 float& HT, TLorentzVector& hadronicSystem) {
 
   map<TString, susy::PFJetCollection>::iterator pfJets_it = ev.pfJets.find("ak5");
   if(pfJets_it != ev.pfJets.end()) {
@@ -778,18 +505,6 @@ void SusyEventAnalyzer::findJets(susy::Event& ev, vector<susy::Photon*> candidat
       if(!isGoodJet(*it, corrP4)) continue;
       if(JetOverlapsElectron(corrP4, isoEles, looseEles)) continue;
       if(JetOverlapsMuon(corrP4, isoMuons, looseMuons)) continue;
-
-      if(h_DR_jet_gg) h_DR_jet_gg->Fill(deltaR(corrP4, candidates[0]->caloPosition), deltaR(corrP4, candidates[1]->caloPosition));
-	  
-      bool same_candidates = false;
-      for(vector<susy::Photon*>::iterator m_it = candidates.begin();
-	  m_it != candidates.end(); m_it++) {
-	if(deltaR(corrP4, (*m_it)->caloPosition) < 0.5) {
-	  same_candidates = true;
-	  break;
-	}
-      }
-      if(same_candidates) continue;
 
       pfJets.push_back(&*it);
       csvValues.push_back(it->bTagDiscriminators[susy::kCSV]);
@@ -822,7 +537,7 @@ void SusyEventAnalyzer::findJets(susy::Event& ev, vector<susy::Photon*> candidat
 
 }
 
-void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Photon*> candidates, vector<susy::Muon*>& isoMuons, vector<susy::Muon*>& looseMuons, float& HT) {
+void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& isoMuons, vector<susy::Muon*>& looseMuons) {
 
   map<TString, vector<susy::Muon> >::iterator muMap = ev.muons.find("muons");
   if(muMap != ev.muons.end()) {
@@ -835,30 +550,18 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Photon*> candida
 		     d0correction(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]), 
 		     dZcorrection(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]))
 	 ) {
-	  
-	if(deltaR(candidates[0]->momentum, mu_it->momentum) > 0.5 &&
-	   deltaR(candidates[1]->momentum, mu_it->momentum) > 0.5) {
-	  isoMuons.push_back(&*mu_it);
-	  HT += mu_it->momentum.Pt();
-	}
-	  
+	isoMuons.push_back(&*mu_it);
       }
 
-      else if(isVetoMuon(*mu_it)) {
-	  
-	if(deltaR(candidates[0]->momentum, mu_it->momentum) > 0.5 &&
-	   deltaR(candidates[1]->momentum, mu_it->momentum) > 0.5) {
-	  looseMuons.push_back(&*mu_it);
-	  HT += mu_it->momentum.Pt();
-	}
-      }
+      else if(isVetoMuon(*mu_it)) looseMuons.push_back(&*mu_it);
 
     }
+
   }
 
 }
 
-void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Photon*> candidates, vector<susy::Electron*>& isoEles, vector<susy::Electron*>& looseEles, float& HT) {
+void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Electron*>& isoMuons, vector<susy::Electron*>& looseMuons, vector<susy::Electron*>& isoEles, vector<susy::Electron*>& looseEles) {
 
   map<TString, vector<susy::Electron> >::iterator eleMap = ev.electrons.find("gsfElectrons");
   if(eleMap != ev.electrons.end()) {
@@ -866,20 +569,58 @@ void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Photon*> can
 
       if((int)ele_it->gsfTrackIndex >= (int)(event.tracks).size() || (int)ele_it->gsfTrackIndex < 0) continue;
 
-      if(isMVAElectron(*ele_it, 
-		       event.superClusters, 
-		       event.rho25, 
-		       d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
-		       dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]))) {
+      if(isTightElectron(*ele_it, 
+			 event.superClusters, 
+			 event.rho25, 
+			 d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
+			 dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]))) {
 	
-	if(deltaR(candidates[0]->momentum, ele_it->momentum) > 0.5 &&
-	   deltaR(candidates[1]->momentum, ele_it->momentum) > 0.5) {
-	  isoEles.push_back(&*ele_it);
-	  HT += ele_it->momentum.Pt();
+	bool overlapsMuon = false;
+	
+	for(unsigned int i = 0; i < isoMuons.size(); i++) {
+	  if(deltaR(isoMuons[i]->momentum, ele_it->momentum) <= 0.5) {
+	    overlapsMuon = true;
+	    break;
+	  }
 	}
-	 	  
+
+	for(unsigned int i = 0; i < looseMuons.size(); i++) {
+	  if(deltaR(looseMuons[i]->momentum, ele_it->momentum) <= 0.5) {
+	    overlapsMuon = true;
+	    break;
+	  }
+	}
+
+	if(!overlapsMuon) isoEles.push_back(&*ele_it);
+
       }
 
+      else if(isLooseElectron(*ele_it,
+			      event.superClusters, 
+			      event.rho25, 
+			      d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
+			      dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]))) {	 
+
+	bool overlapsMuon = false;
+	
+	for(unsigned int i = 0; i < isoMuons.size(); i++) {
+	  if(deltaR(isoMuons[i]->momentum, ele_it->momentum) <= 0.5) {
+	    overlapsMuon = true;
+	    break;
+	  }
+	}
+
+	for(unsigned int i = 0; i < looseMuons.size(); i++) {
+	  if(deltaR(looseMuons[i]->momentum, ele_it->momentum) <= 0.5) {
+	    overlapsMuon = true;
+	    break;
+	  }
+	}
+
+	if(!overlapsMuon) looseEles.push_back(&*ele_it);
+	
+      }
+     
     }
   }
 

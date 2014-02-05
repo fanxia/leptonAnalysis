@@ -11,15 +11,15 @@ using namespace std;
 
 enum eventTypes {cNothing, cGG, cEG, cEE, cFF, cGF, cEF};
 
-const int nCategories = 6;
-TString categories[nCategories] = {"gg", "eg", "ff", "gf", "ee", "ef"};
-const int nChannels = 8;
+const int nCategories = 3;
+TString categories[nCategories] = {"gg", "ff", "gf"};
+const int nChannels = 2;
 
-TString channels[nChannels] = {"nojet", "j", "b", "jj", "bj", "muJets", "eleJets", "hadronic"};
-unsigned int nJetReq[nChannels] = {0, 1, 1, 2, 2, 2, 2, 4};
-unsigned int nBtagReq[nChannels] = {0, 0, 1, 0, 1, 1, 1, 1};
-int nEleReq[nChannels] = {-1, -1, -1, -1, -1, 0, 1, 0};
-int nMuonReq[nChannels] = {-1, -1, -1, -1, -1, 1, 0, 0};
+TString channels[nChannels] = {"ele", "muon"};
+unsigned int nJetReq[nChannels] = {0, 0};
+unsigned int nBtagReq[nChannels] = {0, 0};
+int nEleReq[nChannels] = {1, -1};
+int nMuonReq[nChannels] = {-1, 1};
 
 typedef std::vector<std::vector<TH1F*> > VTH1F;
 typedef std::vector<std::vector<TH2F*> > VTH2F;

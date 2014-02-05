@@ -114,7 +114,7 @@ bool passCutBasedPhotonID(susy::Photon gamma, float rho, int point) {
 bool is_egf(susy::Photon gamma, float rho) {
 
   if(fabs(gamma.caloPosition.Eta()) < 1.4442 &&
-     gamma.momentum.Et() > 25.0 &&
+     gamma.momentum.Et() > 20.0 &&
      gamma.hadTowOverEm < 0.05 &&
      neutralHadronIso_corrected(gamma, rho) < 3.5 + 0.04*gamma.momentum.Pt() &&
      photonIso_corrected(gamma, rho) < 1.3 + 0.005*gamma.momentum.Pt() &&

@@ -44,9 +44,6 @@ void ana_signal(TString scan = "stop-bino", TString discriminant = "CSVM", bool 
   if(scan == "stop-bino") sprintf(input_file, "dcap:///pnfs/cms/WAX/resilient/bfrancis/SusyNtuples/cms538v1/naturalBinoNLSP/tree_naturalBinoNLSPout_mst_%d_M3_5050_M1_%d.root", index1, index2);
   else if(scan == "stop-bino extended") sprintf(input_file, "/eos/uscms/store/user/lpcpjm/PrivateMC/FastSim/533p3_full/naturalBinoNLSP_try3/SusyNtuple/cms533v1_v1/tree_naturalBinoNLSPout_mst_%d_M3_5025_M1_%d.root", index1, index2);
 
-  //sprintf(input_file, "/eos/uscms/store/user/lpcpjm/PrivateMC/FastSim/525p1v3/Spectra_gsq_B/SusyNtuple/cms533v1_v1/tree_%d_%d_375.root", index1, index2);
-  //sprintf(input_file, "/eos/uscms/store/user/lpcpjm/PrivateMC/FastSim/525p1/Spectra_gsq_W/SusyNtuple/cms525v2_v1/tree_%d_%d_375.root", index1, index2);
-
   cout << "input_file = " << input_file << endl;
 
   chain.Add(input_file);
@@ -66,28 +63,20 @@ void ana_signal(TString scan = "stop-bino", TString discriminant = "CSVM", bool 
   sea->SetPrintLevel(0);
   sea->SetUseTrigger(true);
 
-  std::vector<TString> eg_names;
-  eg_names.push_back("HLT_Photon36_CaloId10_Iso50_Photon22_CaloId10_Iso50");
-  std::vector<int> eg_types;
-  eg_types.push_back(1);
-  eg_types.push_back(2);
-  eg_types.push_back(3);
-  sea->AddHlt(eg_names, eg_types);
+  std::vector<TString> ele_trigger;
+  ele_trigger.push_back("HLT_Ele27_WP80_v");
+  std::vector<int> ele_type;
+  ele_type.push_back(1);
+  sea->AddHlt(ele_trigger, ele_type);
 
-  std::vector<TString> f_names;
-  f_names.push_back("HLT_Photon36_CaloId10_Iso50_Photon22_CaloId10_Iso50");
-  f_names.push_back("HLT_Photon36_CaloId10_Iso50_Photon22_R9Id85");
-  f_names.push_back("HLT_Photon36_R9Id85_Photon22_CaloId10_Iso50");
-  f_names.push_back("HLT_Photon36_R9Id85_Photon22_R9Id85");
-  std::vector<int> f_types;
-  f_types.push_back(4);
-  f_types.push_back(5);
-  f_types.push_back(6);
-  sea->AddHlt(f_names, f_types);
-
+  std::vector<TString> mu_trigger;
+  mu_trigger.push_back("HLT_IsoMu24_eta2p1_v");
+  std::vector<int> mu_type;
+  mu_type.push_back(2);
+  sea->AddHlt(mu_trigger, mu_type);
+  
   sea->SetProcessNEvents(-1);
 
-  //sea->IncludeAJson("combinedJSON_jun1.json");
   sea->SetUseJson(false);
 
   sea->SetIsMC(isMC);
@@ -124,10 +113,6 @@ void ana_signal(TString scan = "stop-bino", TString discriminant = "CSVM", bool 
   sea->CalculateBtagEfficiency();
   std::cout << std::endl << "Acceptance()" << std::endl;
   sea->Acceptance();
-  //std::cout << std::endl << "SignalContent_gg()" << std::endl;
-  //sea->SignalContent_gg();
-
-  //sea->Step0();
 
   ts.Stop();
 
