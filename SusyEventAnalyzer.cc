@@ -2114,7 +2114,7 @@ void SusyEventAnalyzer::ttggStudy() {
 }
 
 void SusyEventAnalyzer::SignalContent_gg() {
-
+  /*
   char * tmp = getenv("CONDOR_SECTION");
   cout << "tmp = " << tmp << endl;
   int index = atoi(tmp);
@@ -2695,7 +2695,7 @@ void SusyEventAnalyzer::SignalContent_gg() {
   out->Write();
   out->Close();
 
-  
+  */
 }
 
 void SusyEventAnalyzer::PhotonInfo() {
