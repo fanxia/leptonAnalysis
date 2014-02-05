@@ -141,38 +141,40 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
     int nPVertex = GetNumberPV(event);
     if(nPVertex == 0) continue;
 
-    findPhotons_prioritizeCount(event, candidate_pair, event_type, useDPhiCut);
-    //findPhotons_prioritizeEt(event, candidate_pair, event_type, useDPhiCut);
-    //findPhotons_simple(event, candidate_pair, event_type, 0, useDPhiCut); // 0 (L), 1 (M), 2 (T)
-
-    if(event_type != 1) {
-      nCnt[28][0]++;
-      continue;
-    }
-
     float HT = 0.;
+
+    findMuons(event, isoMuons, looseMuons, HT);
+    findElectrons(event, isoMuons, looseMuons, isoEles, looseEles, HT);
+
+    if(isoMuons.size() + isoEles.size() != 1) continue;
+
+    bool passHLT = true;
+    if(useTrigger) {
+      if(isoEles.size() == 1) passHLT = PassTriggers(1);
+      else if(isoMuons.size() == 1) passHLT = PassTriggers(2);
+    }
+    if(!passHLT) continue;
+
+    findPhotons(event, 
+		photons,
+		isoMuons, looseMuons,
+		isoEles, looseEles,
+		HT);
+
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
 
-    findMuons(event, candidate_pair, isoMuons, looseMuons, HT);
-    findElectrons(event, candidate_pair, isoEles, looseEles, HT);
-    findJets(event, candidate_pair,
+    findJets(event, 
+	     photons,
 	     isoMuons, looseMuons,
 	     isoEles, looseEles,
 	     pfJets, btags,
 	     sf,
 	     tagInfos, csvValues, 
 	     pfJets_corrP4, btags_corrP4, 
-	     HT, hadronicSystem,
-	     h_DR_jet_gg);
-
-    HT += candidate_pair[0]->momentum.Pt();
-    HT += candidate_pair[1]->momentum.Pt();
+	     HT_jets_, hadronicSystem);
 
     ////////////////////
 
-    bool passHLT = useTrigger ? PassTriggers(4) : true;
-    if(!passHLT) {nCnt[36][0]++;continue;}
-	
     for(unsigned int iJet = 0; iJet < pfJets.size(); iJet++) {
       map<TString, Float_t>::iterator s_it = pfJets[iJet]->jecScaleFactors.find("L1FastL2L3");
       if(s_it == pfJets[iJet]->jecScaleFactors.end()) {
@@ -1539,7 +1541,7 @@ void SusyEventAnalyzer::Acceptance() {
 	     pfJets_corrP4, btags_corrP4, 
 	     HT_jets_, hadronicSystem);
 
-    HT_ = HT + HT_jets_; // wrong
+    HT_ = HT + HT_jets_;
     hadronic_pt_ = hadronicSystem.Pt();
 
     max_csv_ = (csvValues.size() >= 1) ? csvValues[0] : -1.;
