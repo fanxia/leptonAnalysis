@@ -1363,7 +1363,7 @@ void SusyEventAnalyzer::Acceptance() {
   float trailMVAregErr_ = 0.;
 
   vector<TTree*> eventTrees;
-  for(int i = 0; i < nEleChannels; i++) {
+  for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree("gg_"+channels[i]+"_EvtTree"+output_code_t, "An event tree for final analysis");
     tree->Branch("pfMET", &pfMET_, "pfMET_/F");
     tree->Branch("pfMET_x", &pfMET_x_, "pfMET_x_/F");
@@ -1528,7 +1528,7 @@ void SusyEventAnalyzer::Acceptance() {
 		isoEles, looseEles,
 		HT);
 
-    nPhotons_ = photons.size();
+    Nphotons_ = photons.size();
 
     HT_jets_ = 0.;
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
@@ -1595,8 +1595,6 @@ void SusyEventAnalyzer::Acceptance() {
     pfMVAMET_    = pfMVAMet->met();
     genMET_      = genMet->met();
 
-    diEMpT_ = (candidate_pair[0]->momentum + candidate_pair[1]->momentum).Pt();
-
     // Transverse W mass
     if(isoEles.size() == 1 && isoMuons.size() == 0) {
       float metphi = (pfMet->mEt - sysShiftCorr).Phi();
@@ -1616,13 +1614,13 @@ void SusyEventAnalyzer::Acceptance() {
     }
     else w_mT_ = -1.;
 
-    isoEle_pt_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Pt() : -1.;
-    isoEle_phi_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Phi() : -10.;
-    isoEle_eta_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Eta() : -10.;
+    ele_pt_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Pt() : -1.;
+    ele_phi_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Phi() : -10.;
+    ele_eta_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Eta() : -10.;
 
-    isoMuon_pt_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Pt() : -1.;
-    isoMuon_phi_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Phi() : -10.;
-    isoMuon_eta_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Eta() : -10.;
+    muon_pt_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Pt() : -1.;
+    muon_phi_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Phi() : -10.;
+    muon_eta_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Eta() : -10.;
 
     lead_Et_ = (photons.size() > 0) ? photons[0]->momentum.Et() : -1.;
     lead_Eta_ = (photons.size() > 0) ? photons[0]->momentum.Eta() : -1.;
@@ -1638,6 +1636,8 @@ void SusyEventAnalyzer::Acceptance() {
     trailMVAregEnergy_ = (photons.size() > 1) ? photons[1]->MVAregEnergy : -1.;
     trailMVAregErr_ = (photons.size() > 1) ? photons[1]->MVAregErr : -1.;
 
+    diEMpT_ = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).Pt() : -1.;
+
     float dEta_ = (photons.size() > 1) ? photons[0]->caloPosition.Eta() - photons[1]->caloPosition.Eta() : -100;
     photon_dPhi_ = (photons.size() > 1) ? TVector2::Phi_mpi_pi(photons[0]->caloPosition.Phi() - photons[1]->caloPosition.Phi()) : -100;
     photon_dR_ = (photons.size() > 1) ? sqrt(dEta_*dEta_ + photon_dPhi_*photon_dPhi_) : -100;
@@ -1647,7 +1647,7 @@ void SusyEventAnalyzer::Acceptance() {
     lead_sIetaIeta_ = (photons.size() > 0) ? photons[0]->sigmaIetaIeta : -10;
     trail_sIetaIeta_ = (photons.size() > 1) ? photons[1]->sigmaIetaIeta : -10;
 
-    invmass_ = (photons.size() > 1) ? (candidate_pair[0]->momentum + candidate_pair[1]->momentum).M() : -10;
+    photon_invmass_ = (photons.size() > 1) ? (candidate_pair[0]->momentum + candidate_pair[1]->momentum).M() : -10;
 
     Njets_ = pfJets.size();
     Nbtags_ = btags.size();
@@ -1712,7 +1712,7 @@ void SusyEventAnalyzer::Acceptance() {
 // lepton veto in hadronic mode
 
 void SusyEventAnalyzer::ttggStudy() {
-
+  /*
   const int NCNT = 50;
   int nCnt[NCNT][nChannels];
   for(int i = 0; i < NCNT; i++) {
@@ -2109,6 +2109,7 @@ void SusyEventAnalyzer::ttggStudy() {
 
   out->Write();
   out->Close();
+  */
 
 }
 
@@ -2698,7 +2699,7 @@ void SusyEventAnalyzer::SignalContent_gg() {
 }
 
 void SusyEventAnalyzer::PhotonInfo() {
-
+  /*
   const int NCNT = 50;
   int nCnt[NCNT][nChannels];
   for(int i = 0; i < NCNT; i++) {
@@ -2948,5 +2949,5 @@ void SusyEventAnalyzer::PhotonInfo() {
   out->cd();
   out->Write();
   out->Close();
-
+  */
 }
