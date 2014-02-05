@@ -1647,7 +1647,7 @@ void SusyEventAnalyzer::Acceptance() {
     lead_sIetaIeta_ = (photons.size() > 0) ? photons[0]->sigmaIetaIeta : -10;
     trail_sIetaIeta_ = (photons.size() > 1) ? photons[1]->sigmaIetaIeta : -10;
 
-    photon_invmass_ = (photons.size() > 1) ? (candidate_pair[0]->momentum + candidate_pair[1]->momentum).M() : -10;
+    photon_invmass_ = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).M() : -10;
 
     Njets_ = pfJets.size();
     Nbtags_ = btags.size();
