@@ -1614,8 +1614,6 @@ void SusyEventAnalyzer::Acceptance() {
 
 	}
 
-      
-
       w_mT_genNeutrino_ = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - genNu_phi));
       w_mT_genNeutrino_ *= 2. * genNu_pt * pfMET_sysShift_;
       w_mT_genNeutrino_ = sqrt(w_mT_genNeutrino_);

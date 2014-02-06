@@ -431,7 +431,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
     for(vector<susy::Photon>::iterator it = phoMap->second.begin();
 	it != phoMap->second.end(); it++) {
       
-      if(is_egf(*it, event.rho25)) {
+      if(is_eg(*it, event.rho25) && it->nPixelSeeds == 0) {
 
 	bool overlap = false;
 	

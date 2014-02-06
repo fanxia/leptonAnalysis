@@ -28,24 +28,17 @@ void ana_mc(TString scan = "DATASETNAME", TString discriminant = "CSVM", bool is
   sea->SetPrintInterval(1e4);             // print frequency
   sea->SetPrintLevel(0);                  // print level for event contents
 
-  std::vector<TString> eg_names;
-  eg_names.push_back("HLT_Photon36_CaloId10_Iso50_Photon22_CaloId10_Iso50_v");
-  std::vector<int> eg_types;
-  eg_types.push_back(1);
-  eg_types.push_back(2);
-  eg_types.push_back(3);
-  sea->AddHlt(eg_names, eg_types);
+  std::vector<TString> ele_trigger;
+  ele_trigger.push_back("HLT_Ele27_WP80_v");
+  std::vector<int> ele_type;
+  ele_type.push_back(1);
+  sea->AddHlt(ele_trigger, ele_type);
 
-  std::vector<TString> f_names;
-  f_names.push_back("HLT_Photon36_CaloId10_Iso50_Photon22_CaloId10_Iso50_v");
-  f_names.push_back("HLT_Photon36_CaloId10_Iso50_Photon22_R9Id85_v");
-  f_names.push_back("HLT_Photon36_R9Id85_Photon22_CaloId10_Iso50_v");
-  f_names.push_back("HLT_Photon36_R9Id85_Photon22_R9Id85_v");
-  std::vector<int> f_types;
-  f_types.push_back(4);
-  f_types.push_back(5);
-  f_types.push_back(6);
-  sea->AddHlt(f_names, f_types);
+  std::vector<TString> mu_trigger;
+  mu_trigger.push_back("HLT_IsoMu24_eta2p1_v");
+  std::vector<int> mu_type;
+  mu_type.push_back(2);
+  sea->AddHlt(mu_trigger, mu_type);
 
   sea->SetUseTrigger(true);
 
@@ -59,7 +52,7 @@ void ana_mc(TString scan = "DATASETNAME", TString discriminant = "CSVM", bool is
   sea->SetDoBtagScaling(false);
   sea->SetBtagTechnicalStop("ABCD");  
 
-  sea->SetRejectFakeElectrons(true);
+  sea->SetRejectFakeElectrons(false);
 
   sea->SetUseSyncFile(false);
   //sea->IncludeSyncFile("synchro/dmorse_ff.txt_not_brian_ff_nojet.txt");

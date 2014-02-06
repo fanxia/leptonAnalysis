@@ -4,7 +4,7 @@ bool isGoodJet(susy::PFJet jet, TLorentzVector corrP4) {
   
   bool isGood = false;
 
-  if((corrP4.Pt() > 30.0) && (fabs(corrP4.Eta()) < 2.6)) { // STUDY BOTH OF THESE
+  if((corrP4.Pt() > 30.0) && (fabs(corrP4.Eta()) < 2.4)) { // STUDY BOTH OF THESE
 
     if((jet.neutralHadronEnergy/jet.momentum.Energy() < 0.99) &&
        (jet.neutralEmEnergy/jet.momentum.Energy() < 0.99) &&
