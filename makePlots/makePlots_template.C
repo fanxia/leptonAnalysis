@@ -1,25 +1,23 @@
 void makePlots() {
 
-  gROOT->LoadMacro("analyze.C+");
+  gROOT->LoadMacro("analyze_mc.C+");
 
   TStopwatch ts;
   ts.Start();
 
   TString input = "FILE_TO_RUN";
   bool addMC = true;
-  TString intLumi = "19.7";
-  int intLumi_int = 19.712;
-  
-  bool useFF = true;
-  bool useDifferenceSystematic = false;
+  int intLumi = 19712; // quote to 19.7
 
   double metCut = -1.;
 
+  bool useTTbar = false;
+  bool useTTMBD = false;
   bool displayKStest = true;
+  bool blinded = true;
 
   for(int i = 0; i < 8; i++) {
-    mvaTreeMaker(input, i);
-    analyze(input, addMC, i, intLumi, intLumi_int, useFF, useDifferenceSystematic, metCut, displayKStest);
+    analyze(input, addMC, i, intLumi, metCut, useTTbar, useTTMBD, displayKStest, blinded);
   }  
 
   ts.Stop();
