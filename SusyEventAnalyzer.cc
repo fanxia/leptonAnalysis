@@ -1389,17 +1389,10 @@ void SusyEventAnalyzer::Acceptance() {
     }
     if(!passHLT) continue;
 
-    findPhotons(event, 
-		photons,
-		isoMuons, looseMuons,
-		isoEles, looseEles,
-		HT);
-
     float HT_jets = 0.;
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
 
     findJets(event, 
-	     photons,
 	     isoMuons, looseMuons,
 	     isoEles, looseEles,
 	     pfJets, btags,
@@ -1407,6 +1400,13 @@ void SusyEventAnalyzer::Acceptance() {
 	     tagInfos, csvValues, 
 	     pfJets_corrP4, btags_corrP4, 
 	     HT_jets, hadronicSystem);
+
+    findPhotons(event, 
+		photons,
+		pfJets_corrP4,
+		isoMuons, looseMuons,
+		isoEles, looseEles,
+		HT);
 
     float btagWeight[nChannels];
     float btagWeightUp[nChannels];

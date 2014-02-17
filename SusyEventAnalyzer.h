@@ -136,11 +136,11 @@ class SusyEventAnalyzer {
 		     float& HT);
   void findPhotons(susy::Event& ev, 
 		   vector<susy::Photon*>& photons,
+		   vector<TLorentzVector>& pfJets_corrP4,
 		   vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
 		   vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
 		   float& HT);
   void findJets(susy::Event& ev, 
-		vector<susy::Photon*> photons,
 		vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
 		vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
 		vector<susy::PFJet*>& pfJets, vector<susy::PFJet*>& btags, 
@@ -434,6 +434,7 @@ double SusyEventAnalyzer::dZcorrection(TVector3& beamSpot, susy::Track& track) c
 
 void SusyEventAnalyzer::findPhotons(susy::Event& ev, 
 				    vector<susy::Photon*>& photons,
+				    vector<TLorentzVector>& pfJets_corrP4,
 				    vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
 				    vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
 				    float& HT) {
@@ -443,16 +444,25 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
     for(vector<susy::Photon>::iterator it = phoMap->second.begin();
 	it != phoMap->second.end(); it++) {
       
-      if(is_eg(*it, event.rho25) && it->nPixelSeeds == 0) {
+      if(is_egf(*it, event.rho25) && it->passelectronveto) {
 
 	bool overlap = false;
 	
+	for(unsigned int k = 0; k < pfJets_corrP4.size(); k++) {
+	  if(deltaR(pfJets_corrP4[i], it->caloPosition) < 0.5) {
+	    overlap = true;
+	    break;
+	  }
+	}
+	if(overlap) continue;
+
 	for(unsigned int i = 0; i < isoMuons.size(); i++) {
 	  if(deltaR(isoMuons[i]->momentum, it->caloPosition) <= 0.5) {
 	    overlap = true;
 	    break;
 	  }
 	}
+	if(overlap) continue;
 
 	for(unsigned int i = 0; i < looseMuons.size(); i++) {
 	  if(deltaR(looseMuons[i]->momentum, it->caloPosition) <= 0.5) {
@@ -460,6 +470,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 	    break;
 	  }
 	}
+	if(overlap) continue;
 
 	for(unsigned int i = 0; i < isoEles.size(); i++) {
 	  if(deltaR(isoEles[i]->momentum, it->caloPosition) <= 0.5) {
@@ -467,14 +478,14 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 	    break;
 	  }
 	}
-
+	if(overlap) continue;
+	
 	for(unsigned int i = 0; i < looseEles.size(); i++) {
 	  if(deltaR(looseEles[i]->momentum, it->caloPosition) <= 0.5) {
 	    overlap = true;
 	    break;
 	  }
 	}
-
 	if(overlap) continue;
 
 	photons.push_back(&*it);
@@ -492,7 +503,6 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 }
 
 void SusyEventAnalyzer::findJets(susy::Event& ev,
-				 vector<susy::Photon*> photons,
 				 vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
 				 vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
 				 vector<susy::PFJet*>& pfJets, vector<susy::PFJet*>& btags, 
@@ -516,16 +526,6 @@ void SusyEventAnalyzer::findJets(susy::Event& ev,
       if(!isGoodJet(*it, corrP4)) continue;
       if(JetOverlapsElectron(corrP4, isoEles, looseEles)) continue;
       if(JetOverlapsMuon(corrP4, isoMuons, looseMuons)) continue;
-
-      bool same_photons = false;
-      for(vector<susy::Photon*>::iterator m_it = photons.begin();
-          m_it != photons.end(); m_it++) {
-        if(deltaR(corrP4, (*m_it)->caloPosition) < 0.5) {
-          same_photons = true;
-          break;
-        }
-      }
-      if(same_photons) continue;
 
       pfJets.push_back(&*it);
       csvValues.push_back(it->bTagDiscriminators[susy::kCSV]);
