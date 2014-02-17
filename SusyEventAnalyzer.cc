@@ -1282,11 +1282,6 @@ void SusyEventAnalyzer::Acceptance() {
   TFile * out = new TFile("signal_contamination"+output_code_t+".root", "RECREATE");
   out->cd();
 
-  TH2F * h_dR_ele_gamma = new TH2F("dR_ele_gamma", "#DeltaR between gsf electrons and lead/trailing #gamma#gamma candidates;#DeltaR_{lead #gamma, ele};#DeltaR_{trail #gamma, ele}", 50, 0, 5, 50, 0, 5);
-  TH2F * h_dR_mu_gamma = new TH2F("dR_mu_gamma", "#DeltaR between muons and lead/trailing #gamma#gamma candidates;#DeltaR_{lead #gamma, #mu};#DeltaR_{trail #gamma, #mu}", 50, 0, 5, 50, 0, 5);
-
-  TH2F * h_DR_jet_gg = new TH2F("DR_jet_gg", "#DeltaR between jets and lead/trailing #gamma#gamma candidates;#DeltaR_{lead #gamma, jet};#DeltaR_{trail #gamma, jet}", 50, 0, 5, 50, 0, 5);
-
   const int nTreeVariables = 68;
 
   TString varNames[nTreeVariables] = {
@@ -1385,6 +1380,7 @@ void SusyEventAnalyzer::Acceptance() {
     findElectrons(event, isoMuons, looseMuons, isoEles, looseEles, HT);
     
     if(isoMuons.size() + isoEles.size() != 1) continue;
+    if(looseMuons.size() + looseEles.size() != 0) continue;
 
     bool passHLT = true;
     if(useTrigger) {
