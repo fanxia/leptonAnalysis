@@ -156,12 +156,12 @@ class SusyEventAnalyzer {
   void SetTreeValues(map<TString, float>& treeMap,
 		     susy::Event& event,
 		     vector<susy::Muon*> isoMuons, vector<susy::Electron*> isoEles, 
-		     vector<susy::PFJet*> pfJets, vector<susy::PFJet*>, btags,
+		     vector<susy::PFJet*> pfJets, vector<susy::PFJet*> btags,
 		     vector<susy::Photon*> photons,
 		     vector<TLorentzVector> pfJets_corrP4, vector<TLorentzVector> btags_corrP4,
 		     vector<float> csvValues,
 		     TLorentzVector hadronicSystem,
-		     float HT, float HT_jets
+		     float HT, float HT_jets,
 		     int nPVertex,
 		     float eventWeight, float eventWeightErr);
 
@@ -819,12 +819,12 @@ int SusyEventAnalyzer::FigureTTbarDecayMode(susy::Event& ev) {
 void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 				      susy::Event& event,
 				      vector<susy::Muon*> isoMuons, vector<susy::Electron*> isoEles, 
-				      vector<susy::PFJet*> pfJets, vector<susy::PFJet*>, btags,
+				      vector<susy::PFJet*> pfJets, vector<susy::PFJet*> btags,
 				      vector<susy::Photon*> photons,
 				      vector<TLorentzVector> pfJets_corrP4, vector<TLorentzVector> btags_corrP4,
 				      vector<float> csvValues,
 				      TLorentzVector hadronicSystem,
-				      float HT, float HT_jets
+				      float HT, float HT_jets,
 				      int nPVertex,
 				      float eventWeight, float eventWeightErr) {
 
@@ -966,7 +966,6 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   
   float diJetPt, lead_matched_jetpt, trail_matched_jetpt;
   bool matchingWorked = (photons.size() > 1 && GetDiJetPt(event, photons, diJetPt, lead_matched_jetpt, trail_matched_jetpt));
-  if(!matchingWorked) nCnt[46][0]++;
   treeMap["diJetPt"] = diJetPt;
   
   float dEta = (photons.size() > 1) ? photons[0]->caloPosition.Eta() - photons[1]->caloPosition.Eta() : -100;
