@@ -155,16 +155,9 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
     }
     if(!passHLT) continue;
 
-    findPhotons(event, 
-		photons,
-		isoMuons, looseMuons,
-		isoEles, looseEles,
-		HT);
-
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
 
     findJets(event, 
-	     photons,
 	     isoMuons, looseMuons,
 	     isoEles, looseEles,
 	     pfJets, btags,
@@ -172,6 +165,13 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
 	     tagInfos, csvValues, 
 	     pfJets_corrP4, btags_corrP4, 
 	     HT, hadronicSystem);
+
+    findPhotons(event, 
+		photons,
+		pfJets_corrP4,
+		isoMuons, looseMuons,
+		isoEles, looseEles,
+		HT);
 
     ////////////////////
 
