@@ -449,7 +449,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 	bool overlap = false;
 	
 	for(unsigned int k = 0; k < pfJets_corrP4.size(); k++) {
-	  if(deltaR(pfJets_corrP4[i], it->caloPosition) < 0.5) {
+	  if(deltaR(pfJets_corrP4[k], it->caloPosition) < 0.5) {
 	    overlap = true;
 	    break;
 	  }
