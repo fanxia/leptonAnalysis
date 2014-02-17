@@ -1437,7 +1437,7 @@ void SusyEventAnalyzer::Acceptance() {
 		  pfJets_corrP4, btags_corrP4,
 		  csvValues,
 		  hadronicSystem,
-		  HT, HT_jets
+		  HT, HT_jets,
 		  nPVertex,
 		  eventWeight, eventWeightErr);
 

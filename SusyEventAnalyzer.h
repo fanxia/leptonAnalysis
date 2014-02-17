@@ -899,11 +899,11 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     }
     
     float w_mT_genNeutrino = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - genNu_phi));
-    w_mT_genNeutrino *= 2. * genNu_pt * pfMET_sysShift_;
+    w_mT_genNeutrino *= 2. * genNu_pt * treeMap["pfMET_sysShift"];
     treeMap["w_mT_genNeutrino"] = sqrt(w_mT_genNeutrino);
     
     float w_mT = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
-    w_mT *= 2. * isoEles[0]->momentum.Pt() * pfMET_sysShift_;
+    w_mT *= 2. * isoEles[0]->momentum.Pt() * treeMap["pfMET_sysShift"];
     treeMap["w_mT"] = sqrt(w_mT);
   }
   else if(isoEles.size() == 0 && isoMuons.size() == 1) {
@@ -923,11 +923,11 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     }
     
     float w_mT_genNeutrino = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - genNu_phi));
-    w_mT_genNeutrino *= 2. * genNu_pt * pfMET_sysShift_;
+    w_mT_genNeutrino *= 2. * genNu_pt * treeMap["pfMET_sysShift"];
     treeMap["w_mT_genNeutrino"] = sqrt(w_mT_genNeutrino);
     
     float w_mT = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
-    w_mT *= 2. * isoMuons[0]->momentum.Pt() * pfMET_sysShift_;
+    w_mT *= 2. * isoMuons[0]->momentum.Pt() * treeMap["pfMET_sysShift"];
     treeMap["w_mT"] = sqrt(w_mT);
   }
   else {
