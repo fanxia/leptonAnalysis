@@ -325,7 +325,7 @@ void SusyEventAnalyzer::Data() {
 
   vector<TTree*> eventTrees;
   for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree("gg_"+channels[i]+"_EvtTree"+output_code_t, "An event tree for final analysis");
+    TTree * tree = new TTree("gg_"+channels[i]+"_EvtTree", "An event tree for final analysis");
     
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
 
@@ -449,7 +449,7 @@ void SusyEventAnalyzer::Data() {
 		  hadronicSystem,
 		  HT, HT_jets,
 		  nPVertex,
-		  eventWeight, eventWeightErr,
+		  0, 0,
 		  jentry);
 
     ////////////////////
