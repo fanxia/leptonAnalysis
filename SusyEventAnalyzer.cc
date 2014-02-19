@@ -419,10 +419,10 @@ void SusyEventAnalyzer::Data() {
       continue;
     }
 
-    bool passHLT = useTrigger;
+    bool passHLT = true;
     if(useTrigger) {
-      if(isoEles.size() == 1) passHLT &= PassTriggers(1);
-      else if(isoMuons.size() == 1) passHLT &= PassTriggers(2);
+      if(isoEles.size() == 1) passHLT = PassTriggers(1);
+      else if(isoMuons.size() == 1) passHLT = PassTriggers(2);
     }
     if(!passHLT) {
       nCnt[25][0]++;
