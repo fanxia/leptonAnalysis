@@ -669,7 +669,8 @@ void SusyEventAnalyzer::Acceptance() {
 		  hadronicSystem,
 		  HT, HT_jets,
 		  nPVertex,
-		  eventWeight, eventWeightErr);
+		  eventWeight, eventWeightErr,
+		  0);
 
     ////////////////////
 
