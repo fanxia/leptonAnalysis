@@ -230,7 +230,7 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
 }
 
 void SusyEventAnalyzer::Data() {
-  /*
+
   TFile* out = new TFile("hist_"+outputName+"_"+btagger+".root", "RECREATE");
   out->cd();
 
@@ -300,552 +300,38 @@ void SusyEventAnalyzer::Data() {
   // Reweighting trees
   /////////////////////////////////
 
-  float pfMET_ = 0.;
-  float pfMET_x_ = 0.;
-  float pfMET_y_ = 0.;
-  float pfMET_phi_ = 0.;
-  float pfMET_sysShift_ = 0.;
-  float pfMET_sysShift_phi_ = 0.;
-  float pfMET_t1_ = 0.;
-  float pfMET_t1p2_ = 0.;
-  float pfMET_t01_ = 0.;
-  float pfMET_t01p2_ = 0.;
-  float pfNoPUMET_ = 0.;
-  float pfMVAMET_ = 0.;
-  float diEMpT_ = 0.;
-  float diJetPt_ = 0.;
-  int Njets_ = 0;
-  int Nbtags_ = 0;
-  int Nelectrons_ = 0;
-  int Nmuons_ = 0;
-  float isoEle_pt_ = 0.;
-  float isoEle_phi_ = 0.;
-  float isoEle_eta_ = 0.;
-  float isoMuon_pt_ = 0.;
-  float isoMuon_phi_ = 0.;
-  float isoMuon_eta_ = 0.;
-  float invmass_ = 0.;
-  float HT_ = 0.;
-  float HT_jets_ = 0.;
-  float hadronic_pt_ = 0.;
-  float minDPhi_gMET_ = 0;
-  float minDPhi_jMET_ = 0;
-  float lead_Et_ = 0;
-  float trail_Et_ = 0;
-  float lead_Eta_ = 0;
-  float trail_Eta_ = 0;
-  float lead_Phi_ = 0;
-  float trail_Phi_ = 0;
+  const int nTreeVariables = 63;
 
-  float w_mT_ = 0.;
-
-  float lead_matched_jetpt_ = 0;
-  float trail_matched_jetpt_ = 0;
-
-  float leadptOverInvmass_ = 0;
-  float trailptOverInvmass_ = 0;
-
-  float lead_chHadIso_ = 0;
-  float trail_chHadIso_ = 0;
-  float lead_sIetaIeta_ = 0;
-  float trail_sIetaIeta_ = 0;
-
-  int nPV_ = 0;
-  float photon_dR_ = 0;
-  float photon_dPhi_ = 0;
-
-  float jet1_pt_ = -1;
-  float jet2_pt_ = -1;
-  float jet3_pt_ = -1;
-  float jet4_pt_ = -1;
-
-  float btag1_pt_ = -1;
-  float btag2_pt_ = -1;
-
-  float max_csv_ = -1;
-  float submax_csv_ = -1;
-  float min_csv_ = 10;
-
-  float minDR_leadPhoton_jets_ = -1;
-  float minDR_trailPhoton_jets_ = -1;
-
-  int runNumber_ = 0;
-  ULong_t eventNumber_ = 0;
-  int lumiBlock_ = 0;
-  Long64_t jentry_ = 0;
-
-  float dimuon_invmass_ = 0.;
-  float diphodimu_invmass_ = 0;
-
-  Int_t metFilterBit_ = 0;
-
-  float leadMVAregEnergy_ = 0.;
-  float leadMVAregErr_ = 0.;
-  float trailMVAregEnergy_ = 0.;
-  float trailMVAregErr_ = 0.;
-  
-  vector<TTree*> ffTrees;
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree("ff_"+channels[i]+"_EvtTree", "An event tree for final analysis");
-    tree->Branch("pfMET", &pfMET_, "pfMET_/F");
-    tree->Branch("pfMET_x", &pfMET_x_, "pfMET_x_/F");
-    tree->Branch("pfMET_y", &pfMET_y_, "pfMET_y_/F");
-    tree->Branch("pfMET_phi", &pfMET_phi_, "pfMET_phi_/F");
-    tree->Branch("pfMET_sysShift_phi", &pfMET_sysShift_phi_, "pfMET_sysShift_phi_/F");
-    tree->Branch("pfMET_sysShift", &pfMET_sysShift_, "pfMET_sysShift_/F");
-    tree->Branch("pfMET_t1", &pfMET_t1_, "pfMET_t1_/F");
-    tree->Branch("pfMET_t1p2", &pfMET_t1p2_, "pfMET_t1p2_/F");
-    tree->Branch("pfMET_t01", &pfMET_t01_, "pfMET_t01_/F");
-    tree->Branch("pfMET_t01p2", &pfMET_t01p2_, "pfMET_t01p2_/F");
-    tree->Branch("pfNoPUMET", &pfNoPUMET_, "pfNoPUMET_/F");
-    tree->Branch("pfMVAMET", &pfMVAMET_, "pfMVAMET_/F");
-    tree->Branch("diEMpT", &diEMpT_, "diEMpT_/F");
-    tree->Branch("diJetPt", &diJetPt_, "diJetPt_/F");
-    tree->Branch("Njets", &Njets_, "Njets_/I");
-    tree->Branch("Nbtags", &Nbtags_, "Nbtags_/I");
-    tree->Branch("Nelectrons", &Nelectrons_, "Nelectrons_/I");
-    tree->Branch("Nmuons", &Nmuons_, "Nmuons_/I");
-    tree->Branch("isoEle_pt", &isoEle_pt_, "isoEle_pt_/F");
-    tree->Branch("isoEle_phi", &isoEle_phi_, "isoEle_phi_/F");
-    tree->Branch("isoEle_eta", &isoEle_eta_, "isoEle_eta_/F");
-    tree->Branch("isoMuon_pt", &isoMuon_pt_, "isoMuon_pt_/F");
-    tree->Branch("isoMuon_phi", &isoMuon_phi_, "isoMuon_phi_/F");
-    tree->Branch("isoMuon_eta", &isoMuon_eta_, "isoMuon_eta_/F");
-    tree->Branch("invmass", &invmass_, "invmass_/F");
-    tree->Branch("HT", &HT_, "HT_/F");
-    tree->Branch("HT_jets", &HT_jets_, "HT_jets_/F");
-    tree->Branch("hadronic_pt", &hadronic_pt_, "hadronic_pt_/F");
-    tree->Branch("minDPhi_gMET", &minDPhi_gMET_, "minDPhi_gMET_/F");
-    tree->Branch("minDPhi_jMET", &minDPhi_jMET_, "minDPhi_jMET_/F");
-    tree->Branch("minDR_leadPhoton_jets", &minDR_leadPhoton_jets_, "minDR_leadPhoton_jets_/F");
-    tree->Branch("minDR_trailPhoton_jets", &minDR_trailPhoton_jets_, "minDR_trailPhoton_jets_/F");
-    tree->Branch("leadPhotonEt", &lead_Et_, "lead_Et_/F");
-    tree->Branch("trailPhotonEt", &trail_Et_, "trail_Et_/F");
-    tree->Branch("leadPhotonEta", &lead_Eta_, "lead_Eta_/F");
-    tree->Branch("w_mT", &w_mT_, "w_mT_/F");
-    tree->Branch("leadMatchedJetPt", &lead_matched_jetpt_, "lead_matched_jetpt_/F");
-    tree->Branch("trailMatchedJetPt", &trail_matched_jetpt_, "trail_matched_jetpt_/F");
-    tree->Branch("trailPhotonEta", &trail_Eta_, "trail_Eta_/F");
-    tree->Branch("leadPhotonPhi", &lead_Phi_, "lead_Phi_/F");
-    tree->Branch("trailPhotonPhi", &trail_Phi_, "trail_Phi_/F");
-    tree->Branch("leadptOverInvmass", &leadptOverInvmass_, "leadptOverInvmass_/F");
-    tree->Branch("trailptOverInvmass", &trailptOverInvmass_, "trailptOverInvmass_/F");
-    tree->Branch("leadChargedHadronIso", &lead_chHadIso_, "lead_chHadIso_/F");
-    tree->Branch("trailChargedHadronIso", &trail_chHadIso_, "trail_chHadIso_/F");
-    tree->Branch("leadSigmaIetaIeta", &lead_sIetaIeta_, "lead_sIetaIeta_/F");
-    tree->Branch("trailSigmaIetaIeta", &trail_sIetaIeta_, "trail_sIetaIeta_/F");
-    tree->Branch("jet1_pt", &jet1_pt_, "jet1_pt_/F");
-    tree->Branch("jet2_pt", &jet2_pt_, "jet2_pt_/F");
-    tree->Branch("jet3_pt", &jet3_pt_, "jet3_pt_/F");
-    tree->Branch("jet4_pt", &jet4_pt_, "jet4_pt_/F");
-    tree->Branch("max_csv", &max_csv_, "max_csv_/F");
-    tree->Branch("btag1_pt", &btag1_pt_, "btag1_pt_/F");
-    tree->Branch("btag2_pt", &btag2_pt_, "btag2_pt_/F");
-    tree->Branch("submax_csv", &submax_csv_, "submax_csv_/F");
-    tree->Branch("min_csv", &min_csv_, "min_csv_/F");
-    tree->Branch("nPV", &nPV_, "nPV_/I");
-    tree->Branch("photon_dR", &photon_dR_, "photon_dR_/F");
-    tree->Branch("photon_dPhi", &photon_dPhi_, "photon_dPhi_/F");
-    tree->Branch("runNumber", &runNumber_, "runNumber_/I");
-    tree->Branch("eventNumber", &eventNumber_, "eventNumber_/l");
-    tree->Branch("luminosityBlockNumber", &lumiBlock_, "lumiBlock_/I");
-    tree->Branch("jentry", &jentry_, "jentry_/L");
-    tree->Branch("dimuon_invmass", &dimuon_invmass_, "dimuon_invmass_/F");
-    tree->Branch("diphodimu_invmass", &diphodimu_invmass_, "diphodimu_invmass_/F");
-    tree->Branch("metFilterBit", &metFilterBit_, "metFilterBit_/I");
-    tree->Branch("leadMVAregEnergy", &leadMVAregEnergy_, "leadMVAregEnergy_/F");
-    tree->Branch("leadMVAregErr", &leadMVAregErr_, "leadMVAregErr_/F");
-    tree->Branch("trailMVAregEnergy", &trailMVAregEnergy_, "trailMVAregEnergy_/F");
-    tree->Branch("trailMVAregErr", &trailMVAregErr_, "trailMVAregErr_/F");
+  TString varNames[nTreeVariables] = {
+    "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
+    "pfMET_sysShift", "pfMET_sysShift_phi",
+    "pfMET_t1", "pfMET_t1p2", "pfMET_t01", "pfMET_t01p2", "pfNoPUMET", "pfMVAMET",
+    "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons",
+    "HT", "HT_jets", "hadronic_pt", "w_mT",
+    "ele_pt", "ele_phi", "ele_eta",
+    "muon_pt", "muon_phi", "muon_eta",
+    "leadPhotonEt", "leadPhotonEta", "leadPhotonPhi", "leadChargedHadronIso", "leadSigmaIetaIeta", "lead_nPixelSeeds", "leadMVAregEnergy", "leadMVAregErr",
+    "trailPhotonEt", "trailPhotonEta", "trailPhotonPhi", "trailChargedHadronIso", "trailSigmaIetaIeta", "trail_nPixelSeeds", "trailMVAregEnergy", "trailMVAregErr",
+    "photon_invmass", "photon_dR", "photon_dPhi", "diEMpT", "diJetPt",
+    "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
+    "btag1_pt", "btag2_pt",
+    "max_csv", "submax_csv", "min_csv",
+    "nPV",
+    "metFilterBit",
+    "runNumber", "eventNumber", "lumiBlock", "jentry"};
     
-    ffTrees.push_back(tree);
-  }
+  map<TString, float> treeMap;
+  for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;
 
-  vector<TTree*> gfTrees;
+  vector<TTree*> eventTrees;
   for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree("gf_"+channels[i]+"_EvtTree", "An event tree for final analysis");
-    tree->Branch("pfMET", &pfMET_, "pfMET_/F");
-    tree->Branch("pfMET_x", &pfMET_x_, "pfMET_x_/F");
-    tree->Branch("pfMET_y", &pfMET_y_, "pfMET_y_/F");
-    tree->Branch("pfMET_phi", &pfMET_phi_, "pfMET_phi_/F");
-    tree->Branch("pfMET_sysShift_phi", &pfMET_sysShift_phi_, "pfMET_sysShift_phi_/F");
-    tree->Branch("pfMET_sysShift", &pfMET_sysShift_, "pfMET_sysShift_/F");
-    tree->Branch("pfMET_t1", &pfMET_t1_, "pfMET_t1_/F");
-    tree->Branch("pfMET_t1p2", &pfMET_t1p2_, "pfMET_t1p2_/F");
-    tree->Branch("pfMET_t01", &pfMET_t01_, "pfMET_t01_/F");
-    tree->Branch("pfMET_t01p2", &pfMET_t01p2_, "pfMET_t01p2_/F");
-    tree->Branch("pfNoPUMET", &pfNoPUMET_, "pfNoPUMET_/F");
-    tree->Branch("pfMVAMET", &pfMVAMET_, "pfMVAMET_/F");
-    tree->Branch("diEMpT", &diEMpT_, "diEMpT_/F");
-    tree->Branch("diJetPt", &diJetPt_, "diJetPt_/F");
-    tree->Branch("Njets", &Njets_, "Njets_/I");
-    tree->Branch("Nbtags", &Nbtags_, "Nbtags_/I");
-    tree->Branch("Nelectrons", &Nelectrons_, "Nelectrons_/I");
-    tree->Branch("Nmuons", &Nmuons_, "Nmuons_/I");
-    tree->Branch("isoEle_pt", &isoEle_pt_, "isoEle_pt_/F");
-    tree->Branch("isoEle_phi", &isoEle_phi_, "isoEle_phi_/F");
-    tree->Branch("isoEle_eta", &isoEle_eta_, "isoEle_eta_/F");
-    tree->Branch("isoMuon_pt", &isoMuon_pt_, "isoMuon_pt_/F");
-    tree->Branch("isoMuon_phi", &isoMuon_phi_, "isoMuon_phi_/F");
-    tree->Branch("isoMuon_eta", &isoMuon_eta_, "isoMuon_eta_/F");
-    tree->Branch("invmass", &invmass_, "invmass_/F");
-    tree->Branch("HT", &HT_, "HT_/F");
-    tree->Branch("HT_jets", &HT_jets_, "HT_jets_/F");
-    tree->Branch("hadronic_pt", &hadronic_pt_, "hadronic_pt_/F");
-    tree->Branch("minDPhi_gMET", &minDPhi_gMET_, "minDPhi_gMET_/F");
-    tree->Branch("minDPhi_jMET", &minDPhi_jMET_, "minDPhi_jMET_/F");
-    tree->Branch("minDR_leadPhoton_jets", &minDR_leadPhoton_jets_, "minDR_leadPhoton_jets_/F");
-    tree->Branch("minDR_trailPhoton_jets", &minDR_trailPhoton_jets_, "minDR_trailPhoton_jets_/F");
-    tree->Branch("leadPhotonEt", &lead_Et_, "lead_Et_/F");
-    tree->Branch("trailPhotonEt", &trail_Et_, "trail_Et_/F");
-    tree->Branch("leadMatchedJetPt", &lead_matched_jetpt_, "lead_matched_jetpt_/F");
-    tree->Branch("trailMatchedJetPt", &trail_matched_jetpt_, "trail_matched_jetpt_/F");
-    tree->Branch("leadPhotonEta", &lead_Eta_, "lead_Eta_/F");
-    tree->Branch("w_mT", &w_mT_, "w_mT_/F");
-    tree->Branch("trailPhotonEta", &trail_Eta_, "trail_Eta_/F");
-    tree->Branch("leadPhotonPhi", &lead_Phi_, "lead_Phi_/F");
-    tree->Branch("trailPhotonPhi", &trail_Phi_, "trail_Phi_/F");
-    tree->Branch("leadptOverInvmass", &leadptOverInvmass_, "leadptOverInvmass_/F");
-    tree->Branch("trailptOverInvmass", &trailptOverInvmass_, "trailptOverInvmass_/F");
-    tree->Branch("leadChargedHadronIso", &lead_chHadIso_, "lead_chHadIso_/F");
-    tree->Branch("trailChargedHadronIso", &trail_chHadIso_, "trail_chHadIso_/F");
-    tree->Branch("leadSigmaIetaIeta", &lead_sIetaIeta_, "lead_sIetaIeta_/F");
-    tree->Branch("trailSigmaIetaIeta", &trail_sIetaIeta_, "trail_sIetaIeta_/F");
-    tree->Branch("jet1_pt", &jet1_pt_, "jet1_pt_/F");
-    tree->Branch("jet2_pt", &jet2_pt_, "jet2_pt_/F");
-    tree->Branch("jet3_pt", &jet3_pt_, "jet3_pt_/F");
-    tree->Branch("jet4_pt", &jet4_pt_, "jet4_pt_/F");
-    tree->Branch("btag1_pt", &btag1_pt_, "btag1_pt_/F");
-    tree->Branch("btag2_pt", &btag2_pt_, "btag2_pt_/F");
-    tree->Branch("max_csv", &max_csv_, "max_csv_/F");
-    tree->Branch("submax_csv", &submax_csv_, "submax_csv_/F");
-    tree->Branch("min_csv", &min_csv_, "min_csv_/F");
-    tree->Branch("nPV", &nPV_, "nPV_/I");
-    tree->Branch("photon_dR", &photon_dR_, "photon_dR_/F");
-    tree->Branch("photon_dPhi", &photon_dPhi_, "photon_dPhi_/F");
-    tree->Branch("runNumber", &runNumber_, "runNumber_/I");
-    tree->Branch("eventNumber", &eventNumber_, "eventNumber_/l");
-    tree->Branch("luminosityBlockNumber", &lumiBlock_, "lumiBlock_/I");
-    tree->Branch("jentry", &jentry_, "jentry_/L");
-    tree->Branch("dimuon_invmass", &dimuon_invmass_, "dimuon_invmass_/F");
-    tree->Branch("diphodimu_invmass", &diphodimu_invmass_, "diphodimu_invmass_/F");
-    tree->Branch("metFilterBit", &metFilterBit_, "metFilterBit_/I");
-    tree->Branch("leadMVAregEnergy", &leadMVAregEnergy_, "leadMVAregEnergy_/F");
-    tree->Branch("leadMVAregErr", &leadMVAregErr_, "leadMVAregErr_/F");
-    tree->Branch("trailMVAregEnergy", &trailMVAregEnergy_, "trailMVAregEnergy_/F");
-    tree->Branch("trailMVAregErr", &trailMVAregErr_, "trailMVAregErr_/F");
+    TTree * tree = new TTree("gg_"+channels[i]+"_EvtTree"+output_code_t, "An event tree for final analysis");
+    
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
 
-    gfTrees.push_back(tree);
+    eventTrees.push_back(tree);
   }
-
-  vector<TTree*> ggTrees;
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree("gg_"+channels[i]+"_EvtTree", "An event tree for final analysis");
-    tree->Branch("pfMET", &pfMET_, "pfMET_/F");
-    tree->Branch("pfMET_x", &pfMET_x_, "pfMET_x_/F");
-    tree->Branch("pfMET_y", &pfMET_y_, "pfMET_y_/F");
-    tree->Branch("pfMET_phi", &pfMET_phi_, "pfMET_phi_/F");
-    tree->Branch("pfMET_sysShift_phi", &pfMET_sysShift_phi_, "pfMET_sysShift_phi_/F");
-    tree->Branch("pfMET_sysShift", &pfMET_sysShift_, "pfMET_sysShift_/F");
-    tree->Branch("pfMET_t1", &pfMET_t1_, "pfMET_t1_/F");
-    tree->Branch("pfMET_t1p2", &pfMET_t1p2_, "pfMET_t1p2_/F");
-    tree->Branch("pfMET_t01", &pfMET_t01_, "pfMET_t01_/F");
-    tree->Branch("pfMET_t01p2", &pfMET_t01p2_, "pfMET_t01p2_/F");
-    tree->Branch("pfNoPUMET", &pfNoPUMET_, "pfNoPUMET_/F");
-    tree->Branch("pfMVAMET", &pfMVAMET_, "pfMVAMET_/F");
-    tree->Branch("diEMpT", &diEMpT_, "diEMpT_/F");
-    tree->Branch("diJetPt", &diJetPt_, "diJetPt_/F");
-    tree->Branch("Njets", &Njets_, "Njets_/I");
-    tree->Branch("Nbtags", &Nbtags_, "Nbtags_/I");
-    tree->Branch("Nelectrons", &Nelectrons_, "Nelectrons_/I");
-    tree->Branch("Nmuons", &Nmuons_, "Nmuons_/I");
-    tree->Branch("isoEle_pt", &isoEle_pt_, "isoEle_pt_/F");
-    tree->Branch("isoEle_phi", &isoEle_phi_, "isoEle_phi_/F");
-    tree->Branch("isoEle_eta", &isoEle_eta_, "isoEle_eta_/F");
-    tree->Branch("isoMuon_pt", &isoMuon_pt_, "isoMuon_pt_/F");
-    tree->Branch("isoMuon_phi", &isoMuon_phi_, "isoMuon_phi_/F");
-    tree->Branch("isoMuon_eta", &isoMuon_eta_, "isoMuon_eta_/F");
-    tree->Branch("invmass", &invmass_, "invmass_/F");
-    tree->Branch("HT", &HT_, "HT_/F");
-    tree->Branch("HT_jets", &HT_jets_, "HT_jets_/F");
-    tree->Branch("hadronic_pt", &hadronic_pt_, "hadronic_pt_/F");
-    tree->Branch("minDPhi_gMET", &minDPhi_gMET_, "minDPhi_gMET_/F");
-    tree->Branch("minDPhi_jMET", &minDPhi_jMET_, "minDPhi_jMET_/F");
-    tree->Branch("minDR_leadPhoton_jets", &minDR_leadPhoton_jets_, "minDR_leadPhoton_jets_/F");
-    tree->Branch("minDR_trailPhoton_jets", &minDR_trailPhoton_jets_, "minDR_trailPhoton_jets_/F");
-    tree->Branch("leadPhotonEt", &lead_Et_, "lead_Et_/F");
-    tree->Branch("trailPhotonEt", &trail_Et_, "trail_Et_/F");
-    tree->Branch("leadMatchedJetPt", &lead_matched_jetpt_, "lead_matched_jetpt_/F");
-    tree->Branch("trailMatchedJetPt", &trail_matched_jetpt_, "trail_matched_jetpt_/F");
-    tree->Branch("leadPhotonEta", &lead_Eta_, "lead_Eta_/F");
-    tree->Branch("w_mT", &w_mT_, "w_mT_/F");
-    tree->Branch("trailPhotonEta", &trail_Eta_, "trail_Eta_/F");
-    tree->Branch("leadPhotonPhi", &lead_Phi_, "lead_Phi_/F");
-    tree->Branch("trailPhotonPhi", &trail_Phi_, "trail_Phi_/F");
-    tree->Branch("leadptOverInvmass", &leadptOverInvmass_, "leadptOverInvmass_/F");
-    tree->Branch("trailptOverInvmass", &trailptOverInvmass_, "trailptOverInvmass_/F");
-    tree->Branch("leadChargedHadronIso", &lead_chHadIso_, "lead_chHadIso_/F");
-    tree->Branch("trailChargedHadronIso", &trail_chHadIso_, "trail_chHadIso_/F");
-    tree->Branch("leadSigmaIetaIeta", &lead_sIetaIeta_, "lead_sIetaIeta_/F");
-    tree->Branch("trailSigmaIetaIeta", &trail_sIetaIeta_, "trail_sIetaIeta_/F");
-    tree->Branch("jet1_pt", &jet1_pt_, "jet1_pt_/F");
-    tree->Branch("jet2_pt", &jet2_pt_, "jet2_pt_/F");
-    tree->Branch("jet3_pt", &jet3_pt_, "jet3_pt_/F");
-    tree->Branch("jet4_pt", &jet4_pt_, "jet4_pt_/F");
-    tree->Branch("btag1_pt", &btag1_pt_, "btag1_pt_/F");
-    tree->Branch("btag2_pt", &btag2_pt_, "btag2_pt_/F");
-    tree->Branch("max_csv", &max_csv_, "max_csv_/F");
-    tree->Branch("submax_csv", &submax_csv_, "submax_csv_/F");
-    tree->Branch("min_csv", &min_csv_, "min_csv_/F");
-    tree->Branch("nPV", &nPV_, "nPV_/I");
-    tree->Branch("photon_dR", &photon_dR_, "photon_dR_/F");
-    tree->Branch("photon_dPhi", &photon_dPhi_, "photon_dPhi_/F");
-    tree->Branch("runNumber", &runNumber_, "runNumber_/I");
-    tree->Branch("eventNumber", &eventNumber_, "eventNumber_/l");
-    tree->Branch("luminosityBlockNumber", &lumiBlock_, "lumiBlock_/I");
-    tree->Branch("jentry", &jentry_, "jentry_/L");
-    tree->Branch("dimuon_invmass", &dimuon_invmass_, "dimuon_invmass_/F");
-    tree->Branch("diphodimu_invmass", &diphodimu_invmass_, "diphodimu_invmass_/F");
-    tree->Branch("metFilterBit", &metFilterBit_, "metFilterBit_/I");
-    tree->Branch("leadMVAregEnergy", &leadMVAregEnergy_, "leadMVAregEnergy_/F");
-    tree->Branch("leadMVAregErr", &leadMVAregErr_, "leadMVAregErr_/F");
-    tree->Branch("trailMVAregEnergy", &trailMVAregEnergy_, "trailMVAregEnergy_/F");
-    tree->Branch("trailMVAregErr", &trailMVAregErr_, "trailMVAregErr_/F");
-
-    ggTrees.push_back(tree);
-  }
-
-  vector<TTree*> egTrees;
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree("eg_"+channels[i]+"_EvtTree", "An event tree for final analysis");
-    tree->Branch("pfMET", &pfMET_, "pfMET_/F");
-    tree->Branch("pfMET_x", &pfMET_x_, "pfMET_x_/F");
-    tree->Branch("pfMET_y", &pfMET_y_, "pfMET_y_/F");
-    tree->Branch("pfMET_phi", &pfMET_phi_, "pfMET_phi_/F");
-    tree->Branch("pfMET_sysShift_phi", &pfMET_sysShift_phi_, "pfMET_sysShift_phi_/F");
-    tree->Branch("pfMET_sysShift", &pfMET_sysShift_, "pfMET_sysShift_/F");
-    tree->Branch("pfMET_t1", &pfMET_t1_, "pfMET_t1_/F");
-    tree->Branch("pfMET_t1p2", &pfMET_t1p2_, "pfMET_t1p2_/F");
-    tree->Branch("pfMET_t01", &pfMET_t01_, "pfMET_t01_/F");
-    tree->Branch("pfMET_t01p2", &pfMET_t01p2_, "pfMET_t01p2_/F");
-    tree->Branch("pfNoPUMET", &pfNoPUMET_, "pfNoPUMET_/F");
-    tree->Branch("pfMVAMET", &pfMVAMET_, "pfMVAMET_/F");
-    tree->Branch("diEMpT", &diEMpT_, "diEMpT_/F");
-    tree->Branch("diJetPt", &diJetPt_, "diJetPt_/F");
-    tree->Branch("Njets", &Njets_, "Njets_/I");
-    tree->Branch("Nbtags", &Nbtags_, "Nbtags_/I");
-    tree->Branch("Nelectrons", &Nelectrons_, "Nelectrons_/I");
-    tree->Branch("Nmuons", &Nmuons_, "Nmuons_/I");
-    tree->Branch("isoEle_pt", &isoEle_pt_, "isoEle_pt_/F");
-    tree->Branch("isoEle_phi", &isoEle_phi_, "isoEle_phi_/F");
-    tree->Branch("isoEle_eta", &isoEle_eta_, "isoEle_eta_/F");
-    tree->Branch("isoMuon_pt", &isoMuon_pt_, "isoMuon_pt_/F");
-    tree->Branch("isoMuon_phi", &isoMuon_phi_, "isoMuon_phi_/F");
-    tree->Branch("isoMuon_eta", &isoMuon_eta_, "isoMuon_eta_/F");
-    tree->Branch("invmass", &invmass_, "invmass_/F");
-    tree->Branch("HT", &HT_, "HT_/F");
-    tree->Branch("HT_jets", &HT_jets_, "HT_jets_/F");
-    tree->Branch("hadronic_pt", &hadronic_pt_, "hadronic_pt_/F");
-    tree->Branch("minDPhi_gMET", &minDPhi_gMET_, "minDPhi_gMET_/F");
-    tree->Branch("minDPhi_jMET", &minDPhi_jMET_, "minDPhi_jMET_/F");
-    tree->Branch("minDR_leadPhoton_jets", &minDR_leadPhoton_jets_, "minDR_leadPhoton_jets_/F");
-    tree->Branch("minDR_trailPhoton_jets", &minDR_trailPhoton_jets_, "minDR_trailPhoton_jets_/F");
-    tree->Branch("leadPhotonEt", &lead_Et_, "lead_Et_/F");
-    tree->Branch("trailPhotonEt", &trail_Et_, "trail_Et_/F");
-    tree->Branch("leadMatchedJetPt", &lead_matched_jetpt_, "lead_matched_jetpt_/F");
-    tree->Branch("trailMatchedJetPt", &trail_matched_jetpt_, "trail_matched_jetpt_/F");
-    tree->Branch("leadPhotonEta", &lead_Eta_, "lead_Eta_/F");
-    tree->Branch("w_mT", &w_mT_, "w_mT_/F");
-    tree->Branch("trailPhotonEta", &trail_Eta_, "trail_Eta_/F");
-    tree->Branch("leadPhotonPhi", &lead_Phi_, "lead_Phi_/F");
-    tree->Branch("trailPhotonPhi", &trail_Phi_, "trail_Phi_/F");
-    tree->Branch("leadptOverInvmass", &leadptOverInvmass_, "leadptOverInvmass_/F");
-    tree->Branch("trailptOverInvmass", &trailptOverInvmass_, "trailptOverInvmass_/F");
-    tree->Branch("leadChargedHadronIso", &lead_chHadIso_, "lead_chHadIso_/F");
-    tree->Branch("trailChargedHadronIso", &trail_chHadIso_, "trail_chHadIso_/F");
-    tree->Branch("leadSigmaIetaIeta", &lead_sIetaIeta_, "lead_sIetaIeta_/F");
-    tree->Branch("trailSigmaIetaIeta", &trail_sIetaIeta_, "trail_sIetaIeta_/F");
-    tree->Branch("jet1_pt", &jet1_pt_, "jet1_pt_/F");
-    tree->Branch("jet2_pt", &jet2_pt_, "jet2_pt_/F");
-    tree->Branch("jet3_pt", &jet3_pt_, "jet3_pt_/F");
-    tree->Branch("jet4_pt", &jet4_pt_, "jet4_pt_/F");
-    tree->Branch("btag1_pt", &btag1_pt_, "btag1_pt_/F");
-    tree->Branch("btag2_pt", &btag2_pt_, "btag2_pt_/F");
-    tree->Branch("max_csv", &max_csv_, "max_csv_/F");
-    tree->Branch("submax_csv", &submax_csv_, "submax_csv_/F");
-    tree->Branch("min_csv", &min_csv_, "min_csv_/F");
-    tree->Branch("nPV", &nPV_, "nPV_/I");
-    tree->Branch("photon_dR", &photon_dR_, "photon_dR_/F");
-    tree->Branch("photon_dPhi", &photon_dPhi_, "photon_dPhi_/F");
-    tree->Branch("runNumber", &runNumber_, "runNumber_/I");
-    tree->Branch("eventNumber", &eventNumber_, "eventNumber_/l");
-    tree->Branch("luminosityBlockNumber", &lumiBlock_, "lumiBlock_/I");
-    tree->Branch("jentry", &jentry_, "jentry_/L");
-    tree->Branch("dimuon_invmass", &dimuon_invmass_, "dimuon_invmass_/F");
-    tree->Branch("diphodimu_invmass", &diphodimu_invmass_, "diphodimu_invmass_/F");
-    tree->Branch("metFilterBit", &metFilterBit_, "metFilterBit_/I");
-    tree->Branch("leadMVAregEnergy", &leadMVAregEnergy_, "leadMVAregEnergy_/F");
-    tree->Branch("leadMVAregErr", &leadMVAregErr_, "leadMVAregErr_/F");
-    tree->Branch("trailMVAregEnergy", &trailMVAregEnergy_, "trailMVAregEnergy_/F");
-    tree->Branch("trailMVAregErr", &trailMVAregErr_, "trailMVAregErr_/F");
-
-    egTrees.push_back(tree);
-  }
-
-  vector<TTree*> eeTrees;
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree("ee_"+channels[i]+"_EvtTree", "An event tree for final analysis");
-    tree->Branch("pfMET", &pfMET_, "pfMET_/F");
-    tree->Branch("pfMET_x", &pfMET_x_, "pfMET_x_/F");
-    tree->Branch("pfMET_y", &pfMET_y_, "pfMET_y_/F");
-    tree->Branch("pfMET_phi", &pfMET_phi_, "pfMET_phi_/F");
-    tree->Branch("pfMET_sysShift_phi", &pfMET_sysShift_phi_, "pfMET_sysShift_phi_/F");
-    tree->Branch("pfMET_sysShift", &pfMET_sysShift_, "pfMET_sysShift_/F");
-    tree->Branch("pfMET_t1", &pfMET_t1_, "pfMET_t1_/F");
-    tree->Branch("pfMET_t1p2", &pfMET_t1p2_, "pfMET_t1p2_/F");
-    tree->Branch("pfMET_t01", &pfMET_t01_, "pfMET_t01_/F");
-    tree->Branch("pfMET_t01p2", &pfMET_t01p2_, "pfMET_t01p2_/F");
-    tree->Branch("pfNoPUMET", &pfNoPUMET_, "pfNoPUMET_/F");
-    tree->Branch("pfMVAMET", &pfMVAMET_, "pfMVAMET_/F");
-    tree->Branch("diEMpT", &diEMpT_, "diEMpT_/F");
-    tree->Branch("diJetPt", &diJetPt_, "diJetPt_/F");
-    tree->Branch("Njets", &Njets_, "Njets_/I");
-    tree->Branch("Nbtags", &Nbtags_, "Nbtags_/I");
-    tree->Branch("Nelectrons", &Nelectrons_, "Nelectrons_/I");
-    tree->Branch("Nmuons", &Nmuons_, "Nmuons_/I");
-    tree->Branch("isoEle_pt", &isoEle_pt_, "isoEle_pt_/F");
-    tree->Branch("isoEle_phi", &isoEle_phi_, "isoEle_phi_/F");
-    tree->Branch("isoEle_eta", &isoEle_eta_, "isoEle_eta_/F");
-    tree->Branch("isoMuon_pt", &isoMuon_pt_, "isoMuon_pt_/F");
-    tree->Branch("isoMuon_phi", &isoMuon_phi_, "isoMuon_phi_/F");
-    tree->Branch("isoMuon_eta", &isoMuon_eta_, "isoMuon_eta_/F");
-    tree->Branch("invmass", &invmass_, "invmass_/F");
-    tree->Branch("HT", &HT_, "HT_/F");
-    tree->Branch("HT_jets", &HT_jets_, "HT_jets_/F");
-    tree->Branch("hadronic_pt", &hadronic_pt_, "hadronic_pt_/F");
-    tree->Branch("minDPhi_gMET", &minDPhi_gMET_, "minDPhi_gMET_/F");
-    tree->Branch("minDPhi_jMET", &minDPhi_jMET_, "minDPhi_jMET_/F");
-    tree->Branch("minDR_leadPhoton_jets", &minDR_leadPhoton_jets_, "minDR_leadPhoton_jets_/F");
-    tree->Branch("minDR_trailPhoton_jets", &minDR_trailPhoton_jets_, "minDR_trailPhoton_jets_/F");
-    tree->Branch("leadPhotonEt", &lead_Et_, "lead_Et_/F");
-    tree->Branch("trailPhotonEt", &trail_Et_, "trail_Et_/F");
-    tree->Branch("leadMatchedJetPt", &lead_matched_jetpt_, "lead_matched_jetpt_/F");
-    tree->Branch("trailMatchedJetPt", &trail_matched_jetpt_, "trail_matched_jetpt_/F");
-    tree->Branch("leadPhotonEta", &lead_Eta_, "lead_Eta_/F");
-    tree->Branch("w_mT", &w_mT_, "w_mT_/F");
-    tree->Branch("trailPhotonEta", &trail_Eta_, "trail_Eta_/F");
-    tree->Branch("leadPhotonPhi", &lead_Phi_, "lead_Phi_/F");
-    tree->Branch("trailPhotonPhi", &trail_Phi_, "trail_Phi_/F");
-    tree->Branch("leadptOverInvmass", &leadptOverInvmass_, "leadptOverInvmass_/F");
-    tree->Branch("trailptOverInvmass", &trailptOverInvmass_, "trailptOverInvmass_/F");
-    tree->Branch("leadChargedHadronIso", &lead_chHadIso_, "lead_chHadIso_/F");
-    tree->Branch("trailChargedHadronIso", &trail_chHadIso_, "trail_chHadIso_/F");
-    tree->Branch("leadSigmaIetaIeta", &lead_sIetaIeta_, "lead_sIetaIeta_/F");
-    tree->Branch("trailSigmaIetaIeta", &trail_sIetaIeta_, "trail_sIetaIeta_/F");
-    tree->Branch("jet1_pt", &jet1_pt_, "jet1_pt_/F");
-    tree->Branch("jet2_pt", &jet2_pt_, "jet2_pt_/F");
-    tree->Branch("jet3_pt", &jet3_pt_, "jet3_pt_/F");
-    tree->Branch("jet4_pt", &jet4_pt_, "jet4_pt_/F");
-    tree->Branch("btag1_pt", &btag1_pt_, "btag1_pt_/F");
-    tree->Branch("btag2_pt", &btag2_pt_, "btag2_pt_/F");
-    tree->Branch("max_csv", &max_csv_, "max_csv_/F");
-    tree->Branch("submax_csv", &submax_csv_, "submax_csv_/F");
-    tree->Branch("min_csv", &min_csv_, "min_csv_/F");
-    tree->Branch("nPV", &nPV_, "nPV_/I");
-    tree->Branch("photon_dR", &photon_dR_, "photon_dR_/F");
-    tree->Branch("photon_dPhi", &photon_dPhi_, "photon_dPhi_/F");
-    tree->Branch("runNumber", &runNumber_, "runNumber_/I");
-    tree->Branch("eventNumber", &eventNumber_, "eventNumber_/l");
-    tree->Branch("luminosityBlockNumber", &lumiBlock_, "lumiBlock_/I");
-    tree->Branch("jentry", &jentry_, "jentry_/L");
-    tree->Branch("dimuon_invmass", &dimuon_invmass_, "dimuon_invmass_/F");
-    tree->Branch("diphodimu_invmass", &diphodimu_invmass_, "diphodimu_invmass_/F");
-    tree->Branch("metFilterBit", &metFilterBit_, "metFilterBit_/I");
-    tree->Branch("leadMVAregEnergy", &leadMVAregEnergy_, "leadMVAregEnergy_/F");
-    tree->Branch("leadMVAregErr", &leadMVAregErr_, "leadMVAregErr_/F");
-    tree->Branch("trailMVAregEnergy", &trailMVAregEnergy_, "trailMVAregEnergy_/F");
-    tree->Branch("trailMVAregErr", &trailMVAregErr_, "trailMVAregErr_/F");
-
-    eeTrees.push_back(tree);
-  }
-
-  vector<TTree*> efTrees;
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree("ef_"+channels[i]+"_EvtTree", "An event tree for final analysis");
-    tree->Branch("pfMET", &pfMET_, "pfMET_/F");
-    tree->Branch("pfMET_x", &pfMET_x_, "pfMET_x_/F");
-    tree->Branch("pfMET_y", &pfMET_y_, "pfMET_y_/F");
-    tree->Branch("pfMET_phi", &pfMET_phi_, "pfMET_phi_/F");
-    tree->Branch("pfMET_sysShift_phi", &pfMET_sysShift_phi_, "pfMET_sysShift_phi_/F");
-    tree->Branch("pfMET_sysShift", &pfMET_sysShift_, "pfMET_sysShift_/F");
-    tree->Branch("pfMET_t1", &pfMET_t1_, "pfMET_t1_/F");
-    tree->Branch("pfMET_t1p2", &pfMET_t1p2_, "pfMET_t1p2_/F");
-    tree->Branch("pfMET_t01", &pfMET_t01_, "pfMET_t01_/F");
-    tree->Branch("pfMET_t01p2", &pfMET_t01p2_, "pfMET_t01p2_/F");
-    tree->Branch("pfNoPUMET", &pfNoPUMET_, "pfNoPUMET_/F");
-    tree->Branch("pfMVAMET", &pfMVAMET_, "pfMVAMET_/F");
-    tree->Branch("diEMpT", &diEMpT_, "diEMpT_/F");
-    tree->Branch("diJetPt", &diJetPt_, "diJetPt_/F");
-    tree->Branch("Njets", &Njets_, "Njets_/I");
-    tree->Branch("Nbtags", &Nbtags_, "Nbtags_/I");
-    tree->Branch("Nelectrons", &Nelectrons_, "Nelectrons_/I");
-    tree->Branch("Nmuons", &Nmuons_, "Nmuons_/I");
-    tree->Branch("isoEle_pt", &isoEle_pt_, "isoEle_pt_/F");
-    tree->Branch("isoEle_phi", &isoEle_phi_, "isoEle_phi_/F");
-    tree->Branch("isoEle_eta", &isoEle_eta_, "isoEle_eta_/F");
-    tree->Branch("isoMuon_pt", &isoMuon_pt_, "isoMuon_pt_/F");
-    tree->Branch("isoMuon_phi", &isoMuon_phi_, "isoMuon_phi_/F");
-    tree->Branch("isoMuon_eta", &isoMuon_eta_, "isoMuon_eta_/F");
-    tree->Branch("invmass", &invmass_, "invmass_/F");
-    tree->Branch("HT", &HT_, "HT_/F");
-    tree->Branch("HT_jets", &HT_jets_, "HT_jets_/F");
-    tree->Branch("hadronic_pt", &hadronic_pt_, "hadronic_pt_/F");
-    tree->Branch("minDPhi_gMET", &minDPhi_gMET_, "minDPhi_gMET_/F");
-    tree->Branch("minDPhi_jMET", &minDPhi_jMET_, "minDPhi_jMET_/F");
-    tree->Branch("minDR_leadPhoton_jets", &minDR_leadPhoton_jets_, "minDR_leadPhoton_jets_/F");
-    tree->Branch("minDR_trailPhoton_jets", &minDR_trailPhoton_jets_, "minDR_trailPhoton_jets_/F");
-    tree->Branch("leadPhotonEt", &lead_Et_, "lead_Et_/F");
-    tree->Branch("trailPhotonEt", &trail_Et_, "trail_Et_/F");
-    tree->Branch("leadMatchedJetPt", &lead_matched_jetpt_, "lead_matched_jetpt_/F");
-    tree->Branch("trailMatchedJetPt", &trail_matched_jetpt_, "trail_matched_jetpt_/F");
-    tree->Branch("leadPhotonEta", &lead_Eta_, "lead_Eta_/F");
-    tree->Branch("w_mT", &w_mT_, "w_mT_/F");
-    tree->Branch("trailPhotonEta", &trail_Eta_, "trail_Eta_/F");
-    tree->Branch("leadPhotonPhi", &lead_Phi_, "lead_Phi_/F");
-    tree->Branch("trailPhotonPhi", &trail_Phi_, "trail_Phi_/F");
-    tree->Branch("leadptOverInvmass", &leadptOverInvmass_, "leadptOverInvmass_/F");
-    tree->Branch("trailptOverInvmass", &trailptOverInvmass_, "trailptOverInvmass_/F");
-    tree->Branch("leadChargedHadronIso", &lead_chHadIso_, "lead_chHadIso_/F");
-    tree->Branch("trailChargedHadronIso", &trail_chHadIso_, "trail_chHadIso_/F");
-    tree->Branch("leadSigmaIetaIeta", &lead_sIetaIeta_, "lead_sIetaIeta_/F");
-    tree->Branch("trailSigmaIetaIeta", &trail_sIetaIeta_, "trail_sIetaIeta_/F");
-    tree->Branch("jet1_pt", &jet1_pt_, "jet1_pt_/F");
-    tree->Branch("jet2_pt", &jet2_pt_, "jet2_pt_/F");
-    tree->Branch("jet3_pt", &jet3_pt_, "jet3_pt_/F");
-    tree->Branch("jet4_pt", &jet4_pt_, "jet4_pt_/F");
-    tree->Branch("btag1_pt", &btag1_pt_, "btag1_pt_/F");
-    tree->Branch("btag2_pt", &btag2_pt_, "btag2_pt_/F");
-    tree->Branch("max_csv", &max_csv_, "max_csv_/F");
-    tree->Branch("submax_csv", &submax_csv_, "submax_csv_/F");
-    tree->Branch("min_csv", &min_csv_, "min_csv_/F");
-    tree->Branch("nPV", &nPV_, "nPV_/I");
-    tree->Branch("photon_dR", &photon_dR_, "photon_dR_/F");
-    tree->Branch("photon_dPhi", &photon_dPhi_, "photon_dPhi_/F");
-    tree->Branch("runNumber", &runNumber_, "runNumber_/I");
-    tree->Branch("eventNumber", &eventNumber_, "eventNumber_/l");
-    tree->Branch("luminosityBlockNumber", &lumiBlock_, "lumiBlock_/I");
-    tree->Branch("jentry", &jentry_, "jentry_/L");
-    tree->Branch("dimuon_invmass", &dimuon_invmass_, "dimuon_invmass_/F");
-    tree->Branch("diphodimu_invmass", &diphodimu_invmass_, "diphodimu_invmass_/F");
-    tree->Branch("metFilterBit", &metFilterBit_, "metFilterBit_/I");
-    tree->Branch("leadMVAregEnergy", &leadMVAregEnergy_, "leadMVAregEnergy_/F");
-    tree->Branch("leadMVAregErr", &leadMVAregErr_, "leadMVAregErr_/F");
-    tree->Branch("trailMVAregEnergy", &trailMVAregEnergy_, "trailMVAregEnergy_/F");
-    tree->Branch("trailMVAregErr", &trailMVAregErr_, "trailMVAregErr_/F");
-
-    efTrees.push_back(tree);
-  }
-
+  
   ScaleFactorInfo sf(btagger);
 
   // to check duplicate events
@@ -861,9 +347,7 @@ void SusyEventAnalyzer::Data() {
   Long64_t jentry = 0;
   while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
 
-    jentry_ = jentry;
-
-    if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
+  if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
       cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
     }
     
@@ -905,12 +389,12 @@ void SusyEventAnalyzer::Data() {
       }
     }
 
-    vector<susy::Photon*> candidate_pair;
+    vector<susy::Muon*> isoMuons, looseMuons;
+    vector<susy::Electron*> isoEles, looseEles;
     vector<susy::PFJet*> pfJets, btags;
     vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
     vector<float> csvValues;
-    vector<susy::Muon*> isoMuons, looseMuons;
-    vector<susy::Electron*> isoEles, looseEles;
+    vector<susy::Photon*> photons;
     vector<BtagInfo> tagInfos;
 
     int event_type = 0;
@@ -918,186 +402,55 @@ void SusyEventAnalyzer::Data() {
     int nPVertex = GetNumberPV(event);
     if(nPVertex == 0) continue;
 
-    susy::MET* pfMet         = &(event.metMap.find("pfMet")->second);
-    susy::MET* pfMetType1    = &(event.metMap.find("pfType1CorrectedMet")->second);
-    susy::MET* pfMetType1p2  = &(event.metMap.find("pfType1p2CorrectedMet")->second);
-    susy::MET* pfMetType01   = &(event.metMap.find("pfType01CorrectedMet")->second);
-    susy::MET* pfMetType01p2 = &(event.metMap.find("pfType01p2CorrectedMet")->second);
-    susy::MET* pfNoPileUpMet = &(event.metMap.find("pfNoPileUpMet")->second);
-    susy::MET* pfMVAMet      = &(event.metMap.find("pfMVAMet")->second);
-
-    findPhotons_prioritizeCount(event, candidate_pair, event_type, useDPhiCut);
-    //findPhotons_prioritizeEt(event, candidate_pair, event_type, useDPhiCut);
-    //findPhotons_simple(event, candidate_pair, event_type, 0, useDPhiCut); // 0 (L), 1 (M), 2 (T)
-    //findPhotons_fakesWithSeeds(event, candidate_pair, event_type, useDPhiCut);
-
-    if(event_type == 0) {
-      nCnt[28][0]++;
-      continue;
-    }
-
-    bool passHLT = useTrigger ? PassTriggers(abs(event_type)) : true;
-    if(!passHLT) {
-      const int nPos = 30 + abs(event_type);
-      nCnt[nPos][0]++;
-      continue;
-    }
-
-    bool duplicateEvent = ! (allEvents[event.runNumber].insert(event.eventNumber)).second;
-    if(event.isRealData && duplicateEvent) continue;
-
-    lead_Et_ = candidate_pair[0]->momentum.Et();
-    lead_Eta_ = candidate_pair[0]->caloPosition.Eta();
-    lead_Phi_ = candidate_pair[0]->caloPosition.Phi();
-    trail_Et_ = candidate_pair[1]->momentum.Et();
-    trail_Eta_ = candidate_pair[1]->caloPosition.Eta();
-    trail_Phi_ = candidate_pair[1]->caloPosition.Phi();
-    
-    leadMVAregEnergy_ = candidate_pair[0]->MVAregEnergy;
-    leadMVAregErr_ = candidate_pair[0]->MVAregErr;
-    trailMVAregEnergy_ = candidate_pair[1]->MVAregEnergy;
-    trailMVAregErr_ = candidate_pair[1]->MVAregErr;
-
-    metFilterBit_ = event.metFilterBit;
-
-    nPV_ = nPVertex;
-    float dEta_ = candidate_pair[0]->caloPosition.Eta() - candidate_pair[1]->caloPosition.Eta();
-    photon_dPhi_ = TVector2::Phi_mpi_pi(candidate_pair[0]->caloPosition.Phi() - candidate_pair[1]->caloPosition.Phi());
-    photon_dR_ = sqrt(dEta_*dEta_ + photon_dPhi_*photon_dPhi_);
-    runNumber_ = event.runNumber;
-    eventNumber_ = event.eventNumber;
-    lumiBlock_ = event.luminosityBlockNumber;
-
-    leadptOverInvmass_ = candidate_pair[0]->momentum.Pt() / ((candidate_pair[0]->momentum + candidate_pair[1]->momentum).M());
-    trailptOverInvmass_ = candidate_pair[1]->momentum.Pt() / ((candidate_pair[0]->momentum + candidate_pair[1]->momentum).M());
-
-    lead_chHadIso_ = chargedHadronIso_corrected(*candidate_pair[0], event.rho25);
-    trail_chHadIso_ = chargedHadronIso_corrected(*candidate_pair[1], event.rho25);
-
-    lead_sIetaIeta_ = candidate_pair[0]->sigmaIetaIeta;
-    trail_sIetaIeta_ = candidate_pair[1]->sigmaIetaIeta;
-
     float HT = 0.;
+
+    findMuons(event, isoMuons, looseMuons, HT);
+    findElectrons(event, isoMuons, looseMuons, isoEles, looseEles, HT);
+    
+    if(isoMuons.size() + isoEles.size() != 1) continue;
+    if(looseMuons.size() + looseEles.size() != 0) continue;
+
+    bool passHLT = useTrigger;
+    if(useTrigger) {
+      if(isoEles.size() == 1) passHLT &= PassTriggers(1);
+      else if(isoMuons.size() == 1) passHLT &= PassTriggers(2);
+    }
+    if(!passHLT) continue;
+
+    float HT_jets = 0.;
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
 
-    findMuons(event, candidate_pair, isoMuons, looseMuons, HT);
-    findElectrons(event, candidate_pair, isoEles, looseEles, HT);
-
-    findJets(event, candidate_pair, 
+    findJets(event, 
 	     isoMuons, looseMuons,
 	     isoEles, looseEles,
 	     pfJets, btags,
 	     sf,
 	     tagInfos, csvValues, 
 	     pfJets_corrP4, btags_corrP4, 
-	     HT, hadronicSystem,
-	     h_DR_jet_gg);
+	     HT_jets, hadronicSystem);
 
-    HT_jets_ = HT;
-    hadronic_pt_ = hadronicSystem.Pt();
+    findPhotons(event, 
+		photons,
+		pfJets_corrP4,
+		isoMuons, looseMuons,
+		isoEles, looseEles,
+		HT);
+		
+    bool duplicateEvent = ! (allEvents[event.runNumber].insert(event.eventNumber)).second;
+    if(event.isRealData && duplicateEvent) continue;
 
-    max_csv_ = (csvValues.size() >= 1) ? csvValues[0] : -1.;
-    submax_csv_ = (csvValues.size() >= 2) ? csvValues[1] : -1.;
-    min_csv_ = (csvValues.size() >= 1) ? csvValues.back() : -1.;
-
-    HT += candidate_pair[0]->momentum.Pt();
-    HT += candidate_pair[1]->momentum.Pt();
-
-    jet1_pt_ = (pfJets_corrP4.size() >= 1) ? pfJets_corrP4[0].Pt() : -1.;
-    jet2_pt_ = (pfJets_corrP4.size() >= 2) ? pfJets_corrP4[1].Pt() : -1.;
-    jet3_pt_ = (pfJets_corrP4.size() >= 3) ? pfJets_corrP4[2].Pt() : -1.;
-    jet4_pt_ = (pfJets_corrP4.size() >= 4) ? pfJets_corrP4[3].Pt() : -1.;
-
-    btag1_pt_ = (btags_corrP4.size() >= 1) ? btags_corrP4[0].Pt() : -1.;
-    btag2_pt_ = (btags_corrP4.size() >= 2) ? btags_corrP4[1].Pt() : -1.;
-    
-    pfMET_       = pfMet->met();
-    pfMET_x_     = pfMet->metX();
-    pfMET_y_     = pfMet->metY();
-    pfMET_phi_   = pfMet->mEt.Phi();
-
-    TVector2 sysShiftCorr(4.83642e-02 + 2.48870e-01*nPVertex, -1.50135e-01 - 8.27917e-02*nPVertex);
-    pfMET_sysShift_ = (pfMet->mEt - sysShiftCorr).Mod();
-    pfMET_sysShift_phi_ = (pfMet->mEt - sysShiftCorr).Phi();
-
-    pfMET_t1_    = pfMetType1->met();
-    pfMET_t1p2_  = pfMetType1p2->met();
-    pfMET_t01_   = pfMetType01->met();
-    pfMET_t01p2_ = pfMetType01p2->met();
-    pfNoPUMET_   = pfNoPileUpMet->met();
-    pfMVAMET_    = pfMVAMet->met();
-
-    // Transverse W mass
-    if(isoEles.size() == 1 && isoMuons.size() == 0) {
-      float metphi = (pfMet->mEt - sysShiftCorr).Phi();
-      float leptonphi = isoEles[0]->momentum.Phi();
-
-      w_mT_ = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
-      w_mT_ *= 2. * isoEles[0]->momentum.Pt() * pfMET_sysShift_;
-      w_mT_ = sqrt(w_mT_);
-    }
-    else if(isoEles.size() == 0 && isoMuons.size() == 1) {
-      float metphi = (pfMet->mEt - sysShiftCorr).Phi();
-      float leptonphi = isoMuons[0]->momentum.Phi();
-
-      w_mT_ = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
-      w_mT_ *= 2. * isoMuons[0]->momentum.Pt() * pfMET_sysShift_;
-      w_mT_ = sqrt(w_mT_);
-    }
-    else w_mT_ = -1.;
-
-    isoEle_pt_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Pt() : -1.;
-    isoEle_phi_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Phi() : -10.;
-    isoEle_eta_ = (isoEles.size() > 0) ? isoEles[0]->momentum.Eta() : -10.;
-
-    isoMuon_pt_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Pt() : -1.;
-    isoMuon_phi_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Phi() : -10.;
-    isoMuon_eta_ = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Eta() : -10.;
-
-    // Calculate dPhi_min(g, MET)
-    float dPhi_gMET_lead = TVector2::Phi_mpi_pi(candidate_pair[0]->caloPosition.Phi() - pfMet->mEt.Phi());
-    float dPhi_gMET_trail = TVector2::Phi_mpi_pi(candidate_pair[1]->caloPosition.Phi() - pfMet->mEt.Phi());
-    minDPhi_gMET_ = min(fabs(dPhi_gMET_lead), fabs(dPhi_gMET_trail));
-
-    float min_deltaPhi_jetsMET = 999.;
-    for(unsigned int iJet = 0; iJet < pfJets.size(); iJet++) {
-      float dPhi_jetMET = fabs(TVector2::Phi_mpi_pi(pfJets[iJet]->momentum.Phi() - pfMet->mEt.Phi()));
-      if(dPhi_jetMET < min_deltaPhi_jetsMET) min_deltaPhi_jetsMET = dPhi_jetMET;
-    }
-    minDPhi_jMET_ = (pfJets.size() > 0) ? min_deltaPhi_jetsMET : -1.;
-
-    float min_deltaR_lead_jet = 999.;
-    for(unsigned int iJet = 0; iJet < pfJets.size(); iJet++) {
-      float dEta_x = candidate_pair[0]->caloPosition.Eta() - pfJets[iJet]->momentum.Eta();
-      float dPhi_x = TVector2::Phi_mpi_pi(candidate_pair[0]->caloPosition.Phi() - pfJets[iJet]->momentum.Phi());
-      float dR_x = sqrt(dEta_x*dEta_x + dPhi_x*dPhi_x);
-
-      if(dR_x < min_deltaR_lead_jet) min_deltaR_lead_jet = dR_x;
-    }
-    minDR_leadPhoton_jets_ = (pfJets.size() > 0) ? min_deltaR_lead_jet : -1.;
-
-    float min_deltaR_trail_jet = 999.;
-    for(unsigned int iJet = 0; iJet < pfJets.size(); iJet++) {
-      float dEta_x = candidate_pair[1]->caloPosition.Eta() - pfJets[iJet]->momentum.Eta();
-      float dPhi_x = TVector2::Phi_mpi_pi(candidate_pair[1]->caloPosition.Phi() - pfJets[iJet]->momentum.Phi());
-      float dR_x = sqrt(dEta_x*dEta_x + dPhi_x*dPhi_x);
-
-      if(dR_x < min_deltaR_trail_jet) min_deltaR_trail_jet = dR_x;
-    }
-    minDR_trailPhoton_jets_ = (pfJets.size() > 0) ? min_deltaR_trail_jet : -1.;
-      
-    float diJetPt = 0.;
-    bool matchingWorked = GetDiJetPt(event, candidate_pair, diJetPt, lead_matched_jetpt_, trail_matched_jetpt_);
-    if(!matchingWorked) nCnt[46][0]++;
-    
-    diJetPt_ = diJetPt;
-    diEMpT_ = (candidate_pair[0]->momentum + candidate_pair[1]->momentum).Pt();
-    Njets_ = pfJets.size();
-    Nbtags_ = btags.size();
-    Nelectrons_ = isoEles.size();
-    Nmuons_ = isoMuons.size();
-    invmass_ = (candidate_pair[0]->momentum + candidate_pair[1]->momentum).M();
-    HT_ = HT;
+    SetTreeValues(treeMap,
+		  event,
+		  isoMuons, isoEles, 
+		  pfJets, btags,
+		  photons,
+		  pfJets_corrP4, btags_corrP4,
+		  csvValues,
+		  hadronicSystem,
+		  HT, HT_jets,
+		  nPVertex,
+		  eventWeight, eventWeightErr,
+		  jentry);
 
     ////////////////////
 
@@ -1108,125 +461,8 @@ void SusyEventAnalyzer::Data() {
 	if(nEleReq[chan] >= 0 && isoEles.size() != nEleReq[chan]) continue;
 	if(nMuonReq[chan] >= 0 && isoMuons.size() != nMuonReq[chan]) continue;
 
-	if(event_type == cGG) {
-	
-	  h_diempt[0][chan]->Fill((candidate_pair[0]->momentum + candidate_pair[1]->momentum).Pt(), pfJets.size());
-	  h_dijetpt[0][chan]->Fill(diJetPt, pfJets.size());
-
-	  ggTrees[chan]->Fill();
-
-	  if(chan == 1) {
-	    for(int iCut = 0; iCut < nDivisions_chi2; iCut++) {
-	      double cut_val = (double)iCut / (double)nDivisions_chi2;
-	      bool wouldPass = false;
-    
-	      for(unsigned int iJet = 0; iJet < pfJets.size(); iJet++) {
-		if(pfJets[iJet]->bTagDiscriminators[susy::kCSV] > cut_val) {
-		  wouldPass = true;
-		  break;
-		}
-	      }
-	      if(wouldPass) h_met_varyCSVcut_gg_j[iCut]->Fill(pfMet->met());
-
-	    }
-	  }
-
-	  if(chan == 4) {
-	    for(int iCut = 0; iCut < nDivisions_chi2; iCut++) {
-	      double cut_val = (double)iCut / (double)nDivisions_chi2;
-	      int nPassing = 0;
-    
-	      for(unsigned int iJet = 0; iJet < pfJets.size(); iJet++) {
-		if(pfJets[iJet]->bTagDiscriminators[susy::kCSV] > cut_val) nPassing++;
-	      }
-	      if(nPassing >= 2) h_met_squareCSVcut_gg_jj[iCut]->Fill(pfMet->met());
-
-	    }
-	  }
-	      
-	  nCnt[2][chan]++;
-	  
-	} // if gg event
-
-	else if(abs(event_type) == cEG) {
-
-	  egTrees[chan]->Fill();
-	  nCnt[3][chan]++;
-	  
-	} // if eg event
-
-	else if(event_type == cFF) {
-	  
-	  h_diempt[2][chan]->Fill((candidate_pair[0]->momentum + candidate_pair[1]->momentum).Pt(), pfJets.size());
-	  h_dijetpt[2][chan]->Fill(diJetPt, pfJets.size());
-
-	  ffTrees[chan]->Fill();
-	  
-	  if(chan == 1) {
-	    for(int iCut = 0; iCut < nDivisions_chi2; iCut++) {
-	      double cut_val = (double)iCut / (double)nDivisions_chi2;
-	      bool wouldPass = false;
-	      
-	      for(unsigned int iJet = 0; iJet < pfJets.size(); iJet++) {
-		if(pfJets[iJet]->bTagDiscriminators[susy::kCSV] > cut_val) {
-		  wouldPass = true;
-		  break;
-		}
-	      }
-	      if(wouldPass) h_met_varyCSVcut_ff_j[iCut]->Fill(pfMet->met());
-
-	    }
-	  }
-
-	  if(chan == 4) {
-	    for(int iCut = 0; iCut < nDivisions_chi2; iCut++) {
-	      double cut_val = (double)iCut / (double)nDivisions_chi2;
-	      int nPassing = 0;
-    
-	      for(unsigned int iJet = 0; iJet < pfJets.size(); iJet++) {
-		if(pfJets[iJet]->bTagDiscriminators[susy::kCSV] > cut_val) nPassing++;
-	      }
-	      if(nPassing >= 2) h_met_squareCSVcut_ff_jj[iCut]->Fill(pfMet->met());
-
-	    }
-	  }
-
-	  nCnt[4][chan]++;
-
-	} // if chan jet event
-	
-	else if(abs(event_type) == cGF) {
-	  
-	  h_diempt[3][chan]->Fill((candidate_pair[0]->momentum + candidate_pair[1]->momentum).Pt(), pfJets.size());
-	  h_dijetpt[3][chan]->Fill(diJetPt, pfJets.size());
-
-	  gfTrees[chan]->Fill();
-	  
-	  nCnt[5][chan]++;
-	  
-	} // if chan jet event
-
-	else if(event_type == cEE) {
-
-	  h_diempt[4][chan]->Fill((candidate_pair[0]->momentum + candidate_pair[1]->momentum).Pt(), pfJets.size());
-	  h_dijetpt[4][chan]->Fill(diJetPt, pfJets.size());
-	  
-	  eeTrees[chan]->Fill();
-	  
-	  nCnt[6][chan]++;
-	  
-	}
-
-	else if(abs(event_type) == cEF) {
-	  
-	  h_diempt[5][chan]->Fill((candidate_pair[0]->momentum + candidate_pair[1]->momentum).Pt(), pfJets.size());
-	  h_dijetpt[5][chan]->Fill(diJetPt, pfJets.size());
-	  
-	  efTrees[chan]->Fill();
-	  
-	  nCnt[7][chan]++;
-	  
-	}
+	nCnt[2][chan]++;
+	eventTrees[chan]->Fill();
 
       } // loop over jet/btag req channels
 
@@ -1261,8 +497,6 @@ void SusyEventAnalyzer::Data() {
   out->cd();
   out->Write();
   out->Close();
-
-  */
 
 }
 
@@ -1469,18 +703,9 @@ void SusyEventAnalyzer::Acceptance() {
     cout << "ff+" << channels[i] << " events              : " << nCnt[4][i] << endl;
     cout << "gf+" << channels[i] << " events              : " << nCnt[5][i] << endl;
   }
-  cout << "-----------------------------------------------" << endl;
   cout << endl;
   cout << "----------------Continues, info----------------" << endl;
-  cout << "no passing candidates     : " << nCnt[28][0] << endl;
-  cout << "diJet matching failed     : " << nCnt[31][0] << endl;
-  if(rejectFakeElectrons) cout << "double fake ee --> gg     : " << nCnt[32][0] << endl;
-  cout << "gg fail hlt               : " << nCnt[33][0] << endl;
-  cout << "eg fail hlt               : " << nCnt[34][0] << endl;
-  cout << "ee fail hlt               : " << nCnt[35][0] << endl;
-  cout << "ff fail hlt               : " << nCnt[36][0] << endl;
-  cout << "gf fail hlt               : " << nCnt[37][0] << endl;
-
+ 
   puFile->Close();
   btagEfficiency->Close();
 

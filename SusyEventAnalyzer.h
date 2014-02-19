@@ -154,7 +154,7 @@ class SusyEventAnalyzer {
   int FigureTTbarDecayMode(susy::Event& ev);
 
   void SetTreeValues(map<TString, float>& treeMap,
-		     susy::Event& event,
+		     susy::Event& event_,
 		     vector<susy::Muon*> isoMuons, vector<susy::Electron*> isoEles, 
 		     vector<susy::PFJet*> pfJets, vector<susy::PFJet*> btags,
 		     vector<susy::Photon*> photons,
@@ -163,7 +163,8 @@ class SusyEventAnalyzer {
 		     TLorentzVector hadronicSystem,
 		     float HT, float HT_jets,
 		     int nPVertex,
-		     float eventWeight, float eventWeightErr);
+		     float eventWeight, float eventWeightErr,
+		     Long64_t jentry);
 
   // lazy junk
   void FillMetFilter2D(susy::Event& ev, TH2F*& h);
@@ -826,13 +827,14 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 				      TLorentzVector hadronicSystem,
 				      float HT, float HT_jets,
 				      int nPVertex,
-				      float eventWeight, float eventWeightErr) {
+				      float eventWeight, float eventWeightErr,
+				      Long64_t jentry) {
 
   treeMap["Nmuons"] = isoMuons.size();
   treeMap["Nelectrons"] = isoEles.size();
   treeMap["nPV"] = nPVertex;
   treeMap["metFilterBit"] = event_.metFilterBit;
-  if(scan == "stop-bino") treeMap["ttbarDecayMode"] = FigureTTbarDecayMode(event_);
+  if(isMC && scan == "stop-bino") treeMap["ttbarDecayMode"] = FigureTTbarDecayMode(event_);
   treeMap["Nphotons"] = photons.size();
   treeMap["Njets"] = pfJets.size();
   treeMap["Nbtags"] = btags.size();
@@ -852,8 +854,8 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["btag1_pt"] = (btags_corrP4.size() >= 1) ? btags_corrP4[0].Pt() : -1.;
   treeMap["btag2_pt"] = (btags_corrP4.size() >= 2) ? btags_corrP4[1].Pt() : -1.;
 
-  treeMap["pileupWeight"] = eventWeight;
-  treeMap["pileupWeightErr"] = eventWeightErr;
+  if(isMC) treeMap["pileupWeight"] = eventWeight;
+  if(isMC) treeMap["pileupWeightErr"] = eventWeightErr;
         
   susy::MET* pfMet         = &(event_.metMap.find("pfMet")->second);
   susy::MET* pfMetType1    = &(event_.metMap.find("pfType1CorrectedMet")->second);
@@ -879,7 +881,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["pfMET_t01p2"] = pfMetType01p2->met();
   treeMap["pfNoPUMET"]   = pfNoPileUpMet->met();
   treeMap["pfMVAMET"]    = pfMVAMet->met();
-  treeMap["genMET"]      = genMet->met();
+  if(isMC) treeMap["genMET"]      = genMet->met();
   
   // Transverse W mass
   if(isoEles.size() == 1 && isoMuons.size() == 0) {
@@ -887,21 +889,20 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     float leptonphi = isoEles[0]->momentum.Phi();
     float genNu_phi, genNu_pt;
     
-    for(vector<susy::Particle>::iterator genit = event_.genParticles.begin(); genit != event_.genParticles.end(); genit++) {
+    if(isMC) {
+      for(vector<susy::Particle>::iterator genit = event_.genParticles.begin(); genit != event_.genParticles.end(); genit++) {
+	if(genit->status != 1) continue;
+	if(abs(genit->pdgId) != 12) continue;
+	if(abs(event_.genParticles[genit->motherIndex].pdgId) != 24) continue;
+	genNu_phi = genit->momentum.Phi();
+	genNu_pt = genit->momentum.Pt();
+      }
       
-      if(genit->status != 1) continue;
-      if(abs(genit->pdgId) != 12) continue;
-      if(abs(event_.genParticles[genit->motherIndex].pdgId) != 24) continue;
-      
-      genNu_phi = genit->momentum.Phi();
-      genNu_pt = genit->momentum.Pt();
-      
-    }
-    
     float w_mT_genNeutrino = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - genNu_phi));
     w_mT_genNeutrino *= 2. * genNu_pt * treeMap["pfMET_sysShift"];
     treeMap["w_mT_genNeutrino"] = sqrt(w_mT_genNeutrino);
-    
+    }
+
     float w_mT = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
     w_mT *= 2. * isoEles[0]->momentum.Pt() * treeMap["pfMET_sysShift"];
     treeMap["w_mT"] = sqrt(w_mT);
@@ -911,28 +912,27 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     float leptonphi = isoMuons[0]->momentum.Phi();
     float genNu_phi, genNu_pt;
     
+    if(isMC) {
     for(vector<susy::Particle>::iterator genit = event_.genParticles.begin(); genit != event_.genParticles.end(); genit++) {
-      
       if(genit->status != 1) continue;
       if(abs(genit->pdgId) != 14) continue;
       if(abs(event_.genParticles[genit->motherIndex].pdgId) != 24) continue;
-      
       genNu_phi = genit->momentum.Phi();
       genNu_pt = genit->momentum.Pt();
-      
     }
     
     float w_mT_genNeutrino = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - genNu_phi));
     w_mT_genNeutrino *= 2. * genNu_pt * treeMap["pfMET_sysShift"];
     treeMap["w_mT_genNeutrino"] = sqrt(w_mT_genNeutrino);
-    
+    }    
+
     float w_mT = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
     w_mT *= 2. * isoMuons[0]->momentum.Pt() * treeMap["pfMET_sysShift"];
     treeMap["w_mT"] = sqrt(w_mT);
   }
   else {
     treeMap["w_mT"] = -1.;
-    treeMap["w_mT_genNeutrino"] = -1.;
+    if(isMC) treeMap["w_mT_genNeutrino"] = -1.;
   }
   
   treeMap["ele_pt"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Pt() : -1.;
@@ -974,6 +974,13 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["photon_dPhi"] = photon_dPhi;
   treeMap["photon_dR"] = photon_dR;
   
+  if(!isMC) {
+    treeMap["runNumber"] = event_.runNumber;
+    treeMap["eventNumber"] = event_.eventNumber;
+    treeMap["lumiBlock"] = event_.luminosityBlockNumber;
+    treeMap["jentry"] = jentry;
+  }
+
 }
 
 void SusyEventAnalyzer::IncludeSyncFile(char* file) {
