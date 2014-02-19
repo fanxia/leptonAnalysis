@@ -410,10 +410,16 @@ void SusyEventAnalyzer::Data() {
     findMuons(event, isoMuons, looseMuons, HT);
     findElectrons(event, isoMuons, looseMuons, isoEles, looseEles, HT);
     
-    if(isoMuons.size() + isoEles.size() != 1) {
+    if(isoMuons.size() + isoEles.size() != 0) {
       nCnt[23][0]++;
       continue;
     }
+
+    if(isoMuons.size() + isoEles.size() > 1) {
+      nCnt[29][0]++;
+      continue;
+    }
+
     if(looseMuons.size() + looseEles.size() != 0) {
       nCnt[24][0]++;
       continue;
@@ -502,7 +508,8 @@ void SusyEventAnalyzer::Data() {
   cout << "----------------Continues, info----------------" << endl;
   cout << "fail MET filters         : " << nCnt[21][0] << endl;
   cout << "No primary vertex        : " << nCnt[22][0] << endl;
-  cout << "zero or 2+ tight leptons : " << nCnt[23][0] << endl;
+  cout << "zero tight leptons       : " << nCnt[23][0] << endl;
+  cout << "2+ tight leptons         : " << nCnt[29][0] << endl;
   cout << "1+ loose leptons         : " << nCnt[24][0] << endl;
   cout << "fail HLT                 : " << nCnt[25][0] << endl;
   cout << "-----------------------------------------------" << endl;
