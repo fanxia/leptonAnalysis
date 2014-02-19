@@ -400,22 +400,34 @@ void SusyEventAnalyzer::Data() {
     int event_type = 0;
 
     int nPVertex = GetNumberPV(event);
-    if(nPVertex == 0) continue;
+    if(nPVertex == 0) {
+      nCnt[22][0]++;
+      continue;
+    }
 
     float HT = 0.;
 
     findMuons(event, isoMuons, looseMuons, HT);
     findElectrons(event, isoMuons, looseMuons, isoEles, looseEles, HT);
     
-    if(isoMuons.size() + isoEles.size() != 1) continue;
-    if(looseMuons.size() + looseEles.size() != 0) continue;
+    if(isoMuons.size() + isoEles.size() != 1) {
+      nCnt[23][0]++;
+      continue;
+    }
+    if(looseMuons.size() + looseEles.size() != 0) {
+      nCnt[24][0]++;
+      continue;
+    }
 
     bool passHLT = useTrigger;
     if(useTrigger) {
       if(isoEles.size() == 1) passHLT &= PassTriggers(1);
       else if(isoMuons.size() == 1) passHLT &= PassTriggers(2);
     }
-    if(!passHLT) continue;
+    if(!passHLT) {
+      nCnt[25][0]++;
+      continue;
+    }
 
     float HT_jets = 0.;
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
@@ -488,11 +500,13 @@ void SusyEventAnalyzer::Data() {
   cout << "-----------------------------------------------" << endl;
   cout << endl;
   cout << "----------------Continues, info----------------" << endl;
-  cout << "fail MET filters          : " << nCnt[21][0] << endl;
-  cout << "no passing candidates     : " << nCnt[28][0] << endl;
+  cout << "fail MET filters         : " << nCnt[21][0] << endl;
+  cout << "No primary vertex        : " << nCnt[22][0] << endl;
+  cout << "zero or 2+ tight leptons : " << nCnt[23][0] << endl;
+  cout << "1+ loose leptons         : " << nCnt[24][0] << endl;
+  cout << "fail HLT                 : " << nCnt[25][0] << endl;
   cout << "-----------------------------------------------" << endl;
   cout << endl;
-  cout << "events with no dijetpt    : " << nCnt[46][0] << endl;
 
   out->cd();
   out->Write();
