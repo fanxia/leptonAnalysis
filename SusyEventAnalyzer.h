@@ -588,7 +588,7 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& isoMuons
   }
 
 }
-
+//durp
 void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*>& isoMuons, vector<susy::Muon*>& looseMuons, vector<susy::Electron*>& isoEles, vector<susy::Electron*>& looseEles, float& HT) {
 
   map<TString, vector<susy::Electron> >::iterator eleMap = ev.electrons.find("gsfElectrons");
