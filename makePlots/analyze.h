@@ -222,7 +222,7 @@ class PlotMaker : public TObject {
 		Float_t ymin, Float_t ymax,
 		Float_t ratiomin, Float_t ratiomax,
 		bool drawSignal, bool drawLegend, bool drawPrelim,
-		TFile*& out) {
+		TFile*& out);
 
   void CreateTable();
 
