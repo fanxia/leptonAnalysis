@@ -188,7 +188,6 @@ class PlotMaker : public TObject {
 		TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLepTree,
 		TTree * wjets, TTree * dy,
 		TTree * ttgjets, TTree * ttgg,
-		TTree * ttbar,
 		TTree * sig_a, TTree * sig_b);
 
   void SetDisplayKStest(bool v) { displayKStest = v; }
@@ -273,7 +272,6 @@ void PlotMaker::SetTrees(TTree * gg,
 			 TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLep,
 			 TTree * wjets, TTree * dy,
 			 TTree * ttgjets, TTree * ttgg,
-			 TTree * ttbar,
 			 TTree * sig_a, TTree * sig_b) {
 
   ggTree = gg;

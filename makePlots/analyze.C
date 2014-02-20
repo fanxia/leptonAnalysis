@@ -99,7 +99,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     can->SetLogz(false);
   }
 
-  PlotMaker * pMaker = new PlotMaker(intLumi_int, egScale, egScaleErr, channels[channel], blinded);
+  PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], blinded);
   pMaker->SetTrees(ggTree,
 		   ttHadronicTree, ttSemiLepTree, ttFullLepTree,
 		   wjetsTree, dyjetsTree,
