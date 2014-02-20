@@ -410,7 +410,7 @@ void SusyEventAnalyzer::Data() {
     findMuons(event, isoMuons, looseMuons, HT);
     findElectrons(event, isoMuons, looseMuons, isoEles, looseEles, HT);
     
-    if(isoMuons.size() + isoEles.size() != 0) {
+    if(isoMuons.size() + isoEles.size() == 0) {
       nCnt[23][0]++;
       continue;
     }

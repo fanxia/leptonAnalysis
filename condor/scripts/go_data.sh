@@ -22,7 +22,14 @@ mv $WORK_DIR/filelist_$JOB_NUMBER .
 
 while read file
 do
-  	sed -i '9i chain.Add("'$file'");' ANALYZER
+
+        if [[ $file == /pnfs/* ]];
+        then
+            	sed -i '9i chain.Add("dcap://'$file'");' ANALYZER
+        else
+            	sed -i '9i chain.Add("'$file'");' ANALYZER
+        fi
+
 done < filelist_$JOB_NUMBER
 
 root -b -q -l ANALYZER
