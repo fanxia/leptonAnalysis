@@ -36,7 +36,7 @@ const TString gifOrPdf = ".pdf";
 TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
   TH1D * h = new TH1D(name, title, nBins, xlo, xhi);
   h->Sumw2();
-  FillHistoFromTree(h, variable, metCut);
+  FillHistoFromTree(h, tree, variable, metCut);
   return h;
 }
   
@@ -270,7 +270,7 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
 }
 
 void PlotMaker::SetTrees(TTree * gg,
-			 TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLepTree,
+			 TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLep,
 			 TTree * wjets, TTree * dy,
 			 TTree * ttgjets, TTree * ttgg,
 			 TTree * ttbar,

@@ -75,7 +75,6 @@ void FillSignalHistoFromTree(TH1D*& h, TTree * tree, TString variable, double me
 
   tree->ResetBranchAddresses();
 
-  return h;
 }
 
 bool LargerHistogram(const TH1D* h1, const TH1D* h2) {
