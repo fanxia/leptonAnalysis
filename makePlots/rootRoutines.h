@@ -29,7 +29,7 @@ void FillHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut) 
   tree->ResetBranchAddresses();
 }
 
-void FillSignalHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut, Float_t scale) {
+void FillSignalHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut, double scale) {
 
   Float_t var, met;
   Float_t puWeight, btagWeight;

@@ -47,14 +47,14 @@ TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title
   return h;
 }
 
-TH1D * SignalHistoFromTree(Float_t scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
+TH1D * SignalHistoFromTree(double scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
   TH1D * h = new TH1D(name, title, nBins, xlo, xhi);
   h->Sumw2();
   FillSignalHistoFromTree(h, tree, variable, metCut, scale);
   return h;
 }
 
-TH1D * SignalHistoFromTree(Float_t scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut = -1.) {
+TH1D * SignalHistoFromTree(double scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut = -1.) {
   TH1D * h = new TH1D(name, title, nBins, customBins);
   h->Sumw2();
   FillSignalHistoFromTree(h, tree, variable, metCut, scale);
