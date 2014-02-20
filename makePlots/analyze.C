@@ -27,7 +27,7 @@
 #include <stdarg.h>
 #include <exception>
 
-#include "analyze_mc.h"
+#include "analyze.h"
 
 using namespace std;
 
