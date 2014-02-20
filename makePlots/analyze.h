@@ -33,192 +33,31 @@ using namespace std;
 
 const TString gifOrPdf = ".pdf";
 
-TH1D * HistoFromTree(bool isAFloat, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
-
+TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
   TH1D * h = new TH1D(name, title, nBins, xlo, xhi);
   h->Sumw2();
-
-  Float_t met;
-  tree->SetBranchAddress("pfMET", &met);
-
-  Float_t var;
-  Int_t var_int;
-  if(variable != "pfMET") {
-    if(isAFloat) tree->SetBranchAddress(variable, &var);
-    else tree->SetBranchAddress(variable, &var_int);
-  }
-  for(int i = 0; i < tree->GetEntries(); i++) {
-    tree->GetEntry(i);
-
-    if(metCut > 0. && met >= metCut) continue;
-
-    if(variable != "pfMET") {
-      if(isAFloat) h->Fill(var);
-      else h->Fill(var_int);
-    }
-    else h->Fill(met);
-
-  }
-
-  tree->ResetBranchAddresses();
-
+  FillHistoFromTree(h, variable, metCut);
   return h;
 }
-
-TH1D * HistoFromTree(bool isAFloat, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut = -1.) {
-
+  
+TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut = -1.) {
   TH1D * h = new TH1D(name, title, nBins, customBins);
   h->Sumw2();
-
-  Float_t met;
-  tree->SetBranchAddress("pfMET", &met);
-
-  Float_t var;
-  Int_t var_int;
-  if(variable != "pfMET") {
-    if(isAFloat) tree->SetBranchAddress(variable, &var);
-    else tree->SetBranchAddress(variable, &var_int);
-  }
-  for(int i = 0; i < tree->GetEntries(); i++) {
-    tree->GetEntry(i);
-
-    if(metCut > 0. && met >= metCut) continue;
-
-    if(variable != "pfMET") {
-      if(isAFloat) h->Fill(var);
-      else h->Fill(var_int);
-    }
-    else h->Fill(met);
-
-  }
-
-  tree->ResetBranchAddresses();
-
+  FillHistoFromTree(h, tree, variable, metCut);
   return h;
 }
 
-TH1D * SignalHistoFromTree(Float_t scale, bool isAFloat, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
-
+TH1D * SignalHistoFromTree(Float_t scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
   TH1D * h = new TH1D(name, title, nBins, xlo, xhi);
   h->Sumw2();
-
-  Float_t var, met;
-  Int_t var_int;
-  Float_t puWeight, btagWeight;
-  Float_t puWeightErr, btagWeightErr, btagWeightUp, btagWeightDown;
-
-  tree->SetBranchAddress("pfMET", &met);
-  if(variable != "pfMET") {
-    if(isAFloat) tree->SetBranchAddress(variable, &var);
-    else tree->SetBranchAddress(variable, &var_int);
-  }
-
-  tree->SetBranchAddress("pileupWeight", &puWeight);
-  tree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  tree->SetBranchAddress("btagWeight", &btagWeight);
-  tree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  tree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  tree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  for(int i = 0; i < tree->GetEntries(); i++) {
-    tree->GetEntry(i);
-
-    if(metCut > 0. && met >= metCut) continue;
-
-    Float_t olderror = 0.;
-
-    if(variable == "pfMET") var = met;
-
-    if(isAFloat) {
-      olderror = h->GetBinError(h->FindBin(var));
-      h->Fill(var, puWeight * btagWeight);
-    }
-    else {
-      olderror = h->GetBinError(h->FindBin(var_int));
-      h->Fill(var_int, puWeight * btagWeight);
-    }
-    
-    // protection from weird 1200 weight errors...
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    Float_t newerror = sqrt(olderror*olderror + addError2);
-
-    if(isAFloat) h->SetBinError(h->FindBin(var), newerror);
-    else h->SetBinError(h->FindBin(var_int), newerror);
-      
-  }
-
-  h->Scale(scale);
-
-  tree->ResetBranchAddresses();
-
+  FillSignalHistoFromTree(h, tree, variable, metCut, scale);
   return h;
 }
 
-TH1D * SignalHistoFromTree(Float_t scale, bool isAFloat, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut = -1.) {
-
+TH1D * SignalHistoFromTree(Float_t scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut = -1.) {
   TH1D * h = new TH1D(name, title, nBins, customBins);
   h->Sumw2();
-
-  Float_t var, met;
-  Int_t var_int;
-  Float_t puWeight, btagWeight;
-  Float_t puWeightErr, btagWeightErr, btagWeightUp, btagWeightDown;
-
-  tree->SetBranchAddress("pfMET", &met);
-  if(variable != "pfMET") {
-    if(isAFloat) tree->SetBranchAddress(variable, &var);
-    else tree->SetBranchAddress(variable, &var_int);
-  }
-
-  tree->SetBranchAddress("pileupWeight", &puWeight);
-  tree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  tree->SetBranchAddress("btagWeight", &btagWeight);
-  tree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  tree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  tree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  for(int i = 0; i < tree->GetEntries(); i++) {
-    tree->GetEntry(i);
-
-    if(metCut > 0. && met >= metCut) continue;
-
-    Float_t olderror = 0.;
-
-    if(variable == "pfMET") var = met;
-
-    if(isAFloat) {
-      olderror = h->GetBinError(h->FindBin(var));
-      h->Fill(var, puWeight * btagWeight);
-    }
-    else {
-      olderror = h->GetBinError(h->FindBin(var_int));
-      h->Fill(var_int, puWeight * btagWeight);
-    }
-    
-    // protection from weird 1200 weight errors...
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    Float_t newerror = sqrt(olderror*olderror + addError2);
-
-    if(isAFloat) h->SetBinError(h->FindBin(var), newerror);
-    else h->SetBinError(h->FindBin(var_int), newerror);
-      
-  }
-
-  h->Scale(scale);
-
-  tree->ResetBranchAddresses();
-
+  FillSignalHistoFromTree(h, tree, variable, metCut, scale);
   return h;
 }
 
@@ -326,7 +165,6 @@ class PlotMaker : public TObject {
 
  public:
   PlotMaker(Int_t lumi,
-	    Float_t ewkScale, Float_t ewkScaleErr,
 	    TString requirement,
 	    bool blind);
   virtual ~PlotMaker() { 
@@ -334,36 +172,28 @@ class PlotMaker : public TObject {
     KSscores.clear();
 
     delete ggTree;
-    delete egTree;
-    delete qcd30to40Tree;
-    delete qcd40Tree;
-    delete gjet20to40Tree;
-    delete gjet40Tree;
-    delete diphotonjetsTree;
     delete ttHadronicTree;
     delete ttSemiLepTree;
     delete ttFullLepTree;
+    delete wjetsTree;
+    delete dyjetsTree;
     delete ttgjetsTree;
+    delete ttggTree;
     delete sigaTree;
     delete sigbTree;
     
   }
 
-  void SetTrees(TTree * gg, TTree * eg,
-		TTree * qcd30to40, TTree * qcd40,
-		TTree * gjet20to40, TTree * gjet40,
-		TTree * diphotonjets,
-		TTree * diphoBox10to25, TTree * diphoBox25to250, TTree * diphoBox250toInf,
+  void SetTrees(TTree * gg,
 		TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLepTree,
-		TTree * ttgjets,
+		TTree * wjets, TTree * dy,
+		TTree * ttgjets, TTree * ttgg,
 		TTree * ttbar,
 		TTree * sig_a, TTree * sig_b);
 
-  void SetUseTTbar(bool v) { useTTbar = v; }
-  void SetUseTTMBD(bool v) { useTTMBD = v; }
   void SetDisplayKStest(bool v) { displayKStest = v; }
 
-  void CreatePlot(TString variable, bool isAFloat,
+  void CreatePlot(TString variable,
 		  Int_t nBinsX, Float_t bin_lo, Float_t bin_hi,
 		  TString xaxisTitle, TString yaxisTitle,
 		  Float_t xmin, Float_t xmax,
@@ -372,7 +202,7 @@ class PlotMaker : public TObject {
 		  bool drawSignal, bool drawLegend, bool drawPrelim,
 		  TFile*& out, double metCut);
 
-  void CreatePlot(TString variable, bool isAFloat,
+  void CreatePlot(TString variable,
 		  Int_t nBinsX, Double_t* customBins,
 		  TString xaxisTitle,
 		  Float_t xmin, Float_t xmax,
@@ -381,44 +211,43 @@ class PlotMaker : public TObject {
 		  bool drawSignal, bool drawLegend, bool drawPrelim,
 		  TFile*& out, double metCut);
 
+  void DrawPlot(TH1D * gg,
+		TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
+		TH1D * wjets, TH1D * dyjets,
+		TH1D * ttg, TH1D * ttgg,
+		TH1D * sig_a, TH1D * sig_b,
+		TString variable,
+		TString xaxisTitle, TString yaxisTitle,
+		Float_t xmin, Float_t xmax,
+		Float_t ymin, Float_t ymax,
+		Float_t ratiomin, Float_t ratiomax,
+		bool drawSignal, bool drawLegend, bool drawPrelim,
+		TFile*& out) {
+
   void CreateTable();
 
   void PlotKolmogorovValues();
 
  private:
   TTree * ggTree;
-  TTree * egTree;
   
-  TTree * qcd30to40Tree;
-  TTree * qcd40Tree;
-
-  TTree * gjet20to40Tree;
-  TTree * gjet40Tree;
-
-  TTree * diphotonjetsTree;
-
-  TTree * diphotonBox10to25Tree;
-  TTree * diphotonBox25to250Tree;
-  TTree * diphotonBox250toInfTree;
-
   TTree * ttHadronicTree;
   TTree * ttSemiLepTree;
   TTree * ttFullLepTree;
 
-  TTree * ttgjetsTree;
+  TTree * wjetsTree;
+  TTree * dyjetsTree;
 
-  TTree * ttjetsTree;
+  TTree * ttgjetsTree;
+  TTree * ttggTree;
 
   TTree * sigaTree;
   TTree * sigbTree;
 
   Int_t intLumi_int;
   TString intLumi;
-  Float_t egScale, egScaleErr;
   TString req;
 
-  bool useTTbar;
-  bool useTTMBD;
   bool displayKStest;
   bool blinded;
 
@@ -426,10 +255,8 @@ class PlotMaker : public TObject {
   
 };
 
-PlotMaker::PlotMaker(Int_t lumi, Float_t ewkScale, Float_t ewkScaleErr, TString requirement, bool blind) :
+PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   intLumi_int(lumi),
-  egScale(ewkScale),
-  egScaleErr(ewkScaleErr),
   req(requirement),
   blinded(blind)
 {
@@ -437,52 +264,36 @@ PlotMaker::PlotMaker(Int_t lumi, Float_t ewkScale, Float_t ewkScaleErr, TString 
   sprintf(buffer, "%.3f", (float)intLumi_int / 1000.);
   intLumi = buffer;
 
-  useTTbar = true;
-  useTTMBD = true;
   displayKStest = false;
 
   KSscores.clear();
 }
 
-void PlotMaker::SetTrees(TTree * gg, TTree * eg,
-			 TTree * qcd30to40, TTree * qcd40,
-			 TTree * gjet20to40, TTree * gjet40,
-			 TTree * diphotonjets,
-			 TTree * diphoBox10to25, TTree * diphoBox25to250, TTree * diphoBox250toInf,
-			 TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLep,
-			 TTree * ttgjets,
+void PlotMaker::SetTrees(TTree * gg,
+			 TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLepTree,
+			 TTree * wjets, TTree * dy,
+			 TTree * ttgjets, TTree * ttgg,
 			 TTree * ttbar,
 			 TTree * sig_a, TTree * sig_b) {
 
   ggTree = gg;
-  egTree = eg;
-  
-  qcd30to40Tree = qcd30to40;
-  qcd40Tree = qcd40;
-
-  gjet20to40Tree = gjet20to40;
-  gjet40Tree = gjet40;
-
-  diphotonjetsTree = diphotonjets;
-
-  diphotonBox10to25Tree = diphoBox10to25;
-  diphotonBox25to250Tree = diphoBox25to250;
-  diphotonBox250toInfTree = diphoBox250toInf;
   
   ttHadronicTree = ttHadronic;
   ttSemiLepTree = ttSemiLep;
   ttFullLepTree = ttFullLep;
 
-  ttgjetsTree = ttgjets;
+  wjetsTree = wjets;
+  dyjetsTree = dy;
 
-  ttjetsTree = ttbar;
+  ttgjetsTree = ttgjets;
+  ttggTree = ttgg;
 
   sigaTree = sig_a;
   sigbTree = sig_b;
 
 }
 
-void PlotMaker::CreatePlot(TString variable, bool isAFloat,
+void PlotMaker::CreatePlot(TString variable,
 			   Int_t nBinsX, Float_t bin_lo, Float_t bin_hi,
 			   TString xaxisTitle, TString yaxisTitle,
 			   Float_t xmin, Float_t xmax,
@@ -491,64 +302,124 @@ void PlotMaker::CreatePlot(TString variable, bool isAFloat,
 			   bool drawSignal, bool drawLegend, bool drawPrelim,
 			   TFile*& out, double metCut) {
 
-  TH1D * gg = HistoFromTree(isAFloat, variable, ggTree, variable+"_gg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * gg = HistoFromTree(variable, ggTree, variable+"_gg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+
+  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 * 1.019 * 1.019 / 12119013., variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+
+  TH1D * wjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 37509. / 18393090., variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * dyjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 3504. / 30459503., variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+
+  TH1D * ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 0.146 / 1719954., variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+
+  TH1D * sig_a;
+  TH1D * sig_b;
+  if(drawSignal) {
+    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigaTree, variable+"_a_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigbTree, variable+"_b_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  }
+
+  DrawPlot(gg,
+	   ttHadronic, ttSemiLep, ttFullLep,
+	   wjets, dyjets,
+	   ttg, ttgg,
+	   sig_a, sig_b,
+	   variable,
+	   xaxisTitle, yaxisTitle,
+	   xmin, xmax,
+	   ymin, ymax,
+	   ratiomin, ratiomax,
+	   drawSignal, drawLegend, drawPrelim,
+	   out);
+
+}
+
+void PlotMaker::CreatePlot(TString variable,
+			   Int_t nBinsX, Double_t* customBins,
+			   TString xaxisTitle,
+			   Float_t xmin, Float_t xmax,
+			   Float_t ymin, Float_t ymax,
+			   Float_t ratiomin, Float_t ratiomax,
+			   bool drawSignal, bool drawLegend, bool drawPrelim,
+			   TFile*& out, double metCut) {
+
+  TString yaxisTitle = "Number of Events / GeV";
+
+  TH1D * gg = HistoFromTree(variable, ggTree, variable+"_gg_"+req, variable, nBinsX, customBins, metCut); 
+  gg = (TH1D*)DivideByBinWidth(gg);
+
+  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, customBins, metCut);
+  ttHadronic = (TH1D*)DivideByBinWidth(ttHadronic);
+  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, customBins, metCut);
+  ttSemiLep = (TH1D*)DivideByBinWidth(ttSemiLep);
+  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 * 1.019 * 1.019 / 12119013., variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, customBins, metCut);
+  ttFullLep = (TH1D*)DivideByBinWidth(ttFullLep);
+
+  TH1D * wjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 37509. / 18393090., variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, customBins, metCut);
+  wjets = (TH1D*)DivideByBinWidth(wjets);
+  TH1D * dyjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 3504. / 30459503., variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, customBins, metCut);
+  dyjets = (TH1D*)DivideByBinWidth(dyjets);
+
+  TH1D * ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, customBins, metCut);
+  ttg = (TH1D*)DivideByBinWidth(ttg);
+  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 0.146 / 1719954., variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, customBins, metCut);
+  ttgg = (TH1D*)DivideByBinWidth(ttgg);
+  
+  TH1D * sig_a;
+  TH1D * sig_b;
+  if(drawSignal) {
+    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., true, variable, sigaTree, variable+"_a_"+req, variable, nBinsX, customBins, metCut);
+    sig_a = (TH1D*)DivideByBinWidth(sig_a);
+    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., true, variable, sigbTree, variable+"_b_"+req, variable, nBinsX, customBins, metCut);
+    sig_b = (TH1D*)DivideByBinWidth(sig_b);
+  }
+
+  DrawPlot(gg,
+	   ttHadronic, ttSemiLep, ttFullLep,
+	   wjets, dyjets,
+	   ttg, ttgg,
+	   sig_a, sig_b,
+	   variable,
+	   xaxisTitle, yaxisTitle,
+	   xmin, xmax,
+	   ymin, ymax,
+	   ratiomin, ratiomax,
+	   drawSignal, drawLegend, drawPrelim,
+	   out);
+
+}
+
+void PlotMaker::DrawPlot(TH1D * gg,
+			 TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
+			 TH1D * wjets, TH1D * dyjets,
+			 TH1D * ttg, TH1D * ttgg,
+			 TH1D * sig_a, TH1D * sig_b,
+			 TString variable,
+			 TString xaxisTitle, TString yaxisTitle,
+			 Float_t xmin, Float_t xmax,
+			 Float_t ymin, Float_t ymax,
+			 Float_t ratiomin, Float_t ratiomax,
+			 bool drawSignal, bool drawLegend, bool drawPrelim,
+			 TFile*& out) {
 
   if(blinded) for(int i = 0; i < gg->GetNbinsX(); i++) {
       gg->SetBinContent(i+1, 1.e-14);
       gg->SetBinError(i+1, 1.e-14);
     }
 
-  TH1D * ewk = HistoFromTree(isAFloat, variable, egTree, variable+"_eg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-
-  TH1D * ewk_noNorm = (TH1D*)ewk->Clone();
-  ewk->Scale(egScale);
-  for(int i = 0; i < ewk->GetNbinsX(); i++) {
-    Float_t normerr = egScaleErr*(ewk_noNorm->GetBinContent(i+1));
-    Float_t staterr = ewk->GetBinError(i+1);
-    Float_t new_err = sqrt(normerr*normerr + staterr*staterr);
-    ewk->SetBinError(i+1, new_err);
-  }
-
-  TH1D * qcd30to40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 2.35E-4 * 1.019 * 1.019 / 6061407., isAFloat, variable, qcd30to40Tree, variable+"_qcd30to40_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * qcd40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 0.002175 * 1.019 * 1.019 / 9782735., isAFloat, variable, qcd40Tree, variable+"_qcd40_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * qcd = (TH1D*)qcd30to40->Clone(variable+"_qcd_"+req);
-  qcd->Add(qcd40);
-
-  TH1D * gjet20to40 = SignalHistoFromTree(intLumi_int * 81930.0 * 0.001835 * 1.019 * 1.019 / 5907942., isAFloat, variable, gjet20to40Tree, variable+"_gjet20to40_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * gjet40 = SignalHistoFromTree(intLumi_int * 8884.0 * 0.05387 * 1.019 * 1.019 / 5956149., isAFloat, variable, gjet40Tree, variable+"_gjet40_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * gjet = (TH1D*)gjet20to40->Clone(variable+"_gjet_"+req);
-  gjet->Add(gjet40);
-
-  TH1D * diphotonjets = SignalHistoFromTree(intLumi_int * 75.39 * 1.019 * 1.019 / 1156030., isAFloat, variable, diphotonjetsTree, variable+"_diphotonjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-
-  TH1D * diphoBox10to25 = SignalHistoFromTree(intLumi_int * 424.8 * 1.019 * 1.019 / 500400., isAFloat, variable, diphotonBox10to25Tree, variable+"_diphoBox10to25_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * diphoBox25to250 = SignalHistoFromTree(intLumi_int * 15.54 * 1.019 * 1.019 / 832275., isAFloat, variable, diphotonBox25to250Tree, variable+"_diphoBox25to250_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * diphoBox250toInf = SignalHistoFromTree(intLumi_int * 1.18e-3 * 1.019 * 1.019 / 966976., isAFloat, variable, diphotonBox250toInfTree, variable+"_diphoBox250toInf_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * diphoBox = (TH1D*)diphoBox250toInf->Clone(variable+"_diphoBox_"+req);
-  diphoBox->Add(diphoBox25to250);
-  diphoBox->Add(diphoBox10to25);
-  
-  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., isAFloat, variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., isAFloat, variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 * 1.019 * 1.019 / 12119013., isAFloat, variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
   TH1D * ttbar = (TH1D*)ttHadronic->Clone(variable+"_ttbar_"+req);
   ttbar->Add(ttSemiLep);
   ttbar->Add(ttFullLep);
 
-  TH1D * ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., isAFloat, variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * bkg = (TH1D*)ttbar->Clone(variable+"_bkg_"+req);
 
-  TH1D * ttMBD = SignalHistoFromTree(intLumi_int * 136.3 * 1.019 * 1.019 / 6923652., isAFloat, variable, ttjetsTree, variable+"_ttMBD_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-
-  TH1D * bkg = (TH1D*)qcd->Clone(variable+"_bkg_"+req);
-
-  bkg->Add(gjet);
-  bkg->Add(diphotonjets);
-  bkg->Add(diphoBox);
-  bkg->Add(ewk);
+  bkg->Add(wjets);
+  bkg->Add(dyjets);
   bkg->Add(ttg);
-  if(useTTbar) bkg->Add(ttbar);
-  if(useTTMBD) bkg->Add(ttMBD);
-
+  bkg->Add(ttgg);
+  
   Double_t kolm = gg->KolmogorovTest(bkg);
   TString kolmText = Form("KS test probability = %5.3g", kolm);
   TText * tt = new TText(0.92, 0.5, kolmText);
@@ -557,65 +428,34 @@ void PlotMaker::CreatePlot(TString variable, bool isAFloat,
 
   out->cd();
   gg->Write();
-  qcd->Write();
-  gjet->Write();
-  diphotonjets->Write();
-  diphoBox->Write();
-  ewk->Write();
-  ttg->Write();
   ttbar->Write();
-  ttMBD->Write();
+  wjets->Write();
+  dyjets->Write();
+  ttg->Write();
+  ttgg->Write();
   bkg->Write();
 
-  gjet->Add(diphotonjets);
-  gjet->Add(diphoBox);
-  gjet->Add(ewk);
-  gjet->Add(ttg);
-  if(useTTbar) gjet->Add(ttbar);
-  if(useTTMBD) gjet->Add(ttMBD);
-
-  diphotonjets->Add(diphoBox);
-  diphotonjets->Add(ewk);
-  diphotonjets->Add(ttg);
-  if(useTTbar) diphotonjets->Add(ttbar);
-  if(useTTMBD) diphotonjets->Add(ttMBD);
-
-  diphoBox->Add(ewk);
-  diphoBox->Add(ttg);
-  if(useTTbar) diphoBox->Add(ttbar);
-  if(useTTMBD) diphoBox->Add(ttMBD);
-
-  ewk->Add(ttg);
-  if(useTTbar) ewk->Add(ttbar);
-  if(useTTMBD) ewk->Add(ttMBD);
+  wjets->Add(dyjets);
+  wjets->Add(ttg);
+  wjets->Add(ttgg);
   
-  if(useTTbar) ttg->Add(ttbar);
-  if(useTTMBD) ttg->Add(ttMBD);
+  dyjets->Add(ttg);
+  dyjets->Add(ttgg);
 
-  if(useTTMBD) ttbar->Add(ttMBD);
+  ttg->Add(ttgg);
 
   TH1D * errors = (TH1D*)bkg->Clone("errors");
-
-  TH1D * sig_a;
-  TH1D * sig_b;
-  if(drawSignal) {
-    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., isAFloat, variable, sigaTree, variable+"_a_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., isAFloat, variable, sigbTree, variable+"_b_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  }
 
   if(drawSignal) calculateROC(sig_a, sig_b, bkg, req, variable);
 
   TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
   leg->AddEntry(gg, "#gamma#gamma Candidate Sample", "LP");
   leg->AddEntry(errors, "Total Background Uncertainty", "F");
-  leg->AddEntry(bkg, "QCD", "F");
-  leg->AddEntry(gjet, "#gamma + jets", "F");
-  leg->AddEntry(diphotonjets, "#gamma#gamma + jets", "F");
-  leg->AddEntry(diphoBox, "#gamma#gamma Box", "F");
-  leg->AddEntry(ewk, "Electroweak", "F");
-  leg->AddEntry(ttg, "t#bar{t}#gamma + jets", "F");
-  if(useTTbar) leg->AddEntry(ttbar, "t#bar{t} + jets", "F");
-  if(useTTMBD) leg->AddEntry(ttMBD, "t#bar{t} MBD", "F");
+  leg->AddEntry(bkg, "t#bar{t} inclusive", "F");
+  leg->AddEntry(wjets, "W + Jets", "F");
+  leg->AddEntry(dyjets, "DY + Jets", "F");
+  leg->AddEntry(ttg, "t#bar{t}+#gamma", "F");
+  leg->AddEntry(ttgg, "t#bar{t}+#gamma#gamma", "F");
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 
@@ -635,38 +475,26 @@ void PlotMaker::CreatePlot(TString variable, bool isAFloat,
   errors->SetFillStyle(3154);
   errors->SetMarkerSize(0);
 
-  // new stack: qcd, gjet, diphotonjets, ewk, ttg, ttbar
+  // new stack: ttbar, wjets, dyjets, ttg, ttgg
   bkg->SetFillColor(kGray);
   bkg->SetMarkerSize(0);
   bkg->SetLineColor(1);
 
-  gjet->SetFillColor(kOrange-3);
-  gjet->SetMarkerSize(0);
-  gjet->SetLineColor(1);
+  wjets->SetFillColor(kOrange-3);
+  wjets->SetMarkerSize(0);
+  wjets->SetLineColor(1);
 
-  diphotonjets->SetFillColor(kYellow);
-  diphotonjets->SetMarkerSize(0);
-  diphotonjets->SetLineColor(1);
+  dyjets->SetFillColor(kYellow);
+  dyjets->SetMarkerSize(0);
+  dyjets->SetLineColor(1);
 
-  diphoBox->SetFillColor(kViolet);
-  diphoBox->SetMarkerSize(0);
-  diphoBox->SetLineColor(1);
-
-  ewk->SetFillColor(8);
-  ewk->SetMarkerSize(0);
-  ewk->SetLineColor(1);
-
-  ttg->SetFillColor(kRed-3);
+  ttg->SetFillColor(kViolet);
   ttg->SetMarkerSize(0);
   ttg->SetLineColor(1);
 
-  ttbar->SetFillColor(kMagenta-2);
-  ttbar->SetMarkerSize(0);
-  ttbar->SetLineColor(1);
-
-  ttMBD->SetFillColor(kBlue+3);
-  ttMBD->SetMarkerSize(0);
-  ttMBD->SetLineColor(1);
+  ttgg->SetFillColor(8);
+  ttgg->SetMarkerSize(0);
+  ttgg->SetLineColor(1);
 
   TCanvas * can = new TCanvas("can", "Plot", 10, 10, 2000, 2000);
 
@@ -691,15 +519,12 @@ void PlotMaker::CreatePlot(TString variable, bool isAFloat,
   if(xmax > xmin) bkg->GetXaxis()->SetRangeUser(xmin, xmax);
   bkg->GetYaxis()->SetRangeUser(ymin, ymax);
 
-  // new stack: qcd, gjet, diphotonjets, ewk, ttg, ttbar
+  // new stack: ttbar, wjets, dyjets, ttg, ttgg
   bkg->Draw("hist");
-  gjet->Draw("same hist");
-  diphotonjets->Draw("same hist");
-  diphoBox->Draw("same hist");
-  ewk->Draw("same hist");
+  wjets->Draw("same hist");
+  dyjets->Draw("same hist");
   ttg->Draw("same hist");
-  if(useTTbar) ttbar->Draw("same hist");
-  if(useTTMBD) ttMBD->Draw("same hist");
+  ttgg->Draw("same hist");
   errors->Draw("same e2");
   gg->Draw("same e1");
   bkg->Draw("same axis");
@@ -722,313 +547,6 @@ void PlotMaker::CreatePlot(TString variable, bool isAFloat,
     tt->AppendPad();
     KSscores.push_back(make_pair(variable, kolm));
   }
-
-  padlo->cd();
-  padlo->SetTopMargin(0);
-  padlo->SetBottomMargin(0.2);
-
-  TH1D * ratio = (TH1D*)gg->Clone("ratio");
-  ratio->Reset();
-  ratio->SetTitle("Data / Background");
-  for(int i = 0; i < ratio->GetNbinsX(); i++) {
-    if(bkg->GetBinContent(i+1) == 0.) continue;
-    ratio->SetBinContent(i+1, gg->GetBinContent(i+1) / bkg->GetBinContent(i+1));
-    ratio->SetBinError(i+1, gg->GetBinError(i+1) / bkg->GetBinContent(i+1));
-  }
-
-  TH1D * ratio_sys;
-  ratio_sys = (TH1D*)bkg->Clone("ratio_sys");
-  for(int i = 0; i < ratio_sys->GetNbinsX(); i++) {
-    ratio_sys->SetBinContent(i+1, 1.);
-    if(bkg->GetBinContent(i+1) == 0.) ratio_sys->SetBinError(i+1, 0.);
-    else ratio_sys->SetBinError(i+1, ratio_sys->GetBinError(i+1) / bkg->GetBinContent(i+1));
-  }
-
-  if(xmax > xmin) ratio->GetXaxis()->SetRangeUser(xmin, xmax);
-
-  ratio_sys->SetFillStyle(1001);
-  ratio_sys->SetFillColor(kGray);
-  ratio_sys->SetLineColor(kGray);
-  ratio_sys->SetMarkerColor(kGray);
-
-  ratio->GetXaxis()->SetTitle(xaxisTitle);
-  ratio->GetXaxis()->SetLabelFont(63);
-  ratio->GetXaxis()->SetLabelSize(48);
-  ratio->GetXaxis()->SetTitleSize(0.12);
-  ratio->GetXaxis()->SetTitleOffset(0.6);
-  ratio->GetYaxis()->SetTitle("Data / Background");
-  ratio->GetYaxis()->SetLabelFont(63);
-  ratio->GetYaxis()->SetLabelSize(48);
-  ratio->GetYaxis()->SetTitleSize(0.08);
-  ratio->GetYaxis()->SetTitleOffset(0.5);
-  ratio->GetYaxis()->SetRangeUser(ratiomin, ratiomax);
-  ratio->GetYaxis()->SetNdivisions(508);
-
-  ratio->Draw("e1");
-  ratio_sys->Draw("e2 same");
-  ratio->Draw("e1 same");
-  ratio->Draw("axis same");
-
-  TLine * oneLine = new TLine(xmin, 1, xmax, 1);
-  oneLine->SetLineStyle(2);
-  oneLine->Draw();  
-
-  padhi->cd();
-  padhi->SetLogy(true);
-  can->SaveAs(variable+"_"+req+".pdf");
-
-  delete can;
-
-}
-
-void PlotMaker::CreatePlot(TString variable, bool isAFloat,
-			   Int_t nBinsX, Double_t* customBins,
-			   TString xaxisTitle,
-			   Float_t xmin, Float_t xmax,
-			   Float_t ymin, Float_t ymax,
-			   Float_t ratiomin, Float_t ratiomax,
-			   bool drawSignal, bool drawLegend, bool drawPrelim,
-			   TFile*& out, double metCut) {
-
-  TString yaxisTitle = "Number of Events / GeV";
-
-  TH1D * gg = HistoFromTree(isAFloat, variable, ggTree, variable+"_gg_"+req, variable, nBinsX, customBins, metCut);
-  gg = (TH1D*)DivideByBinWidth(gg);
-  
-  if(blinded) for(int i = 0; i < gg->GetNbinsX(); i++) {
-      gg->SetBinContent(i+1, 1.e-14);
-      gg->SetBinError(i+1, 1.e-14);
-    }
-
-  TH1D * ewk = HistoFromTree(isAFloat, variable, egTree, variable+"_eg_"+req, variable, nBinsX, customBins, metCut);
-  
-  TH1D * ewk_noNorm = (TH1D*)ewk->Clone();
-  ewk->Scale(egScale);
-  for(int i = 0; i < ewk->GetNbinsX(); i++) {
-    Float_t normerr = egScaleErr*(ewk_noNorm->GetBinContent(i+1));
-    Float_t staterr = ewk->GetBinError(i+1);
-    Float_t new_err = sqrt(normerr*normerr + staterr*staterr);
-    ewk->SetBinError(i+1, new_err);
-  }
-  ewk = (TH1D*)DivideByBinWidth(ewk);
-
-  TH1D * qcd30to40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 2.35E-4 * 1.019 * 1.019 / 6061407., isAFloat, variable, qcd30to40Tree, variable+"_qcd30to40_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * qcd40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 0.002175 * 1.019 * 1.019 / 9782735., isAFloat, variable, qcd40Tree, variable+"_qcd40_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * qcd = (TH1D*)qcd30to40->Clone(variable+"_qcd_"+req);
-  qcd->Add(qcd40);
-  qcd = (TH1D*)DivideByBinWidth(qcd);
-
-  TH1D * gjet20to40 = SignalHistoFromTree(intLumi_int * 81930.0 * 0.001835 * 1.019 * 1.019 / 5907942., isAFloat, variable, gjet20to40Tree, variable+"_gjet20to40_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * gjet40 = SignalHistoFromTree(intLumi_int * 8884.0 * 0.05387 * 1.019 * 1.019 / 5956149., isAFloat, variable, gjet40Tree, variable+"_gjet40_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * gjet = (TH1D*)gjet20to40->Clone(variable+"_gjet_"+req);
-  gjet->Add(gjet40);
-  gjet = (TH1D*)DivideByBinWidth(gjet);
-
-   TH1D * diphotonjets = SignalHistoFromTree(intLumi_int * 75.39 * 1.019 * 1.019 / 1156030., isAFloat, variable, diphotonjetsTree, variable+"_diphotonjets_"+req, variable, nBinsX, customBins, metCut);
-   diphotonjets = (TH1D*)DivideByBinWidth(diphotonjets);
-
-   TH1D * diphoBox10to25 = SignalHistoFromTree(intLumi_int * 424.8 * 1.019 * 1.019 / 500400., isAFloat, variable, diphotonBox10to25Tree, variable+"_diphoBox10to25_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * diphoBox25to250 = SignalHistoFromTree(intLumi_int * 15.54 * 1.019 * 1.019 / 832275., isAFloat, variable, diphotonBox25to250Tree, variable+"_diphoBox25to250_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * diphoBox250toInf = SignalHistoFromTree(intLumi_int * 1.18e-3 * 1.019 * 1.019 / 966976., isAFloat, variable, diphotonBox250toInfTree, variable+"_diphoBox250toInf_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * diphoBox = (TH1D*)diphoBox250toInf->Clone(variable+"_diphoBox_"+req);
-  diphoBox->Add(diphoBox25to250);
-  diphoBox->Add(diphoBox10to25);
-  diphoBox = (TH1D*)DivideByBinWidth(diphoBox);
-
-  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., isAFloat, variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., isAFloat, variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, customBins, metCut);
-  TH1D * ttbar = (TH1D*)ttHadronic->Clone(variable+"_ttbar_"+req);
-  ttbar->Add(ttSemiLep);
-  ttbar = (TH1D*)DivideByBinWidth(ttbar);
-
-  TH1D * ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., isAFloat, variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, customBins, metCut);
-  ttg = (TH1D*)DivideByBinWidth(ttg);
-
-  TH1D * ttMBD = SignalHistoFromTree(intLumi_int * 136.3 * 1.019 * 1.019 / 6923652., isAFloat, variable, ttjetsTree, variable+"_ttMBD_"+req, variable, nBinsX, customBins, metCut);
-  ttMBD = (TH1D*)DivideByBinWidth(ttMBD);
-
-  TH1D * bkg = (TH1D*)qcd->Clone(variable+"_bkg_"+req);
-
-  bkg->Add(gjet);
-  bkg->Add(diphotonjets);
-  bkg->Add(diphoBox);
-  bkg->Add(ewk);
-  bkg->Add(ttg);
-  if(useTTbar) bkg->Add(ttbar);
-  if(useTTMBD) bkg->Add(ttMBD);
-
-  Double_t kolm = gg->KolmogorovTest(bkg);
-  TString kolmText = Form("KS test probability = %5.3g", kolm);
-  TText * tt = new TText(0.92, 0.5, kolmText);
-  tt->SetTextAngle(90.);
-  tt->SetNDC(); tt->SetTextSize( 0.032 );
-
-  out->cd();
-  gg->Write();
-  qcd->Write();
-  gjet->Write();
-  diphotonjets->Write();
-  diphoBox->Write();
-  ewk->Write();
-  ttg->Write();
-  ttbar->Write();
-  ttMBD->Write();
-  bkg->Write();
-
-  gjet->Add(diphotonjets);
-  gjet->Add(diphoBox);
-  gjet->Add(ewk);
-  gjet->Add(ttg);
-  if(useTTbar) gjet->Add(ttbar);
-  if(useTTMBD) gjet->Add(ttMBD);
-
-  diphotonjets->Add(diphoBox);
-  diphotonjets->Add(ewk);
-  diphotonjets->Add(ttg);
-  if(useTTbar) diphotonjets->Add(ttbar);
-  if(useTTMBD) diphotonjets->Add(ttMBD);
-
-  diphoBox->Add(ewk);
-  diphoBox->Add(ttg);
-  if(useTTbar) diphoBox->Add(ttbar);
-  if(useTTMBD) diphoBox->Add(ttMBD);
-
-  ewk->Add(ttg);
-  if(useTTbar) ewk->Add(ttbar);
-  if(useTTMBD) ewk->Add(ttMBD);
-  
-  if(useTTbar) ttg->Add(ttbar);
-  if(useTTMBD) ttg->Add(ttMBD);
-
-  if(useTTMBD) ttbar->Add(ttMBD);
-
-  TH1D * errors = (TH1D*)bkg->Clone("errors");
-
-  TH1D * sig_a;
-  TH1D * sig_b;
-  if(drawSignal) {
-    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., true, variable, sigaTree, variable+"_a_"+req, variable, nBinsX, customBins, metCut);
-    sig_a = (TH1D*)DivideByBinWidth(sig_a);
-    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., true, variable, sigbTree, variable+"_b_"+req, variable, nBinsX, customBins, metCut);
-    sig_b = (TH1D*)DivideByBinWidth(sig_b);
-  }
-
-  if(drawSignal) calculateROC(sig_a, sig_b, bkg, req, variable);
-
-  TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
-  leg->AddEntry(gg, "#gamma#gamma Candidate Sample", "LP");
-  leg->AddEntry(errors, "Total Background Uncertainty", "F");
-  leg->AddEntry(bkg, "QCD", "F");
-  leg->AddEntry(gjet, "#gamma + jets", "F");
-  leg->AddEntry(diphotonjets, "#gamma#gamma + jets", "F");
-  leg->AddEntry(diphoBox, "#gamma#gamma Box", "F");
-  leg->AddEntry(ewk, "Electroweak", "F");
-  leg->AddEntry(ttg, "t#bar{t}#gamma + jets", "F");
-  if(useTTbar) leg->AddEntry(ttbar, "t#bar{t} + jets", "F");
-  if(useTTMBD) leg->AddEntry(ttMBD, "t#bar{t} MBD", "F");
-  leg->SetFillColor(0);
-  leg->SetTextSize(0.028);
-
-  TPaveText * prelim = new TPaveText(0.50, 0.42, 0.85, 0.62, "NDC");
-  prelim->SetFillColor(0);
-  prelim->SetFillStyle(0);
-  prelim->SetLineColor(0);
-  prelim->AddText("CMS Preliminary 2013");
-  prelim->AddText(" ");
-  prelim->AddText("#sqrt{s} = 8 TeV, #intL = "+intLumi+" fb^{-1}");
-  prelim->AddText(req+" Requirement");
-
-  gg->SetMarkerStyle(20); 
-  gg->SetMarkerSize(1.5);
-
-  errors->SetFillColor(kOrange+10);
-  errors->SetFillStyle(3154);
-  errors->SetMarkerSize(0);
-
-  // new stack: qcd, gjet, ewk, ttg, ttbar
-  bkg->SetFillColor(kGray);
-  bkg->SetMarkerSize(0);
-  bkg->SetLineColor(1);
-
-  gjet->SetFillColor(kOrange-3);
-  gjet->SetMarkerSize(0);
-  gjet->SetLineColor(1);
-
-  diphotonjets->SetFillColor(kYellow);
-  diphotonjets->SetMarkerSize(0);
-  diphotonjets->SetLineColor(1);
-
-  diphoBox->SetFillColor(kViolet);
-  diphoBox->SetMarkerSize(0);
-  diphoBox->SetLineColor(1);
-
-  ewk->SetFillColor(8);
-  ewk->SetMarkerSize(0);
-  ewk->SetLineColor(1);
-
-  ttg->SetFillColor(kRed-3);
-  ttg->SetMarkerSize(0);
-  ttg->SetLineColor(1);
-
-  ttbar->SetFillColor(kMagenta-2);
-  ttbar->SetMarkerSize(0);
-  ttbar->SetLineColor(1);
-
-  ttMBD->SetFillColor(kBlue+3);
-  ttMBD->SetMarkerSize(0);
-  ttMBD->SetLineColor(1);
-
-  TCanvas * can = new TCanvas("can", "Plot", 10, 10, 2000, 2000);
-
-  TPad * padhi = new TPad("padhi", "padhi", 0, 0.3, 1, 1);
-  TPad * padlo = new TPad("padlo", "padlo", 0, 0, 1, 0.3);
-
-  padhi->Draw();
-  padlo->Draw();
-  padhi->cd();
-
-  padhi->SetLogy(false);
-  padhi->SetTickx(true);
-  padhi->SetTicky(true);
-  //padhi->SetGridx(true);
-  //padhi->SetGridy(true);
-  padhi->SetBottomMargin(0);
-
-  bkg->SetTitle(variable);
-  bkg->GetXaxis()->SetTitle(xaxisTitle);
-  bkg->GetYaxis()->SetTitle(yaxisTitle);
-
-  if(xmax > xmin) bkg->GetXaxis()->SetRangeUser(xmin, xmax);
-  bkg->GetYaxis()->SetRangeUser(ymin, ymax);
-
-  // new stack: qcd, gjet, diphotonjets, ewk, ttg, ttbar
-  bkg->Draw("hist");
-  gjet->Draw("same hist");
-  diphotonjets->Draw("same hist");
-  diphoBox->Draw("same hist");
-  ewk->Draw("same hist");
-  ttg->Draw("same hist");
-  if(useTTbar) ttbar->Draw("same hist");
-  if(useTTMBD) ttMBD->Draw("same hist");
-  errors->Draw("same e2");
-  gg->Draw("same e1");
-  bkg->Draw("same axis");
-
-  if(drawSignal) {
-    sig_a->SetLineColor(kMagenta);
-    sig_a->SetLineWidth(3);
-    leg->AddEntry(sig_a, "GGM #gamma#gamma (460_175)", "L");
-    sig_a->Draw("same hist");
-    
-    sig_b->SetLineColor(kBlue);
-    sig_b->SetLineWidth(3);
-    leg->AddEntry(sig_b, "GGM #gamma#gamma (560_325)", "L");
-    sig_b->Draw("same hist");
-  }
-
-  if(drawLegend) leg->Draw("same");
-  if(drawPrelim && drawLegend) prelim->Draw("same");
-  if(displayKStest) tt->AppendPad();
 
   padlo->cd();
   padlo->SetTopMargin(0);

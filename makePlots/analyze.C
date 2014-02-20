@@ -35,7 +35,7 @@ const TString ffColor = "kOrange+10";
 const TString eeColor = "kBlue";
 const TString egColor = "kGreen";
 
-void analyze(TString input, bool addMC, int channel, int intLumi_int, double metCut, bool useTTbar, bool useTTMBD, bool displayKStest, bool blinded) {
+void analyze(TString input, bool addMC, int channel, int intLumi_int, double metCut, bool displayKStest, bool blinded) {
 
   gROOT->Reset();
   gROOT->SetBatch(true);
@@ -43,66 +43,16 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   gStyle->SetOptStat(0000);
   gStyle->SetOptTitle(0);
 
-  const int nChannels = 8;
+  const int nChannels = 1;
   TString channels[nChannels] = {
-    "nojet",
-    "j", "b",
-    "jj", "bj",
-    "muJets", // gg+mu+bj + X (dilep veto)
-    "eleJets",
-    "hadronic" // gg+5j1b + X (lep veto)
+    "ele"
   };
 
   prep_signal(channels[channel]);
 
   TFile * in = new TFile(input, "READ");
 
-  // pixel veto
-  Float_t fakeRate = 0.019;
-  Float_t fakeRate_err = 0.0001;
-
-  // electron conversion veto
-  //Float_t fakeRate = 0.08;
-  //Float_t fakeRate_err = 0.02;
-
-  Float_t fakeRate_sys = 0.0006;
-
-  // Scale the backgrounds
-  Float_t egScale = fakeRate/(1. - fakeRate);
-  Float_t egScaleErr = fakeRate_err/(1. - fakeRate)/(1. - fakeRate);
-
   TTree * ggTree = (TTree*)in->Get("gg_"+channels[channel]+"_EvtTree");
-  TTree * egTree = (TTree*)in->Get("eg_"+channels[channel]+"_EvtTree");
-
-  TFile * fTTGJets = new TFile("inputs/signal_contamination_ttgjets.root", "READ");
-  TTree * ttgjetsTree = (TTree*)fTTGJets->Get("gg_"+channels[channel]+"_EvtTree_ttgjets");
-
-  TFile * fTTMBD = new TFile("inputs/signal_contamination_TTJets.root");
-  TTree * ttMBDTree = (TTree*)fTTMBD->Get("gg_"+channels[channel]+"_EvtTree_TTJets");
-
-  TFile * fQCD30to40 = new TFile("inputs/signal_contamination_qcd30to40.root", "READ");
-  TTree * qcd30to40Tree = (TTree*)fQCD30to40->Get("gg_"+channels[channel]+"_EvtTree_qcd30to40");
-
-  TFile * fQCD40 = new TFile("inputs/signal_contamination_qcd40.root", "READ");
-  TTree * qcd40Tree = (TTree*)fQCD40->Get("gg_"+channels[channel]+"_EvtTree_qcd40");
-
-  TFile * fGJet20to40 = new TFile("inputs/signal_contamination_GJet20to40.root", "READ");
-  TTree * gjet20to40Tree = (TTree*)fGJet20to40->Get("gg_"+channels[channel]+"_EvtTree_GJet20to40");
-
-  TFile * fGJet40 = new TFile("inputs/signal_contamination_GJet40.root", "READ");
-  TTree * gjet40Tree = (TTree*)fGJet40->Get("gg_"+channels[channel]+"_EvtTree_GJet40");
-
-  TFile * fDiPhotonJets = new TFile("inputs/signal_contamination_DiPhotonJets.root", "READ");
-  TTree * diphotonjetsTree = (TTree*)fDiPhotonJets->Get("gg_"+channels[channel]+"_EvtTree_DiPhotonJets");
-
-  TFile * fDiphoBox10to25 = new TFile("inputs/signal_contamination_DiPhotonBox10To25.root");
-  TTree * diphoBox10to25Tree = (TTree*)fDiphoBox10to25->Get("gg_"+channels[channel]+"_EvtTree_DiPhotonBox10To25");
-
-  TFile * fDiphoBox25to250 = new TFile("inputs/signal_contamination_DiPhotonBox25To250.root");
-  TTree * diphoBox25to250Tree = (TTree*)fDiphoBox25to250->Get("gg_"+channels[channel]+"_EvtTree_DiPhotonBox25To250");
-
-  TFile * fDiphoBox250toInf = new TFile("inputs/signal_contamination_DiPhotonBox250ToInf.root");
-  TTree * diphoBox250toInfTree = (TTree*)fDiphoBox250toInf->Get("gg_"+channels[channel]+"_EvtTree_DiPhotonBox250ToInf");
 
   TFile * fTTHadronic = new TFile("inputs/signal_contamination_ttJetsHadronic.root", "READ");
   TTree * ttHadronicTree = (TTree*)fTTHadronic->Get("gg_"+channels[channel]+"_EvtTree_ttJetsHadronic");
@@ -112,6 +62,18 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   TFile * fTTFullLep = new TFile("inputs/signal_contamination_ttJetsFullLep.root", "READ");
   TTree * ttFullLepTree = (TTree*)fTTFullLep->Get("gg_"+channels[channel]+"_EvtTree_ttJetsFullLep");
+
+  TFile * fWJets = new TFile("inputs/signal_contamination_WJetsToLNu.root", "READ");
+  TTree * wjetsTree = (TTree*)fWJets->Get("gg_"+channels[channel]+"_EvtTree_WJetsToLNu");
+
+  TFile * fDYJets = new TFile("inputs/signal_contamination_dyJetsToLL.root", "READ");
+  TTree * dyjetsTree = (TTree*)fDYJets->Get("gg_"+channels[channel]+"_EvtTree_dyJetsToLL");
+  
+  TFile * fTTGJets = new TFile("inputs/signal_contamination_ttgjets.root", "READ");
+  TTree * ttgjetsTree = (TTree*)fTTGJets->Get("gg_"+channels[channel]+"_EvtTree_ttgjets");
+
+  TFile * fTTGG = new TFile("inputs/signal_contamination_ttgg.root", "READ");
+  TTree * ttggTree = (TTree*)fTTGG->Get("gg_"+channels[channel]+"_EvtTree_ttgg");
 
   TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
   TTree * sigaTree = (TTree*)fSigA->Get("gg_"+channels[channel]+"_EvtTree_mst_460_m1_175");
@@ -137,42 +99,19 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     can->SetLogz(false);
   }
 
-  TH2D * DR_jet_gg = (TH2D*)in->Get("DR_jet_gg");
-  if(channel == 0) {
-    DR_jet_gg->Draw("colz");
-    TLine * vertline = new TLine(0.5, 0, 0.5, 5);
-    vertline->SetLineColor(kRed);
-    vertline->SetLineWidth(3);
-    vertline->Draw("same");
-    TLine * horiline = new TLine(0, 0.5, 5, 0.5);
-    horiline->SetLineColor(kRed);
-    horiline->SetLineWidth(3);
-    horiline->Draw("same");
-    can->SetLogz(true);
-    can->SaveAs("DR_jet_gg_"+channels[channel]+gifOrPdf);
-
-    can->SetLogz(false);
-  }
-
   PlotMaker * pMaker = new PlotMaker(intLumi_int, egScale, egScaleErr, channels[channel], blinded);
-  pMaker->SetTrees(ggTree, egTree,
-		   qcd30to40Tree, qcd40Tree,
-		   gjet20to40Tree, gjet40Tree,
-		   diphotonjetsTree,
-		   diphoBox10to25Tree, diphoBox25to250Tree, diphoBox250toInfTree,
+  pMaker->SetTrees(ggTree,
 		   ttHadronicTree, ttSemiLepTree, ttFullLepTree,
-		   ttgjetsTree,
-		   ttMBDTree,
+		   wjetsTree, dyjetsTree,
+		   ttgjetsTree, ttggTree,
 		   sigaTree, sigbTree);
 
-  pMaker->SetUseTTbar(useTTbar);
-  pMaker->SetUseTTMBD(useTTMBD);
   pMaker->SetDisplayKStest(displayKStest);
 
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
-  pMaker->CreatePlot("photon_dR", true,
+  pMaker->CreatePlot("photon_dR",
 		     50, 0., 5.,
 		     "#DeltaR_{#gamma#gamma}", "Number of Events",
 		     0.5, 5., 
@@ -181,7 +120,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("minDR_leadPhoton_jets", true,
+  pMaker->CreatePlot("minDR_leadPhoton_jets",
 		     50, 0., 5.,
 		     "min(#DeltaR_{#gamma_{lead}, jets})", "Number of Events",
 		     0.5, 5., 
@@ -190,7 +129,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("minDR_trailPhoton_jets", true,
+  pMaker->CreatePlot("minDR_trailPhoton_jets",
 		     50, 0., 5.,
 		     "min(#DeltaR_{#gamma_{trail}, jets})", "Number of Events",
 		     0.5, 5., 
@@ -199,7 +138,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("photon_dPhi", true,
+  pMaker->CreatePlot("photon_dPhi",
 		     35, 0., 3.14159,
 		     "#Delta#phi_{#gamma#gamma}", "Number of Events",
 		     0., 3.14159, 
@@ -208,7 +147,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("minDPhi_gMET", true,
+  pMaker->CreatePlot("minDPhi_gMET",
 		     35, 0., 3.14159,
 		     "min(#Delta#phi_{#gamma, MET})", "Number of Events",
 		     0., 3.14159, 
@@ -217,7 +156,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     false, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("minDPhi_jMET", true,
+  pMaker->CreatePlot("minDPhi_jMET",
 		     35, 0., 3.14159,
 		     "min(#Delta#phi_{jets, MET})", "Number of Events",
 		     0., 3.14159, 
@@ -226,7 +165,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     false, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("leadPhotonEta", true,
+  pMaker->CreatePlot("leadPhotonEta",
 		     40, -1.5, 1.5,
 		     "#eta of leading #gamma", "Number of Events",
 		     -1.5, 1.5, 
@@ -235,7 +174,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     false, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("trailPhotonEta", true,
+  pMaker->CreatePlot("trailPhotonEta",
 		     40, -1.5, 1.5,
 		     "#eta of trailing #gamma", "Number of Events",
 		     -1.5, 1.5, 
@@ -244,7 +183,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     false, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("leadPhotonPhi", true,
+  pMaker->CreatePlot("leadPhotonPhi",
 		     63, -3.14159, 3.14159,
 		     "#phi of leading #gamma", "Number of Events",
 		     -3.2, 3.2, 
@@ -253,7 +192,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     false, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("trailPhotonPhi", true,
+  pMaker->CreatePlot("trailPhotonPhi",
 		     63, -3.14159, 3.14159,
 		     "#phi of trailing #gamma", "Number of Events",
 		     -3.2, 3.2, 
@@ -262,7 +201,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     false, false, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("Njets", false,
+  pMaker->CreatePlot("Njets",
 		     20, 0., 20.,
 		     "nJets", "Number of Events",
 		     0, 9, 
@@ -271,7 +210,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("Nbtags", false,
+  pMaker->CreatePlot("Nbtags",
 		     20, 0., 20.,
 		     "nBtags", "Number of Events",
 		     0, 4, 
@@ -280,7 +219,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("Nelectrons", false,
+  pMaker->CreatePlot("Nelectrons",
 		     20, 0., 20.,
 		     "nElectrons", "Number of Events",
 		     0, 4, 
@@ -289,7 +228,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("Nmuons", false,
+  pMaker->CreatePlot("Nmuons",
 		     20, 0., 20.,
 		     "nMuons", "Number of Events",
 		     0, 4, 
@@ -298,29 +237,29 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, false,
 		     out, metCut);
 
-  pMaker->CreatePlot("max_csv", true,
+  pMaker->CreatePlot("max_csv",
 		     20, 0., 1.,
 		     "max csv", "Number of Events",
 		     0, 4, 
 		     2.e-3, 3.e6,
 		     0., 2.1,
-		     true, true, false,
+		     true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("submax_csv", true,
+  pMaker->CreatePlot("submax_csv",
 		     20, 0., 1.,
 		     "sub-max csv", "Number of Events",
 		     0, 4, 
 		     2.e-3, 3.e6,
 		     0., 2.1,
-		     true, true, false,
+		     true, true,
 		     out, metCut);
 
   const int nKinematicBins = 41;
   Double_t xbins_kinematic[nKinematicBins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
 						110, 120, 130, 140, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
 
-  pMaker->CreatePlot("HT_jets", true,
+  pMaker->CreatePlot("HT_jets",
 		     nKinematicBins, xbins_kinematic,
 		     "HT (jets only) (GeV/c^{2})",
 		     0, 2000, 
@@ -329,7 +268,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("hadronic_pt", true,
+  pMaker->CreatePlot("hadronic_pt",
 		     nKinematicBins, xbins_kinematic,
 		     "Jet System Pt (GeV/c)",
 		     0, 2000, 
@@ -338,7 +277,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("invmass", true,
+  pMaker->CreatePlot("invmass",
 		     nKinematicBins, xbins_kinematic,
 		     "m_{#gamma#gamma} (GeV/c^{2})",
 		     0, 2000, 
@@ -347,7 +286,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("HT", true,
+  pMaker->CreatePlot("HT",
 		     nKinematicBins, xbins_kinematic,
 		     "HT (GeV)",
 		     0, 2000, 
@@ -356,25 +295,25 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("jet1_pt", true,
+  pMaker->CreatePlot("jet1_pt",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt of leading jet",
 		     0, 1400, 
 		     2.e-3, 8.e3,
 		     0., 4.5,
-		     true, true, true,
+		     true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("jet2_pt", true,
+  pMaker->CreatePlot("jet2_pt",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt of sub-leading jet",
 		     0, 1400, 
 		     2.e-3, 8.e3,
 		     0., 4.5,
-		     true, true, true,
+		     true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("jet3_pt", true,
+  pMaker->CreatePlot("jet3_pt",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt of third-leading jet",
 		     0, 1400, 
@@ -383,7 +322,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("jet4_pt", true,
+  pMaker->CreatePlot("jet4_pt",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt of fourth-leading jet",
 		     0, 1400, 
@@ -392,7 +331,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("btag1_pt", true,
+  pMaker->CreatePlot("btag1_pt",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt of leading btag",
 		     0, 1400, 
@@ -401,7 +340,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
   
-  pMaker->CreatePlot("btag2_pt", true,
+  pMaker->CreatePlot("btag2_pt",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt of sub-leading btag",
 		     0, 1400, 
@@ -410,7 +349,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("leadPhotonEt", true,
+  pMaker->CreatePlot("leadPhotonEt",
 		     nKinematicBins, xbins_kinematic,
 		     "Et of leading #gamma",
 		     0, 1200, 
@@ -419,7 +358,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("trailPhotonEt", true,
+  pMaker->CreatePlot("trailPhotonEt",
 		     nKinematicBins, xbins_kinematic,
 		     "Et of trailing #gamma",
 		     0, 1200, 
@@ -428,7 +367,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("diEMpT", true,
+  pMaker->CreatePlot("diEMpT",
 		     nKinematicBins, xbins_kinematic,
 		     "di-EM Pt",
 		     0, 1200, 
@@ -439,7 +378,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   const int ndijetptbins = 31;
   Double_t dijetptbins[ndijetptbins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 200, 300, 400, 600, 1000, 1400};
-  pMaker->CreatePlot("diJetPt", true,
+  pMaker->CreatePlot("diJetPt",
 		     ndijetptbins, dijetptbins,
 		     "di-Jet Pt",
 		     0, 1400, 
@@ -448,7 +387,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("leadMatchedJetPt", true,
+  pMaker->CreatePlot("leadMatchedJetPt",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt of jet matched to leading #gamma",
 		     0, 1200, 
@@ -457,7 +396,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("trailMatchedJetPt", true,
+  pMaker->CreatePlot("trailMatchedJetPt",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt of jet matched to trailing #gamma",
 		     0, 1200, 
@@ -466,7 +405,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("leadptOverInvmass", true,
+  pMaker->CreatePlot("leadptOverInvmass",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt(lead #gamma) / m_{#gamma#gamma}",
 		     0, 1200, 
@@ -475,7 +414,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out, metCut);
 
-  pMaker->CreatePlot("trailptOverInvmass", true,
+  pMaker->CreatePlot("trailptOverInvmass",
 		     nKinematicBins, xbins_kinematic,
 		     "Pt(trail #gamma) / m_{#gamma#gamma}",
 		     0, 1200, 
@@ -505,7 +444,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     300};
   //650};
 
-  pMaker->CreatePlot("pfMET", true,
+  pMaker->CreatePlot("pfMET",
 		     nMetBins, xbins_met,
 		     "#slash{E}_{T} (GeV)",
 		     xbins_met[0], xbins_met[nMetBins],

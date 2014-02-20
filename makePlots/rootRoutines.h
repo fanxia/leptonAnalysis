@@ -1,4 +1,5 @@
 #include "TH1.h"
+#include "TTree.h"
 #include "TString.h"
 
 #include <vector>
@@ -6,7 +7,76 @@
 
 using namespace std;
 
-//const TString gifOrPdf = ".pdf";
+void FillHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut) {
+
+  Float_t met;
+  tree->SetBranchAddress("pfMET", &met);
+
+  Float_t var;
+
+  if(variable != "pfMET") tree->SetBranchAddress(variable, &var);
+
+  for(int i = 0; i < tree->GetEntries(); i++) {
+    tree->GetEntry(i);
+
+    if(metCut > 0. && met >= metCut) continue;
+
+    if(variable != "pfMET") h->Fill(var);
+    else h->Fill(met);
+
+  }
+
+  tree->ResetBranchAddresses();
+}
+
+void FillSignalHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut, Float_t scale) {
+
+  Float_t var, met;
+  Float_t puWeight, btagWeight;
+  Float_t puWeightErr, btagWeightErr, btagWeightUp, btagWeightDown;
+
+  tree->SetBranchAddress("pfMET", &met);
+  if(variable != "pfMET") tree->SetBranchAddress(variable, &var);
+
+  tree->SetBranchAddress("pileupWeight", &puWeight);
+  tree->SetBranchAddress("pileupWeightErr", &puWeightErr);
+  tree->SetBranchAddress("btagWeight", &btagWeight);
+  tree->SetBranchAddress("btagWeightErr", &btagWeightErr);
+  tree->SetBranchAddress("btagWeightUp", &btagWeightUp);
+  tree->SetBranchAddress("btagWeightDown", &btagWeightDown);
+
+  for(int i = 0; i < tree->GetEntries(); i++) {
+    tree->GetEntry(i);
+
+    if(metCut > 0. && met >= metCut) continue;
+
+    Float_t olderror = 0.;
+
+    if(variable == "pfMET") var = met;
+
+    olderror = h->GetBinError(h->FindBin(var));
+    h->Fill(var, puWeight * btagWeight);
+
+    // protection from weird 1200 weight errors...
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
+    Float_t newerror = sqrt(olderror*olderror + addError2);
+
+    h->SetBinError(h->FindBin(var), newerror);
+      
+  }
+
+  h->Scale(scale);
+
+  tree->ResetBranchAddresses();
+
+  return h;
+}
 
 bool LargerHistogram(const TH1D* h1, const TH1D* h2) {
   return (h1->GetMaximum() > h2->GetMaximum());

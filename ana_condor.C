@@ -4,7 +4,7 @@ void ana_condor(TString discriminant = "CSVM", bool isMC = false) {
   gSystem->Load("libSusyEvent.so");
 
   gROOT->LoadMacro("SusyEventAnalyzer.cc++");
-  //durp
+
   TChain chain("susyTree");
   chain.Add("dcap:///pnfs/cms/WAX/11/store/user/lpcsusystealth/ntuples/singleElectronA_v1/susyEvents_100_1_9iw.root");
   
