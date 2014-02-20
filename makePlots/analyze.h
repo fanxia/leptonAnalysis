@@ -370,9 +370,9 @@ void PlotMaker::CreatePlot(TString variable,
   TH1D * sig_a;
   TH1D * sig_b;
   if(drawSignal) {
-    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., true, variable, sigaTree, variable+"_a_"+req, variable, nBinsX, customBins, metCut);
+    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigaTree, variable+"_a_"+req, variable, nBinsX, customBins, metCut);
     sig_a = (TH1D*)DivideByBinWidth(sig_a);
-    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., true, variable, sigbTree, variable+"_b_"+req, variable, nBinsX, customBins, metCut);
+    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigbTree, variable+"_b_"+req, variable, nBinsX, customBins, metCut);
     sig_b = (TH1D*)DivideByBinWidth(sig_b);
   }
 
@@ -607,15 +607,15 @@ void PlotMaker::DrawPlot(TH1D * gg,
 }
 
 void PlotMaker::CreateTable() {
-
+  /*
   const int nBins = 5;
   Double_t xbins[nBins+1] = {0, 20, 50, 80, 100, 1000};
 
   Double_t rangeLow[nBins] = {0, 0, 50, 80, 100};
   Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
 
-  TH1D * h_gg = HistoFromTree(true, "pfMET", ggTree, "pfMet2_gg_"+req, "pfMet2", nBins, xbins, -1.);
-  TH1D * h_ewk = HistoFromTree(true, "pfMET", egTree, "pfMet2_eg_"+req, "pfMet2", nBins, xbins, -1.);
+  TH1D * h_gg = HistoFromTree("pfMET", ggTree, "pfMet2_gg_"+req, "pfMet2", nBins, xbins, -1.);
+  TH1D * h_ewk = HistoFromTree("pfMET", egTree, "pfMet2_eg_"+req, "pfMet2", nBins, xbins, -1.);
   
   TH1D * ewk_noNorm = (TH1D*)h_ewk->Clone();
   h_ewk->Scale(egScale);
@@ -695,6 +695,7 @@ void PlotMaker::CreateTable() {
   }
 
   fclose(tableFile);
+  */
 }
 
 void PlotMaker::PlotKolmogorovValues() {
@@ -739,8 +740,7 @@ void prep_signal(TString req) {
   int index1, index2;
 
   TH2D * h_acc = new TH2D("acc_"+req, "acc_"+req, 30, xbins, 32, ybins);
-  TH2D * h_contam = new TH2D("contam_"+req, "contam_"+req, 30, xbins, 32, ybins);
-
+  
   TFile * out = new TFile("signal_"+req+".root", "RECREATE");
 
   for(int i = 0; i < 899; i++) {
@@ -757,37 +757,24 @@ void prep_signal(TString req) {
     }
     
     TTree * ggTree = (TTree*)f->Get("gg_"+req+"_EvtTree"+code_t);
-    TTree * gfTree = (TTree*)f->Get("gf_"+req+"_EvtTree"+code_t);
-    TTree * ffTree = (TTree*)f->Get("ff_"+req+"_EvtTree"+code_t);
-
+    
     TH1D * gg;
-    TH1D * gf;
-    TH1D * ff;
-
+    
     if(ggTree->GetEntries() > 0) {
-      gg = (TH1D*)SignalHistoFromTree(1.0, true, "pfMET", ggTree, "met_gg_"+req+code_t, "met_gg_"+req+code_t, 400, 0., 2000.);
-      gf = (TH1D*)SignalHistoFromTree(1.0, true, "pfMET", gfTree, "met_gf_"+req+code_t, "met_gf_"+req+code_t, 400, 0., 2000.);
-      ff = (TH1D*)SignalHistoFromTree(1.0, true, "pfMET", ffTree, "met_ff_"+req+code_t, "met_ff_"+req+code_t, 400, 0., 2000.);
-
+      gg = (TH1D*)SignalHistoFromTree(1.0, "pfMET", ggTree, "met_gg_"+req+code_t, "met_gg_"+req+code_t, 400, 0., 2000.);
+      
       out->cd();
       gg->Write();
-      gf->Write();
-      ff->Write();
     }
     else {
       f->Close();
       continue;
     }
 
-    //TH1D * h = (TH1D*)f->Get("ngen"+code_t);
-    //double n = h->GetBinContent(1);
     double n = 15000.;
 
     double acceptance = gg->Integral();
     if(n > 0) h_acc->Fill(index1, index2, acceptance / n);
-
-    double contamination = ff->Integral();
-    if(n > 0) h_contam->Fill(index1, index2, contamination / acceptance);
 
     f->Close();
   }
@@ -805,17 +792,6 @@ void prep_signal(TString req) {
   h_acc->Draw("colz");
   can->SaveAs("acceptance_"+req+".pdf");
   
-  h_contam->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
-  h_contam->GetXaxis()->SetRangeUser(0, 1600);
-  h_contam->GetXaxis()->SetLabelSize(0.03);
-  h_contam->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
-  h_contam->GetYaxis()->SetTitleOffset(1.3);
-  h_contam->GetYaxis()->SetLabelSize(0.03);
-  h_contam->GetYaxis()->SetRangeUser(0, 1600);
-  h_contam->GetZaxis()->SetLabelSize(0.02);
-  h_contam->Draw("colz");
-  can->SaveAs("contamination_"+req+".pdf");
-
   out->Write();
   out->Close();
 
