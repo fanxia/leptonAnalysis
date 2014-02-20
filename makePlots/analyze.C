@@ -301,7 +301,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     0, 1400, 
 		     2.e-3, 8.e3,
 		     0., 4.5,
-		     true, true,
+		     true, true, true,
 		     out, metCut);
 
   pMaker->CreatePlot("jet2_pt",
@@ -310,7 +310,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     0, 1400, 
 		     2.e-3, 8.e3,
 		     0., 4.5,
-		     true, true,
+		     true, true, true,
 		     out, metCut);
 
   pMaker->CreatePlot("jet3_pt",
@@ -462,13 +462,13 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   out->Close();
 
   in->Close();
-  fTTGJets->Close();
-  fQCD30to40->Close();
-  fQCD40->Close();
-  fGJet20to40->Close();
-  fGJet40->Close();
   fTTHadronic->Close();
   fTTSemiLep->Close();
+  fTTFullLep->Close();
+  fWJets->Close();
+  fDYJets->Close();
+  fTTGJets->Close();
+  fTTGG->Close();
   fSigA->Close();
   fSigB->Close();
 
