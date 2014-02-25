@@ -308,6 +308,7 @@ void PlotMaker::CreatePlot(TString variable,
 
   TH1D * wjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 37509. / 18393090., variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
   TH1D * dyjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 3504. / 30459503., variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  dyjets->Scale(100. / 98.); // 2 files didn't finish...
 
   TH1D * ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
   TH1D * ttgg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 0.146 / 1719954., variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
