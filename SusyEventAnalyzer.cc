@@ -537,6 +537,8 @@ void SusyEventAnalyzer::Acceptance() {
   TFile * out = new TFile("signal_contamination"+output_code_t+".root", "RECREATE");
   out->cd();
 
+  TH1D * h_nEvents = new TH1D("nEvents"+output_code_t, "nEvents"+output_code_t, 1, 0, 1);
+
   const int nTreeVariables = 68;
 
   TString varNames[nTreeVariables] = {
@@ -582,6 +584,7 @@ void SusyEventAnalyzer::Acceptance() {
   Long64_t nEntries = fTree->GetEntries();
   cout << "Total events in files : " << nEntries << endl;
   cout << "Events to be processed : " << processNEvents << endl;
+  h_nEvents->Fill(0, nEntries);
 
   // start event looping
   Long64_t jentry = 0;

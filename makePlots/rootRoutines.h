@@ -48,6 +48,11 @@ void FillSignalHistoFromTree(TH1D*& h, TTree * tree, TString variable, double me
   for(int i = 0; i < tree->GetEntries(); i++) {
     tree->GetEntry(i);
 
+    if(btagWeight != btagWeight) {
+      cout << "btagWeight = nan!" << endl;
+      continue;
+    }
+
     if(metCut > 0. && met >= metCut) continue;
 
     Float_t olderror = 0.;
