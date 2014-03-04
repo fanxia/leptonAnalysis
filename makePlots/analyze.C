@@ -49,7 +49,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 				 "ele_jjj", "muon_jjj",
 				 "ele_bjj", "muon_bjj"};
   
-  prep_signal(channels[channel]);
+  prep_signal(channels[channel], nPhotons_req);
 
   TFile * in = new TFile(input, "READ");
 

@@ -741,7 +741,7 @@ void PlotMaker::PlotKolmogorovValues() {
 
 }
 
-void prep_signal(TString req) {
+void prep_signal(TString req, int nPhotons_req) {
 
   Double_t mst[29] = {110, 160, 185, 210, 235, 260, 285, 310, 335, 360, 385, 410, 460, 510, 560, 610, 660, 710, 810, 910, 1010, 1110, 1210, 1310, 1410, 1510, 1710, 2010, 5010};
   Double_t mBino[31] = {25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 375, 425, 475, 525, 575, 625, 675, 725, 825, 925, 1025, 1125, 1225, 1325, 1425, 1525, 1725, 2025};
@@ -783,7 +783,7 @@ void prep_signal(TString req) {
     TH1D * gg;
     
     if(ggTree->GetEntries() > 0) {
-      gg = (TH1D*)SignalHistoFromTree(1.0, "pfMET", ggTree, "met_gg_"+req+code_t, "met_gg_"+req+code_t, 400, 0., 2000.);
+      gg = (TH1D*)SignalHistoFromTree(1.0, "pfMET", ggTree, "met_gg_"+req+code_t, "met_gg_"+req+code_t, 400, 0., 2000., nPhotons_req);
       
       out->cd();
       gg->Write();
