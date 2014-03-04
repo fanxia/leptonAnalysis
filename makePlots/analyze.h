@@ -783,7 +783,7 @@ void prep_signal(TString req, int nPhotons_req) {
     TH1D * gg;
     
     if(ggTree->GetEntries() > 0) {
-      gg = (TH1D*)SignalHistoFromTree(1.0, "pfMET", ggTree, "met_gg_"+req+code_t, "met_gg_"+req+code_t, 400, 0., 2000., nPhotons_req);
+      gg = (TH1D*)SignalHistoFromTree(1.0, "pfMET", ggTree, "met_gg_"+req+code_t, "met_gg_"+req+code_t, 400, 0., 2000., -1, nPhotons_req);
       
       out->cd();
       gg->Write();
