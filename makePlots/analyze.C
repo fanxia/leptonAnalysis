@@ -72,7 +72,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   TFile * fDYJets = new TFile("inputs/signal_contamination_dyJetsToLL.root", "READ");
   TTree * dyjetsTree = (TTree*)fDYJets->Get("gg_"+channels[channel]+"_EvtTree_dyJetsToLL");
-  TH1D * nGen_dyjets = (TTree*)fDYJets->Get("nEvents_dyJetsToLL");
+  TH1D * nGen_dyjets = (TH1D*)fDYJets->Get("nEvents_dyJetsToLL");
 
   TFile * fTTGJets = new TFile("inputs/signal_contamination_ttgjets.root", "READ");
   TTree * ttgjetsTree = (TTree*)fTTGJets->Get("gg_"+channels[channel]+"_EvtTree_ttgjets");
