@@ -185,10 +185,14 @@ class PlotMaker : public TObject {
   }
 
   void SetTrees(TTree * gg,
-		TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLepTree,
+		TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLep,
 		TTree * wjets, TTree * dy,
 		TTree * ttgjets, TTree * ttgg,
 		TTree * sig_a, TTree * sig_b);
+
+  void GetNGen(TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
+	       TH1D * wjets, TH1D * dy,
+	       TH1D * ttgjets, TH1D * ttgg);
 
   void SetDisplayKStest(bool v) { displayKStest = v; }
 
@@ -243,6 +247,10 @@ class PlotMaker : public TObject {
   TTree * sigaTree;
   TTree * sigbTree;
 
+  Double_t nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep;
+  Double_t nGen_wjets, nGen_dyjets;
+  Double_t nGen_ttgjets, nGen_ttgg;
+
   Int_t intLumi_int;
   TString intLumi;
   TString req;
@@ -291,6 +299,26 @@ void PlotMaker::SetTrees(TTree * gg,
 
 }
 
+void PlotMaker::GetNGen(TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
+			TH1D * wjets, TH1D * dy,
+			TH1D * ttgjets, TH1D * ttgg) {
+
+  Double_t nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep;
+  Double_t nGen_wjets, nGen_dyjets;
+  Double_t nGen_ttgjets, nGen_ttgg;
+
+  nGen_ttHadronic = ttHadronic->Integral();
+  nGen_ttSemiLep = ttSemiLep->Integral();
+  nGen_ttFullLep = ttFullLep->Integral();
+
+  nGen_wjets = wjets->Integral();
+  nGen_dyjets = dy->Integral();
+  
+  nGen_ttgjets = ttgjets->Integral();
+  nGen_ttgg = ttgg->Integral();
+
+}
+
 void PlotMaker::CreatePlot(TString variable,
 			   Int_t nBinsX, Float_t bin_lo, Float_t bin_hi,
 			   TString xaxisTitle, TString yaxisTitle,
@@ -302,16 +330,15 @@ void PlotMaker::CreatePlot(TString variable,
 
   TH1D * gg = HistoFromTree(variable, ggTree, variable+"_gg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
 
-  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 * 1.019 * 1.019 / 12119013., variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 / nGen_ttHadronic, variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 / nGen_ttSemiLep, variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 / nGen_ttFullLep, variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
 
-  TH1D * wjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 37509. / 18393090., variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * dyjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 3504. / 30459503., variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  dyjets->Scale(100. / 98.); // 2 files didn't finish...
+  TH1D * wjets = SignalHistoFromTree(intLumi_int * 37509. / nGen_wjets, variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * dyjets = SignalHistoFromTree(intLumi_int * 3504. / nGen_dyjets, variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
 
-  TH1D * ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 0.146 / 1719954., variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttg = SignalHistoFromTree(intLumi_int * 14.0 / nGen_ttgjets, variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 0.146 / nGen_ttgg, variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
 
   TH1D * sig_a;
   TH1D * sig_b;
@@ -349,21 +376,21 @@ void PlotMaker::CreatePlot(TString variable,
   TH1D * gg = HistoFromTree(variable, ggTree, variable+"_gg_"+req, variable, nBinsX, customBins, metCut); 
   gg = (TH1D*)DivideByBinWidth(gg);
 
-  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 / nGen_ttHadronic, variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, customBins, metCut);
   ttHadronic = (TH1D*)DivideByBinWidth(ttHadronic);
-  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 / nGen_ttSemiLep, variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, customBins, metCut);
   ttSemiLep = (TH1D*)DivideByBinWidth(ttSemiLep);
-  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 * 1.019 * 1.019 / 12119013., variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 / nGen_ttFullLep, variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, customBins, metCut);
   ttFullLep = (TH1D*)DivideByBinWidth(ttFullLep);
 
-  TH1D * wjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 37509. / 18393090., variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * wjets = SignalHistoFromTree(intLumi_int * 37509. / nGen_wjets, variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, customBins, metCut);
   wjets = (TH1D*)DivideByBinWidth(wjets);
-  TH1D * dyjets = SignalHistoFromTree(intLumi_int *  1.019 * 1.019 * 3504. / 30459503., variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * dyjets = SignalHistoFromTree(intLumi_int * 3504. / nGen_dyjets, variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, customBins, metCut);
   dyjets = (TH1D*)DivideByBinWidth(dyjets);
 
-  TH1D * ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttg = SignalHistoFromTree(intLumi_int * 14.0 / nGen_ttgjets, variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, customBins, metCut);
   ttg = (TH1D*)DivideByBinWidth(ttg);
-  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 0.146 / 1719954., variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 0.146 / nGen_ttgg, variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, customBins, metCut);
   ttgg = (TH1D*)DivideByBinWidth(ttgg);
   
   TH1D * sig_a;

@@ -27,7 +27,7 @@ unsigned int nBtagReq[nChannels] = {0, 0,
 				    1, 1,
 				    0, 0,
 				    1, 1};
-int nEleReq[nChannels] = {1, -1
+int nEleReq[nChannels] = {1, -1,
 			  1, -1,
 			  1, -1,
 			  1, -1};

@@ -56,24 +56,31 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   TFile * fTTHadronic = new TFile("inputs/signal_contamination_ttJetsHadronic.root", "READ");
   TTree * ttHadronicTree = (TTree*)fTTHadronic->Get("gg_"+channels[channel]+"_EvtTree_ttJetsHadronic");
-  
+  TH1D * nGen_ttHadronic = (TH1D*)fTTHadronic->Get("nEvents_ttJetsHadronic");
+
   TFile * fTTSemiLep = new TFile("inputs/signal_contamination_ttJetsSemiLep.root", "READ");
   TTree * ttSemiLepTree = (TTree*)fTTSemiLep->Get("gg_"+channels[channel]+"_EvtTree_ttJetsSemiLep");
+  TH1D * nGen_ttSemiLep = (TH1D*)fTTSemiLep->Get("nEvents_ttJetsSemiLep");
 
   TFile * fTTFullLep = new TFile("inputs/signal_contamination_ttJetsFullLep.root", "READ");
   TTree * ttFullLepTree = (TTree*)fTTFullLep->Get("gg_"+channels[channel]+"_EvtTree_ttJetsFullLep");
+  TH1D * nGen_ttFullLep = (TH1D*)fTTFullLep->Get("nEvents_ttJetsFullLep");
 
   TFile * fWJets = new TFile("inputs/signal_contamination_WJetsToLNu.root", "READ");
   TTree * wjetsTree = (TTree*)fWJets->Get("gg_"+channels[channel]+"_EvtTree_WJetsToLNu");
+  TH1D * nGen_wjets = (TH1D*)fWJets->Get("nEvents_WJetsToLNu");
 
   TFile * fDYJets = new TFile("inputs/signal_contamination_dyJetsToLL.root", "READ");
   TTree * dyjetsTree = (TTree*)fDYJets->Get("gg_"+channels[channel]+"_EvtTree_dyJetsToLL");
-  
+  TH1D * nGen_dyjets = (TTree*)fDYJets->Get("nEvents_dyJetsToLL");
+
   TFile * fTTGJets = new TFile("inputs/signal_contamination_ttgjets.root", "READ");
   TTree * ttgjetsTree = (TTree*)fTTGJets->Get("gg_"+channels[channel]+"_EvtTree_ttgjets");
+  TH1D * nGen_ttgjets = (TH1D*)fTTGJets->Get("nEvents_ttgjets");
 
   TFile * fTTGG = new TFile("inputs/signal_contamination_ttGG.root", "READ");
   TTree * ttggTree = (TTree*)fTTGG->Get("gg_"+channels[channel]+"_EvtTree_ttGG");
+  TH1D * nGen_ttgg = (TH1D*)fTTGG->Get("nEvents_ttGG");
 
   TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
   TTree * sigaTree = (TTree*)fSigA->Get("gg_"+channels[channel]+"_EvtTree_mst_460_m1_175");
@@ -100,11 +107,16 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   }
 
   PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], blinded);
+
   pMaker->SetTrees(ggTree,
 		   ttHadronicTree, ttSemiLepTree, ttFullLepTree,
 		   wjetsTree, dyjetsTree,
 		   ttgjetsTree, ttggTree,
 		   sigaTree, sigbTree);
+
+  pMaker->GetNGen(nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep,
+		  nGen_wjets, nGen_dyjets,
+		  nGen_ttgjets, nGen_ttgg);
 
   pMaker->SetDisplayKStest(displayKStest);
 

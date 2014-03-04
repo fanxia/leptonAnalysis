@@ -584,7 +584,7 @@ void SusyEventAnalyzer::Acceptance() {
   Long64_t nEntries = fTree->GetEntries();
   cout << "Total events in files : " << nEntries << endl;
   cout << "Events to be processed : " << processNEvents << endl;
-  h_nEvents->Fill(0, nEntries);
+  h_nEvents->Fill(0., (Double_t)nEntries);
 
   // start event looping
   Long64_t jentry = 0;
