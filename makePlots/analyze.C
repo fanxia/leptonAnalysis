@@ -216,7 +216,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("pfMET",
 		     true,
-		     "#slash{E}_{T} (GeV)",
+		     "#slash{E}_{T} (GeV)", "Number of Events",
 		     xbins_met[0], xbins_met[nMetBins],
 		     7.e-4, 25000.,
 		     0., 9.1,
@@ -261,7 +261,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("HT_jets",
 		     true,
-		     "HT (jets only) (GeV/c^{2})",
+		     "HT (jets only) (GeV/c^{2})", "Number of Events",
 		     0, 2000, 
 		     2.e-3, 3.e4,
 		     0., 11.5,
@@ -270,7 +270,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("hadronic_pt",
 		     true,
-		     "Jet System Pt (GeV/c)",
+		     "Jet System Pt (GeV/c)", "Number of Events",
 		     0, 2000, 
 		     2.e-3, 3.e4,
 		     0., 11.5,
@@ -279,7 +279,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("HT",
 		     true,
-		     "HT (GeV)",
+		     "HT (GeV)", "Number of Events",
 		     0, 2000, 
 		     2.e-3, 3.e4,
 		     0., 5.1,
@@ -288,7 +288,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("jet1_pt",
 		     true,
-		     "Pt of leading jet",
+		     "Pt of leading jet", "Number of Events",
 		     0, 1400, 
 		     2.e-3, 8.e3,
 		     0., 4.5,
@@ -297,7 +297,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("jet2_pt",
 		     true,
-		     "Pt of sub-leading jet",
+		     "Pt of sub-leading jet", "Number of Events",
 		     0, 1400, 
 		     2.e-3, 8.e3,
 		     0., 4.5,
@@ -306,7 +306,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("jet3_pt",
 		     true,
-		     "Pt of third-leading jet",
+		     "Pt of third-leading jet", "Number of Events",
 		     0, 1400, 
 		     2.e-3, 8.e3,
 		     0., 4.5,
@@ -315,7 +315,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("btag1_pt",
 		     true,
-		     "Pt of leading btag",
+		     "Pt of leading btag", "Number of Events",
 		     0, 1400, 
 		     2.e-3, 8.e3,
 		     0., 4.5,
@@ -323,7 +323,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
   
   if(nPhotons_req >= 1) {
-    pMaker->CreatePlot("leadPhotonEta",
+    pMaker->CreatePlot("leadPhotonEta"
 		       false,
 		       "#eta of leading #gamma", "Number of Events",
 		       -1.5, 1.5, 
@@ -343,7 +343,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
     pMaker->CreatePlot("leadPhotonEt",
 		       true,
-		       "Et of leading #gamma",
+		       "Et of leading #gamma", "Number of Events",
 		       0, 1200, 
 		       2.e-3, 5.e4,
 		       0., 5.1,
@@ -390,7 +390,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   
   pMaker->CreatePlot("photon_invmass",
 		     true,
-		     "m_{#gamma#gamma} (GeV/c^{2})",
+		     "m_{#gamma#gamma} (GeV/c^{2})", "Number of Events",
 		     0, 2000, 
 		     2.e-3, 3.e4,
 		     0., 11.5,
@@ -399,7 +399,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("trailPhotonEt",
 		     true,
-		     "Et of trailing #gamma",
+		     "Et of trailing #gamma", "Number of Events",
 		     0, 1200, 
 		     2.e-3, 5.e4,
 		     0., 5.1,
@@ -408,7 +408,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->CreatePlot("diEMpT",
 		     true,
-		     "di-EM Pt",
+		     "di-EM Pt", "Number of Events",
 		     0, 1200, 
 		     2.e-3, 5.e4,
 		     0., 5.1,
@@ -417,7 +417,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   
   pMaker->CreatePlot("diJetPt",
 		     true,
-		     "di-Jet Pt",
+		     "di-Jet Pt", "Number of Events",
 		     0, 1400, 
 		     2.e-3, 5.e4,
 		     0., 5.1,
