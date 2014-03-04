@@ -13,10 +13,11 @@ void makePlots() {
   double metCut = -1.;
 
   bool displayKStest = true;
-  bool blinded = true;
+  bool blinded = false;
+  int nPhotons_req = 0;
 
-  for(int i = 0; i < 1; i++) {
-    analyze(input, addMC, i, intLumi, metCut, displayKStest, blinded);
+  for(int i = 0; i < 8; i++) {
+    analyze(input, addMC, i, intLumi, metCut, nPhotons_req, displayKStest, blinded);
   }  
 
   ts.Stop();

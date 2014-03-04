@@ -33,31 +33,31 @@ using namespace std;
 
 const TString gifOrPdf = ".pdf";
 
-TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
+TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut, int nPhotons_req) {
   TH1D * h = new TH1D(name, title, nBins, xlo, xhi);
   h->Sumw2();
-  FillHistoFromTree(h, tree, variable, metCut);
+  FillHistoFromTree(h, tree, variable, metCut, nPhotons_req);
   return h;
 }
   
-TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut = -1.) {
+TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut, int nPhotons_req) {
   TH1D * h = new TH1D(name, title, nBins, customBins);
   h->Sumw2();
-  FillHistoFromTree(h, tree, variable, metCut);
+  FillHistoFromTree(h, tree, variable, metCut, nPhotons_req);
   return h;
 }
 
-TH1D * SignalHistoFromTree(double scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut = -1.) {
+TH1D * SignalHistoFromTree(double scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut, int nPhotons_req) {
   TH1D * h = new TH1D(name, title, nBins, xlo, xhi);
   h->Sumw2();
-  FillSignalHistoFromTree(h, tree, variable, metCut, scale);
+  FillSignalHistoFromTree(h, tree, variable, metCut, nPhotons_req, scale);
   return h;
 }
 
-TH1D * SignalHistoFromTree(double scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut = -1.) {
+TH1D * SignalHistoFromTree(double scale, TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t* customBins, double metCut, int nPhotons_req) {
   TH1D * h = new TH1D(name, title, nBins, customBins);
   h->Sumw2();
-  FillSignalHistoFromTree(h, tree, variable, metCut, scale);
+  FillSignalHistoFromTree(h, tree, variable, metCut, nPhotons_req, scale);
   return h;
 }
 
@@ -203,7 +203,7 @@ class PlotMaker : public TObject {
 		  Float_t ymin, Float_t ymax,
 		  Float_t ratiomin, Float_t ratiomax,
 		  bool drawSignal, bool drawLegend, bool drawPrelim,
-		  TFile*& out, double metCut);
+		  TFile*& out, double metCut, int nPhotons_req);
 
   void CreatePlot(TString variable,
 		  Int_t nBinsX, Double_t* customBins,
@@ -212,7 +212,7 @@ class PlotMaker : public TObject {
 		  Float_t ymin, Float_t ymax,
 		  Float_t ratiomin, Float_t ratiomax,
 		  bool drawSignal, bool drawLegend, bool drawPrelim,
-		  TFile*& out, double metCut);
+		  TFile*& out, double metCut, int nPhotons_req);
 
   void DrawPlot(TH1D * gg,
 		TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
@@ -303,10 +303,6 @@ void PlotMaker::GetNGen(TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
 			TH1D * wjets, TH1D * dy,
 			TH1D * ttgjets, TH1D * ttgg) {
 
-  Double_t nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep;
-  Double_t nGen_wjets, nGen_dyjets;
-  Double_t nGen_ttgjets, nGen_ttgg;
-
   nGen_ttHadronic = ttHadronic->Integral();
   nGen_ttSemiLep = ttSemiLep->Integral();
   nGen_ttFullLep = ttFullLep->Integral();
@@ -326,25 +322,25 @@ void PlotMaker::CreatePlot(TString variable,
 			   Float_t ymin, Float_t ymax,
 			   Float_t ratiomin, Float_t ratiomax,
 			   bool drawSignal, bool drawLegend, bool drawPrelim,
-			   TFile*& out, double metCut) {
+			   TFile*& out, double metCut, int nPhotons_req) {
 
-  TH1D * gg = HistoFromTree(variable, ggTree, variable+"_gg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * gg = HistoFromTree(variable, ggTree, variable+"_gg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
 
-  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 / nGen_ttHadronic, variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 / nGen_ttSemiLep, variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 / nGen_ttFullLep, variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 / nGen_ttHadronic, variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
+  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 / nGen_ttSemiLep, variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
+  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 / nGen_ttFullLep, variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
 
-  TH1D * wjets = SignalHistoFromTree(intLumi_int * 37509. / nGen_wjets, variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * dyjets = SignalHistoFromTree(intLumi_int * 3504. / nGen_dyjets, variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * wjets = SignalHistoFromTree(intLumi_int * 37509. / nGen_wjets, variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
+  TH1D * dyjets = SignalHistoFromTree(intLumi_int * 3504. / nGen_dyjets, variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
 
-  TH1D * ttg = SignalHistoFromTree(intLumi_int * 14.0 / nGen_ttgjets, variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 0.146 / nGen_ttgg, variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+  TH1D * ttg = SignalHistoFromTree(intLumi_int * 14.0 / nGen_ttgjets, variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
+  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 0.146 / nGen_ttgg, variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
 
   TH1D * sig_a;
   TH1D * sig_b;
   if(drawSignal) {
-    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigaTree, variable+"_a_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
-    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigbTree, variable+"_b_"+req, variable, nBinsX, bin_lo, bin_hi, metCut);
+    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigaTree, variable+"_a_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
+    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigbTree, variable+"_b_"+req, variable, nBinsX, bin_lo, bin_hi, metCut, nPhotons_req);
   }
 
   DrawPlot(gg,
@@ -369,36 +365,36 @@ void PlotMaker::CreatePlot(TString variable,
 			   Float_t ymin, Float_t ymax,
 			   Float_t ratiomin, Float_t ratiomax,
 			   bool drawSignal, bool drawLegend, bool drawPrelim,
-			   TFile*& out, double metCut) {
+			   TFile*& out, double metCut, int nPhotons_req) {
 
   TString yaxisTitle = "Number of Events / GeV";
 
-  TH1D * gg = HistoFromTree(variable, ggTree, variable+"_gg_"+req, variable, nBinsX, customBins, metCut); 
+  TH1D * gg = HistoFromTree(variable, ggTree, variable+"_gg_"+req, variable, nBinsX, customBins, metCut, nPhotons_req); 
   gg = (TH1D*)DivideByBinWidth(gg);
 
-  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 / nGen_ttHadronic, variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 / nGen_ttHadronic, variable, ttHadronicTree, variable+"_ttHadronic_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
   ttHadronic = (TH1D*)DivideByBinWidth(ttHadronic);
-  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 / nGen_ttSemiLep, variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 / nGen_ttSemiLep, variable, ttSemiLepTree, variable+"_ttSemiLep_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
   ttSemiLep = (TH1D*)DivideByBinWidth(ttSemiLep);
-  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 / nGen_ttFullLep, variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttFullLep = SignalHistoFromTree(intLumi_int * 13.43 / nGen_ttFullLep, variable, ttFullLepTree, variable+"_ttFullLep_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
   ttFullLep = (TH1D*)DivideByBinWidth(ttFullLep);
 
-  TH1D * wjets = SignalHistoFromTree(intLumi_int * 37509. / nGen_wjets, variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * wjets = SignalHistoFromTree(intLumi_int * 37509. / nGen_wjets, variable, wjetsTree, variable+"_wjets_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
   wjets = (TH1D*)DivideByBinWidth(wjets);
-  TH1D * dyjets = SignalHistoFromTree(intLumi_int * 3504. / nGen_dyjets, variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * dyjets = SignalHistoFromTree(intLumi_int * 3504. / nGen_dyjets, variable, dyjetsTree, variable+"_dyjets_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
   dyjets = (TH1D*)DivideByBinWidth(dyjets);
 
-  TH1D * ttg = SignalHistoFromTree(intLumi_int * 14.0 / nGen_ttgjets, variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttg = SignalHistoFromTree(intLumi_int * 14.0 / nGen_ttgjets, variable, ttgjetsTree, variable+"_ttgjets_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
   ttg = (TH1D*)DivideByBinWidth(ttg);
-  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 0.146 / nGen_ttgg, variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, customBins, metCut);
+  TH1D * ttgg = SignalHistoFromTree(intLumi_int * 0.146 / nGen_ttgg, variable, ttggTree, variable+"_ttgg_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
   ttgg = (TH1D*)DivideByBinWidth(ttgg);
   
   TH1D * sig_a;
   TH1D * sig_b;
   if(drawSignal) {
-    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigaTree, variable+"_a_"+req, variable, nBinsX, customBins, metCut);
+    sig_a = SignalHistoFromTree(0.147492 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigaTree, variable+"_a_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
     sig_a = (TH1D*)DivideByBinWidth(sig_a);
-    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigbTree, variable+"_b_"+req, variable, nBinsX, customBins, metCut);
+    sig_b = SignalHistoFromTree(0.0399591 * intLumi_int * 1.019 * 1.019 / 15000., variable, sigbTree, variable+"_b_"+req, variable, nBinsX, customBins, metCut, nPhotons_req);
     sig_b = (TH1D*)DivideByBinWidth(sig_b);
   }
 

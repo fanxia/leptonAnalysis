@@ -7,36 +7,38 @@
 
 using namespace std;
 
-void FillHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut) {
+void FillHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut, int nPhotons_req) {
 
-  Float_t met;
+  Float_t var, met, nphotons;
   tree->SetBranchAddress("pfMET", &met);
+  tree->SetBranchAddress("Nphotons", &nphotons);
 
-  Float_t var;
-
-  if(variable != "pfMET") tree->SetBranchAddress(variable, &var);
+  if(variable != "pfMET" && variable != "Nphotons") tree->SetBranchAddress(variable, &var);
 
   for(int i = 0; i < tree->GetEntries(); i++) {
     tree->GetEntry(i);
 
+    if((int)nphotons != nPhotons_req) continue;
     if(metCut > 0. && met >= metCut) continue;
 
-    if(variable != "pfMET") h->Fill(var);
-    else h->Fill(met);
+    if(variable == "pfMET") h->Fill(met);
+    else if(variable == "Nphotons") h->Fill(nphotons);
+    else h->Fill(var);
 
   }
 
   tree->ResetBranchAddresses();
 }
 
-void FillSignalHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut, double scale) {
+void FillSignalHistoFromTree(TH1D*& h, TTree * tree, TString variable, double metCut, int nPhotons_req, double scale) {
 
-  Float_t var, met;
+  Float_t var, met, nphotons;
   Float_t puWeight, btagWeight;
   Float_t puWeightErr, btagWeightErr, btagWeightUp, btagWeightDown;
 
   tree->SetBranchAddress("pfMET", &met);
-  if(variable != "pfMET") tree->SetBranchAddress(variable, &var);
+  tree->SetBranchAddress("Nphotons", &nphotons);
+  if(variable != "pfMET" && variable != "Nphotons") tree->SetBranchAddress(variable, &var);
 
   tree->SetBranchAddress("pileupWeight", &puWeight);
   tree->SetBranchAddress("pileupWeightErr", &puWeightErr);
@@ -49,15 +51,17 @@ void FillSignalHistoFromTree(TH1D*& h, TTree * tree, TString variable, double me
     tree->GetEntry(i);
 
     if(btagWeight != btagWeight) {
-      cout << "btagWeight = nan!" << endl;
+      //cout << "btagWeight = nan!" << endl;
       continue;
     }
 
+    if((int)nphotons != nPhotons_req) continue;
     if(metCut > 0. && met >= metCut) continue;
 
     Float_t olderror = 0.;
 
     if(variable == "pfMET") var = met;
+    if(variable == "Nphotons") var = nphotons;
 
     olderror = h->GetBinError(h->FindBin(var));
     h->Fill(var, puWeight * btagWeight);

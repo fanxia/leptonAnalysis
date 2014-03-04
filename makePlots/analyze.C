@@ -35,7 +35,7 @@ const TString ffColor = "kOrange+10";
 const TString eeColor = "kBlue";
 const TString egColor = "kGreen";
 
-void analyze(TString input, bool addMC, int channel, int intLumi_int, double metCut, bool displayKStest, bool blinded) {
+void analyze(TString input, bool addMC, int channel, int intLumi_int, double metCut, int nPhotons_req, bool displayKStest, bool blinded) {
 
   gROOT->Reset();
   gROOT->SetBatch(true);
@@ -43,11 +43,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   gStyle->SetOptStat(0000);
   gStyle->SetOptTitle(0);
 
-  const int nChannels = 1;
-  TString channels[nChannels] = {
-    "ele"
-  };
-
+  const int nChannels = 8;
+  TString channels[nChannels] = {"ele", "muon",
+				 "ele_b", "muon_b",
+				 "ele_jjj", "muon_jjj",
+				 "ele_bjj", "muon_bjj"};
+  
   prep_signal(channels[channel]);
 
   TFile * in = new TFile(input, "READ");
@@ -130,25 +131,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-2, 3.e5,
 		     0., 2.1,
 		     true, false, false,
-		     out, metCut);
-
-  pMaker->CreatePlot("minDR_leadPhoton_jets",
-		     50, 0., 5.,
-		     "min(#DeltaR_{#gamma_{lead}, jets})", "Number of Events",
-		     0.5, 5., 
-		     2.e-2, 3.e5,
-		     0., 2.1,
-		     true, false, false,
-		     out, metCut);
-
-  pMaker->CreatePlot("minDR_trailPhoton_jets",
-		     50, 0., 5.,
-		     "min(#DeltaR_{#gamma_{trail}, jets})", "Number of Events",
-		     0.5, 5., 
-		     2.e-2, 3.e5,
-		     0., 2.1,
-		     true, false, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("photon_dPhi",
 		     35, 0., 3.14159,
@@ -157,25 +140,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-2, 3.e5,
 		     0., 2.1,
 		     true, false, false,
-		     out, metCut);
-
-  pMaker->CreatePlot("minDPhi_gMET",
-		     35, 0., 3.14159,
-		     "min(#Delta#phi_{#gamma, MET})", "Number of Events",
-		     0., 3.14159, 
-		     2.e-2, 3.e5,
-		     0., 2.1,
-		     false, false, false,
-		     out, metCut);
-
-  pMaker->CreatePlot("minDPhi_jMET",
-		     35, 0., 3.14159,
-		     "min(#Delta#phi_{jets, MET})", "Number of Events",
-		     0., 3.14159, 
-		     2.e-2, 3.e5,
-		     0., 2.1,
-		     false, false, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("leadPhotonEta",
 		     40, -1.5, 1.5,
@@ -184,7 +149,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e4,
 		     0., 2.1,
 		     false, false, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("trailPhotonEta",
 		     40, -1.5, 1.5,
@@ -193,7 +158,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e4,
 		     0., 2.1,
 		     false, false, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("leadPhotonPhi",
 		     63, -3.14159, 3.14159,
@@ -202,7 +167,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e4,
 		     0., 2.1,
 		     false, false, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("trailPhotonPhi",
 		     63, -3.14159, 3.14159,
@@ -211,7 +176,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e4,
 		     0., 2.1,
 		     false, false, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("Njets",
 		     20, 0., 20.,
@@ -220,7 +185,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e6,
 		     0., 2.1,
 		     true, true, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("Nbtags",
 		     20, 0., 20.,
@@ -229,7 +194,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e6,
 		     0., 2.1,
 		     true, true, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("Nelectrons",
 		     20, 0., 20.,
@@ -238,7 +203,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e6,
 		     0., 2.1,
 		     true, true, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("Nmuons",
 		     20, 0., 20.,
@@ -247,7 +212,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e6,
 		     0., 2.1,
 		     true, true, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("max_csv",
 		     20, 0., 1.,
@@ -256,7 +221,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e6,
 		     0., 2.1,
 		     true, true, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("submax_csv",
 		     20, 0., 1.,
@@ -265,7 +230,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e6,
 		     0., 2.1,
 		     true, true, false,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   const int nKinematicBins = 41;
   Double_t xbins_kinematic[nKinematicBins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
@@ -278,7 +243,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e4,
 		     0., 11.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("hadronic_pt",
 		     nKinematicBins, xbins_kinematic,
@@ -287,7 +252,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e4,
 		     0., 11.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("invmass",
 		     nKinematicBins, xbins_kinematic,
@@ -296,7 +261,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e4,
 		     0., 11.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("HT",
 		     nKinematicBins, xbins_kinematic,
@@ -305,7 +270,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 3.e4,
 		     0., 5.1,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("jet1_pt",
 		     nKinematicBins, xbins_kinematic,
@@ -314,7 +279,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 8.e3,
 		     0., 4.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("jet2_pt",
 		     nKinematicBins, xbins_kinematic,
@@ -323,7 +288,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 8.e3,
 		     0., 4.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("jet3_pt",
 		     nKinematicBins, xbins_kinematic,
@@ -332,7 +297,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 8.e3,
 		     0., 4.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("jet4_pt",
 		     nKinematicBins, xbins_kinematic,
@@ -341,7 +306,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 8.e3,
 		     0., 4.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("btag1_pt",
 		     nKinematicBins, xbins_kinematic,
@@ -350,7 +315,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 8.e3,
 		     0., 4.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
   
   pMaker->CreatePlot("btag2_pt",
 		     nKinematicBins, xbins_kinematic,
@@ -359,7 +324,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 8.e3,
 		     0., 4.5,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("leadPhotonEt",
 		     nKinematicBins, xbins_kinematic,
@@ -368,7 +333,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 5.e4,
 		     0., 5.1,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("trailPhotonEt",
 		     nKinematicBins, xbins_kinematic,
@@ -377,7 +342,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 5.e4,
 		     0., 5.1,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreatePlot("diEMpT",
 		     nKinematicBins, xbins_kinematic,
@@ -386,7 +351,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 5.e4,
 		     0., 5.1,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   const int ndijetptbins = 31;
   Double_t dijetptbins[ndijetptbins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 200, 300, 400, 600, 1000, 1400};
@@ -397,43 +362,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-3, 5.e4,
 		     0., 5.1,
 		     true, true, true,
-		     out, metCut);
-
-  pMaker->CreatePlot("leadMatchedJetPt",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt of jet matched to leading #gamma",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut);
-
-  pMaker->CreatePlot("trailMatchedJetPt",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt of jet matched to trailing #gamma",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut);
-
-  pMaker->CreatePlot("leadptOverInvmass",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt(lead #gamma) / m_{#gamma#gamma}",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut);
-
-  pMaker->CreatePlot("trailptOverInvmass",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt(trail #gamma) / m_{#gamma#gamma}",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   const int nMetBins = 16;
   Double_t xbins_met[nMetBins+1] = {
@@ -463,7 +392,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     7.e-4, 25000.,
 		     0., 9.1,
 		     true, true, true,
-		     out, metCut);
+		     out, metCut, nPhotons_req);
 
   pMaker->CreateTable();
 
