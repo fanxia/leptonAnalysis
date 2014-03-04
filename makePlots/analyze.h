@@ -225,8 +225,8 @@ class PlotMaker : public TObject {
     h_dyjets.clear();
     h_ttgjets.clear();
     h_ttgg.clear();
-    h_sig_a.clear();
-    h_sig_b.clear();
+    h_siga.clear();
+    h_sigb.clear();
 
   }
 
@@ -247,7 +247,7 @@ class PlotMaker : public TObject {
   void SetDisplayKStest(bool v) { displayKStest = v; }
 
   void BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_t xhi);
-  void BookHistogram(TString variable, Int_t nBinsX, Double_t* customBins);
+  void BookHistogram(TString variable, Int_t nBins, Double_t* customBins);
 
   void FillHistograms(double metCut, int nPhotons_req);
 
@@ -303,6 +303,8 @@ class PlotMaker : public TObject {
   TTree * sigbTree;
 
   Double_t nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep;
+  Double_t nGen_tbar_s, nGen_tbar_t, nGen_tbar_tW;
+  Double_t nGen_t_s, nGen_t_t, nGen_t_tW;
   Double_t nGen_wjets, nGen_dyjets;
   Double_t nGen_ttgjets, nGen_ttgg;
 
@@ -336,8 +338,8 @@ class PlotMaker : public TObject {
   vector<TH1D*> h_ttgjets;
   vector<TH1D*> h_ttgg;
 
-  vector<TH1D*> h_sig_a;
-  vector<TH1D*> h_sig_b;
+  vector<TH1D*> h_siga;
+  vector<TH1D*> h_sigb;
   
 };
 
@@ -370,8 +372,8 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   h_dyjets.clear();
   h_ttgjets.clear();
   h_ttgg.clear();
-  h_sig_a.clear();
-  h_sig_b.clear();
+  h_siga.clear();
+  h_sigb.clear();
 }
 
 void PlotMaker::SetTrees(TTree * gg,
@@ -493,15 +495,15 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
   
   TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, xlo, xhi);
   sig_a->Sumw2();
-  h_sig_a.push_back(sig_a);
+  h_siga.push_back(sig_a);
   
   TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, xlo, xhi);
   sig_b->Sumw2();
-  h_sig_b.push_back(sig_b);
+  h_sigb.push_back(sig_b);
   
 }
 
-void PlotMaker::BookHistogram(TString variable, Int_t nBinsX, Double_t* customBins) {
+void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBins) {
 
   variables.push_back(variable);
 
@@ -563,11 +565,11 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBinsX, Double_t* customBi
   
   TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, customBins);
   sig_a->Sumw2();
-  h_sig_a.push_back(sig_a);
+  h_siga.push_back(sig_a);
   
   TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, customBins);
   sig_b->Sumw2();
-  h_sig_b.push_back(sig_b);
+  h_sigb.push_back(sig_b);
   
 }
 
@@ -582,7 +584,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(unsigned int i = 0; i < variables.size(); i++) {
 
-    if(variable == "pfMET" || variable == "Nphotons") continue;
+    if(variables[i] == "pfMET" || variables[i] == "Nphotons") continue;
 
     ggTree->SetBranchAddress(variables[i], &(vars[i]));
     ttHadronicTree->SetBranchAddress(variables[i], &(vars[i]));
@@ -808,7 +810,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_s[j]->Scale(intLumi_int * xsec_tbar_s / nGen_tbar_s);
+  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_s[j]->Scale(intLumi_int * xsec_Tbar_s / nGen_tbar_s);
 
   for(int i = 0; i < tbar_tTree->GetEntries(); i++) {
     tbar_tTree->GetEntry(i);
@@ -831,7 +833,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_t[j]->Scale(intLumi_int * xsec_tbar_t / nGen_tbar_t);
+  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_t[j]->Scale(intLumi_int * xsec_Tbar_t / nGen_tbar_t);
 
   for(int i = 0; i < tbar_tWTree->GetEntries(); i++) {
     tbar_tWTree->GetEntry(i);
@@ -854,7 +856,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_tW[j]->Scale(intLumi_int * xsec_tbar_tW / nGen_tbar_tW);
+  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_tW[j]->Scale(intLumi_int * xsec_Tbar_tW / nGen_tbar_tW);
 
   for(int i = 0; i < t_sTree->GetEntries(); i++) {
     t_sTree->GetEntry(i);
@@ -1038,7 +1040,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_siga[j]->Scale(intLumi_int * xsec_siga / nGen_siga);
+  for(unsigned int j = 0; j < vars.size(); j++) h_siga[j]->Scale(intLumi_int * xsec_siga / 15000.);
 
   for(int i = 0; i < sigbTree->GetEntries(); i++) {
     sigbTree->GetEntry(i);
@@ -1061,7 +1063,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_sigb[j]->Scale(intLumi_int * xsec_sigb / nGen_sigb);
+  for(unsigned int j = 0; j < vars.size(); j++) h_sigb[j]->Scale(intLumi_int * xsec_sigb / 15000.);
 
   ttHadronicTree->ResetBranchAddresses();
   ttSemiLepTree->ResetBranchAddresses();
@@ -1125,9 +1127,9 @@ void PlotMaker::CreatePlot(TString variable,
   DrawPlot(h_gg[var_num],
 	   h_ttHadronic[var_num], h_ttSemiLep[var_num], h_ttFullLep[var_num],
 	   h_tbar_s[var_num], h_tbar_t[var_num], h_tbar_tW[var_num],
-	   h_t_s[var_num], h_t[var_num], h_tW[var_num],
+	   h_t_s[var_num], h_t_t[var_num], h_t_tW[var_num],
 	   h_wjets[var_num], h_dyjets[var_num],
-	   h_ttg[var_num], h_ttgg[var_num],
+	   h_ttgjets[var_num], h_ttgg[var_num],
 	   h_siga[var_num], h_sigb[var_num],
 	   variable,
 	   xaxisTitle, yaxisTitle,
