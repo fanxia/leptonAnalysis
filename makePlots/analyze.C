@@ -67,6 +67,30 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   TTree * ttFullLepTree = (TTree*)fTTFullLep->Get("gg_"+channels[channel]+"_EvtTree_ttJetsFullLep");
   TH1D * nGen_ttFullLep = (TH1D*)fTTFullLep->Get("nEvents_ttJetsFullLep");
 
+  TFile * fTBar_s = new TFile("inputs/signal_contamination_TBar_s.root", "READ");
+  TTree * tbar_sTree = (TTree*)fTBar_s->Get("gg_"+channels[channel]+"_EvtTree_TBar_s");
+  TH1D * nGen_tbar_s = (TH1D*)fTBar_s->Get("nEvents_TBar_s");
+
+  TFile * fTBar_t = new TFile("inputs/signal_contamination_TBar_t.root", "READ");
+  TTree * tbar_tTree = (TTree*)fTBar_t->Get("gg_"+channels[channel]+"_EvtTree_TBar_t");
+  TH1D * nGen_tbar_t = (TH1D*)fTBar_t->Get("nEvents_TBar_t");
+
+  TFile * fTBar_tW = new TFile("inputs/signal_contamination_TBar_tW.root", "READ");
+  TTree * t_tWTree = (TTree*)fTBar_tW->Get("gg_"+channels[channel]+"_EvtTree_TBar_tW");
+  TH1D * nGen_tbar_tW = (TH1D*)fTBar_tW->Get("nEvents_TBar_tW");
+
+  TFile * fT_s = new TFile("inputs/signal_contamination_T_s.root", "READ");
+  TTree * t_sTree = (TTree*)fT_s->Get("gg_"+channels[channel]+"_EvtTree_T_s");
+  TH1D * nGen_t_s = (TH1D*)fT_s->Get("nEvents_T_s");
+
+  TFile * fT_t = new TFile("inputs/signal_contamination_T_t.root", "READ");
+  TTree * t_tTree = (TTree*)fT_t->Get("gg_"+channels[channel]+"_EvtTree_T_t");
+  TH1D * nGen_t_t = (TH1D*)fT_t->Get("nEvents_T_t");
+
+  TFile * fT_tW = new TFile("inputs/signal_contamination_T_tW.root", "READ");
+  TTree * t_tWTree = (TTree*)fT_tW->Get("gg_"+channels[channel]+"_EvtTree_T_tW");
+  TH1D * nGen_t_tW = (TH1D*)fT_tW->Get("nEvents_T_tW");
+
   TFile * fWJets = new TFile("inputs/signal_contamination_WJetsToLNu.root", "READ");
   TTree * wjetsTree = (TTree*)fWJets->Get("gg_"+channels[channel]+"_EvtTree_WJetsToLNu");
   TH1D * nGen_wjets = (TH1D*)fWJets->Get("nEvents_WJetsToLNu");
@@ -111,258 +135,19 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->SetTrees(ggTree,
 		   ttHadronicTree, ttSemiLepTree, ttFullLepTree,
+		   tbar_sTree, tbar_tTree, tbar_tWTree,
+		   t_sTree, t_tTree, t_tWTree,
 		   wjetsTree, dyjetsTree,
 		   ttgjetsTree, ttggTree,
 		   sigaTree, sigbTree);
 
-  pMaker->GetNGen(nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep,
+  pMaker->SetNGen(nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep,
+		  nGen_tbar_s, nGen_tbar_t, nGen_tbar_tW,
+		  nGen_t_s, nGen_t_t, nGen_t_tW,
 		  nGen_wjets, nGen_dyjets,
 		  nGen_ttgjets, nGen_ttgg);
 
   pMaker->SetDisplayKStest(displayKStest);
-
-  // Now save the met plots out to file -- use these later for the limit-setting
-  TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
-
-  pMaker->CreatePlot("photon_dR",
-		     50, 0., 5.,
-		     "#DeltaR_{#gamma#gamma}", "Number of Events",
-		     0.5, 5., 
-		     2.e-2, 3.e5,
-		     0., 2.1,
-		     true, false, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("photon_dPhi",
-		     35, 0., 3.14159,
-		     "#Delta#phi_{#gamma#gamma}", "Number of Events",
-		     0., 3.14159, 
-		     2.e-2, 3.e5,
-		     0., 2.1,
-		     true, false, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("leadPhotonEta",
-		     40, -1.5, 1.5,
-		     "#eta of leading #gamma", "Number of Events",
-		     -1.5, 1.5, 
-		     2.e-3, 3.e4,
-		     0., 2.1,
-		     false, false, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("trailPhotonEta",
-		     40, -1.5, 1.5,
-		     "#eta of trailing #gamma", "Number of Events",
-		     -1.5, 1.5, 
-		     2.e-3, 3.e4,
-		     0., 2.1,
-		     false, false, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("leadPhotonPhi",
-		     63, -3.14159, 3.14159,
-		     "#phi of leading #gamma", "Number of Events",
-		     -3.2, 3.2, 
-		     2.e-3, 3.e4,
-		     0., 2.1,
-		     false, false, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("trailPhotonPhi",
-		     63, -3.14159, 3.14159,
-		     "#phi of trailing #gamma", "Number of Events",
-		     -3.2, 3.2, 
-		     2.e-3, 3.e4,
-		     0., 2.1,
-		     false, false, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("Njets",
-		     20, 0., 20.,
-		     "nJets", "Number of Events",
-		     0, 9, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
-		     true, true, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("Nbtags",
-		     20, 0., 20.,
-		     "nBtags", "Number of Events",
-		     0, 4, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
-		     true, true, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("Nelectrons",
-		     20, 0., 20.,
-		     "nElectrons", "Number of Events",
-		     0, 4, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
-		     true, true, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("Nmuons",
-		     20, 0., 20.,
-		     "nMuons", "Number of Events",
-		     0, 4, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
-		     true, true, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("max_csv",
-		     20, 0., 1.,
-		     "max csv", "Number of Events",
-		     0, 4, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
-		     true, true, false,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("submax_csv",
-		     20, 0., 1.,
-		     "sub-max csv", "Number of Events",
-		     0, 4, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
-		     true, true, false,
-		     out, metCut, nPhotons_req);
-
-  const int nKinematicBins = 41;
-  Double_t xbins_kinematic[nKinematicBins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
-						110, 120, 130, 140, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
-
-  pMaker->CreatePlot("HT_jets",
-		     nKinematicBins, xbins_kinematic,
-		     "HT (jets only) (GeV/c^{2})",
-		     0, 2000, 
-		     2.e-3, 3.e4,
-		     0., 11.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("hadronic_pt",
-		     nKinematicBins, xbins_kinematic,
-		     "Jet System Pt (GeV/c)",
-		     0, 2000, 
-		     2.e-3, 3.e4,
-		     0., 11.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("invmass",
-		     nKinematicBins, xbins_kinematic,
-		     "m_{#gamma#gamma} (GeV/c^{2})",
-		     0, 2000, 
-		     2.e-3, 3.e4,
-		     0., 11.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("HT",
-		     nKinematicBins, xbins_kinematic,
-		     "HT (GeV)",
-		     0, 2000, 
-		     2.e-3, 3.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("jet1_pt",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt of leading jet",
-		     0, 1400, 
-		     2.e-3, 8.e3,
-		     0., 4.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("jet2_pt",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt of sub-leading jet",
-		     0, 1400, 
-		     2.e-3, 8.e3,
-		     0., 4.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("jet3_pt",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt of third-leading jet",
-		     0, 1400, 
-		     2.e-3, 8.e3,
-		     0., 4.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("jet4_pt",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt of fourth-leading jet",
-		     0, 1400, 
-		     2.e-3, 8.e3,
-		     0., 4.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("btag1_pt",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt of leading btag",
-		     0, 1400, 
-		     2.e-3, 8.e3,
-		     0., 4.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-  
-  pMaker->CreatePlot("btag2_pt",
-		     nKinematicBins, xbins_kinematic,
-		     "Pt of sub-leading btag",
-		     0, 1400, 
-		     2.e-3, 8.e3,
-		     0., 4.5,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("leadPhotonEt",
-		     nKinematicBins, xbins_kinematic,
-		     "Et of leading #gamma",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("trailPhotonEt",
-		     nKinematicBins, xbins_kinematic,
-		     "Et of trailing #gamma",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  pMaker->CreatePlot("diEMpT",
-		     nKinematicBins, xbins_kinematic,
-		     "di-EM Pt",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
-
-  const int ndijetptbins = 31;
-  Double_t dijetptbins[ndijetptbins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 200, 300, 400, 600, 1000, 1400};
-  pMaker->CreatePlot("diJetPt",
-		     ndijetptbins, dijetptbins,
-		     "di-Jet Pt",
-		     0, 1400, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out, metCut, nPhotons_req);
 
   const int nMetBins = 16;
   Double_t xbins_met[nMetBins+1] = {
@@ -385,27 +170,280 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     300};
   //650};
 
+  const int nKinematicBins = 41;
+  Double_t xbins_kinematic[nKinematicBins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
+						110, 120, 130, 140, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
+
+  const int ndijetptbins = 31;
+  Double_t dijetptbins[ndijetptbins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 200, 300, 400, 600, 1000, 1400};
+
+  // has to start with nphotons then met
+  pMaker->BookHistogram("Nphotons", 4, 0., 4.);
+  pMaker->BookHistogram("pfMET", nMetBins, xbins_met);
+  pMaker->BookHistogram("Njets", 20, 0., 20.);
+  pMaker->BookHistogram("Nbtags", 20, 0., 20.);
+  pMaker->BookHistogram("max_csv", 20, 0., 1.);
+  pMaker->BookHistogram("submax_csv", 20, 0., 1.);
+  pMaker->BookHistogram("HT_jets", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("hadronic_pt", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("HT", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("jet1_pt", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("jet2_pt", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("jet3_pt", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("btag1_pt", nKinematicBins, xbins_kinematic);
+
+  if(nPhoton_req >= 1) {
+    pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic);
+    pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);
+    pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
+  }
+
+  if(nPhoton_req >= 2) {
+    pMaker->BookHistogram("trailPhotonEt", nKinematicBins, xbins_kinematic);
+    pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic);
+    pMaker->BookHistogram("diJetPt", ndijetptbins, dijetptbins);
+    pMaker->BookHistogram("photon_invmass", nKinematicBins, xbins_kinematic);
+    pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);
+    pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);
+    pMaker->BookHistogram("photon_dR", 50, 0., 5.);
+    pMaker->BookHistogram("photon_dPhi", 35, 0., 3.14159);
+  }
+
+  pMaker->FillHistograms(metCut, nPhotons_req)
+
+  // Now save the met plots out to file -- use these later for the limit-setting
+  TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
+
   pMaker->CreatePlot("pfMET",
-		     nMetBins, xbins_met,
+		     true,
 		     "#slash{E}_{T} (GeV)",
 		     xbins_met[0], xbins_met[nMetBins],
 		     7.e-4, 25000.,
 		     0., 9.1,
 		     true, true, true,
-		     out, metCut, nPhotons_req);
+		     out);
 
-  pMaker->CreateTable();
+  pMaker->CreatePlot("Njets",
+		     false,
+		     "nJets", "Number of Events",
+		     0, 9, 
+		     2.e-3, 3.e6,
+		     0., 2.1,
+		     true, true, false,
+		     out);
+  
+  pMaker->CreatePlot("Nbtags",
+		     false,
+		     "nBtags", "Number of Events",
+		     0, 4, 
+		     2.e-3, 3.e6,
+		     0., 2.1,
+		     true, true, false,
+		     out);
+
+   pMaker->CreatePlot("max_csv",
+		      false,
+		     "max csv", "Number of Events",
+		     0, 4, 
+		     2.e-3, 3.e6,
+		     0., 2.1,
+		     true, true, false,
+		     out);
+
+  pMaker->CreatePlot("submax_csv",
+		     false,
+		     "sub-max csv", "Number of Events",
+		     0, 4, 
+		     2.e-3, 3.e6,
+		     0., 2.1,
+		     true, true, false,
+		     out);
+
+  pMaker->CreatePlot("HT_jets",
+		     true,
+		     "HT (jets only) (GeV/c^{2})",
+		     0, 2000, 
+		     2.e-3, 3.e4,
+		     0., 11.5,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("hadronic_pt",
+		     true,
+		     "Jet System Pt (GeV/c)",
+		     0, 2000, 
+		     2.e-3, 3.e4,
+		     0., 11.5,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("HT",
+		     true,
+		     "HT (GeV)",
+		     0, 2000, 
+		     2.e-3, 3.e4,
+		     0., 5.1,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("jet1_pt",
+		     true,
+		     "Pt of leading jet",
+		     0, 1400, 
+		     2.e-3, 8.e3,
+		     0., 4.5,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("jet2_pt",
+		     true,
+		     "Pt of sub-leading jet",
+		     0, 1400, 
+		     2.e-3, 8.e3,
+		     0., 4.5,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("jet3_pt",
+		     true,
+		     "Pt of third-leading jet",
+		     0, 1400, 
+		     2.e-3, 8.e3,
+		     0., 4.5,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("btag1_pt",
+		     true,
+		     "Pt of leading btag",
+		     0, 1400, 
+		     2.e-3, 8.e3,
+		     0., 4.5,
+		     true, true, true,
+		     out);
+  
+  if(nPhoton_req >= 1) {
+    pMaker->CreatePlot("leadPhotonEta",
+		       false,
+		       "#eta of leading #gamma", "Number of Events",
+		       -1.5, 1.5, 
+		       2.e-3, 3.e4,
+		       0., 2.1,
+		       false, false, false,
+		       out);
+
+    pMaker->CreatePlot("leadPhotonPhi",
+		       false,
+		       "#phi of leading #gamma", "Number of Events",
+		       -3.2, 3.2, 
+		       2.e-3, 3.e4,
+		       0., 2.1,
+		       false, false, false,
+		       out);
+
+    pMaker->CreatePlot("leadPhotonEt",
+		       true,
+		       "Et of leading #gamma",
+		       0, 1200, 
+		       2.e-3, 5.e4,
+		       0., 5.1,
+		       true, true, true,
+		       out);
+  }
+
+  if(nPhoton_req >= 2) {
+    pMaker->CreatePlot("photon_dR",
+		       false,
+		       "#DeltaR_{#gamma#gamma}", "Number of Events",
+		       0.5, 5., 
+		       2.e-2, 3.e5,
+		       0., 2.1,
+		       true, false, false,
+		       out);
+
+    pMaker->CreatePlot("photon_dPhi",
+		       false,
+		       "#Delta#phi_{#gamma#gamma}", "Number of Events",
+		       0., 3.14159, 
+		       2.e-2, 3.e5,
+		       0., 2.1,
+		       true, false, false,
+		       out);
+
+  pMaker->CreatePlot("trailPhotonEta",
+		     false,
+		     "#eta of trailing #gamma", "Number of Events",
+		     -1.5, 1.5, 
+		     2.e-3, 3.e4,
+		     0., 2.1,
+		     false, false, false,
+		     out);
+
+  pMaker->CreatePlot("trailPhotonPhi",
+		     false,
+		     "#phi of trailing #gamma", "Number of Events",
+		     -3.2, 3.2, 
+		     2.e-3, 3.e4,
+		     0., 2.1,
+		     false, false, false,
+		     out);
+  
+  pMaker->CreatePlot("photon_invmass",
+		     true,
+		     "m_{#gamma#gamma} (GeV/c^{2})",
+		     0, 2000, 
+		     2.e-3, 3.e4,
+		     0., 11.5,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("trailPhotonEt",
+		     true,
+		     "Et of trailing #gamma",
+		     0, 1200, 
+		     2.e-3, 5.e4,
+		     0., 5.1,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("diEMpT",
+		     true,
+		     "di-EM Pt",
+		     0, 1200, 
+		     2.e-3, 5.e4,
+		     0., 5.1,
+		     true, true, true,
+		     out);
+  
+  pMaker->CreatePlot("diJetPt",
+		     true,
+		     "di-Jet Pt",
+		     0, 1400, 
+		     2.e-3, 5.e4,
+		     0., 5.1,
+		     true, true, true,
+		     out);
+
+  }
+
+  //pMaker->CreateTable();
 
   pMaker->PlotKolmogorovValues();
-
+  
   delete pMaker;
-    
+  
   out->Close();
 
   in->Close();
   fTTHadronic->Close();
   fTTSemiLep->Close();
   fTTFullLep->Close();
+  fTBar_s->Close();
+  fTBar_t->Close();
+  fTBar_tW->Close();
+  fT_s->Close();
+  fT_t->Close();
+  fT_tW->Close();
   fWJets->Close();
   fDYJets->Close();
   fTTGJets->Close();
