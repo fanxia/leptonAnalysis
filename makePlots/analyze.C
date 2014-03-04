@@ -323,7 +323,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
   
   if(nPhotons_req >= 1) {
-    pMaker->CreatePlot("leadPhotonEta"
+    pMaker->CreatePlot("leadPhotonEta",
 		       false,
 		       "#eta of leading #gamma", "Number of Events",
 		       -1.5, 1.5, 
