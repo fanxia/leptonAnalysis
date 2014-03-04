@@ -76,7 +76,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   TH1D * nGen_tbar_t = (TH1D*)fTBar_t->Get("nEvents_TBar_t");
 
   TFile * fTBar_tW = new TFile("inputs/signal_contamination_TBar_tW.root", "READ");
-  TTree * t_tWTree = (TTree*)fTBar_tW->Get("gg_"+channels[channel]+"_EvtTree_TBar_tW");
+  TTree * tbar_tWTree = (TTree*)fTBar_tW->Get("gg_"+channels[channel]+"_EvtTree_TBar_tW");
   TH1D * nGen_tbar_tW = (TH1D*)fTBar_tW->Get("nEvents_TBar_tW");
 
   TFile * fT_s = new TFile("inputs/signal_contamination_T_s.root", "READ");
@@ -192,13 +192,13 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->BookHistogram("jet3_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("btag1_pt", nKinematicBins, xbins_kinematic);
 
-  if(nPhoton_req >= 1) {
+  if(nPhotons_req >= 1) {
     pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);
     pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
   }
 
-  if(nPhoton_req >= 2) {
+  if(nPhotons_req >= 2) {
     pMaker->BookHistogram("trailPhotonEt", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("diJetPt", ndijetptbins, dijetptbins);
@@ -322,7 +322,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out);
   
-  if(nPhoton_req >= 1) {
+  if(nPhotons_req >= 1) {
     pMaker->CreatePlot("leadPhotonEta",
 		       false,
 		       "#eta of leading #gamma", "Number of Events",
@@ -351,7 +351,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       out);
   }
 
-  if(nPhoton_req >= 2) {
+  if(nPhotons_req >= 2) {
     pMaker->CreatePlot("photon_dR",
 		       false,
 		       "#DeltaR_{#gamma#gamma}", "Number of Events",

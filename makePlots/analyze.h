@@ -879,7 +879,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_t_s[j]->Scale(intLumi_int * xsec_t_s / nGen_t_s);
+  for(unsigned int j = 0; j < vars.size(); j++) h_t_s[j]->Scale(intLumi_int * xsec_T_s / nGen_t_s);
 
   for(int i = 0; i < t_tTree->GetEntries(); i++) {
     t_tTree->GetEntry(i);
@@ -902,7 +902,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_t_t[j]->Scale(intLumi_int * xsec_t_t / nGen_t_t);
+  for(unsigned int j = 0; j < vars.size(); j++) h_t_t[j]->Scale(intLumi_int * xsec_T_t / nGen_t_t);
 
   for(int i = 0; i < t_tWTree->GetEntries(); i++) {
     t_tWTree->GetEntry(i);
@@ -925,7 +925,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_t_tW[j]->Scale(intLumi_int * xsec_t_tW / nGen_t_tW);
+  for(unsigned int j = 0; j < vars.size(); j++) h_t_tW[j]->Scale(intLumi_int * xsec_T_tW / nGen_t_tW);
 
   for(int i = 0; i < wjetsTree->GetEntries(); i++) {
     wjetsTree->GetEntry(i);
