@@ -209,7 +209,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("photon_dPhi", 35, 0., 3.14159);
   }
 
-  pMaker->FillHistograms(metCut, nPhotons_req)
+  pMaker->FillHistograms(metCut, nPhotons_req);
 
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
