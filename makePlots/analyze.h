@@ -344,7 +344,7 @@ class PlotMaker : public TObject {
 };
 
 PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
-  intLumi_int(lumi),
+intLumi_int(lumi),
   req(requirement),
   blinded(blind)
 {
@@ -584,8 +584,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(unsigned int i = 0; i < variables.size(); i++) {
 
-    if(variables[i] == "pfMET" || variables[i] == "Nphotons") continue;
-
     ggTree->SetBranchAddress(variables[i], &(vars[i]));
     ttHadronicTree->SetBranchAddress(variables[i], &(vars[i]));
     ttSemiLepTree->SetBranchAddress(variables[i], &(vars[i]));
@@ -727,16 +725,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+    
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_ttHadronic[j]->GetBinError(h_ttHadronic[j]->FindBin(vars[j]));
-      h_ttHadronic[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_ttHadronic[j]->Fill(vars[j], puWeight * btagWeight);
       h_ttHadronic[j]->SetBinError(h_ttHadronic[j]->FindBin(vars[j]), newerror);
     }
 
@@ -750,16 +747,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_ttSemiLep[j]->GetBinError(h_ttSemiLep[j]->FindBin(vars[j]));
-      h_ttSemiLep[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_ttSemiLep[j]->Fill(vars[j], puWeight * btagWeight);
       h_ttSemiLep[j]->SetBinError(h_ttSemiLep[j]->FindBin(vars[j]), newerror);
     }
 
@@ -773,16 +769,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_ttFullLep[j]->GetBinError(h_ttFullLep[j]->FindBin(vars[j]));
-      h_ttFullLep[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_ttFullLep[j]->Fill(vars[j], puWeight * btagWeight);
       h_ttFullLep[j]->SetBinError(h_ttFullLep[j]->FindBin(vars[j]), newerror);
     }
 
@@ -796,16 +791,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_tbar_s[j]->GetBinError(h_tbar_s[j]->FindBin(vars[j]));
-      h_tbar_s[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_tbar_s[j]->Fill(vars[j], puWeight * btagWeight);
       h_tbar_s[j]->SetBinError(h_tbar_s[j]->FindBin(vars[j]), newerror);
     }
 
@@ -819,16 +813,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_tbar_t[j]->GetBinError(h_tbar_t[j]->FindBin(vars[j]));
-      h_tbar_t[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_tbar_t[j]->Fill(vars[j], puWeight * btagWeight);
       h_tbar_t[j]->SetBinError(h_tbar_t[j]->FindBin(vars[j]), newerror);
     }
 
@@ -841,17 +834,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
+    
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_tbar_tW[j]->GetBinError(h_tbar_tW[j]->FindBin(vars[j]));
-      h_tbar_tW[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_tbar_tW[j]->Fill(vars[j], puWeight * btagWeight);
       h_tbar_tW[j]->SetBinError(h_tbar_tW[j]->FindBin(vars[j]), newerror);
     }
 
@@ -865,16 +857,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_t_s[j]->GetBinError(h_t_s[j]->FindBin(vars[j]));
-      h_t_s[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_t_s[j]->Fill(vars[j], puWeight * btagWeight);
       h_t_s[j]->SetBinError(h_t_s[j]->FindBin(vars[j]), newerror);
     }
 
@@ -888,16 +879,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_t_t[j]->GetBinError(h_t_t[j]->FindBin(vars[j]));
-      h_t_t[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_t_t[j]->Fill(vars[j], puWeight * btagWeight);
       h_t_t[j]->SetBinError(h_t_t[j]->FindBin(vars[j]), newerror);
     }
 
@@ -911,16 +901,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_t_tW[j]->GetBinError(h_t_tW[j]->FindBin(vars[j]));
-      h_t_tW[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_t_tW[j]->Fill(vars[j], puWeight * btagWeight);
       h_t_tW[j]->SetBinError(h_t_tW[j]->FindBin(vars[j]), newerror);
     }
 
@@ -934,16 +923,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_wjets[j]->GetBinError(h_wjets[j]->FindBin(vars[j]));
-      h_wjets[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_wjets[j]->Fill(vars[j], puWeight * btagWeight);
       h_wjets[j]->SetBinError(h_wjets[j]->FindBin(vars[j]), newerror);
     }
 
@@ -957,16 +945,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_dyjets[j]->GetBinError(h_dyjets[j]->FindBin(vars[j]));
-      h_dyjets[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_dyjets[j]->Fill(vars[j], puWeight * btagWeight);
       h_dyjets[j]->SetBinError(h_dyjets[j]->FindBin(vars[j]), newerror);
     }
 
@@ -980,16 +967,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_ttgjets[j]->GetBinError(h_ttgjets[j]->FindBin(vars[j]));
-      h_ttgjets[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_ttgjets[j]->Fill(vars[j], puWeight * btagWeight);
       h_ttgjets[j]->SetBinError(h_ttgjets[j]->FindBin(vars[j]), newerror);
     }
 
@@ -1003,16 +989,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_ttgg[j]->GetBinError(h_ttgg[j]->FindBin(vars[j]));
-      h_ttgg[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_ttgg[j]->Fill(vars[j], puWeight * btagWeight);
       h_ttgg[j]->SetBinError(h_ttgg[j]->FindBin(vars[j]), newerror);
     }
 
@@ -1026,16 +1011,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_siga[j]->GetBinError(h_siga[j]->FindBin(vars[j]));
-      h_siga[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_siga[j]->Fill(vars[j], puWeight * btagWeight);
       h_siga[j]->SetBinError(h_siga[j]->FindBin(vars[j]), newerror);
     }
 
@@ -1049,16 +1033,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
+    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       Float_t olderror = h_sigb[j]->GetBinError(h_sigb[j]->FindBin(vars[j]));
-      h_sigb[j]->Fill(vars[j], puWeight * btagWeight);
-      
-      if(btagWeightErr > 20.) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t newerror = sqrt(olderror*olderror + addError2);
-
+      h_sigb[j]->Fill(vars[j], puWeight * btagWeight);
       h_sigb[j]->SetBinError(h_sigb[j]->FindBin(vars[j]), newerror);
     }
 
@@ -1095,7 +1078,7 @@ void PlotMaker::CreatePlot(TString variable,
   unsigned int var_num = 10000;
 
   for(unsigned int i = 0; i < variables.size(); i++) {
-    if(variable == variables[var_num]) {
+    if(variable == variables[i]) {
       var_num = i;
       break;
     }
@@ -1380,61 +1363,61 @@ void PlotMaker::DrawPlot(TH1D * gg,
 
 void PlotMaker::CreateTable() {
   /*
-  const int nBins = 5;
-  Double_t xbins[nBins+1] = {0, 20, 50, 80, 100, 1000};
+    const int nBins = 5;
+    Double_t xbins[nBins+1] = {0, 20, 50, 80, 100, 1000};
 
-  Double_t rangeLow[nBins] = {0, 0, 50, 80, 100};
-  Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
+    Double_t rangeLow[nBins] = {0, 0, 50, 80, 100};
+    Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
 
-  TH1D * h_gg = HistoFromTree("pfMET", ggTree, "pfMet2_gg_"+req, "pfMet2", nBins, xbins, -1.);
-  TH1D * h_ewk = HistoFromTree("pfMET", egTree, "pfMet2_eg_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * h_gg = HistoFromTree("pfMET", ggTree, "pfMet2_gg_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * h_ewk = HistoFromTree("pfMET", egTree, "pfMet2_eg_"+req, "pfMet2", nBins, xbins, -1.);
   
-  TH1D * ewk_noNorm = (TH1D*)h_ewk->Clone();
-  h_ewk->Scale(egScale);
-  for(int i = 0; i < h_ewk->GetNbinsX(); i++) {
+    TH1D * ewk_noNorm = (TH1D*)h_ewk->Clone();
+    h_ewk->Scale(egScale);
+    for(int i = 0; i < h_ewk->GetNbinsX(); i++) {
     Float_t normerr = egScaleErr*(ewk_noNorm->GetBinContent(i+1));
     Float_t staterr = h_ewk->GetBinError(i+1);
     Float_t new_err = sqrt(normerr*normerr + staterr*staterr);
     h_ewk->SetBinError(i+1, new_err);
-  }
+    }
 
-  TH1D * qcd30to40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 2.35E-4 * 1.019 * 1.019 / 6061407., true, "pfMET", qcd30to40Tree, "pfMet2_qcd30to40_"+req, "pfMet2", nBins, xbins, -1.);
-  TH1D * qcd40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 0.002175 * 1.019 * 1.019 / 9782735., true, "pfMET", qcd40Tree, "pfMet2_qcd40_"+req, "pfMet2", nBins, xbins, -1.);
-  TH1D * h_qcd = (TH1D*)qcd30to40->Clone("pfMet2_qcd_"+req);
-  h_qcd->Add(qcd40);
+    TH1D * qcd30to40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 2.35E-4 * 1.019 * 1.019 / 6061407., true, "pfMET", qcd30to40Tree, "pfMet2_qcd30to40_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * qcd40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 0.002175 * 1.019 * 1.019 / 9782735., true, "pfMET", qcd40Tree, "pfMet2_qcd40_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * h_qcd = (TH1D*)qcd30to40->Clone("pfMet2_qcd_"+req);
+    h_qcd->Add(qcd40);
 
-  TH1D * gjet20to40 = SignalHistoFromTree(intLumi_int * 81930.0 * 0.001835 * 1.019 * 1.019 / 5907942., true, "pfMET", gjet20to40Tree, "pfMet2_gjet20to40_"+req, "pfMet2", nBins, xbins, -1.);
-  TH1D * gjet40 = SignalHistoFromTree(intLumi_int * 8884.0 * 0.05387 * 1.019 * 1.019 / 5956149., true, "pfMET", gjet40Tree, "pfMet2_gjet40_"+req, "pfMet2", nBins, xbins, -1.);
-  TH1D * h_gjet = (TH1D*)gjet20to40->Clone("pfMet2_gjet_"+req);
-  h_gjet->Add(gjet40);
+    TH1D * gjet20to40 = SignalHistoFromTree(intLumi_int * 81930.0 * 0.001835 * 1.019 * 1.019 / 5907942., true, "pfMET", gjet20to40Tree, "pfMet2_gjet20to40_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * gjet40 = SignalHistoFromTree(intLumi_int * 8884.0 * 0.05387 * 1.019 * 1.019 / 5956149., true, "pfMET", gjet40Tree, "pfMet2_gjet40_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * h_gjet = (TH1D*)gjet20to40->Clone("pfMet2_gjet_"+req);
+    h_gjet->Add(gjet40);
 
-  TH1D * diphotonjets = SignalHistoFromTree(intLumi_int * 75.39 * 1.019 * 1.019 / 1156030., true, "pfMET", diphotonjetsTree, "pfMet2_diphotonjets_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * diphotonjets = SignalHistoFromTree(intLumi_int * 75.39 * 1.019 * 1.019 / 1156030., true, "pfMET", diphotonjetsTree, "pfMet2_diphotonjets_"+req, "pfMet2", nBins, xbins, -1.);
 
-  TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., true, "pfMET", ttHadronicTree, "pfMet2_ttHadronic_"+req, "pfMet2", nBins, xbins, -1.);
-  TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., true, "pfMET", ttSemiLepTree, "pfMet2_ttSemiLep_"+req, "pfMet2", nBins, xbins, -1.);
-  TH1D * ttbar = (TH1D*)ttHadronic->Clone("pfMet2_ttbar_"+req);
-  ttbar->Add(ttSemiLep);
+    TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., true, "pfMET", ttHadronicTree, "pfMet2_ttHadronic_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., true, "pfMET", ttSemiLepTree, "pfMet2_ttSemiLep_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * ttbar = (TH1D*)ttHadronic->Clone("pfMet2_ttbar_"+req);
+    ttbar->Add(ttSemiLep);
 
-  TH1D * h_ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., true, "pfMET", ttgjetsTree, "pfMet2_ttgjets_"+req, "pfMet2", nBins, xbins, -1.);
+    TH1D * h_ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., true, "pfMET", ttgjetsTree, "pfMet2_ttgjets_"+req, "pfMet2", nBins, xbins, -1.);
 
-  TH1D * bkg = (TH1D*)h_qcd->Clone("pfMet2_bkg_"+req);
+    TH1D * bkg = (TH1D*)h_qcd->Clone("pfMet2_bkg_"+req);
 
-  bkg->Add(h_gjet);
-  bkg->Add(diphotonjets);
-  bkg->Add(h_ewk);
-  bkg->Add(h_ttg);
+    bkg->Add(h_gjet);
+    bkg->Add(diphotonjets);
+    bkg->Add(h_ewk);
+    bkg->Add(h_ttg);
 
-  // Calculate entries
+    // Calculate entries
 
-  FILE * tableFile = fopen("errorTable_"+req+".temp", "w");
+    FILE * tableFile = fopen("errorTable_"+req+".temp", "w");
 
-  Double_t binLow[nBins], binHigh[nBins];
-  for(int i = 0; i < nBins; i++) {
+    Double_t binLow[nBins], binHigh[nBins];
+    for(int i = 0; i < nBins; i++) {
     binLow[i] = h_gg->GetXaxis()->FindBin(rangeLow[i]);
     binHigh[i] = (rangeHigh[i] == -1) ? -1 : h_gg->GetXaxis()->FindBin(rangeHigh[i]) - 1;
-  }
+    }
 
-  for(int i = 0; i < nBins; i++) {
+    for(int i = 0; i < nBins; i++) {
 
     Double_t gg, ggerr;
     gg = h_gg->IntegralAndError(binLow[i], binHigh[i], ggerr);
@@ -1464,9 +1447,9 @@ void PlotMaker::CreateTable() {
     total = bkg->IntegralAndError(binLow[i], binHigh[i], totalerr);
     fprintf(tableFile, "bkgval%dx:%.1f\nbkgstat%dx:%.2f\n", i+1, total, i+1, totalerr);
 
-  }
+    }
 
-  fclose(tableFile);
+    fclose(tableFile);
   */
 }
 
