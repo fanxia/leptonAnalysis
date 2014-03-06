@@ -732,7 +732,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -761,7 +761,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -790,7 +790,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -819,7 +819,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -848,7 +848,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -877,7 +877,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
     
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -906,7 +906,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -935,7 +935,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -964,7 +964,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -993,7 +993,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -1022,7 +1022,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -1051,7 +1051,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -1080,7 +1080,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -1109,7 +1109,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -1138,7 +1138,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    if(btagWeightErr > 20.) btagWeightErr = btagWeight;
+    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
     Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
