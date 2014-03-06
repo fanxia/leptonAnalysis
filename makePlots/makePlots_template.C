@@ -7,8 +7,7 @@ void makePlots() {
 
   TString input = "FILE_TO_RUN";
   bool addMC = true;
-  //int intLumi = 19712; // quote to 19.7
-  int intLumi = 876.225;
+  int intLumi = 19712; // quote to 19.7
 
   double metCut = -1.;
 
@@ -16,8 +15,14 @@ void makePlots() {
   bool blinded = false;
   int nPhotons_req = 0;
 
-  for(int i = 0; i < 8; i++) {
-    analyze(input, addMC, i, intLumi, metCut, nPhotons_req, displayKStest, blinded);
+  const int nChannels = 8;
+  int nBtagReq[nChannels] = {0, 0,
+			     1, 1,
+			     0, 0,
+			     1, 1};
+
+  for(int i = 0; i < nChannels; i++) {
+    analyze(input, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
   }  
 
   ts.Stop();

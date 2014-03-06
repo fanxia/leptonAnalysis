@@ -35,7 +35,7 @@ const TString ffColor = "kOrange+10";
 const TString eeColor = "kBlue";
 const TString egColor = "kGreen";
 
-void analyze(TString input, bool addMC, int channel, int intLumi_int, double metCut, int nPhotons_req, bool displayKStest, bool blinded) {
+void analyze(TString input, bool addMC, int channel, int intLumi_int, double metCut, int nPhotons_req, int nBtagReq, bool displayKStest, bool blinded) {
 
   gROOT->Reset();
   gROOT->SetBatch(true);
@@ -191,6 +191,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->BookHistogram("jet2_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("jet3_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("btag1_pt", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("w_mT", nKinematicBins, xbins_kinematic);
 
   if(nPhotons_req >= 1) {
     pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic);
@@ -209,7 +210,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("photon_dPhi", 35, 0., 3.14159);
   }
 
-  pMaker->FillHistograms(metCut, nPhotons_req);
+  pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq);
 
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
@@ -322,6 +323,15 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out);
   
+  pMaker->CreatePlot("w_mT",
+		     true,
+		     "Transverse Mass", "Number of Events",
+		     0, 1400, 
+		     2.e-3, 8.e3,
+		     0., 4.5,
+		     true, true, true,
+		     out);
+
   if(nPhotons_req >= 1) {
     pMaker->CreatePlot("leadPhotonEta",
 		       false,

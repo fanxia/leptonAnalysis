@@ -249,7 +249,7 @@ class PlotMaker : public TObject {
   void BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_t xhi);
   void BookHistogram(TString variable, Int_t nBins, Double_t* customBins);
 
-  void FillHistograms(double metCut, int nPhotons_req);
+  void FillHistograms(double metCut, int nPhotons_req, int nBtagReq);
 
   void CreatePlot(TString variable,
 		  bool divideByWidth,
@@ -574,7 +574,7 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
 }
 
 // expects BookHistogram on nphotons, then met, then others
-void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
+void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
   vector<Float_t> vars;
   vars.resize(variables.size());
@@ -721,6 +721,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
   for(int i = 0; i < ttHadronicTree->GetEntries(); i++) {
     ttHadronicTree->GetEntry(i);
 
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
+
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -742,6 +749,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(int i = 0; i < ttSemiLepTree->GetEntries(); i++) {
     ttSemiLepTree->GetEntry(i);
+
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
 
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
@@ -765,6 +779,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
   for(int i = 0; i < ttFullLepTree->GetEntries(); i++) {
     ttFullLepTree->GetEntry(i);
 
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
+
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -786,6 +807,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(int i = 0; i < tbar_sTree->GetEntries(); i++) {
     tbar_sTree->GetEntry(i);
+
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
 
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
@@ -809,6 +837,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
   for(int i = 0; i < tbar_tTree->GetEntries(); i++) {
     tbar_tTree->GetEntry(i);
 
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
+
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -830,6 +865,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(int i = 0; i < tbar_tWTree->GetEntries(); i++) {
     tbar_tWTree->GetEntry(i);
+
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
 
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
@@ -853,6 +895,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
   for(int i = 0; i < t_sTree->GetEntries(); i++) {
     t_sTree->GetEntry(i);
 
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
+
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -874,6 +923,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(int i = 0; i < t_tTree->GetEntries(); i++) {
     t_tTree->GetEntry(i);
+
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
 
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
@@ -897,6 +953,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
   for(int i = 0; i < t_tWTree->GetEntries(); i++) {
     t_tWTree->GetEntry(i);
 
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
+
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -918,6 +981,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(int i = 0; i < wjetsTree->GetEntries(); i++) {
     wjetsTree->GetEntry(i);
+
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
 
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
@@ -941,6 +1011,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
   for(int i = 0; i < dyjetsTree->GetEntries(); i++) {
     dyjetsTree->GetEntry(i);
 
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
+
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -962,6 +1039,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(int i = 0; i < ttgjetsTree->GetEntries(); i++) {
     ttgjetsTree->GetEntry(i);
+
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
 
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
@@ -985,6 +1069,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
   for(int i = 0; i < ttggTree->GetEntries(); i++) {
     ttggTree->GetEntry(i);
 
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
+
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -1007,6 +1098,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
   for(int i = 0; i < sigaTree->GetEntries(); i++) {
     sigaTree->GetEntry(i);
 
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
+
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -1028,6 +1126,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req) {
 
   for(int i = 0; i < sigbTree->GetEntries(); i++) {
     sigbTree->GetEntry(i);
+
+    if(nBtagReq == 0) {
+      btagWeight = 1.;
+      btagWeightErr = 0.;
+      btagWeightUp = 1.;
+      btagWeightDown = 1.;
+    }
 
     if(btagWeight != btagWeight) continue;
     if((int)vars[0] != nPhotons_req) continue;
