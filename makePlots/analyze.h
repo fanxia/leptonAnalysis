@@ -1349,11 +1349,11 @@ void PlotMaker::DrawPlot(TH1D * gg,
   singleTop->SetMarkerSize(0);
   singleTop->SetLineColor(1);
 
-  ttg->SetFillColor(kViolet);
+  ttg->SetFillColor(8);
   ttg->SetMarkerSize(0);
   ttg->SetLineColor(1);
 
-  ttgg->SetFillColor(8);
+  ttgg->SetFillColor(kCyan+3);
   ttgg->SetMarkerSize(0);
   ttgg->SetLineColor(1);
 
