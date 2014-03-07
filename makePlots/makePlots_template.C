@@ -22,6 +22,7 @@ void makePlots() {
 			     1, 1};
 
   for(int i = 0; i < nChannels; i++) {
+    if(i != 6) continue;
     analyze(input, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
   }  
 

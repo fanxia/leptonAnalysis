@@ -149,33 +149,13 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->SetDisplayKStest(displayKStest);
 
-  const int nMetBins = 16;
-  Double_t xbins_met[nMetBins+1] = {
-    0,
-    5,
-    10,
-    15,
-    20,
-    25,
-    30,
-    35,
-    40,
-    45,
-    50,
-    60,
-    70,
-    80,
-    100,
-    150,
-    300};
-  //650};
+  const int nMetBins = 17;
+  Double_t xbins_met[nMetBins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 100, 150, 300, 650};
 
-  const int nKinematicBins = 41;
-  Double_t xbins_kinematic[nKinematicBins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
-						110, 120, 130, 140, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
-
-  const int ndijetptbins = 31;
-  Double_t dijetptbins[ndijetptbins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 200, 300, 400, 600, 1000, 1400};
+  const int nKinematicBins = 28;
+  Double_t xbins_kinematic[nKinematicBins+1] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 350, 
+						400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
+  
 
   // has to start with nphotons then met
   pMaker->BookHistogram("Nphotons", 4, 0., 4.);
@@ -202,7 +182,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   if(nPhotons_req >= 2) {
     pMaker->BookHistogram("trailPhotonEt", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic);
-    pMaker->BookHistogram("diJetPt", ndijetptbins, dijetptbins);
+    pMaker->BookHistogram("diJetPt", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("photon_invmass", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);
@@ -215,39 +195,48 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
+  pMaker->CreatePlot("Nphotons",
+		     false,
+		     "Number of #gamma's", "Number of Events",
+		     0, 4,
+		     2.e-3, 3.e6,
+		     0., 2.1,
+		     true, true, true,
+		     out);
+
   pMaker->CreatePlot("pfMET",
 		     true,
 		     "#slash{E}_{T} (GeV)", "Number of Events",
 		     xbins_met[0], xbins_met[nMetBins],
-		     7.e-4, 25000.,
-		     0., 9.1,
+		     7.e-3, 2.5e4,
+		     0., 2.8,
 		     true, true, true,
 		     out);
 
   pMaker->CreatePlot("Njets",
 		     false,
 		     "nJets", "Number of Events",
-		     0, 9, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
+		     0, 11, 
+		     2.e-2, 3.e6,
+		     0., 1.8,
 		     true, true, false,
 		     out);
   
   pMaker->CreatePlot("Nbtags",
 		     false,
 		     "nBtags", "Number of Events",
-		     0, 4, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
+		     0, 6, 
+		     2.e-2, 3.e6,
+		     0., 1.8,
 		     true, true, false,
 		     out);
 
    pMaker->CreatePlot("max_csv",
 		      false,
 		     "max csv", "Number of Events",
-		     0, 4, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
+		     0.6, 1., 
+		     2.e-2, 3.e6,
+		     0., 1.8,
 		     true, true, false,
 		     out);
 
@@ -255,8 +244,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     false,
 		     "sub-max csv", "Number of Events",
 		     0, 4, 
-		     2.e-3, 3.e6,
-		     0., 2.1,
+		     2.e-2, 3.e5,
+		     0., 1.8,
 		     true, true, false,
 		     out);
 
@@ -264,17 +253,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true,
 		     "HT (jets only) (GeV/c^{2})", "Number of Events",
 		     0, 2000, 
-		     2.e-3, 3.e4,
-		     0., 11.5,
+		     2.e-4, 4.e3,
+		     0., 3.5,
 		     true, true, true,
 		     out);
 
   pMaker->CreatePlot("hadronic_pt",
 		     true,
 		     "Jet System Pt (GeV/c)", "Number of Events",
-		     0, 2000, 
-		     2.e-3, 3.e4,
-		     0., 11.5,
+		     0, 1500, 
+		     2.e-4, 5.8e3,
+		     0., 8.5,
 		     true, true, true,
 		     out);
 
@@ -282,25 +271,25 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true,
 		     "HT (GeV)", "Number of Events",
 		     0, 2000, 
-		     2.e-3, 3.e4,
-		     0., 5.1,
+		     2.e-4, 2.8e3,
+		     0., 3.8,
 		     true, true, true,
 		     out);
 
   pMaker->CreatePlot("jet1_pt",
 		     true,
 		     "Pt of leading jet", "Number of Events",
-		     0, 1400, 
-		     2.e-3, 8.e3,
-		     0., 4.5,
+		     0, 1500, 
+		     2.e-4, 8.e3,
+		     0., 2.3,
 		     true, true, true,
 		     out);
 
   pMaker->CreatePlot("jet2_pt",
 		     true,
 		     "Pt of sub-leading jet", "Number of Events",
-		     0, 1400, 
-		     2.e-3, 8.e3,
+		     0, 1500, 
+		     2.e-4, 1.3e4,
 		     0., 4.5,
 		     true, true, true,
 		     out);
@@ -308,8 +297,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("jet3_pt",
 		     true,
 		     "Pt of third-leading jet", "Number of Events",
-		     0, 1400, 
-		     2.e-3, 8.e3,
+		     0, 1500, 
+		     2.e-4, 8.e4,
 		     0., 4.5,
 		     true, true, true,
 		     out);
@@ -317,17 +306,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("btag1_pt",
 		     true,
 		     "Pt of leading btag", "Number of Events",
-		     0, 1400, 
-		     2.e-3, 8.e3,
-		     0., 4.5,
+		     0, 1500, 
+		     2.e-4, 8.e3,
+		     0., 4.8,
 		     true, true, true,
 		     out);
   
   pMaker->CreatePlot("w_mT",
 		     true,
 		     "Transverse Mass", "Number of Events",
-		     0, 1400, 
-		     2.e-3, 8.e3,
+		     0, 1500, 
+		     2.e-4, 8.e3,
 		     0., 4.5,
 		     true, true, true,
 		     out);

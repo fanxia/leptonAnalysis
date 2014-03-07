@@ -711,10 +711,11 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
   for(int i = 0; i < ggTree->GetEntries(); i++) {
     ggTree->GetEntry(i);
 
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    for(unsigned int j = 0; j < vars.size(); j++) h_gg[j]->Fill(vars[j]);
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      h_gg[j]->Fill(vars[j]);
 
   }
 
@@ -729,7 +730,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -738,6 +738,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
     
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_ttHadronic[j]->GetBinError(h_ttHadronic[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_ttHadronic[j]->Fill(vars[j], puWeight * btagWeight);
@@ -758,7 +759,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -767,6 +767,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_ttSemiLep[j]->GetBinError(h_ttSemiLep[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_ttSemiLep[j]->Fill(vars[j], puWeight * btagWeight);
@@ -787,7 +788,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -796,6 +796,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_ttFullLep[j]->GetBinError(h_ttFullLep[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_ttFullLep[j]->Fill(vars[j], puWeight * btagWeight);
@@ -816,7 +817,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -825,6 +825,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_tbar_s[j]->GetBinError(h_tbar_s[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_tbar_s[j]->Fill(vars[j], puWeight * btagWeight);
@@ -845,7 +846,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -854,6 +854,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_tbar_t[j]->GetBinError(h_tbar_t[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_tbar_t[j]->Fill(vars[j], puWeight * btagWeight);
@@ -874,7 +875,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
     
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -883,6 +883,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_tbar_tW[j]->GetBinError(h_tbar_tW[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_tbar_tW[j]->Fill(vars[j], puWeight * btagWeight);
@@ -903,7 +904,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -912,6 +912,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_t_s[j]->GetBinError(h_t_s[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_t_s[j]->Fill(vars[j], puWeight * btagWeight);
@@ -932,7 +933,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -941,6 +941,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_t_t[j]->GetBinError(h_t_t[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_t_t[j]->Fill(vars[j], puWeight * btagWeight);
@@ -961,7 +962,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -970,6 +970,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_t_tW[j]->GetBinError(h_t_tW[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_t_tW[j]->Fill(vars[j], puWeight * btagWeight);
@@ -990,7 +991,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -999,6 +999,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_wjets[j]->GetBinError(h_wjets[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_wjets[j]->Fill(vars[j], puWeight * btagWeight);
@@ -1019,7 +1020,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -1028,6 +1028,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_dyjets[j]->GetBinError(h_dyjets[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_dyjets[j]->Fill(vars[j], puWeight * btagWeight);
@@ -1048,7 +1049,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -1057,6 +1057,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_ttgjets[j]->GetBinError(h_ttgjets[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_ttgjets[j]->Fill(vars[j], puWeight * btagWeight);
@@ -1077,7 +1078,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -1086,6 +1086,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_ttgg[j]->GetBinError(h_ttgg[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_ttgg[j]->Fill(vars[j], puWeight * btagWeight);
@@ -1106,7 +1107,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -1115,6 +1115,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_siga[j]->GetBinError(h_siga[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_siga[j]->Fill(vars[j], puWeight * btagWeight);
@@ -1135,7 +1136,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
     if(btagWeight != btagWeight) continue;
-    if((int)vars[0] != nPhotons_req) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
@@ -1144,6 +1144,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_sigb[j]->GetBinError(h_sigb[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_sigb[j]->Fill(vars[j], puWeight * btagWeight);
