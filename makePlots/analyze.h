@@ -716,12 +716,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       h_gg[j]->Fill(vars[j]);
+    }
 
   }
 
   for(int i = 0; i < ttHadronicTree->GetEntries(); i++) {
     ttHadronicTree->GetEntry(i);
-
+    
     if(nBtagReq == 0) {
       btagWeight = 1.;
       btagWeightErr = 0.;
