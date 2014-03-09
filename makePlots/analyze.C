@@ -201,8 +201,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     "Number of #gamma's", "Number of Events",
 		     0, 4,
 		     2.e-3, 3.e6,
-		     0., 2.1,
-		     true, true, true,
+		     0., 1.3,
+		     true, true, false,
 		     out);
 
   pMaker->CreatePlot("pfMET",
@@ -217,7 +217,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("Njets",
 		     false,
 		     "nJets", "Number of Events",
-		     0, 11, 
+		     0, 14, 
 		     2.e-2, 3.e6,
 		     0., 1.8,
 		     true, true, false,
@@ -235,10 +235,10 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
    pMaker->CreatePlot("max_csv",
 		      false,
 		     "max csv", "Number of Events",
-		     0.6, 1., 
+		     0.65, 1., 
 		     2.e-2, 3.e6,
 		     0., 1.8,
-		     true, true, false,
+		     true, false, false,
 		     out);
 
   pMaker->CreatePlot("submax_csv",
@@ -247,7 +247,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     0, 4, 
 		     2.e-2, 3.e5,
 		     0., 1.8,
-		     true, true, false,
+		     true, false, false,
 		     out);
 
   pMaker->CreatePlot("HT_jets",
@@ -256,12 +256,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     0, 2000, 
 		     2.e-4, 4.e3,
 		     0., 3.5,
-		     true, true, true,
+		     true, true, false,
 		     out);
 
   pMaker->CreatePlot("hadronic_pt",
 		     true,
-		     "Jet System Pt (GeV/c)", "Number of Events",
+		     "MHT (GeV/c)", "Number of Events",
 		     0, 1500, 
 		     2.e-4, 5.8e3,
 		     0., 8.5,
@@ -274,7 +274,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     0, 2000, 
 		     2.e-4, 2.8e3,
 		     0., 3.8,
-		     true, true, true,
+		     true, true, false,
 		     out);
 
   pMaker->CreatePlot("jet1_pt",
@@ -289,7 +289,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("jet2_pt",
 		     true,
 		     "Pt of sub-leading jet", "Number of Events",
-		     0, 1500, 
+		     0, 1200, 
 		     2.e-4, 1.3e4,
 		     0., 4.5,
 		     true, true, true,
@@ -298,8 +298,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("jet3_pt",
 		     true,
 		     "Pt of third-leading jet", "Number of Events",
-		     0, 1500, 
-		     2.e-4, 8.e4,
+		     0, 800, 
+		     2.e-5, 8.e4,
 		     0., 4.5,
 		     true, true, true,
 		     out);
@@ -307,18 +307,18 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("btag1_pt",
 		     true,
 		     "Pt of leading btag", "Number of Events",
-		     0, 1500, 
+		     0, 1400, 
 		     2.e-4, 8.e3,
 		     0., 4.8,
-		     true, true, true,
+		     true, true, false,
 		     out);
   
   pMaker->CreatePlot("w_mT",
 		     true,
 		     "Transverse Mass", "Number of Events",
-		     0, 1500, 
+		     0, 1000, 
 		     2.e-4, 8.e3,
-		     0., 4.5,
+		     0., 3.5,
 		     true, true, true,
 		     out);
 

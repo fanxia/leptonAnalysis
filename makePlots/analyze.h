@@ -717,8 +717,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
       if(blinded && vars[0] == 2) continue;
-      if(blinded && vars[1] == 1 && variables[j] == "pfMET" && vars[1] > 50.) continue;
-      if(blinded && vars[1] == 1 && variables[j] == "HT" && vars[2] > 400.) continue;
+      if(blinded && vars[0] == 1 && variables[j] == "pfMET" && vars[1] > 50.) continue;
+      if(blinded && vars[0] == 1 && variables[j] == "HT" && vars[2] > 400.) continue;
 
       h_gg[j]->Fill(vars[j]);
     }
