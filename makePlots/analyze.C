@@ -175,7 +175,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);
     pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("leadSigmaIetaIeta", 30, 0.005, 0.013);
-    pMaker->BookHistogram("leadChargedHadronIso", 30, 0, 3.0);
+    pMaker->BookHistogram("leadChargedHadronIso", 75, 0, 15.0);
   }
 
   if(nPhotons_req >= 2) {
@@ -183,7 +183,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);
     pMaker->BookHistogram("trailSigmaIetaIeta", 30, 0.005, 0.013);
-    pMaker->BookHistogram("trailChargedHadronIso", 30, 0, 3.0);
+    pMaker->BookHistogram("trailChargedHadronIso", 75, 0, 15.0);
     pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("diJetPt", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("photon_invmass", nKinematicBins, xbins_kinematic);
@@ -352,8 +352,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
     pMaker->CreatePlot("leadSigmaIetaIeta",
 		       false,
-		       "#sigma_{i#etai#eta} of Lead #gamma", "Number of Events",
-		       0, 1200,
+		       "Lead #gamma #sigma_{i#etai#eta}", "Number of Events",
+		       0, 0.015,
 		       2.3-3, 5.e4,
 		       0., 5.1,
 		       true, true, true,
@@ -361,11 +361,11 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
     pMaker->CreatePlot("leadChargedHadronIso",
 		       false,
-		       "Ch. Hadron Iso. of Lead #gamma", "Number of Events",
-		       0, 1200,
-		       2.3e-3, 5.e4,
-		       0., 5.1,
-		       true, true, true,
+		       "Lead #gamma ChHadIso", "Number of Events",
+		       0, 15,
+		       2.3e-4, 5.e3,
+		       0., 1.8,
+		       true, false, false,
 		       out);
 
   }
@@ -410,7 +410,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("trailSigmaIetaIeta",
 		     false,
 		     "#sigma_{i#etai#eta} of Trail #gamma", "Number of Events",
-		     0, 1200,
+		     0, 0.015,
 		     2.3-3, 5.e4,
 		     0., 5.1,
 		     true, true, true,
@@ -419,10 +419,10 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("trailChargedHadronIso",
 		     false,
 		     "Ch. Hadron Iso. of Trail #gamma", "Number of Events",
-		     0, 1200,
-		     2.3e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
+		     0, 15,
+		     2.3e-4, 5.e3,
+		     0., 1.8,
+		     true, true, false,
 		     out);
 
   pMaker->CreatePlot("photon_invmass",
