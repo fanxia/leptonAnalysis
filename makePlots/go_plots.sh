@@ -15,7 +15,7 @@ eval `scramv1 runtime -sh`
 ELE_FILE_TO_RUN=$1
 MUON_FILE_TO_RUN=$2
 cat makePlots_template.C | sed s:ELE_FILE_TO_RUN:$ELE_FILE_TO_RUN: | sed s:MUON_FILE_TO_RUN:$MUON_FILE_TO_RUN: > makePlots.C
-root -b -q -l makePlots.C | sed '/.root does not exist/d'
+root -b -q -l makePlots.C | sed '/Error in <TFile::TFile>: file/d'
 rm makePlots.C
 
 file=`date +"%b%d"`
@@ -59,7 +59,7 @@ cp *.root $file/
 cd $file
 
 tar -czf $file.tgz *
-scp $file.tgz $DUMP
+scp $file.tgz $HEP
 
 mv $file.tgz ..
 cd ..
