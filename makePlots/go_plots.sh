@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
 	echo
-	echo "Need a root file input"
+	echo "Need root file inputs"
 	echo
 	exit 0
 fi
@@ -12,8 +12,9 @@ source $VO_CMS_SW_DIR/cmsset_default.sh
 export SCRAM_ARCH=slc5_amd64_gcc462
 eval `scramv1 runtime -sh`
 
-FILE_TO_RUN=$1
-cat makePlots_template.C | sed s:FILE_TO_RUN:$FILE_TO_RUN: > makePlots.C
+ELE_FILE_TO_RUN=$1
+MUON_FILE_TO_RUN=$2
+cat makePlots_template.C | sed s:ELE_FILE_TO_RUN:$ELE_FILE_TO_RUN: | sed s:MUON_FILE_TO_RUN:$MUON_FILE_TO_RUN: > makePlots.C
 root -b -q -l makePlots.C | sed '/.root does not exist/d'
 rm makePlots.C
 

@@ -5,7 +5,8 @@ void makePlots() {
   TStopwatch ts;
   ts.Start();
 
-  TString input = "FILE_TO_RUN";
+  TString input_ele = "ELE_FILE_TO_RUN";
+  TString input_muon = "MUON_FILE_TO_RUN";
   bool addMC = true;
   int intLumi = 19712; // quote to 19.7
 
@@ -16,14 +17,15 @@ void makePlots() {
   int nPhotons_req = 0;
 
   const int nChannels = 8;
-  int nBtagReq[nChannels] = {0, 0,
-			     1, 1,
-			     0, 0,
-			     1, 1};
+  TString channels[nChannels] = {"ele", "ele_b", "ele_jjj", "ele_bjj",
+				 "muon", "muon_b", "muon_jjj", "muon_bjj"};
+  int nBtagReq[nChannels] = {0, 1, 0, 1,
+			     0, 1, 0, 1};
 
   for(int i = 0; i < nChannels; i++) {
-    if(i != 6) continue;
-    analyze(input, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
+    if(i != 3 && i != 7) continue;
+    if(i < 4) analyze(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
+    else analyze(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
   }  
 
   ts.Stop();

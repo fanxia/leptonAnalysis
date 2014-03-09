@@ -35,7 +35,7 @@ const TString ffColor = "kOrange+10";
 const TString eeColor = "kBlue";
 const TString egColor = "kGreen";
 
-void analyze(TString input, bool addMC, int channel, int intLumi_int, double metCut, int nPhotons_req, int nBtagReq, bool displayKStest, bool blinded) {
+void analyze(TString input_ele, bool addMC, int channel, int intLumi_int, double metCut, int nPhotons_req, int nBtagReq, bool displayKStest, bool blinded) {
 
   gROOT->Reset();
   gROOT->SetBatch(true);
@@ -44,15 +44,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   gStyle->SetOptTitle(0);
 
   const int nChannels = 8;
-  TString channels[nChannels] = {"ele", "muon",
-				 "ele_b", "muon_b",
-				 "ele_jjj", "muon_jjj",
-				 "ele_bjj", "muon_bjj"};
-  
+  TString channels[nChannels] = {"ele", "ele_b", "ele_jjj", "ele_bjj",
+				 "muon", "muon_b", "muon_jjj", "muon_bjj"};
+
   prep_signal(channels[channel], nPhotons_req);
 
   TFile * in = new TFile(input, "READ");
-
   TTree * ggTree = (TTree*)in->Get("gg_"+channels[channel]+"_EvtTree");
 
   TFile * fTTHadronic = new TFile("inputs/signal_contamination_ttJetsHadronic.root", "READ");
@@ -157,16 +154,16 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 						400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
   
 
-  // has to start with nphotons then met
+  // has to start with nphotons then met, then HT
   pMaker->BookHistogram("Nphotons", 4, 0., 4.);
   pMaker->BookHistogram("pfMET", nMetBins, xbins_met);
+  pMaker->BookHistogram("HT", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("Njets", 20, 0., 20.);
   pMaker->BookHistogram("Nbtags", 20, 0., 20.);
   pMaker->BookHistogram("max_csv", 20, 0., 1.);
   pMaker->BookHistogram("submax_csv", 20, 0., 1.);
   pMaker->BookHistogram("HT_jets", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("hadronic_pt", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("HT", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("jet1_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("jet2_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("jet3_pt", nKinematicBins, xbins_kinematic);
