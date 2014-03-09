@@ -715,6 +715,10 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      if(blinded && vars[0] == 2) continue;
+      if(blinded && vars[1] == 1 && variables[j] == "pfMET" && vars[1] > 50.) continue;
+
       h_gg[j]->Fill(vars[j]);
     }
 
@@ -1245,12 +1249,12 @@ void PlotMaker::DrawPlot(TH1D * gg,
 			 Float_t ratiomin, Float_t ratiomax,
 			 bool drawSignal, bool drawLegend, bool drawPrelim,
 			 TFile*& out) {
-
+  /*
   if(blinded) for(int i = 0; i < gg->GetNbinsX(); i++) {
       gg->SetBinContent(i+1, 1.e-14);
       gg->SetBinError(i+1, 1.e-14);
     }
-
+  */
   TH1D * ttbar = (TH1D*)ttHadronic->Clone(variable+"_ttbar_"+req);
   ttbar->Add(ttSemiLep);
   ttbar->Add(ttFullLep);

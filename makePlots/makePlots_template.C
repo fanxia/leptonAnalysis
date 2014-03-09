@@ -12,7 +12,7 @@ void makePlots() {
   double metCut = -1.;
 
   bool displayKStest = true;
-  bool blinded = false;
+  bool blinded = true;
   int nPhotons_req = 0;
 
   const int nChannels = 8;
