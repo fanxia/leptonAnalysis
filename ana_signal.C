@@ -74,6 +74,12 @@ void ana_signal(TString scan = "stop-bino", TString discriminant = "CSVM", bool 
   std::vector<int> mu_type;
   mu_type.push_back(2);
   sea->AddHlt(mu_trigger, mu_type);
+
+  std::vector<TString> qcd_mu_trigger;
+  qcd_mu_trigger.push_back("HLT_Mu24_eta2p1_v");
+  std::vector<int> qcd_mu_type;
+  qcd_mu_type.push_back(3);
+  sea->AddHLT(qcd_mu_trigger, qcd_mu_type);
   
   sea->SetProcessNEvents(-1);
 

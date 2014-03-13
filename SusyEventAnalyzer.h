@@ -72,6 +72,7 @@ class SusyEventAnalyzer {
   virtual void PileupWeights(TString puFile);
   virtual void SignalContent_gg();
   virtual void PhotonInfo();
+  virtual void qcdStudy();
 
   // utility functions
   float deltaR(TLorentzVector& p1, TLorentzVector& p2);
@@ -423,7 +424,7 @@ double SusyEventAnalyzer::d0correction(TVector3& beamspot, susy::Track& track) c
 double SusyEventAnalyzer::dZcorrection(TVector3& beamSpot, susy::Track& track) const {
 
   if(&(beamSpot) == 0x0 || &(track) == 0x0) {
-    cout << endl << endl << "Something majorly fucked up in dZcorrection!!!" <<	endl <<	endl;
+    cout << endl << endl << "Something majorly broken in dZcorrection!!!" <<	endl <<	endl;
     return 1.e6;
   }
 
@@ -935,34 +936,69 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     if(isMC) treeMap["w_mT_genNeutrino"] = -1.;
   }
   
+  // M3 calculation
+  if(pfJets_corrP4.size() > 2) {
+    int maxSumPt = 0.;
+    int max_pos = 0;
+    int comb = 1 << pfJets_corrP4.size();
+    
+    for(int i = 0; i < comb; i++) {
+
+      int npicked = 0; 
+      for(int j = 0; j < njets; j++) { 
+	if(((i >> j) & 0x1) == 1) npicked++; 
+      } 
+
+      if(npicked == 3) {
+	TLorentzVector thisCombination(0., 0., 0., 0.);
+	for(int j = 0; j < njets; j++) {
+	  if(((i >> j ) & 0x1) == 1) thisCombination += pfJets_corrP4[j];
+	}
+	if(thisCombination.Pt() > maxSumPt) {
+	  maxSumPt = thisCombination.Pt();
+	  max_pos = i;
+	}
+      }
+
+    }
+    
+    TLorentzVector maxCombination(0., 0., 0., 0.);
+    for(int i = 0; i < njets; i++) {
+      if(((max_pos >> i) & 0x1) == 1) maxCombination += pfJets_corrP4[i];
+    }
+    
+    treeMap["m3"] = maxCombination.M();
+  }
+  else treeMap["m3"] = -1.;
+
   treeMap["ele_pt"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Pt() : -1.;
-  treeMap["ele_phi"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Phi() : -10.;
-  treeMap["ele_eta"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Eta() : -10.;
+  treeMap["ele_phi"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Phi() : -100.;
+  treeMap["ele_eta"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Eta() : -100.;
   
   treeMap["muon_pt"] = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Pt() : -1.;
-  treeMap["muon_phi"] = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Phi() : -10.;
-  treeMap["muon_eta"] = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Eta() : -10.;
+  treeMap["muon_phi"] = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Phi() : -100.;
+  treeMap["muon_eta"] = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Eta() : -100.;
   
   treeMap["leadPhotonEt"] = (photons.size() > 0) ? photons[0]->momentum.Et() : -1.;
-  treeMap["leadPhotonEta"] = (photons.size() > 0) ? photons[0]->momentum.Eta() : -1.;
-  treeMap["leadPhotonPhi"] = (photons.size() > 0) ? photons[0]->momentum.Phi() : -1.;
-  treeMap["leadChargedHadronIso"] = (photons.size() > 0) ? chargedHadronIso_corrected(*photons[0], event_.rho25) : -10;
-  treeMap["leadSigmaIetaIeta"] = (photons.size() > 0) ? photons[0]->sigmaIetaIeta : -10;
-  treeMap["lead_nPixelSeeds"] = (photons.size() > 0) ? photons[0]->nPixelSeeds : -1.;
-  treeMap["leadMVAregEnergy"] = (photons.size() > 0) ? photons[0]->MVAregEnergy : -1.;
-  treeMap["leadMVAregErr"] = (photons.size() > 0) ? photons[0]->MVAregErr : -1.;
+  treeMap["leadPhotonEta"] = (photons.size() > 0) ? photons[0]->momentum.Eta() : -100.;
+  treeMap["leadPhotonPhi"] = (photons.size() > 0) ? photons[0]->momentum.Phi() : -100.;
+  treeMap["leadChargedHadronIso"] = (photons.size() > 0) ? chargedHadronIso_corrected(*photons[0], event_.rho25) : -100.;
+  treeMap["leadSigmaIetaIeta"] = (photons.size() > 0) ? photons[0]->sigmaIetaIeta : -100.;
+  treeMap["lead_nPixelSeeds"] = (photons.size() > 0) ? photons[0]->nPixelSeeds : -10.;
+  treeMap["leadMVAregEnergy"] = (photons.size() > 0) ? photons[0]->MVAregEnergy : -10.;
+  treeMap["leadMVAregErr"] = (photons.size() > 0) ? photons[0]->MVAregErr : -10.;
   
   treeMap["trailPhotonEt"] = (photons.size() > 1) ? photons[1]->momentum.Et() : -1.;
-  treeMap["trailPhotonEta"] = (photons.size() > 1) ? photons[1]->momentum.Eta() : -1.;
-  treeMap["trailPhotonPhi"] = (photons.size() > 1) ? photons[1]->momentum.Phi() : -1.;
-  treeMap["trail_nPixelSeeds"] = (photons.size() > 1) ? photons[1]->nPixelSeeds : -1.;
-  treeMap["trailChargedHadronIso"] = (photons.size() > 1) ? chargedHadronIso_corrected(*photons[1], event_.rho25) : -10;
-  treeMap["trailSigmaIetaIeta"] = (photons.size() > 1) ? photons[1]->sigmaIetaIeta : -10;
-  treeMap["trailMVAregEnergy"] = (photons.size() > 1) ? photons[1]->MVAregEnergy : -1.;
-  treeMap["trailMVAregErr"] = (photons.size() > 1) ? photons[1]->MVAregErr : -1.;
+  treeMap["trailPhotonEta"] = (photons.size() > 1) ? photons[1]->momentum.Eta() : -100.;
+  treeMap["trailPhotonPhi"] = (photons.size() > 1) ? photons[1]->momentum.Phi() : -100.;
+  treeMap["trail_nPixelSeeds"] = (photons.size() > 1) ? photons[1]->nPixelSeeds : -100.;
+  treeMap["trailChargedHadronIso"] = (photons.size() > 1) ? chargedHadronIso_corrected(*photons[1], event_.rho25) : -100.;
+  treeMap["trailSigmaIetaIeta"] = (photons.size() > 1) ? photons[1]->sigmaIetaIeta : -100.;
+  treeMap["trailMVAregEnergy"] = (photons.size() > 1) ? photons[1]->MVAregEnergy : -10.;
+  treeMap["trailMVAregErr"] = (photons.size() > 1) ? photons[1]->MVAregErr : -10.;
   
   treeMap["diEMpT"] = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).Pt() : -1.;
-  treeMap["photon_invmass"] = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).M() : -10;
+  treeMap["photon_invmass"] = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).M() : -10.;
   
   float diJetPt, lead_matched_jetpt, trail_matched_jetpt;
   bool matchingWorked = (photons.size() > 1 && GetDiJetPt(event_, photons, diJetPt, lead_matched_jetpt, trail_matched_jetpt));

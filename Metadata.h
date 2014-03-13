@@ -15,24 +15,19 @@ const int nCategories = 3;
 TString categories[nCategories] = {"gg", "ff", "gf"};
 const int nChannels = 8;
 
-TString channels[nChannels] = {"ele", "muon",
-			       "ele_b", "muon_b",
+TString channels[nChannels] = {"ele_b", "muon_b",
 			       "ele_jjj", "muon_jjj",
 			       "ele_bjj", "muon_bjj"};
-unsigned int nJetReq[nChannels] = {0, 0,
-				   1, 1,
+unsigned int nJetReq[nChannels] = {1, 1,
 				   3, 3,
 				   3, 3};
-unsigned int nBtagReq[nChannels] = {0, 0,
-				    1, 1,
+unsigned int nBtagReq[nChannels] = {1, 1,
 				    0, 0,
 				    1, 1};
 int nEleReq[nChannels] = {1, -1,
 			  1, -1,
-			  1, -1,
 			  1, -1};
 int nMuonReq[nChannels] = {-1, 1,
-			   -1, 1,
 			   -1, 1,
 			   -1, 1};
 

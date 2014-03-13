@@ -169,12 +169,14 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->BookHistogram("jet3_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("btag1_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("w_mT", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("ele_pt", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("muon_pt", nKinematicBins, xbins_kinematic);
 
   if(nPhotons_req >= 1) {
     pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);
     pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
-    pMaker->BookHistogram("leadSigmaIetaIeta", 30, 0.005, 0.013);
+    pMaker->BookHistogram("leadSigmaIetaIeta", 40, 0., 0.02);
     pMaker->BookHistogram("leadChargedHadronIso", 75, 0, 15.0);
   }
 
@@ -182,7 +184,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("trailPhotonEt", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);
-    pMaker->BookHistogram("trailSigmaIetaIeta", 30, 0.005, 0.013);
+    pMaker->BookHistogram("trailSigmaIetaIeta", 40, 0, 0.02);
     pMaker->BookHistogram("trailChargedHadronIso", 75, 0, 15.0);
     pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("diJetPt", nKinematicBins, xbins_kinematic);
@@ -322,6 +324,24 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out);
 
+  pMaker->CreatePlot("ele_pt",
+		     true,
+		     "Pt of electron", "Number of Events",
+		     0, 1500, 
+		     2.e-4, 8.e3,
+		     0., 2.3,
+		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("muon_pt",
+		     true,
+		     "Pt of #mu", "Number of Events",
+		     0, 1500, 
+		     2.e-4, 8.e3,
+		     0., 2.3,
+		     true, true, true,
+		     out);
+
   if(nPhotons_req >= 1) {
     pMaker->CreatePlot("leadPhotonEta",
 		       false,
@@ -365,7 +385,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       0, 15,
 		       2.3e-4, 5.e3,
 		       0., 1.8,
-		       true, false, false,
+		       true, true, false,
 		       out);
 
   }

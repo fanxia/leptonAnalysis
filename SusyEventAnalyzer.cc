@@ -300,14 +300,14 @@ void SusyEventAnalyzer::Data() {
   // Reweighting trees
   /////////////////////////////////
 
-  const int nTreeVariables = 63;
+  const int nTreeVariables = 64;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
     "pfMET_sysShift", "pfMET_sysShift_phi",
     "pfMET_t1", "pfMET_t1p2", "pfMET_t01", "pfMET_t01p2", "pfNoPUMET", "pfMVAMET",
     "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons",
-    "HT", "HT_jets", "hadronic_pt", "w_mT",
+    "HT", "HT_jets", "hadronic_pt", "w_mT", "m3",
     "ele_pt", "ele_phi", "ele_eta",
     "muon_pt", "muon_phi", "muon_eta",
     "leadPhotonEt", "leadPhotonEta", "leadPhotonPhi", "leadChargedHadronIso", "leadSigmaIetaIeta", "lead_nPixelSeeds", "leadMVAregEnergy", "leadMVAregErr",
@@ -539,14 +539,14 @@ void SusyEventAnalyzer::Acceptance() {
 
   TH1D * h_nEvents = new TH1D("nEvents"+output_code_t, "nEvents"+output_code_t, 1, 0, 1);
 
-  const int nTreeVariables = 68;
+  const int nTreeVariables = 69;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
     "pfMET_sysShift", "pfMET_sysShift_phi",
     "pfMET_t1", "pfMET_t1p2", "pfMET_t01", "pfMET_t01p2", "pfNoPUMET", "pfMVAMET", "genMET",
     "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons",
-    "HT", "HT_jets", "hadronic_pt", "w_mT", "w_mT_genNeutrino",
+    "HT", "HT_jets", "hadronic_pt", "w_mT", "w_mT_genNeutrino", "m3",
     "ele_pt", "ele_phi", "ele_eta",
     "muon_pt", "muon_phi", "muon_eta",
     "leadPhotonEt", "leadPhotonEta", "leadPhotonPhi", "leadChargedHadronIso", "leadSigmaIetaIeta", "lead_nPixelSeeds", "leadMVAregEnergy", "leadMVAregErr",
@@ -1984,4 +1984,273 @@ void SusyEventAnalyzer::PhotonInfo() {
   out->Write();
   out->Close();
   */
+}
+
+void SusyEventAnalyzer::qcdStudy() {
+
+  TFile* out = new TFile("qcd_"+outputName+".root", "RECREATE");
+  out->cd();
+
+  const int NCNT = 50;
+  int nCnt[NCNT][nChannels];
+  for(int i = 0; i < NCNT; i++) {
+    for(int j = 0; j < nChannels; j++) {
+      nCnt[i][j] = 0;
+    }
+  }
+
+  ///////////////////////////////////////////////////
+  // Define histograms to be filled for all events
+  ///////////////////////////////////////////////////
+
+  TH2D * h_tightEle_mva_iso = new TH2D("tightEle_mva_iso", "MVA vs relIso for tight electrons", 2000, -10, 10, 2000, 0, 20);
+  TH2D * h_looseEle_mva_iso = new TH2D("looseEle_mva_iso", "MVA vs relIso for loose electrons", 2000, -10, 10, 2000, 0, 20);
+
+  TH1D * h_tightMuon_iso = new TH2D("tightMuon_iso", "relIso for tight muons", 2000, 0, 20);
+  TH1D * h_looseMuon_iso = new TH2D("looseMuon_iso", "relIso for loose muons", 2000, 0, 20);
+  TH1D * h_tightMuon_iso_isoHLT = new TH2D("tightMuon_iso_isoHLT", "relIso for tight muons from isoHLT", 2000, 0, 20);
+  TH1D * h_looseMuon_iso_isoHLT = new TH2D("looseMuon_iso_isoHLT", "relIso for loose muons from isoHLT", 2000, 0, 20);
+  TH1D * h_tightMuon_iso_nonisoHLT = new TH2D("tightMuon_iso_nonisoHLT", "relIso for tight muons from nonisoHLT", 2000, 0, 20);
+  TH1D * h_looseMuon_iso_nonisoHLT = new TH2D("looseMuon_iso_nonisoHLT", "relIso for loose muons from nonisoHLT", 2000, 0, 20);
+
+  ScaleFactorInfo sf(btagger);
+
+  Long64_t nEntries = fTree->GetEntries();
+  cout << "Total events in files : " << nEntries << endl;
+  cout << "Events to be processed : " << processNEvents << endl;
+
+  Long64_t jentry = 0;
+  while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
+
+  if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
+      cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
+    }
+    
+    if(useJson && event.isRealData && !IsGoodLumi(event.runNumber, event.luminosityBlockNumber)) continue;
+
+    if(event.isRealData) {
+      if(event.passMetFilters() != 1 ||
+	 event.passMetFilter(susy::kEcalLaserCorr) != 1 ||
+	 event.passMetFilter(susy::kManyStripClus53X) != 1 ||
+	 event.passMetFilter(susy::kTooManyStripClus53X) != 1) {
+	nCnt[21][0]++;
+	continue;
+      }
+    }
+
+    vector<susy::Muon*> tightMuons, looseMuons;
+    vector<susy::Electron*> tightEles, looseEles;
+    vector<susy::PFJet*> pfJets, btags;
+    vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
+    vector<float> csvValues;
+    vector<susy::Photon*> photons;
+    vector<BtagInfo> tagInfos;
+
+    int event_type = 0;
+
+    int nPVertex = GetNumberPV(event);
+    if(nPVertex == 0) {
+      nCnt[22][0]++;
+      continue;
+    }
+
+    map<TString, vector<susy::Muon> >::iterator muMap = event.muons.find("muons");
+    if(muMap != event.muons.end()) {
+      for(vector<susy::Muon>::iterator mu_it = muMap->second.begin(); mu_it != muMap->second.end(); mu_it++) {
+
+	if((int)mu_it->bestTrackIndex() >= (int)(event.tracks).size() || (int)mu_it->bestTrackIndex() < 0) continue;
+
+	bool hasTracks = (int)mu_it->trackIndex < (int)event.tracks.size() && 
+	  (int)mu_it->standAloneTrackIndex < (int)event.tracks.size() && 
+	  (int)mu_it->combinedTrackIndex < (int)event.tracks.size() && 
+	  (int)mu_it->bestTrackIndex() < (int)event.tracks.size() && 
+	  (int)mu_it->bestTrackIndex() >= 0;
+
+	if(!hasTracks) continue;
+  
+	bool isTight = mu_it->isGlobalMuon() && 
+	  mu_it->isPFMuon() && 
+	  event.tracks[mu_it->combinedTrackIndex].normChi2() < 10. && 
+	  mu_it->nValidMuonHits > 0 && 
+	  mu_it->nMatchedStations > 1 &&
+	  fabs(d0correction(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()])) < 0.2 &&
+	  fabs(dZcorrection(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()])) < 0.5 &&
+	  event.tracks[mu_it->trackIndex].numberOfValidPixelHits > 0 && 
+	  (mu_it->nPixelLayersWithMeasurement + mu_it->nStripLayersWithMeasurement) > 5 && 
+	  mu_it->momentum.Pt() > 30. &&
+	  fabs(mu_it->momentum.Eta()) < 2.1;
+	// Skipped relIso < 0.12 cut
+
+	bool isLoose = (mu.isPFMuon() &&
+			(mu.isGlobalMuon() || mu.isTrackerMuon()) &&
+			mu.momentum.Pt() > 10. &&
+			fabs(mu.momentum.Eta()) < 2.1); // change from 2.5 for non-iso trigger!
+	// Skipped relIso < 0.2 cut
+
+	if(isTight) tightMuons.push_back(&*mu_it);
+	else if(isLoose) looseMuons.push_back(&*mu_it);
+	
+      }
+    }
+    
+    map<TString, vector<susy::Electron> >::iterator eleMap = event.electrons.find("gsfElectrons");
+    if(eleMap != event.electrons.end()) {
+      for(vector<susy::Electron>::iterator ele_it = eleMap->second.begin(); ele_it != eleMap->second.end(); ele_it++) {
+	
+	if((int)ele_it->gsfTrackIndex >= (int)(event.tracks).size() || (int)ele_it->gsfTrackIndex < 0) continue;
+	
+	bool overlapsMuon = false;
+	for(unsigned int i = 0; i < tightMuons.size(); i++) {
+	  if(deltaR(tightMuons[i]->momentum, ele_it->momentum) <= 0.5) {
+	    overlapsMuon = true;
+	    break;
+	  }
+	}
+	for(unsigned int i = 0; i < looseMuons.size(); i++) {
+	  if(deltaR(looseMuons[i]->momentum, ele_it->momentum) <= 0.5) {
+	    overlapsMuon = true;
+	    break;
+	  }
+	}
+	if(overlapsMuon) continue;
+
+	if((int)ele_it->superClusterIndex >= (int)event.SuperClusters.size() || (int)ele_it->superClusterIndex < 0) continue;
+	
+	bool isTight = fabs(event.SuperClusters[ele_it->superClusterIndex].position.Eta()) < 2.5 &&
+		       ele_it->momentum.Pt() > 30. &&
+	               fabs(d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex])) < 0.02 &&
+	               fabs(dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex])) < 1.0 &&
+		       ele_it->passConversionVeto &&
+		       ele_it->nMissingHits <= 0;
+        // Skipped relIso < 0.1 and MVA > 0.5
+	
+	bool isLoose = fabs(event.SuperClusters[ele_it->superClusterIndex].position.Eta()) < 2.5 &&
+		       ele.momentum.Pt() > 10. &&
+	               fabs(d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex])) < 0.04 &&
+	               ele.passConversionVeto &&
+	               ele.nMissingHits <= 0;
+	// Skipped relIso < 0.2 and MVA > 0.5
+	
+	if(isTight) tightEles.push_back(&*ele_it);
+	else if(isLoose) looseEles.push_back(&*ele_it);
+
+      }
+    }
+
+    if(tightMuons.size() + tightMuons.size() == 0) continue;
+    if(tightMuons.size() + tightMuons.size() > 1) continue;
+
+    // keep this on ice for now
+    //if(looseMuons.size() + looseEles.size() != 0) continue;
+
+    bool passHLT = true;
+    if(useTrigger) {
+      if(tightEles.size() == 1) passHLT = PassTriggers(1);
+      else if(tightMuons.size() == 1) passHLT = PassTriggers(2) || PassTriggers(3);
+    }
+    if(!passHLT) {
+      nCnt[25][0]++;
+      continue;
+    }
+
+    float HT = 0;
+    float HT_jets = 0.;
+    TLorentzVector hadronicSystem(0., 0., 0., 0.);
+
+    findJets(event, 
+	     tightMuons, looseMuons,
+	     tightEles, looseEles,
+	     pfJets, btags,
+	     sf,
+	     tagInfos, csvValues, 
+	     pfJets_corrP4, btags_corrP4, 
+	     HT_jets, hadronicSystem);
+
+    if(pfJets.size() < 3 || btags.size() < 1) continue;
+
+    for(unsigned int i = 0; i < tightEles.size(); i++) {
+      float ele_eta = fabs(superClusters[tightEles[i]->superClusterIndex].position.Eta());
+
+      float ea;
+      if(ele_eta < 1.0) ea = 0.13;
+      else if(ele_eta < 1.479) ea = 0.14;
+      else if(ele_eta < 2.0) ea = 0.07;
+      else if(ele_eta < 2.2) ea = 0.09;
+      else if(ele_eta < 2.3) ea = 0.11;
+      else if(ele_eta < 2.4) ea = 0.11;
+      else ea = 0.14;
+
+      float ele_iso = max(0., (tightEles[i]->photonIso + tightEles[i]->neutralHadronIso - event.rho25*ea));
+      ele_iso += tightEles[i]->chargedHadronIso;
+
+      h_tightEle_mva_iso->Fill(tightEles[i]->mvaTrig, ele_iso / tightEles[i]->momentum.Pt());
+    }
+    for(unsigned int i = 0; i < looseEles.size(); i++) {
+      float ele_eta = fabs(superClusters[looseEles[i]->superClusterIndex].position.Eta());
+
+      float ea;
+      if(ele_eta < 1.0) ea = 0.13;
+      else if(ele_eta < 1.479) ea = 0.14;
+      else if(ele_eta < 2.0) ea = 0.07;
+      else if(ele_eta < 2.2) ea = 0.09;
+      else if(ele_eta < 2.3) ea = 0.11;
+      else if(ele_eta < 2.4) ea = 0.11;
+      else ea = 0.14;
+
+      float ele_iso = max(0., (looseEles[i]->photonIso + looseEles[i]->neutralHadronIso - event.rho25*ea));
+      ele_iso += looseEles[i]->chargedHadronIso;
+
+      h_looseEle_mva_iso->Fill(looseEles[i]->mvaTrig, ele_iso / looseEles[i]->momentum.Pt());
+    }
+    
+    for(unsigned int i = 0; i < tightMuons.size(); i++) {
+      float mu_iso = max(0., (tightMuons[i]->sumNeutralHadronEt04 + tightMuons[i]->sumPhotonEt04 - 0.5*(tightMuons[i]->sumPUPt04)));
+      mu_iso += tightMuons[i]->sumChargedHadronPt04;
+      float mu_pt = tightMuons[i]->momentum.Pt();
+      h_tightMuons_iso->Fill(mu_iso / mu_pt);
+      if(PassTriggers(2) && !PassTriggers(3)) h_tightMuons_iso_isoHLT->Fill(mu_iso / mu_pt);
+      if(!PassTriggers(2) && PassTriggers(3)) h_tightMuons_iso_nonisoHLT->Fill(mu_iso / mu_pt);
+    }
+    for(unsigned int i = 0; i < looseMuons.size(); i++) {
+      float mu_iso = max(0., (looseMuons[i]->sumNeutralHadronEt04 + looseMuons[i]->sumPhotonEt04 - 0.5*(looseMuons[i]->sumPUPt04)));
+      mu_iso += looseMuons[i]->sumChargedHadronPt04;
+      float mu_pt = looseMuons[i]->momentum.Pt();
+      h_looseMuons_iso->Fill(mu_iso / mu_pt);
+      if(PassTriggers(2) && !PassTriggers(3)) h_looseMuons_iso_isoHLT->Fill(mu_iso / mu_pt);
+      if(!PassTriggers(2) && PassTriggers(3)) h_looseMuons_iso_nonisoHLT->Fill(mu_iso / mu_pt);
+    }
+
+    ///////////////////////////////////
+    
+  } // for entries
+  
+  cout << "-------------------Job Summary-----------------" << endl;
+  cout << "Total_events         : " << nCnt[0][0] << endl;
+  cout << "in_JSON              : " << nCnt[1][0] << endl;
+  cout << "-----------------------------------------------" << endl;
+  cout << endl;
+  for(int i = 0; i < nChannels; i++) {
+    cout << "----------------" << channels[i] << " Requirement-------------" << endl;
+    cout << "gg+" << channels[i] << " events              : " << nCnt[2][i] << endl;
+    cout << "eg+" << channels[i] << " events              : " << nCnt[3][i] << endl;
+    cout << "ff+" << channels[i] << " events              : " << nCnt[4][i] << endl;
+    cout << "gf+" << channels[i] << " events              : " << nCnt[5][i] << endl;
+    cout << "ee+" << channels[i] << " events              : " << nCnt[6][i] << endl;
+    cout << "ef+" << channels[i] << " events              : " << nCnt[7][i] << endl;
+  }
+  cout << "-----------------------------------------------" << endl;
+  cout << endl;
+  cout << "----------------Continues, info----------------" << endl;
+  cout << "fail MET filters         : " << nCnt[21][0] << endl;
+  cout << "No primary vertex        : " << nCnt[22][0] << endl;
+  cout << "zero tight leptons       : " << nCnt[23][0] << endl;
+  cout << "2+ tight leptons         : " << nCnt[29][0] << endl;
+  cout << "1+ loose leptons         : " << nCnt[24][0] << endl;
+  cout << "fail HLT                 : " << nCnt[25][0] << endl;
+  cout << "-----------------------------------------------" << endl;
+  cout << endl;
+
+  out->cd();
+  out->Write();
+  out->Close();  
 }

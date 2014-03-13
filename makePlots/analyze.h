@@ -45,6 +45,9 @@ const Double_t xsec_Tbar_s = 1.76;
 const Double_t xsec_Tbar_t = 30.7;
 const Double_t xsec_Tbar_tW = 11.1;
 
+const Double_t xsec_TTW = 0.232;
+const Double_t xsec_TTZ = 0.2057;
+
 const Double_t xsec_wjets = 36257.2;
 const Double_t xsec_dyjets = 3503.71;
 
