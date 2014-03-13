@@ -8,6 +8,9 @@
 #include <TRandom3.h>
 #include <TObject.h>
 
+#include <math.h>
+#include <TMath.h>
+
 #include <map>
 #include <set>
 #include <cmath>
@@ -2006,12 +2009,12 @@ void SusyEventAnalyzer::qcdStudy() {
   TH2D * h_tightEle_mva_iso = new TH2D("tightEle_mva_iso", "MVA vs relIso for tight electrons", 2000, -10, 10, 2000, 0, 20);
   TH2D * h_looseEle_mva_iso = new TH2D("looseEle_mva_iso", "MVA vs relIso for loose electrons", 2000, -10, 10, 2000, 0, 20);
 
-  TH1D * h_tightMuon_iso = new TH2D("tightMuon_iso", "relIso for tight muons", 2000, 0, 20);
-  TH1D * h_looseMuon_iso = new TH2D("looseMuon_iso", "relIso for loose muons", 2000, 0, 20);
-  TH1D * h_tightMuon_iso_isoHLT = new TH2D("tightMuon_iso_isoHLT", "relIso for tight muons from isoHLT", 2000, 0, 20);
-  TH1D * h_looseMuon_iso_isoHLT = new TH2D("looseMuon_iso_isoHLT", "relIso for loose muons from isoHLT", 2000, 0, 20);
-  TH1D * h_tightMuon_iso_nonisoHLT = new TH2D("tightMuon_iso_nonisoHLT", "relIso for tight muons from nonisoHLT", 2000, 0, 20);
-  TH1D * h_looseMuon_iso_nonisoHLT = new TH2D("looseMuon_iso_nonisoHLT", "relIso for loose muons from nonisoHLT", 2000, 0, 20);
+  TH1D * h_tightMuon_iso = new TH1D("tightMuon_iso", "relIso for tight muons", 2000, 0, 20);
+  TH1D * h_looseMuon_iso = new TH1D("looseMuon_iso", "relIso for loose muons", 2000, 0, 20);
+  TH1D * h_tightMuon_iso_isoHLT = new TH1D("tightMuon_iso_isoHLT", "relIso for tight muons from isoHLT", 2000, 0, 20);
+  TH1D * h_looseMuon_iso_isoHLT = new TH1D("looseMuon_iso_isoHLT", "relIso for loose muons from isoHLT", 2000, 0, 20);
+  TH1D * h_tightMuon_iso_nonisoHLT = new TH1D("tightMuon_iso_nonisoHLT", "relIso for tight muons from nonisoHLT", 2000, 0, 20);
+  TH1D * h_looseMuon_iso_nonisoHLT = new TH1D("looseMuon_iso_nonisoHLT", "relIso for loose muons from nonisoHLT", 2000, 0, 20);
 
   ScaleFactorInfo sf(btagger);
 
@@ -2081,10 +2084,10 @@ void SusyEventAnalyzer::qcdStudy() {
 	  fabs(mu_it->momentum.Eta()) < 2.1;
 	// Skipped relIso < 0.12 cut
 
-	bool isLoose = (mu.isPFMuon() &&
-			(mu.isGlobalMuon() || mu.isTrackerMuon()) &&
-			mu.momentum.Pt() > 10. &&
-			fabs(mu.momentum.Eta()) < 2.1); // change from 2.5 for non-iso trigger!
+	bool isLoose = (mu_it->isPFMuon() &&
+			(mu_it->isGlobalMuon() || mu_it->isTrackerMuon()) &&
+			mu_it->momentum.Pt() > 10. &&
+			fabs(mu_it->momentum.Eta()) < 2.1); // change from 2.5 for non-iso trigger!
 	// Skipped relIso < 0.2 cut
 
 	if(isTight) tightMuons.push_back(&*mu_it);
@@ -2114,9 +2117,9 @@ void SusyEventAnalyzer::qcdStudy() {
 	}
 	if(overlapsMuon) continue;
 
-	if((int)ele_it->superClusterIndex >= (int)event.SuperClusters.size() || (int)ele_it->superClusterIndex < 0) continue;
+	if((int)ele_it->superClusterIndex >= (int)event.superClusters.size() || (int)ele_it->superClusterIndex < 0) continue;
 	
-	bool isTight = fabs(event.SuperClusters[ele_it->superClusterIndex].position.Eta()) < 2.5 &&
+	bool isTight = fabs(event.superClusters[ele_it->superClusterIndex].position.Eta()) < 2.5 &&
 		       ele_it->momentum.Pt() > 30. &&
 	               fabs(d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex])) < 0.02 &&
 	               fabs(dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex])) < 1.0 &&
@@ -2124,11 +2127,11 @@ void SusyEventAnalyzer::qcdStudy() {
 		       ele_it->nMissingHits <= 0;
         // Skipped relIso < 0.1 and MVA > 0.5
 	
-	bool isLoose = fabs(event.SuperClusters[ele_it->superClusterIndex].position.Eta()) < 2.5 &&
-		       ele.momentum.Pt() > 10. &&
+	bool isLoose = fabs(event.superClusters[ele_it->superClusterIndex].position.Eta()) < 2.5 &&
+		       ele_it->momentum.Pt() > 10. &&
 	               fabs(d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex])) < 0.04 &&
-	               ele.passConversionVeto &&
-	               ele.nMissingHits <= 0;
+		       ele_it->passConversionVeto &&
+	               ele_it->nMissingHits <= 0;
 	// Skipped relIso < 0.2 and MVA > 0.5
 	
 	if(isTight) tightEles.push_back(&*ele_it);
@@ -2169,7 +2172,7 @@ void SusyEventAnalyzer::qcdStudy() {
     if(pfJets.size() < 3 || btags.size() < 1) continue;
 
     for(unsigned int i = 0; i < tightEles.size(); i++) {
-      float ele_eta = fabs(superClusters[tightEles[i]->superClusterIndex].position.Eta());
+      float ele_eta = fabs(event.superClusters[tightEles[i]->superClusterIndex].position.Eta());
 
       float ea;
       if(ele_eta < 1.0) ea = 0.13;
@@ -2186,7 +2189,7 @@ void SusyEventAnalyzer::qcdStudy() {
       h_tightEle_mva_iso->Fill(tightEles[i]->mvaTrig, ele_iso / tightEles[i]->momentum.Pt());
     }
     for(unsigned int i = 0; i < looseEles.size(); i++) {
-      float ele_eta = fabs(superClusters[looseEles[i]->superClusterIndex].position.Eta());
+      float ele_eta = fabs(event.superClusters[looseEles[i]->superClusterIndex].position.Eta());
 
       float ea;
       if(ele_eta < 1.0) ea = 0.13;
@@ -2207,17 +2210,17 @@ void SusyEventAnalyzer::qcdStudy() {
       float mu_iso = max(0., (tightMuons[i]->sumNeutralHadronEt04 + tightMuons[i]->sumPhotonEt04 - 0.5*(tightMuons[i]->sumPUPt04)));
       mu_iso += tightMuons[i]->sumChargedHadronPt04;
       float mu_pt = tightMuons[i]->momentum.Pt();
-      h_tightMuons_iso->Fill(mu_iso / mu_pt);
-      if(PassTriggers(2) && !PassTriggers(3)) h_tightMuons_iso_isoHLT->Fill(mu_iso / mu_pt);
-      if(!PassTriggers(2) && PassTriggers(3)) h_tightMuons_iso_nonisoHLT->Fill(mu_iso / mu_pt);
+      h_tightMuon_iso->Fill(mu_iso / mu_pt);
+      if(PassTriggers(2) && !PassTriggers(3)) h_tightMuon_iso_isoHLT->Fill(mu_iso / mu_pt);
+      if(!PassTriggers(2) && PassTriggers(3)) h_tightMuon_iso_nonisoHLT->Fill(mu_iso / mu_pt);
     }
     for(unsigned int i = 0; i < looseMuons.size(); i++) {
       float mu_iso = max(0., (looseMuons[i]->sumNeutralHadronEt04 + looseMuons[i]->sumPhotonEt04 - 0.5*(looseMuons[i]->sumPUPt04)));
       mu_iso += looseMuons[i]->sumChargedHadronPt04;
       float mu_pt = looseMuons[i]->momentum.Pt();
-      h_looseMuons_iso->Fill(mu_iso / mu_pt);
-      if(PassTriggers(2) && !PassTriggers(3)) h_looseMuons_iso_isoHLT->Fill(mu_iso / mu_pt);
-      if(!PassTriggers(2) && PassTriggers(3)) h_looseMuons_iso_nonisoHLT->Fill(mu_iso / mu_pt);
+      h_looseMuon_iso->Fill(mu_iso / mu_pt);
+      if(PassTriggers(2) && !PassTriggers(3)) h_looseMuon_iso_isoHLT->Fill(mu_iso / mu_pt);
+      if(!PassTriggers(2) && PassTriggers(3)) h_looseMuon_iso_nonisoHLT->Fill(mu_iso / mu_pt);
     }
 
     ///////////////////////////////////

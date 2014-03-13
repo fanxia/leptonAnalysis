@@ -945,13 +945,13 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     for(int i = 0; i < comb; i++) {
 
       int npicked = 0; 
-      for(int j = 0; j < njets; j++) { 
+      for(int j = 0; j < pfJets_corrP4.size(); j++) { 
 	if(((i >> j) & 0x1) == 1) npicked++; 
       } 
 
       if(npicked == 3) {
 	TLorentzVector thisCombination(0., 0., 0., 0.);
-	for(int j = 0; j < njets; j++) {
+	for(int j = 0; j < pfJets_corrP4.size(); j++) {
 	  if(((i >> j ) & 0x1) == 1) thisCombination += pfJets_corrP4[j];
 	}
 	if(thisCombination.Pt() > maxSumPt) {
@@ -963,7 +963,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     }
     
     TLorentzVector maxCombination(0., 0., 0., 0.);
-    for(int i = 0; i < njets; i++) {
+    for(int i = 0; i < pfJets_corrP4.size(); i++) {
       if(((max_pos >> i) & 0x1) == 1) maxCombination += pfJets_corrP4[i];
     }
     
