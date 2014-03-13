@@ -2180,7 +2180,7 @@ void SusyEventAnalyzer::qcdStudy() {
       else if(ele_eta < 2.4) ea = 0.11;
       else ea = 0.14;
 
-      float ele_iso = max((Float_t)0., (tightEles[i]->photonIso + tightEles[i]->neutralHadronIso - event.rho25*ea));
+      float ele_iso = max(0., (double)(tightEles[i]->photonIso + tightEles[i]->neutralHadronIso - event.rho25*ea));
       ele_iso += tightEles[i]->chargedHadronIso;
 
       h_tightEle_mva_iso->Fill(tightEles[i]->mvaTrig, ele_iso / tightEles[i]->momentum.Pt());
@@ -2197,14 +2197,14 @@ void SusyEventAnalyzer::qcdStudy() {
       else if(ele_eta < 2.4) ea = 0.11;
       else ea = 0.14;
 
-      float ele_iso = max((Float_t)0., (looseEles[i]->photonIso + looseEles[i]->neutralHadronIso - event.rho25*ea));
+      float ele_iso = max(0., (double)(looseEles[i]->photonIso + looseEles[i]->neutralHadronIso - event.rho25*ea));
       ele_iso += looseEles[i]->chargedHadronIso;
 
       h_looseEle_mva_iso->Fill(looseEles[i]->mvaTrig, ele_iso / looseEles[i]->momentum.Pt());
     }
     
     for(unsigned int i = 0; i < tightMuons.size(); i++) {
-      float mu_iso = max((Float_t)0., (tightMuons[i]->sumNeutralHadronEt04 + tightMuons[i]->sumPhotonEt04 - 0.5*(tightMuons[i]->sumPUPt04)));
+      float mu_iso = max(0., (double)(tightMuons[i]->sumNeutralHadronEt04 + tightMuons[i]->sumPhotonEt04 - 0.5*(tightMuons[i]->sumPUPt04)));
       mu_iso += tightMuons[i]->sumChargedHadronPt04;
       float mu_pt = tightMuons[i]->momentum.Pt();
       h_tightMuon_iso->Fill(mu_iso / mu_pt);
@@ -2212,7 +2212,7 @@ void SusyEventAnalyzer::qcdStudy() {
       if(!PassTriggers(2) && PassTriggers(3)) h_tightMuon_iso_nonisoHLT->Fill(mu_iso / mu_pt);
     }
     for(unsigned int i = 0; i < looseMuons.size(); i++) {
-      float mu_iso = max((Float_t)0., (looseMuons[i]->sumNeutralHadronEt04 + looseMuons[i]->sumPhotonEt04 - 0.5*(looseMuons[i]->sumPUPt04)));
+      float mu_iso = max(0., (double)(looseMuons[i]->sumNeutralHadronEt04 + looseMuons[i]->sumPhotonEt04 - 0.5*(looseMuons[i]->sumPUPt04)));
       mu_iso += looseMuons[i]->sumChargedHadronPt04;
       float mu_pt = looseMuons[i]->momentum.Pt();
       h_looseMuon_iso->Fill(mu_iso / mu_pt);
