@@ -2003,15 +2003,15 @@ void SusyEventAnalyzer::qcdStudy() {
   // Define histograms to be filled for all events
   ///////////////////////////////////////////////////
 
-  TH2D * h_tightEle_mva_iso = new TH2D("tightEle_mva_iso", "MVA vs relIso for tight electrons", 2000, -10, 10, 2000, 0, 20);
-  TH2D * h_looseEle_mva_iso = new TH2D("looseEle_mva_iso", "MVA vs relIso for loose electrons", 2000, -10, 10, 2000, 0, 20);
+  TH2D * h_tightEle_mva_iso = new TH2D("tightEle_mva_iso", "MVA vs relIso for tight electrons", 40, -2, 2, 100, 0, 20);
+  TH2D * h_looseEle_mva_iso = new TH2D("looseEle_mva_iso", "MVA vs relIso for loose electrons", 40, -2, 2, 100, 0, 20);
 
-  TH1D * h_tightMuon_iso = new TH1D("tightMuon_iso", "relIso for tight muons", 2000, 0, 20);
-  TH1D * h_looseMuon_iso = new TH1D("looseMuon_iso", "relIso for loose muons", 2000, 0, 20);
-  TH1D * h_tightMuon_iso_isoHLT = new TH1D("tightMuon_iso_isoHLT", "relIso for tight muons from isoHLT", 2000, 0, 20);
-  TH1D * h_looseMuon_iso_isoHLT = new TH1D("looseMuon_iso_isoHLT", "relIso for loose muons from isoHLT", 2000, 0, 20);
-  TH1D * h_tightMuon_iso_nonisoHLT = new TH1D("tightMuon_iso_nonisoHLT", "relIso for tight muons from nonisoHLT", 2000, 0, 20);
-  TH1D * h_looseMuon_iso_nonisoHLT = new TH1D("looseMuon_iso_nonisoHLT", "relIso for loose muons from nonisoHLT", 2000, 0, 20);
+  TH1D * h_tightMuon_iso = new TH1D("tightMuon_iso", "relIso for tight muons", 200, 0, 20);
+  TH1D * h_looseMuon_iso = new TH1D("looseMuon_iso", "relIso for loose muons", 200, 0, 20);
+  TH1D * h_tightMuon_iso_isoHLT = new TH1D("tightMuon_iso_isoHLT", "relIso for tight muons from isoHLT", 200, 0, 20);
+  TH1D * h_looseMuon_iso_isoHLT = new TH1D("looseMuon_iso_isoHLT", "relIso for loose muons from isoHLT", 200, 0, 20);
+  TH1D * h_tightMuon_iso_nonisoHLT = new TH1D("tightMuon_iso_nonisoHLT", "relIso for tight muons from nonisoHLT", 200, 0, 20);
+  TH1D * h_looseMuon_iso_nonisoHLT = new TH1D("looseMuon_iso_nonisoHLT", "relIso for loose muons from nonisoHLT", 200, 0, 20);
 
   ScaleFactorInfo sf(btagger);
 
@@ -2137,8 +2137,8 @@ void SusyEventAnalyzer::qcdStudy() {
       }
     }
 
-    if(tightMuons.size() + tightMuons.size() == 0) continue;
-    if(tightMuons.size() + tightMuons.size() > 1) continue;
+    if(tightEles.size() + tightMuons.size() == 0) continue;
+    if(tightEles.size() + tightMuons.size() > 1) continue;
 
     // keep this on ice for now
     //if(looseMuons.size() + looseEles.size() != 0) continue;
