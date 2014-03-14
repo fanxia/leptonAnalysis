@@ -2003,15 +2003,11 @@ void SusyEventAnalyzer::qcdStudy() {
   // Define histograms to be filled for all events
   ///////////////////////////////////////////////////
 
-  TH2D * h_tightEle_mva_iso = new TH2D("tightEle_mva_iso", "MVA vs relIso for tight electrons", 40, -2, 2, 100, 0, 20);
-  TH2D * h_looseEle_mva_iso = new TH2D("looseEle_mva_iso", "MVA vs relIso for loose electrons", 40, -2, 2, 100, 0, 20);
+  TH2D * h_tightEle_mva_iso = new TH2D("tightEle_mva_iso", "MVA vs relIso for tight electrons", 20, -1, 1, 50, 0, 10);
 
   TH1D * h_tightMuon_iso = new TH1D("tightMuon_iso", "relIso for tight muons", 200, 0, 20);
-  TH1D * h_looseMuon_iso = new TH1D("looseMuon_iso", "relIso for loose muons", 200, 0, 20);
   TH1D * h_tightMuon_iso_isoHLT = new TH1D("tightMuon_iso_isoHLT", "relIso for tight muons from isoHLT", 200, 0, 20);
-  TH1D * h_looseMuon_iso_isoHLT = new TH1D("looseMuon_iso_isoHLT", "relIso for loose muons from isoHLT", 200, 0, 20);
   TH1D * h_tightMuon_iso_nonisoHLT = new TH1D("tightMuon_iso_nonisoHLT", "relIso for tight muons from nonisoHLT", 200, 0, 20);
-  TH1D * h_looseMuon_iso_nonisoHLT = new TH1D("looseMuon_iso_nonisoHLT", "relIso for loose muons from nonisoHLT", 200, 0, 20);
 
   ScaleFactorInfo sf(btagger);
 
@@ -2081,11 +2077,7 @@ void SusyEventAnalyzer::qcdStudy() {
 	  fabs(mu_it->momentum.Eta()) < 2.1;
 	// Skipped relIso < 0.12 cut
 
-	bool isLoose = (mu_it->isPFMuon() &&
-			(mu_it->isGlobalMuon() || mu_it->isTrackerMuon()) &&
-			mu_it->momentum.Pt() > 10. &&
-			fabs(mu_it->momentum.Eta()) < 2.1); // change from 2.5 for non-iso trigger!
-	// Skipped relIso < 0.2 cut
+	bool isLoose = isVetoMuon(*mu_it);
 
 	if(isTight) tightMuons.push_back(&*mu_it);
 	else if(isLoose) looseMuons.push_back(&*mu_it);
@@ -2124,12 +2116,11 @@ void SusyEventAnalyzer::qcdStudy() {
 		       ele_it->nMissingHits <= 0;
         // Skipped relIso < 0.1 and MVA > 0.5
 	
-	bool isLoose = fabs(event.superClusters[ele_it->superClusterIndex].position.Eta()) < 2.5 &&
-		       ele_it->momentum.Pt() > 10. &&
-	               fabs(d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex])) < 0.04 &&
-		       ele_it->passConversionVeto &&
-	               ele_it->nMissingHits <= 0;
-	// Skipped relIso < 0.2 and MVA > 0.5
+	bool isLoose = isLooseElectron(*ele_it,
+				       event.superClusters,
+				       event.rho25,
+				       d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]),
+				       dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]));
 	
 	if(isTight) tightEles.push_back(&*ele_it);
 	else if(isLoose) looseEles.push_back(&*ele_it);
@@ -2139,9 +2130,7 @@ void SusyEventAnalyzer::qcdStudy() {
 
     if(tightEles.size() + tightMuons.size() == 0) continue;
     if(tightEles.size() + tightMuons.size() > 1) continue;
-
-    // keep this on ice for now
-    //if(looseMuons.size() + looseEles.size() != 0) continue;
+    if(looseMuons.size() + looseEles.size() != 0) continue;
 
     bool passHLT = true;
     if(useTrigger) {
@@ -2185,24 +2174,7 @@ void SusyEventAnalyzer::qcdStudy() {
 
       h_tightEle_mva_iso->Fill(tightEles[i]->mvaTrig, ele_iso / tightEles[i]->momentum.Pt());
     }
-    for(unsigned int i = 0; i < looseEles.size(); i++) {
-      float ele_eta = fabs(event.superClusters[looseEles[i]->superClusterIndex].position.Eta());
-
-      float ea;
-      if(ele_eta < 1.0) ea = 0.13;
-      else if(ele_eta < 1.479) ea = 0.14;
-      else if(ele_eta < 2.0) ea = 0.07;
-      else if(ele_eta < 2.2) ea = 0.09;
-      else if(ele_eta < 2.3) ea = 0.11;
-      else if(ele_eta < 2.4) ea = 0.11;
-      else ea = 0.14;
-
-      float ele_iso = max(0., (double)(looseEles[i]->photonIso + looseEles[i]->neutralHadronIso - event.rho25*ea));
-      ele_iso += looseEles[i]->chargedHadronIso;
-
-      h_looseEle_mva_iso->Fill(looseEles[i]->mvaTrig, ele_iso / looseEles[i]->momentum.Pt());
-    }
-    
+        
     for(unsigned int i = 0; i < tightMuons.size(); i++) {
       float mu_iso = max(0., (double)(tightMuons[i]->sumNeutralHadronEt04 + tightMuons[i]->sumPhotonEt04 - 0.5*(tightMuons[i]->sumPUPt04)));
       mu_iso += tightMuons[i]->sumChargedHadronPt04;
@@ -2211,15 +2183,7 @@ void SusyEventAnalyzer::qcdStudy() {
       if(PassTriggers(2) && !PassTriggers(3)) h_tightMuon_iso_isoHLT->Fill(mu_iso / mu_pt);
       if(!PassTriggers(2) && PassTriggers(3)) h_tightMuon_iso_nonisoHLT->Fill(mu_iso / mu_pt);
     }
-    for(unsigned int i = 0; i < looseMuons.size(); i++) {
-      float mu_iso = max(0., (double)(looseMuons[i]->sumNeutralHadronEt04 + looseMuons[i]->sumPhotonEt04 - 0.5*(looseMuons[i]->sumPUPt04)));
-      mu_iso += looseMuons[i]->sumChargedHadronPt04;
-      float mu_pt = looseMuons[i]->momentum.Pt();
-      h_looseMuon_iso->Fill(mu_iso / mu_pt);
-      if(PassTriggers(2) && !PassTriggers(3)) h_looseMuon_iso_isoHLT->Fill(mu_iso / mu_pt);
-      if(!PassTriggers(2) && PassTriggers(3)) h_looseMuon_iso_nonisoHLT->Fill(mu_iso / mu_pt);
-    }
-
+    
     ///////////////////////////////////
     
   } // for entries
