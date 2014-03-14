@@ -550,7 +550,7 @@ void SusyEventAnalyzer::Acceptance() {
 
   TH1D * h_nEvents = new TH1D("nEvents"+output_code_t, "nEvents"+output_code_t, 1, 0, 1);
 
-  const int nTreeVariables = 72;
+  const int nTreeVariables = 71;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
