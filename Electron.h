@@ -32,6 +32,27 @@ bool isLooseElectron(susy::Electron ele, vector<susy::SuperCluster> superCluster
 
 }
 
+bool isIsolatedElectron(susy::Electron ele, vector<susy::SuperCluster> superClusters, double rho) {
+
+  if((int)ele.superClusterIndex >= (int)superClusters.size() || (int)ele.superClusterIndex < 0) return false;
+  float ele_eta = fabs(superClusters[ele.superClusterIndex].position.Eta());
+
+  float ea;
+  if(ele_eta < 1.0) ea = 0.13;
+  else if(ele_eta < 1.479) ea = 0.14;
+  else if(ele_eta < 2.0) ea = 0.07;
+  else if(ele_eta < 2.2) ea = 0.09;
+  else if(ele_eta < 2.3) ea = 0.11;
+  else if(ele_eta < 2.4) ea = 0.11;
+  else ea = 0.14;
+
+  float ele_iso = max(0., (ele.photonIso + ele.neutralHadronIso - rho*ea));
+  ele_iso += ele.chargedHadronIso;
+  
+  return (ele.mvaTrig > 0.5 && ele_iso / ele.momentum.Pt() < 0.1);
+
+}
+
 bool isTightElectron(susy::Electron ele, vector<susy::SuperCluster> superClusters, double rho, double d0, double dz) {
 
   if((int)ele.superClusterIndex >= (int)superClusters.size() || (int)ele.superClusterIndex < 0) return false;
@@ -51,10 +72,8 @@ bool isTightElectron(susy::Electron ele, vector<susy::SuperCluster> superCluster
 
   bool passes = ele_eta < 2.5 &&
     ele.momentum.Pt() > 30. &&
-    ele.mvaTrig > 0.5 &&
     fabs(d0) < 0.02 &&
     fabs(dz) < 1.0 &&
-    ele_iso / ele.momentum.Pt() < 0.1 &&
     ele.passConversionVeto &&
     ele.nMissingHits <= 0;
 

@@ -129,21 +129,21 @@ class SusyEventAnalyzer {
 
   // major analysis logic
   void findMuons(susy::Event& ev, 
-		 vector<susy::Muon*>& isoMuons, vector<susy::Muon*>& looseMuons, 
+		 vector<susy::Muon*>& tightMuons, vector<susy::Muon*>& looseMuons, 
 		 float& HT);
   void findElectrons(susy::Event& ev, 
-		     vector<susy::Muon*>& isoMuons, vector<susy::Muon*>& looseMuons, 
-		     vector<susy::Electron*>& isoEles, vector<susy::Electron*>& looseEles, 
+		     vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons, 
+		     vector<susy::Electron*>& tightEles, vector<susy::Electron*>& looseEles, 
 		     float& HT);
   void findPhotons(susy::Event& ev, 
 		   vector<susy::Photon*>& photons,
-		   vector<TLorentzVector>& pfJets_corrP4,
-		   vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
-		   vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
+		   vector<TLorentzVector> pfJets_corrP4,
+		   vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
+		   vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
 		   float& HT);
   void findJets(susy::Event& ev, 
-		vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
-		vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
+		vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
+		vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
 		vector<susy::PFJet*>& pfJets, vector<susy::PFJet*>& btags, 
 		ScaleFactorInfo sf,
 		vector<BtagInfo>& tagInfos, vector<float>& csvValues, 
@@ -156,7 +156,7 @@ class SusyEventAnalyzer {
 
   void SetTreeValues(map<TString, float>& treeMap,
 		     susy::Event& event_,
-		     vector<susy::Muon*> isoMuons, vector<susy::Electron*> isoEles, 
+		     vector<susy::Muon*> tightMuons, vector<susy::Electron*> tightEles, 
 		     vector<susy::PFJet*> pfJets, vector<susy::PFJet*> btags,
 		     vector<susy::Photon*> photons,
 		     vector<TLorentzVector> pfJets_corrP4, vector<TLorentzVector> btags_corrP4,
@@ -436,9 +436,9 @@ double SusyEventAnalyzer::dZcorrection(TVector3& beamSpot, susy::Track& track) c
 
 void SusyEventAnalyzer::findPhotons(susy::Event& ev, 
 				    vector<susy::Photon*>& photons,
-				    vector<TLorentzVector>& pfJets_corrP4,
-				    vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
-				    vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
+				    vector<TLorentzVector> pfJets_corrP4,
+				    vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
+				    vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
 				    float& HT) {
   
   map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
@@ -449,7 +449,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
       if(is_egf(*it, event.rho25) && it->passelectronveto) {
 
 	bool overlap = false;
-	
+
 	for(unsigned int k = 0; k < pfJets_corrP4.size(); k++) {
 	  if(deltaR(pfJets_corrP4[k], it->caloPosition) < 0.5) {
 	    overlap = true;
@@ -458,8 +458,8 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 	}
 	if(overlap) continue;
 
-	for(unsigned int i = 0; i < isoMuons.size(); i++) {
-	  if(deltaR(isoMuons[i]->momentum, it->caloPosition) <= 0.5) {
+	for(unsigned int i = 0; i < tightMuons.size(); i++) {
+	  if(deltaR(tightMuons[i]->momentum, it->caloPosition) <= 0.5) {
 	    overlap = true;
 	    break;
 	  }
@@ -474,8 +474,8 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 	}
 	if(overlap) continue;
 
-	for(unsigned int i = 0; i < isoEles.size(); i++) {
-	  if(deltaR(isoEles[i]->momentum, it->caloPosition) <= 0.5) {
+	for(unsigned int i = 0; i < tightEles.size(); i++) {
+	  if(deltaR(tightEles[i]->momentum, it->caloPosition) <= 0.5) {
 	    overlap = true;
 	    break;
 	  }
@@ -505,8 +505,8 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 }
 
 void SusyEventAnalyzer::findJets(susy::Event& ev,
-				 vector<susy::Muon*> isoMuons, vector<susy::Muon*> looseMuons,
-				 vector<susy::Electron*> isoEles, vector<susy::Electron*> looseEles,
+				 vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
+				 vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
 				 vector<susy::PFJet*>& pfJets, vector<susy::PFJet*>& btags, 
 				 ScaleFactorInfo sf,
 				 vector<BtagInfo>& tagInfos, vector<float>& csvValues, 
@@ -526,8 +526,8 @@ void SusyEventAnalyzer::findJets(susy::Event& ev,
       TLorentzVector corrP4 = scale * it->momentum;
 
       if(!isGoodJet(*it, corrP4)) continue;
-      if(JetOverlapsElectron(corrP4, isoEles, looseEles)) continue;
-      if(JetOverlapsMuon(corrP4, isoMuons, looseMuons)) continue;
+      if(JetOverlapsElectron(corrP4, tightEles, looseEles)) continue;
+      if(JetOverlapsMuon(corrP4, tightMuons, looseMuons)) continue;
 
       pfJets.push_back(&*it);
       csvValues.push_back(it->bTagDiscriminators[susy::kCSV]);
@@ -560,7 +560,7 @@ void SusyEventAnalyzer::findJets(susy::Event& ev,
 
 }
 
-void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& isoMuons, vector<susy::Muon*>& looseMuons, float& HT) {
+void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuons, vector<susy::Muon*>& looseMuons, float& HT) {
 
   map<TString, vector<susy::Muon> >::iterator muMap = ev.muons.find("muons");
   if(muMap != ev.muons.end()) {
@@ -575,7 +575,8 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& isoMuons
 		     d0correction(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]), 
 		     dZcorrection(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]))
 	 ) {
-	isoMuons.push_back(&*mu_it);
+
+	tightMuons.push_back(&*mu_it);
 	HT += mu_it->momentum.Pt();
       }
 
@@ -590,7 +591,7 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& isoMuons
 
 }
 
-void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*>& isoMuons, vector<susy::Muon*>& looseMuons, vector<susy::Electron*>& isoEles, vector<susy::Electron*>& looseEles, float& HT) {
+void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*>& tightMuons, vector<susy::Muon*> looseMuons, vector<susy::Electron*>& tightEles, vector<susy::Electron*>& looseEles, float& HT) {
 
   map<TString, vector<susy::Electron> >::iterator eleMap = ev.electrons.find("gsfElectrons");
   if(eleMap != ev.electrons.end()) {
@@ -598,33 +599,28 @@ void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*>& isoM
 
       if((int)ele_it->gsfTrackIndex >= (int)(event.tracks).size() || (int)ele_it->gsfTrackIndex < 0) continue;
 
+      bool overlapsMuon = false;
+      for(unsigned int i = 0; i < tightMuons.size(); i++) {
+	if(deltaR(tightMuons[i]->momentum, ele_it->momentum) <= 0.5) {
+	  overlapsMuon = true;
+	  break;
+	}
+      }
+      for(unsigned int i = 0; i < looseMuons.size(); i++) {
+	if(deltaR(looseMuons[i]->momentum, ele_it->momentum) <= 0.5) {
+	  overlapsMuon = true;
+	  break;
+	}
+      }
+      if(overlapsMuon) continue;
+
       if(isTightElectron(*ele_it, 
 			 event.superClusters, 
 			 event.rho25, 
 			 d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
 			 dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]))) {
-	
-	bool overlapsMuon = false;
-	
-	for(unsigned int i = 0; i < isoMuons.size(); i++) {
-	  if(deltaR(isoMuons[i]->momentum, ele_it->momentum) <= 0.5) {
-	    overlapsMuon = true;
-	    break;
-	  }
-	}
-
-	for(unsigned int i = 0; i < looseMuons.size(); i++) {
-	  if(deltaR(looseMuons[i]->momentum, ele_it->momentum) <= 0.5) {
-	    overlapsMuon = true;
-	    break;
-	  }
-	}
-
-	if(!overlapsMuon) {
-	  isoEles.push_back(&*ele_it);
-	  HT += ele_it->momentum.Pt();
-	}
-
+	tightEles.push_back(&*ele_it);
+	HT += ele_it->momentum.Pt();
       }
 
       else if(isLooseElectron(*ele_it,
@@ -632,28 +628,8 @@ void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*>& isoM
 			      event.rho25, 
 			      d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
 			      dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]))) {	 
-
-	bool overlapsMuon = false;
-	
-	for(unsigned int i = 0; i < isoMuons.size(); i++) {
-	  if(deltaR(isoMuons[i]->momentum, ele_it->momentum) <= 0.5) {
-	    overlapsMuon = true;
-	    break;
-	  }
-	}
-
-	for(unsigned int i = 0; i < looseMuons.size(); i++) {
-	  if(deltaR(looseMuons[i]->momentum, ele_it->momentum) <= 0.5) {
-	    overlapsMuon = true;
-	    break;
-	  }
-	}
-
-	if(!overlapsMuon) {
-	  looseEles.push_back(&*ele_it);
-	  HT += ele_it->momentum.Pt();
-	}
-	
+	looseEles.push_back(&*ele_it);
+	HT += ele_it->momentum.Pt();
       }
      
     }
@@ -820,7 +796,7 @@ int SusyEventAnalyzer::FigureTTbarDecayMode(susy::Event& ev) {
 
 void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 				      susy::Event& event_,
-				      vector<susy::Muon*> isoMuons, vector<susy::Electron*> isoEles, 
+				      vector<susy::Muon*> tightMuons, vector<susy::Electron*> tightEles, 
 				      vector<susy::PFJet*> pfJets, vector<susy::PFJet*> btags,
 				      vector<susy::Photon*> photons,
 				      vector<TLorentzVector> pfJets_corrP4, vector<TLorentzVector> btags_corrP4,
@@ -831,8 +807,8 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 				      float eventWeight, float eventWeightErr,
 				      Long64_t jentry) {
 
-  treeMap["Nmuons"] = isoMuons.size();
-  treeMap["Nelectrons"] = isoEles.size();
+  treeMap["Nmuons"] = tightMuons.size();
+  treeMap["Nelectrons"] = tightEles.size();
   treeMap["nPV"] = nPVertex;
   treeMap["metFilterBit"] = event_.metFilterBit;
   if(isMC && scan == "stop-bino") treeMap["ttbarDecayMode"] = FigureTTbarDecayMode(event_);
@@ -885,56 +861,24 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   if(isMC) treeMap["genMET"]      = genMet->met();
   
   // Transverse W mass
-  if(isoEles.size() == 1 && isoMuons.size() == 0) {
-    float metphi = (pfMet->mEt - sysShiftCorr).Phi();
-    float leptonphi = isoEles[0]->momentum.Phi();
-    float genNu_phi, genNu_pt;
-    
-    if(isMC) {
-      for(vector<susy::Particle>::iterator genit = event_.genParticles.begin(); genit != event_.genParticles.end(); genit++) {
-	if(genit->status != 1) continue;
-	if(abs(genit->pdgId) != 12) continue;
-	if(abs(event_.genParticles[genit->motherIndex].pdgId) != 24) continue;
-	genNu_phi = genit->momentum.Phi();
-	genNu_pt = genit->momentum.Pt();
-      }
-      
-    float w_mT_genNeutrino = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - genNu_phi));
-    w_mT_genNeutrino *= 2. * genNu_pt * treeMap["pfMET_sysShift"];
-    treeMap["w_mT_genNeutrino"] = sqrt(w_mT_genNeutrino);
-    }
 
+  float metphi = (pfMet->mEt - sysShiftCorr).Phi();
+  float leptonphi, leptonpt;
+  if(tightEles.size() == 1) {
+    leptonphi = tightEles[0]->momentum.Phi();
+    leptonpt = tightEles[0]->momentum.Pt();
+  }
+  if(tightMuons.size() == 1) {
+    leptonphi = tightMuons[0]->momentum.Phi();
+    leptonpt = tightMuons[0]->momentum.Pt();
+  }
+
+  if(tightMuons.size() + tightEles.size() == 1) {
     float w_mT = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
-    w_mT *= 2. * isoEles[0]->momentum.Pt() * treeMap["pfMET_sysShift"];
+    w_mT *= 2. * tightEles[0]->momentum.Pt() * treeMap["pfMET_sysShift"];
     treeMap["w_mT"] = sqrt(w_mT);
   }
-  else if(isoEles.size() == 0 && isoMuons.size() == 1) {
-    float metphi = (pfMet->mEt - sysShiftCorr).Phi();
-    float leptonphi = isoMuons[0]->momentum.Phi();
-    float genNu_phi, genNu_pt;
-    
-    if(isMC) {
-    for(vector<susy::Particle>::iterator genit = event_.genParticles.begin(); genit != event_.genParticles.end(); genit++) {
-      if(genit->status != 1) continue;
-      if(abs(genit->pdgId) != 14) continue;
-      if(abs(event_.genParticles[genit->motherIndex].pdgId) != 24) continue;
-      genNu_phi = genit->momentum.Phi();
-      genNu_pt = genit->momentum.Pt();
-    }
-    
-    float w_mT_genNeutrino = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - genNu_phi));
-    w_mT_genNeutrino *= 2. * genNu_pt * treeMap["pfMET_sysShift"];
-    treeMap["w_mT_genNeutrino"] = sqrt(w_mT_genNeutrino);
-    }    
-
-    float w_mT = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
-    w_mT *= 2. * isoMuons[0]->momentum.Pt() * treeMap["pfMET_sysShift"];
-    treeMap["w_mT"] = sqrt(w_mT);
-  }
-  else {
-    treeMap["w_mT"] = -1.;
-    if(isMC) treeMap["w_mT_genNeutrino"] = -1.;
-  }
+  else treeMap["w_mT"] = -1.;
   
   // M3 calculation
   if(pfJets_corrP4.size() > 2) {
@@ -971,13 +915,40 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   }
   else treeMap["m3"] = -1.;
 
-  treeMap["ele_pt"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Pt() : -1.;
-  treeMap["ele_phi"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Phi() : -100.;
-  treeMap["ele_eta"] = (isoEles.size() > 0) ? isoEles[0]->momentum.Eta() : -100.;
-  
-  treeMap["muon_pt"] = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Pt() : -1.;
-  treeMap["muon_phi"] = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Phi() : -100.;
-  treeMap["muon_eta"] = (isoMuons.size() > 0) ? isoMuons[0]->momentum.Eta() : -100.;
+  treeMap["ele_pt"] = (tightEles.size() > 0) ? tightEles[0]->momentum.Pt() : -1.;
+  treeMap["ele_phi"] = (tightEles.size() > 0) ? tightEles[0]->momentum.Phi() : -100.;
+  treeMap["ele_eta"] = (tightEles.size() > 0) ? tightEles[0]->momentum.Eta() : -100.;
+  treeMap["ele_mvaTrigV0"] = (tightEles.size() > 0) ? tightEles[0]->mvaTrig : -100.;
+
+  if(tightEles.size() > 0) {
+    float ele_eta = fabs(event_.superClusters[tightEles[0]->superClusterIndex].position.Eta());
+    float ea;
+    if(ele_eta < 1.0) ea = 0.13;
+    else if(ele_eta < 1.479) ea = 0.14;
+    else if(ele_eta < 2.0) ea = 0.07;
+    else if(ele_eta < 2.2) ea = 0.09;
+    else if(ele_eta < 2.3) ea = 0.11;
+    else if(ele_eta < 2.4) ea = 0.11;
+    else ea = 0.14;
+      
+    float ele_iso = max(0., (tightEles[0]->photonIso + tightEles[0]->neutralHadronIso - event_.rho25*ea));
+    ele_iso += tightEles[0]->chargedHadronIso;
+    
+    treeMap["ele_relIso"] = ele_iso / tightEles[0]->momentum.Pt();
+  }
+  else treeMap["ele_relIso"] = -100.;
+
+  treeMap["muon_pt"] = (tightMuons.size() > 0) ? tightMuons[0]->momentum.Pt() : -1.;
+  treeMap["muon_phi"] = (tightMuons.size() > 0) ? tightMuons[0]->momentum.Phi() : -100.;
+  treeMap["muon_eta"] = (tightMuons.size() > 0) ? tightMuons[0]->momentum.Eta() : -100.;
+
+  if(tightMuons.size() > 0) {
+    float mu_iso = max(0., (tightMuons[0]->sumNeutralHadronEt04 + tightMuons[0]->sumPhotonEt04 - 0.5*(tightMuons[0]->sumPUPt04)));
+    mu_iso += tightMuons[0]->sumChargedHadronPt04;
+    float mu_pt = tightMuons[0]->momentum.Pt();
+    treeMap["muon_relIso"] = mu_iso / mu_pt;
+  }
+  else treeMap["muon_relIso"] = -10.;
   
   treeMap["leadPhotonEt"] = (photons.size() > 0) ? photons[0]->momentum.Et() : -1.;
   treeMap["leadPhotonEta"] = (photons.size() > 0) ? photons[0]->momentum.Eta() : -100.;
