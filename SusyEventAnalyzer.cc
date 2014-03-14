@@ -481,13 +481,13 @@ void SusyEventAnalyzer::Data() {
 	if(tightMuons.size() != nMuonReq[chan]) continue;
 
 	if(isQCDChannel[chan]) {
-	  if(tightMuons.size() == nMuonReq[chan] && isIsolatedMuon(tightMuons[0])) continue;
-	  if(tightEles.size() == nEleReq[chan] && isIsolatedElectron(tightEles[0], event.superClusters, event.rho25)) continue;
+	  if(tightMuons.size() == nMuonReq[chan] && isIsolatedMuon(*tightMuons[0])) continue;
+	  if((int)(tightEles.size()) == nEleReq[chan] && isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
 	}
 	else {
-	  if(tightMuons.size() == nMuonReq[chan] && useTrigger && !PassTriggers(2)) continue;
-	  if(tightMuons.size() == nMuonReq[chan] && !isIsolatedMuon(tightMuons[0])) continue;
-	  if(tightEles.size() == nEleReq[chan] && !isIsolatedElectron(tightEles[0], event.superClusters, event.rho25)) continue;
+	  if((int)(tightMuons.size()) == nMuonReq[chan] && useTrigger && !PassTriggers(2)) continue;
+	  if((int)(tightMuons.size()) == nMuonReq[chan] && !isIsolatedMuon(*tightMuons[0])) continue;
+	  if((int)(tightEles.size()) == nEleReq[chan] && !isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
 	}
 
 	nCnt[2][chan]++;
@@ -718,14 +718,14 @@ void SusyEventAnalyzer::Acceptance() {
       if(tightMuons.size() != nMuonReq[chan]) continue;
 
       if(isQCDChannel[chan]) {
-	  if(tightMuons.size() == nMuonReq[chan] && isIsolatedMuon(tightMuons[0])) continue;
-	  if(tightEles.size() == nEleReq[chan] && isIsolatedElectron(tightEles[0], event.superClusters, event.rho25)) continue;
-	}
-	else {
-	  if(tightMuons.size() == nMuonReq[chan] && useTrigger && !PassTriggers(2)) continue;
-	  if(tightMuons.size() == nMuonReq[chan] && !isIsolatedMuon(tightMuons[0])) continue;
-	  if(tightEles.size() == nEleReq[chan] && !isIsolatedElectron(tightEles[0], event.superClusters, event.rho25)) continue;
-	}
+	if((int)(tightMuons.size()) == nMuonReq[chan] && isIsolatedMuon(*tightMuons[0])) continue;
+	if((int)(tightEles.size()) == nEleReq[chan] && isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
+      }
+      else {
+	if((int)(tightMuons.size()) == nMuonReq[chan] && useTrigger && !PassTriggers(2)) continue;
+	if((int)(tightMuons.size()) == nMuonReq[chan] && !isIsolatedMuon(*tightMuons[0])) continue;
+	if((int)(tightEles.size()) == nEleReq[chan] && !isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
+      }
 
       treeMap["btagWeight"] = btagWeight[chan];
       treeMap["btagWeightErr"] = btagWeightError[chan];

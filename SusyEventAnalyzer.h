@@ -78,7 +78,7 @@ class SusyEventAnalyzer {
   float deltaR(TLorentzVector& p1, TLorentzVector& p2);
   float deltaR(TLorentzVector& p1, TVector3& p2);
   float deltaR(TVector3& p1, TVector3& p2);
-  TVector3 FindJetVertex(susy::PFJet jet, vector<susy::Track>& tracks);
+  TVector3 FindJetVertex(susy::PFJet jet, vector<susy::Track> tracks);
   double d0correction(TVector3& beamSpot, susy::Track& track) const;
   double dZcorrection(TVector3& beamSpot, susy::Track& track) const;
   void AddHlt(vector<TString> v, vector<int> eventType) {
@@ -358,7 +358,7 @@ float SusyEventAnalyzer::deltaR(TVector3& p1, TVector3& p2) {
   return dR;
 }
 
-TVector3 SusyEventAnalyzer::FindJetVertex(susy::PFJet jet, vector<susy::Track>& tracks) {
+TVector3 SusyEventAnalyzer::FindJetVertex(susy::PFJet jet, vector<susy::Track> tracks) {
 
   vector<TVector3> vertices;
   vector<float> sumPt;
@@ -591,7 +591,7 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuo
 
 }
 
-void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*>& tightMuons, vector<susy::Muon*> looseMuons, vector<susy::Electron*>& tightEles, vector<susy::Electron*>& looseEles, float& HT) {
+void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons, vector<susy::Electron*>& tightEles, vector<susy::Electron*>& looseEles, float& HT) {
 
   map<TString, vector<susy::Electron> >::iterator eleMap = ev.electrons.find("gsfElectrons");
   if(eleMap != ev.electrons.end()) {
@@ -931,7 +931,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     else if(ele_eta < 2.4) ea = 0.11;
     else ea = 0.14;
       
-    float ele_iso = max(0., (tightEles[0]->photonIso + tightEles[0]->neutralHadronIso - event_.rho25*ea));
+    float ele_iso = max(0., (double)(tightEles[0]->photonIso + tightEles[0]->neutralHadronIso - event_.rho25*ea));
     ele_iso += tightEles[0]->chargedHadronIso;
     
     treeMap["ele_relIso"] = ele_iso / tightEles[0]->momentum.Pt();
@@ -943,7 +943,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["muon_eta"] = (tightMuons.size() > 0) ? tightMuons[0]->momentum.Eta() : -100.;
 
   if(tightMuons.size() > 0) {
-    float mu_iso = max(0., (tightMuons[0]->sumNeutralHadronEt04 + tightMuons[0]->sumPhotonEt04 - 0.5*(tightMuons[0]->sumPUPt04)));
+    float mu_iso = max(0., (double)(tightMuons[0]->sumNeutralHadronEt04 + tightMuons[0]->sumPhotonEt04 - 0.5*(tightMuons[0]->sumPUPt04)));
     mu_iso += tightMuons[0]->sumChargedHadronPt04;
     float mu_pt = tightMuons[0]->momentum.Pt();
     treeMap["muon_relIso"] = mu_iso / mu_pt;
