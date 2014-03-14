@@ -875,7 +875,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 
   if(tightMuons.size() + tightEles.size() == 1) {
     float w_mT = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
-    w_mT *= 2. * tightEles[0]->momentum.Pt() * treeMap["pfMET_sysShift"];
+    w_mT *= 2. * leptonpt * treeMap["pfMET_sysShift"];
     treeMap["w_mT"] = sqrt(w_mT);
   }
   else treeMap["w_mT"] = -1.;
