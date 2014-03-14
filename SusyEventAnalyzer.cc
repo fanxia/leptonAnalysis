@@ -485,9 +485,9 @@ void SusyEventAnalyzer::Data() {
 	  if(tightEles.size() > 0 && isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
 	}
 	else {
-	  if(tightMuons.size()) > 0 && useTrigger && !PassTriggers(2)) continue;
-	  if(tightMuons.size()) > 0 && !isIsolatedMuon(*tightMuons[0])) continue;
-	  if(tightEles.size()) > 0 && !isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
+	  if(tightMuons.size() > 0 && useTrigger && !PassTriggers(2)) continue;
+	  if(tightMuons.size() > 0 && !isIsolatedMuon(*tightMuons[0])) continue;
+	  if(tightEles.size() > 0 && !isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
 	}
 
 	nCnt[2][chan]++;
