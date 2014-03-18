@@ -118,6 +118,13 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
   cout << "Total events in files : " << nEntries << endl;
   cout << "Events to be processed : " << processNEvents << endl;
 
+  vector<susy::PFJet*> pfJets, btags;
+  vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
+  vector<float> csvValues;
+  vector<susy::Muon*> tightMuons, looseMuons;
+  vector<susy::Electron*> tightEles, looseEles;
+  vector<BtagInfo> tagInfos;
+
   // start event looping
   Long64_t jentry = 0;
   while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
@@ -128,14 +135,6 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
 
     nCnt[0][0]++; // events
 
-    vector<susy::Photon*> photons;
-    vector<susy::PFJet*> pfJets, btags;
-    vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
-    vector<float> csvValues;
-    vector<susy::Muon*> tightMuons, looseMuons;
-    vector<susy::Electron*> tightEles, looseEles;
-    vector<BtagInfo> tagInfos;
-
     int event_type = 0;
 
     int nPVertex = GetNumberPV(event);
@@ -143,15 +142,30 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
 
     float HT = 0.;
 
-    findMuons(event, tightMuons, looseMuons, HT);
-    findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT);
+    tightMuons.clear();
+    looseMuons.clear();
+    tightEles.clear();
+    looseEles.clear();
+    pfJets.clear();
+    btags.clear();
+    pfJets_corrP4.clear();
+    btags_corrP4.clear();
+    csvValues.clear();
+    tagInfos.clear();
+
+    findMuons(event, tightMuons, looseMuons, HT, kSignal);
+    if(tightMuons.size() > 1 || looseMuons.size() > 0) continue;
+
+    findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT, kSignal);
+    if(tightEles.size() > 1 || looseEles.size() > 0) continue;
 
     if(tightMuons.size() + tightEles.size() != 1) continue;
+    if(looseMuons.size() + looseEles.size() != 0) continue;
 
     bool passHLT = true;
     if(useTrigger) {
       if(tightEles.size() == 1) passHLT = PassTriggers(1);
-      else if(tightMuons.size() == 1) passHLT = PassTriggers(2) || PassTriggers(3);
+      else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
     }
     if(!passHLT) continue;
 
@@ -165,13 +179,6 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
 	     tagInfos, csvValues, 
 	     pfJets_corrP4, btags_corrP4, 
 	     HT, hadronicSystem);
-
-    findPhotons(event, 
-		photons,
-		pfJets_corrP4,
-		tightMuons, looseMuons,
-		tightEles, looseEles,
-		HT);
 
     ////////////////////
 
@@ -272,29 +279,7 @@ void SusyEventAnalyzer::Data() {
     h_metFilter->GetYaxis()->SetBinLabel(i+1, metFilterNames[i]);
   }
 
-  VTH2F h_diempt = BookTH2FVector("diempt", "di-EM pt vs nJets;diEMPt (GeV/c);nJets", 1000, 0., 2000., 200, 0., 200., nCategories, categories, nChannels, channels);
-  VTH2F h_dijetpt = BookTH2FVector("dijetpt", "di-Jet pt vs nJets;diJetPt (GeV/c);nJets", 1000, 0., 2000., 200, 0., 200., nCategories, categories, nChannels, channels);
-  
   TH2F * h_DR_jet_gg = new TH2F("DR_jet_gg", "#DeltaR between jets and lead/trailing #gamma#gamma candidates;#DeltaR_{lead #gamma, jet};#DeltaR_{trail #gamma, jet}", 50, 0, 5, 50, 0, 5);
-
-  const int nDivisions_chi2 = 50;
-
-  TH1F * h_met_varyCSVcut_ff_j[nDivisions_chi2];
-  TH1F * h_met_varyCSVcut_gg_j[nDivisions_chi2];
-  TH1F * h_met_squareCSVcut_ff_jj[nDivisions_chi2];
-  TH1F * h_met_squareCSVcut_gg_jj[nDivisions_chi2];
-
-  for(int i = 0; i < nDivisions_chi2; i++) {
-    char tmp[10];
-    double tmp_val = (double)i / (double)nDivisions_chi2;
-    sprintf(tmp, "%f", tmp_val);
-    TString tmp_t = tmp;
-
-    h_met_varyCSVcut_ff_j[i] = new TH1F("met_varyCSVcut_ff_j_"+tmp_t, "MET for ff+j (maxCSV > "+tmp_t+")", 400, 0, 2000);
-    h_met_varyCSVcut_gg_j[i] = new TH1F("met_varyCSVcut_gg_j_"+tmp_t, "MET for gg+j (maxCSV > "+tmp_t+")", 400, 0, 2000);
-    h_met_squareCSVcut_ff_jj[i] = new TH1F("met_squareCSVcut_ff_jj_"+tmp_t, "MET for ff+jj (maxCSV & submaxCSV > "+tmp_t+")", 400, 0, 2000);
-    h_met_squareCSVcut_gg_jj[i] = new TH1F("met_squareCSVcut_gg_jj_"+tmp_t, "MET for gg+jj (maxCSV & submaxCSV > "+tmp_t+")", 400, 0, 2000);
-  }
 
   /////////////////////////////////
   // Reweighting trees
@@ -323,25 +308,38 @@ void SusyEventAnalyzer::Data() {
   map<TString, float> treeMap;
   for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;
 
-  vector<TTree*> eventTrees;
+  vector<TTree*> signalTrees, eQCDTrees, muQCDTrees;
   for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree(channels[i]+"_EvtTree", "An event tree for final analysis");
-    
+    TTree * tree = new TTree(channels[i]+"_signalTree", "An event tree for final analysis");
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
-
-    eventTrees.push_back(tree);
+    signalTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_eQCDTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    eQCDTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_muQCDTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    muQCDTrees.push_back(tree);
   }
   
   ScaleFactorInfo sf(btagger);
-
-  // to check duplicate events
-  map<int, set<int> > allEvents;
 
   bool quitAfterProcessing = false;
 
   Long64_t nEntries = fTree->GetEntries();
   cout << "Total events in files : " << nEntries << endl;
   cout << "Events to be processed : " << processNEvents << endl;
+
+  vector<susy::Muon*> tightMuons, looseMuons;
+  vector<susy::Electron*> tightEles, looseEles;
+  vector<susy::PFJet*> pfJets, btags;
+  vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
+  vector<float> csvValues;
+  vector<susy::Photon*> photons;
+  vector<BtagInfo> tagInfos;
 
   // start event looping
   Long64_t jentry = 0;
@@ -389,51 +387,61 @@ void SusyEventAnalyzer::Data() {
       }
     }
 
-    vector<susy::Muon*> tightMuons, looseMuons;
-    vector<susy::Electron*> tightEles, looseEles;
-    vector<susy::PFJet*> pfJets, btags;
-    vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
-    vector<float> csvValues;
-    vector<susy::Photon*> photons;
-    vector<BtagInfo> tagInfos;
-
-    int event_type = 0;
-
     int nPVertex = GetNumberPV(event);
     if(nPVertex == 0) {
       nCnt[22][0]++;
       continue;
     }
 
-    float HT = 0.;
+    for(int qcdMode = kSignal; qcdMode < kMuonQCD; qcdMode++) {
 
-    findMuons(event, tightMuons, looseMuons, HT);
-    findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT);
-    
-    if(tightMuons.size() + tightEles.size() == 0) {
-      nCnt[23][0]++;
-      continue;
-    }
+      float HT = 0.;
+      
+      tightMuons.clear();
+      looseMuons.clear();
+      tightEles.clear();
+      looseEles.clear();
+      pfJets.clear();
+      btags.clear();
+      pfJets_corrP4.clear();
+      btags_corrP4.clear();
+      csvValues.clear();
+      photons.clear();
+      tagInfos.clear();
+      
+      findMuons(event, tightMuons, looseMuons, HT, qcdMode);
+      if(tightMuons.size() > 1 || looseMuons.size() > 0) {
+	nCnt[23][qcdMode]++;
+	continue;
+      }
 
-    if(tightMuons.size() + tightEles.size() > 1) {
-      nCnt[29][0]++;
-      continue;
-    }
+      findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT, qcdMode);
+      if(tightEles.size() > 1 || looseEles.size() > 0) {
+	nCnt[29][qcdMode]++;
+	continue;
+      }
 
-    if(looseMuons.size() + looseEles.size() != 0) {
-      nCnt[24][0]++;
-      continue;
-    }
-
-    bool passHLT = true;
-    if(useTrigger) {
-      if(tightEles.size() == 1) passHLT = PassTriggers(1);
-      else if(tightMuons.size() == 1) passHLT = PassTriggers(2) || PassTriggers(3);
-    }
-    if(!passHLT) {
-      nCnt[25][0]++;
-      continue;
-    }
+      if(tightMuons.size() + tightEles.size() != 1) {
+	nCnt[24][qcdMode]++;
+	continue;
+      }
+      if(looseMuons.size() + looseEles.size() != 0) {
+	nCnt[26][qcdMode]++;
+	continue;
+      }
+      
+      bool passHLT = true;
+      if(useTrigger) {
+	if(tightEles.size() == 1) passHLT = PassTriggers(1);
+	else if(tightMuons.size() == 1) {
+	  if(qcdMode == kMuonQCD) passHLT = PassTriggers(2) || PassTriggers(3);
+	  else passHLT = PassTriggers(2);
+	}
+      }
+      if(!passHLT) {
+	nCnt[25][qcdMode]++;
+	continue;
+      }
 
     float HT_jets = 0.;
     TLorentzVector hadronicSystem(0., 0., 0., 0.);
@@ -454,9 +462,6 @@ void SusyEventAnalyzer::Data() {
 		tightEles, looseEles,
 		HT);
 		
-    bool duplicateEvent = ! (allEvents[event.runNumber].insert(event.eventNumber)).second;
-    if(event.isRealData && duplicateEvent) continue;
-
     SetTreeValues(treeMap,
 		  event,
 		  tightMuons, tightEles, 
@@ -472,31 +477,33 @@ void SusyEventAnalyzer::Data() {
 
     ////////////////////
 
-      for(unsigned int chan = 0; chan < nChannels; chan++) {
-
-	if(pfJets.size() < nJetReq[chan]) continue;
-	if(btags.size() < nBtagReq[chan]) continue;
-
-	if(tightEles.size() != nEleReq[chan]) continue;
-	if(tightMuons.size() != nMuonReq[chan]) continue;
-
-	if(isQCDChannel[chan]) {
-	  if(tightMuons.size() > 0 && isIsolatedMuon(*tightMuons[0])) continue;
-	  if(tightEles.size() > 0 && isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
-	}
-	else {
-	  if(tightMuons.size() > 0 && useTrigger && !PassTriggers(2)) continue;
-	  if(tightMuons.size() > 0 && !isIsolatedMuon(*tightMuons[0])) continue;
-	  if(tightEles.size() > 0 && !isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
-	}
-
+    for(unsigned int chan = 0; chan < nChannels; chan++) {
+      
+      if(pfJets.size() < nJetReq[chan]) continue;
+      if(btags.size() < nBtagReq[chan]) continue;
+      
+      if(tightEles.size() != nEleReq[chan]) continue;
+      if(tightMuons.size() != nMuonReq[chan]) continue;
+      
+      if(qcdMode == kSignal) {
 	nCnt[2][chan]++;
-	eventTrees[chan]->Fill();
+	signalTrees[chan]->Fill();
+      }
+      else if(qcdMode == kElectronQCD) {
+	nCnt[3][chan]++;
+	eQCDTrees[chan]->Fill();
+      }
+      else if(qcdMode == kMuonQCD) {
+	nCnt[4][chan]++;
+	muQCDTrees[chan]->Fill();
+      }
 
-      } // loop over jet/btag req channels
-
+    } // loop over jet/btag req channels
+    
     ///////////////////////////////////
     
+    } // for qcd modes
+
     if(quitAfterProcessing) break;
   } // for entries
   
@@ -506,23 +513,19 @@ void SusyEventAnalyzer::Data() {
   cout << "-----------------------------------------------" << endl;
   cout << endl;
   for(int i = 0; i < nChannels; i++) {
-    cout << "----------------" << channels[i] << " Requirement-------------" << endl;
-    cout << "gg+" << channels[i] << " events              : " << nCnt[2][i] << endl;
-    cout << "eg+" << channels[i] << " events              : " << nCnt[3][i] << endl;
-    cout << "ff+" << channels[i] << " events              : " << nCnt[4][i] << endl;
-    cout << "gf+" << channels[i] << " events              : " << nCnt[5][i] << endl;
-    cout << "ee+" << channels[i] << " events              : " << nCnt[6][i] << endl;
-    cout << "ef+" << channels[i] << " events              : " << nCnt[7][i] << endl;
+    cout << "---------------- " << channels[i] << " Requirement ----------------" << endl;
+    cout << "Signal " << channels[i] << " events : " << nCnt[2][i] << endl;
+    cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
+    cout << "muQCD  " << channels[i] << " events : " << nCnt[4][i] << endl;
   }
   cout << "-----------------------------------------------" << endl;
   cout << endl;
   cout << "----------------Continues, info----------------" << endl;
   cout << "fail MET filters         : " << nCnt[21][0] << endl;
   cout << "No primary vertex        : " << nCnt[22][0] << endl;
-  cout << "zero tight leptons       : " << nCnt[23][0] << endl;
-  cout << "2+ tight leptons         : " << nCnt[29][0] << endl;
-  cout << "1+ loose leptons         : " << nCnt[24][0] << endl;
-  cout << "fail HLT                 : " << nCnt[25][0] << endl;
+  cout << "Fail signal HLT          : " << nCnt[25][0] << endl;
+  cout << "Fail eQCD HLT            : " << nCnt[25][1] << endl;
+  cout << "Fail muQCD HLT           : " << nCnt[25][2] << endl;
   cout << "-----------------------------------------------" << endl;
   cout << endl;
 
@@ -597,6 +600,14 @@ void SusyEventAnalyzer::Acceptance() {
   cout << "Events to be processed : " << processNEvents << endl;
   h_nEvents->Fill(0., (Double_t)nEntries);
 
+  vector<susy::Muon*> tightMuons, looseMuons;
+  vector<susy::Electron*> tightEles, looseEles;
+  vector<susy::PFJet*> pfJets, btags;
+  vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
+  vector<float> csvValues;
+  vector<susy::Photon*> photons;
+  vector<BtagInfo> tagInfos;
+
   // start event looping
   Long64_t jentry = 0;
   while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
@@ -631,23 +642,17 @@ void SusyEventAnalyzer::Acceptance() {
       eventWeightErr = 0.;
     }
 
-    vector<susy::Muon*> tightMuons, looseMuons;
-    vector<susy::Electron*> tightEles, looseEles;
-    vector<susy::PFJet*> pfJets, btags;
-    vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
-    vector<float> csvValues;
-    vector<susy::Photon*> photons;
-    
-    vector<BtagInfo> tagInfos;
-
     int nPVertex = GetNumberPV(event);
     if(nPVertex == 0) continue;
 
     float HT = 0.;
 
     findMuons(event, tightMuons, looseMuons, HT);
+    if(tightMuons.size() > 1 || looseMuons.size() > 0) continue;
+
     findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT);
-    
+    if(tightEles.size() > 1 || looseEles.size() > 0) continue;
+
     if(tightMuons.size() + tightEles.size() != 1) continue;
     if(looseMuons.size() + looseEles.size() != 0) continue;
 
@@ -692,7 +697,6 @@ void SusyEventAnalyzer::Acceptance() {
 
       delete tagWeight;
     }
-    tagInfos.clear();
 
     SetTreeValues(treeMap,
 		  event,
@@ -737,6 +741,18 @@ void SusyEventAnalyzer::Acceptance() {
       
     } // for channels
     
+    tightMuons.clear();
+    looseMuons.clear();
+    tightEles.clear();
+    looseEles.clear();
+    pfJets.clear();
+    btags.clear();
+    pfJets_corrP4.clear();
+    btags_corrP4.clear();
+    csvValues.clear();
+    photons.clear();
+    tagInfos.clear();
+
   } // for entries
 
   cout << "-------------------Job Summary-----------------" << endl;

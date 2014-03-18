@@ -130,11 +130,11 @@ class SusyEventAnalyzer {
   // major analysis logic
   void findMuons(susy::Event& ev, 
 		 vector<susy::Muon*>& tightMuons, vector<susy::Muon*>& looseMuons, 
-		 float& HT);
+		 float& HT, int mode);
   void findElectrons(susy::Event& ev, 
 		     vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons, 
 		     vector<susy::Electron*>& tightEles, vector<susy::Electron*>& looseEles, 
-		     float& HT);
+		     float& HT, int mode);
   void findPhotons(susy::Event& ev, 
 		   vector<susy::Photon*>& photons,
 		   vector<TLorentzVector> pfJets_corrP4,
@@ -560,7 +560,7 @@ void SusyEventAnalyzer::findJets(susy::Event& ev,
 
 }
 
-void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuons, vector<susy::Muon*>& looseMuons, float& HT) {
+void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuons, vector<susy::Muon*>& looseMuons, float& HT, int mode) {
 
   map<TString, vector<susy::Muon> >::iterator muMap = ev.muons.find("muons");
   if(muMap != ev.muons.end()) {
@@ -568,21 +568,46 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuo
 
       if((int)mu_it->bestTrackIndex() >= (int)(event.tracks).size() || (int)mu_it->bestTrackIndex() < 0) continue;
 
-      // check if this overlaps with another found muon?
+      bool overlapsMuon = false;
+      for(unsigned int i = 0; i < tightMuons.size(); i++) {
+	if(deltaR(tightMuons[i]->momentum, mu_it->momentum) <= 0.5) {
+	  overlapsMuon = true;
+	  break;
+	}
+      }
+      for(unsigned int i = 0; i < looseMuons.size(); i++) {
+	if(deltaR(looseMuons[i]->momentum, mu_it->momentum) <= 0.5) {
+	  overlapsMuon = true;
+	  break;
+	}
+      }
+      if(overlapsMuon) continue;
 
-      if(isTightMuon(*mu_it, 
-		     event.tracks, 
-		     d0correction(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]), 
-		     dZcorrection(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]))
-	 ) {
+      bool passesTight = isTightMuon(*mu_it, 
+				     event.tracks, 
+				     d0correction(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]), 
+				     dZcorrection(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]));
 
-	tightMuons.push_back(&*mu_it);
-	HT += mu_it->momentum.Pt();
+      if(mode != kMuonQCD) {
+	if(passesTight && isIsolatedMuon(*mu_it)) {
+	  tightMuons.push_back(&*mu_it);
+	  HT += mu_it->momentum.Pt();
+	}
+	else if(isVetoMuon(*mu_it)) {
+	  looseMuons.push_back(&*mu_it);
+	  HT += mu_it->momentum.Pt();
+	}
       }
 
-      else if(isVetoMuon(*mu_it)) {
-	looseMuons.push_back(&*mu_it);
-	HT += mu_it->momentum.Pt();
+      else {
+	if(passesTight && !isIsolatedMuon(*mu_it)) {
+	  tightMuons.push_back(&*mu_it);
+	  HT += mu_it->momentum.Pt();
+	}
+	else if(isVetoMuon(*mu_it)) {
+	  looseMuons.push_back(&*mu_it);
+	  HT += mu_it->momentum.Pt();
+	}
       }
 
     }
@@ -591,7 +616,7 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuo
 
 }
 
-void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons, vector<susy::Electron*>& tightEles, vector<susy::Electron*>& looseEles, float& HT) {
+void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons, vector<susy::Electron*>& tightEles, vector<susy::Electron*>& looseEles, float& HT, int mode) {
 
   map<TString, vector<susy::Electron> >::iterator eleMap = ev.electrons.find("gsfElectrons");
   if(eleMap != ev.electrons.end()) {
@@ -614,24 +639,55 @@ void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*> tight
       }
       if(overlapsMuon) continue;
 
-      if(isTightElectron(*ele_it, 
-			 event.superClusters, 
-			 event.rho25, 
-			 d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
-			 dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]))) {
-	tightEles.push_back(&*ele_it);
-	HT += ele_it->momentum.Pt();
+      bool overlapsElectron = false;
+      for(unsigned int i = 0; i < tightEles.size(); i++) {
+	if(deltaR(tightEles[i]->momentum, ele_it->momentum) <= 0.5) {
+	  overlapsElectron = true;
+	  break;
+	}
+      }
+      for(unsigned int i = 0; i < looseEles.size(); i++) {
+	if(deltaR(looseEles[i]->momentum, ele_it->momentum) <= 0.5) {
+	  overlapsElectron = true;
+	  break;
+	}
+      }
+      if(overlapsElectron) continue;
+
+      bool passesTight = isTightElectron(*ele_it, 
+					 event.superClusters, 
+					 event.rho25, 
+					 d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
+					 dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]));
+
+      bool passesLoose = isLooseElectron(*ele_it,
+					 event.superClusters, 
+					 event.rho25, 
+					 d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
+					 dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]));
+
+      if(mode != kElectronQCD) {
+	if(passesTight && isIsolatedElectron(*ele_it, event.superClusters, event.rho25)) {
+	  tightEles.push_back(&*ele_it);
+	  HT += ele_it->momentum.Pt();
+	}
+	else if(passesLoose) {
+	  looseEles.push_back(&*ele_it);
+	  HT += ele_it->momentum.Pt();
+	}
       }
 
-      else if(isLooseElectron(*ele_it,
-			      event.superClusters, 
-			      event.rho25, 
-			      d0correction(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]), 
-			      dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]))) {	 
-	looseEles.push_back(&*ele_it);
-	HT += ele_it->momentum.Pt();
+      else {
+	if(passesTight && !isIsolatedElectron(*ele_it, event.superClusters, event.rho25)) {
+	  tightEles.push_back(&*ele_it);
+	  HT += ele_it->momentum.Pt();
+	}
+	else if(passesLoose) {
+	  looseEles.push_back(&*ele_it);
+	  HT += ele_it->momentum.Pt();
+	}
       }
-     
+
     }
   }
 
