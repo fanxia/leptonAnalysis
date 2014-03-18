@@ -647,10 +647,10 @@ void SusyEventAnalyzer::Acceptance() {
 
     float HT = 0.;
 
-    findMuons(event, tightMuons, looseMuons, HT);
+    findMuons(event, tightMuons, looseMuons, HT, kSignal);
     if(tightMuons.size() > 1 || looseMuons.size() > 0) continue;
 
-    findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT);
+    findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT, kSignal);
     if(tightEles.size() > 1 || looseEles.size() > 0) continue;
 
     if(tightMuons.size() + tightEles.size() != 1) continue;
@@ -720,7 +720,7 @@ void SusyEventAnalyzer::Acceptance() {
       
       if(tightEles.size() != nEleReq[chan]) continue;
       if(tightMuons.size() != nMuonReq[chan]) continue;
-
+      /*
       if(isQCDChannel[chan]) {
 	if(tightMuons.size() > 0 && isIsolatedMuon(*tightMuons[0])) continue;
 	if(tightEles.size() > 0 && isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
@@ -730,6 +730,7 @@ void SusyEventAnalyzer::Acceptance() {
 	if(tightMuons.size() > 0 && !isIsolatedMuon(*tightMuons[0])) continue;
 	if(tightEles.size() > 0 && !isIsolatedElectron(*tightEles[0], event.superClusters, event.rho25)) continue;
       }
+      */
 
       treeMap["btagWeight"] = btagWeight[chan];
       treeMap["btagWeightErr"] = btagWeightError[chan];
