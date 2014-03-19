@@ -479,6 +479,9 @@ void SusyEventAnalyzer::Data() {
 
     for(unsigned int chan = 0; chan < nChannels; chan++) {
       
+      if(nEleReq[chan] == 1 && qcdMode == kMuonQCD) continue;
+      if(nMuonReq[chan] == 1 && qcdMode == kElectronQCD) continue;
+
       if(pfJets.size() < nJetReq[chan]) continue;
       if(btags.size() < nBtagReq[chan]) continue;
       
@@ -669,10 +672,10 @@ void SusyEventAnalyzer::Acceptance() {
       photons.clear();
       tagInfos.clear();
       
-      findMuons(event, tightMuons, looseMuons, HT, kSignal);
+      findMuons(event, tightMuons, looseMuons, HT, qcdMode);
       if(tightMuons.size() > 1 || looseMuons.size() > 0) continue;
       
-      findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT, kSignal);
+      findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT, qcdMode);
       if(tightEles.size() > 1 || looseEles.size() > 0) continue;
       
       if(tightMuons.size() + tightEles.size() != 1) continue;
@@ -740,6 +743,9 @@ void SusyEventAnalyzer::Acceptance() {
       
       for(unsigned int chan = 0; chan < nChannels; chan++) {
 	
+	if(nEleReq[chan] == 1 && qcdMode == kMuonQCD) continue;
+	if(nMuonReq[chan] == 1 && qcdMode == kElectronQCD) continue;
+
 	if(pfJets.size() < nJetReq[chan]) continue;
 	if(btags.size() < nBtagReq[chan]) continue;
 	
@@ -769,7 +775,7 @@ void SusyEventAnalyzer::Acceptance() {
     } // for qcd modes
 
   } // for entries
-durp
+
   cout << "-------------------Job Summary-----------------" << endl;
   cout << "Total_events         : " << nCnt[0][0] << endl;
   cout << "-----------------------------------------------" << endl;
@@ -777,8 +783,8 @@ durp
   for(int i = 0; i < nChannels; i++) {
     cout << "---------------- " << channels[i] << " Requirement ----------------" << endl;
     cout << "Signal " << channels[i] << " events : " << nCnt[2][i] << endl;
-    cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
-    cout << "muQCD  " << channels[i] << " events : " << nCnt[4][i] << endl;
+    if(nEleReq[chan] == 1) cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
+    if(nMuonReq[chan] == 1) cout << "muQCD  " << channels[i] << " events : " << nCnt[4][i] << endl;
   }
   cout << endl;
   cout << "----------------Continues, info----------------" << endl;
