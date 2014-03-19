@@ -654,7 +654,7 @@ void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*> tight
 					 dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]));
 
       if(mode != kElectronQCD) {
-	if(passesTight && isIsolatedElectron(*ele_it, event.superClusters, event.rho25) && ele.mvaTrig > 0.5) {
+	if(passesTight && isIsolatedElectron(*ele_it, event.superClusters, event.rho25) && ele_it->mvaTrig > 0.5) {
 	  tightEles.push_back(&*ele_it);
 	  HT += ele_it->momentum.Pt();
 	}
