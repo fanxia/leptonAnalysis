@@ -588,28 +588,15 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuo
 				     d0correction(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]), 
 				     dZcorrection(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]));
 
-      if(mode != kMuonQCD) {
-	if(passesTight && isIsolatedMuon(*mu_it)) {
-	  tightMuons.push_back(&*mu_it);
-	  HT += mu_it->momentum.Pt();
-	}
-	else if(isVetoMuon(*mu_it)) {
-	  looseMuons.push_back(&*mu_it);
-	  HT += mu_it->momentum.Pt();
-	}
+      if(passesTight) {
+	tightMuons.push_back(&*mu_it);
+	HT += mu_it->momentum.Pt();
       }
-
-      else {
-	if(passesTight && !isIsolatedMuon(*mu_it)) {
-	  tightMuons.push_back(&*mu_it);
-	  HT += mu_it->momentum.Pt();
-	}
-	else if(isVetoMuon(*mu_it)) {
-	  looseMuons.push_back(&*mu_it);
-	  HT += mu_it->momentum.Pt();
-	}
+      else if(isVetoMuon(*mu_it)) {
+	looseMuons.push_back(&*mu_it);
+	HT += mu_it->momentum.Pt();
       }
-
+      
     }
 
   }
@@ -667,7 +654,7 @@ void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*> tight
 					 dZcorrection(event.vertices[0].position, event.tracks[ele_it->gsfTrackIndex]));
 
       if(mode != kElectronQCD) {
-	if(passesTight && isIsolatedElectron(*ele_it, event.superClusters, event.rho25)) {
+	if(passesTight && isIsolatedElectron(*ele_it, event.superClusters, event.rho25) && ele.mvaTrig > 0.5) {
 	  tightEles.push_back(&*ele_it);
 	  HT += ele_it->momentum.Pt();
 	}

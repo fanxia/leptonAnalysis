@@ -7,13 +7,6 @@
 
 using namespace std;
 
-bool isIsolatedMuon(susy::Muon mu) {
-  float mu_iso = max(0., (mu.sumNeutralHadronEt04 + mu.sumPhotonEt04 - 0.5*(mu.sumPUPt04)));
-  mu_iso += mu.sumChargedHadronPt04;
-
-  return (mu_iso / mu.momentum.Pt() < 0.12);
-}
-
 // This doesn't check for relIso! Muons passing this are either signal or QCD muon candidates
 bool isTightMuon(susy::Muon mu, vector<susy::Track> tracks, double d0, double dz) {
 
@@ -38,7 +31,8 @@ bool isTightMuon(susy::Muon mu, vector<susy::Track> tracks, double d0, double dz
     tracks[mu.trackIndex].numberOfValidPixelHits > 0 && 
     (mu.nPixelLayersWithMeasurement + mu.nStripLayersWithMeasurement) > 5 && 
     mu.momentum.Pt() > 30. &&
-    fabs(mu.momentum.Eta()) < 2.1;
+    fabs(mu.momentum.Eta()) < 2.1 &&
+    mu_iso / mu.momentum.Pt() < 0.12;
   
   return passes;
   

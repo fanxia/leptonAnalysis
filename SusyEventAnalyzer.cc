@@ -308,7 +308,7 @@ void SusyEventAnalyzer::Data() {
   map<TString, float> treeMap;
   for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;
 
-  vector<TTree*> signalTrees, eQCDTrees, muQCDTrees;
+  vector<TTree*> signalTrees, eQCDTrees;
   for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree(channels[i]+"_signalTree", "An event tree for final analysis");
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
@@ -319,12 +319,7 @@ void SusyEventAnalyzer::Data() {
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
     eQCDTrees.push_back(tree);
   }
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree(channels[i]+"_muQCDTree", "An event tree for final analysis");
-    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
-    muQCDTrees.push_back(tree);
-  }
-  
+    
   ScaleFactorInfo sf(btagger);
 
   bool quitAfterProcessing = false;
@@ -393,7 +388,7 @@ void SusyEventAnalyzer::Data() {
       continue;
     }
 
-    for(int qcdMode = kSignal; qcdMode <= kMuonQCD; qcdMode++) {
+    for(int qcdMode = kSignal; qcdMode <= kElectronQCD; qcdMode++) {
 
       float HT = 0.;
       
@@ -433,10 +428,7 @@ void SusyEventAnalyzer::Data() {
       bool passHLT = true;
       if(useTrigger) {
 	if(tightEles.size() == 1) passHLT = PassTriggers(1);
-	else if(tightMuons.size() == 1) {
-	  if(qcdMode == kMuonQCD) passHLT = PassTriggers(2) || PassTriggers(3);
-	  else passHLT = PassTriggers(2);
-	}
+	else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
       }
       if(!passHLT) {
 	nCnt[25][qcdMode]++;
@@ -479,9 +471,6 @@ void SusyEventAnalyzer::Data() {
 
     for(unsigned int chan = 0; chan < nChannels; chan++) {
       
-      if(nEleReq[chan] == 1 && qcdMode == kMuonQCD) continue;
-      if(nMuonReq[chan] == 1 && qcdMode == kElectronQCD) continue;
-
       if(pfJets.size() < nJetReq[chan]) continue;
       if(btags.size() < nBtagReq[chan]) continue;
       
@@ -496,11 +485,7 @@ void SusyEventAnalyzer::Data() {
 	nCnt[3][chan]++;
 	eQCDTrees[chan]->Fill();
       }
-      else if(qcdMode == kMuonQCD) {
-	nCnt[4][chan]++;
-	muQCDTrees[chan]->Fill();
-      }
-
+      
     } // loop over jet/btag req channels
     
     ///////////////////////////////////
@@ -519,7 +504,6 @@ void SusyEventAnalyzer::Data() {
     cout << "---------------- " << channels[i] << " Requirement ----------------" << endl;
     cout << "Signal " << channels[i] << " events : " << nCnt[2][i] << endl;
     cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
-    cout << "muQCD  " << channels[i] << " events : " << nCnt[4][i] << endl;
   }
   cout << "-----------------------------------------------" << endl;
   cout << endl;
@@ -528,7 +512,6 @@ void SusyEventAnalyzer::Data() {
   cout << "No primary vertex        : " << nCnt[22][0] << endl;
   cout << "Fail signal HLT          : " << nCnt[25][0] << endl;
   cout << "Fail eQCD HLT            : " << nCnt[25][1] << endl;
-  cout << "Fail muQCD HLT           : " << nCnt[25][2] << endl;
   cout << "-----------------------------------------------" << endl;
   cout << endl;
 
@@ -581,7 +564,7 @@ void SusyEventAnalyzer::Acceptance() {
   map<TString, float> treeMap;
   for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;
 
-  vector<TTree*> signalTrees, eQCDTrees, muQCDTrees;
+  vector<TTree*> signalTrees, eQCDTrees;
   for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree(channels[i]+"_signalTree", "An event tree for final analysis");
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
@@ -592,12 +575,7 @@ void SusyEventAnalyzer::Acceptance() {
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
     eQCDTrees.push_back(tree);
   }
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree(channels[i]+"_muQCDTree", "An event tree for final analysis");
-    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
-    muQCDTrees.push_back(tree);
-  }
-
+  
   ScaleFactorInfo sf(btagger);
   TFile * btagEfficiency = new TFile("btagEfficiency"+output_code_t+".root", "READ");
   sf.SetTaggingEfficiencies((TH1F*)btagEfficiency->Get("lEff"+output_code_t), (TH1F*)btagEfficiency->Get("cEff"+output_code_t), (TH1F*)btagEfficiency->Get("bEff"+output_code_t));
@@ -656,7 +634,7 @@ void SusyEventAnalyzer::Acceptance() {
     int nPVertex = GetNumberPV(event);
     if(nPVertex == 0) continue;
     
-    for(int qcdMode = kSignal; qcdMode <= kMuonQCD; qcdMode++) {
+    for(int qcdMode = kSignal; qcdMode <= kElectronQCD; qcdMode++) {
       
       float HT = 0.;
       
@@ -684,10 +662,7 @@ void SusyEventAnalyzer::Acceptance() {
       bool passHLT = true;
       if(useTrigger) {
 	if(tightEles.size() == 1) passHLT = PassTriggers(1);
-	else if(tightMuons.size() == 1) {
-	  if(qcdMode == kMuonQCD) passHLT = PassTriggers(2) || PassTriggers(3);
-	  else passHLT = PassTriggers(2);
-	}
+	else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
       }
       if(!passHLT) continue;
       
@@ -743,9 +718,6 @@ void SusyEventAnalyzer::Acceptance() {
       
       for(unsigned int chan = 0; chan < nChannels; chan++) {
 	
-	if(nEleReq[chan] == 1 && qcdMode == kMuonQCD) continue;
-	if(nMuonReq[chan] == 1 && qcdMode == kElectronQCD) continue;
-
 	if(pfJets.size() < nJetReq[chan]) continue;
 	if(btags.size() < nBtagReq[chan]) continue;
 	
@@ -765,10 +737,6 @@ void SusyEventAnalyzer::Acceptance() {
 	  nCnt[3][chan]++;
 	  eQCDTrees[chan]->Fill();
 	}
-	else if(qcdMode == kMuonQCD) {
-	  nCnt[4][chan]++;
-	  muQCDTrees[chan]->Fill();
-	}
 	
       } // for channels
     
@@ -784,7 +752,6 @@ void SusyEventAnalyzer::Acceptance() {
     cout << "---------------- " << channels[i] << " Requirement ----------------" << endl;
     cout << "Signal " << channels[i] << " events : " << nCnt[2][i] << endl;
     if(nEleReq[chan] == 1) cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
-    if(nMuonReq[chan] == 1) cout << "muQCD  " << channels[i] << " events : " << nCnt[4][i] << endl;
   }
   cout << endl;
   cout << "----------------Continues, info----------------" << endl;

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-enum searchMode {kSignal, kElectronQCD, kMuonQCD};
+enum searchMode {kSignal, kElectronQCD};
 
 const int nCategories = 3;
 TString categories[nCategories] = {"signal", "eQCD", "muQCD"};

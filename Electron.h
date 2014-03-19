@@ -49,7 +49,7 @@ bool isIsolatedElectron(susy::Electron ele, vector<susy::SuperCluster> superClus
   float ele_iso = max(0., (ele.photonIso + ele.neutralHadronIso - rho*ea));
   ele_iso += ele.chargedHadronIso;
   
-  return (ele.mvaTrig > 0.5 && ele_iso / ele.momentum.Pt() < 0.1);
+  return (ele_iso / ele.momentum.Pt() < 0.1);
 
 }
 
