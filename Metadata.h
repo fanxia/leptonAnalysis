@@ -11,28 +11,23 @@ using namespace std;
 
 enum searchMode {kSignal, kElectronQCD};
 
-const int nCategories = 3;
-TString categories[nCategories] = {"signal", "eQCD", "muQCD"};
-const int nChannels = 6;
+const int nCategories = 2;
+TString categories[nCategories] = {"signal", "eQCD"};
+const int nChannels = 4;
 
-TString channels[nChannels] = {"ele_b", "muon_b",
-			       "ele_jjj", "muon_jjj",
+TString channels[nChannels] = {"ele_jjj", "muon_jjj",
 			       "ele_bjj", "muon_bjj"};
 
-unsigned int nJetReq[nChannels] = {1, 1,
-				   3, 3,
+unsigned int nJetReq[nChannels] = {3, 3,
 				   3, 3};
 
-unsigned int nBtagReq[nChannels] = {1, 1, 
-				    0, 0, 
+unsigned int nBtagReq[nChannels] = {0, 0, 
 				    1, 1};
 
 int nEleReq[nChannels] = {1, 0,
-			  1, 0,
 			  1, 0};
 
 int nMuonReq[nChannels] = {0, 1,
-			   0, 1,
 			   0, 1};
 
 typedef std::vector<std::vector<TH1F*> > VTH1F;

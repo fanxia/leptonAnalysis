@@ -1,0 +1,103 @@
+\documentclass[landscape]{article}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+
+\begin{document}
+
+\begin{small}
+  
+  \begin{center}
+
+    \begin{tabular}{ | l | c | c | }
+      \hline \hline
+      Cuts & Tight $e$ & Loose $e$ \\ \hline
+      $p_{T}$ & $>$ 30 GeV/$c$ & $>$ 10 GeV/$c$ \\ \hline
+      PFRelIso (0.3) & $<$ 0.1 & $<$ 0.2 \\ \hline
+      $|\eta|$ & $<$ 2.5 & $<$ 2.5 \\ \hline
+      ID & MVA ID("mvaTrigV0") $>$ 0.5 & MVA ID("mvaTrigV0") $>$ 0.5 \\ \hline
+      ID & passConversionVeto & passConversionVeto \\ \hline
+      Converted Photon Rejection & ExpectedInnerTrackHits $\leq$ 0 & ExpectedInnerTrackHits $\leq$ 0 \\ \hline
+      $|d0(PV)|$ & $<$ 0.02 cm & $<$ 0.04 cm \\ \hline
+      $|dZ(PV)|$ & $<$ 1 cm & \\
+      \hline \hline
+    \end{tabular}
+
+    \vspace{10 mm}
+
+    \begin{tabular}{ | l | c | c | }
+      \hline \hline
+      Cuts & Tight $\mu$ & Loose $\mu$ \\ \hline
+      $p_{T}$ & $>$ 30 GeV/$c$ & $>$ 10 GeV/$c$ \\ \hline
+      PFRelIso (0.4) & $<$ 0.12 & $<$ 0.2 \\ \hline
+      $|\eta|$ & $<$ 2.1 & $<$ 2.5 \\ \hline
+      ID & Global Muon & Global Muon or Tracker Muon \\ \hline
+      ID & PFMuon & PFMuon \\ \hline
+      $N_{layers}$ (tracker) & $>$ 5 & \\ \hline
+      $X^{2} / N_{DOF}$ of track fit & $<$ 10 & \\ \hline
+      $N_{hits}$ (pixel) & $>$ 0 & \\ \hline
+      $N_{hits}$ (muon chamber) & $>$ 0 & \\ \hline
+      $N_{segments}(\mu)$ & $>$ 1 & \\ \hline
+      $|d0(PV)|$ & $<$ 0.2 cm & \\ \hline
+      $|dZ(PV)|$ & $<$ 0.5 cm & \\
+      \hline \hline
+    \end{tabular}
+
+    \vspace{10 mm}
+
+    \begin{tabular}{ | l | c | c | }
+      \hline \hline
+      Cuts & Loose $\gamma$ \\ \hline
+      $E_{T}$ & $>$ 20 GeV \\ \hline
+      $|\eta|$ & $<$ 1.4442 \\ \hline
+      H / E & $<$ 0.05 \\ \hline
+      Neutral Hadron Iso & $< 3.5 + 0.04*P_{T}$ \\ \hline
+      Photon Iso & $< 1.3 + 0.005*P_{T}$ \\ \hline
+      Charged Hadron Iso & $< 15$ \\ \hline
+      R9 & $<$ 1.0 \\ \hline
+      $\sigma_{i\eta i\eta}$ & $>$ 0.001 \\ \hline
+      $\sigma_{i\phi i\phi}$ & $>$ 0.001 \\ \hline
+      ID & passElectronVeto \\
+      \hline \hline
+    \end{tabular}
+
+    \vspace{10 mm}
+
+    \begin{tabular}{ | l | c | c | }
+      \hline \hline
+      Sample & Dataset & $\sigma$ (pb) \\ \hline
+      $t\bar{t} \rightarrow jets$ & /TTJets\_HadronicMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 112.33 \\
+      $t\bar{t} \rightarrow \ell\nu + 4 jets$ & /TTJets\_SemiLeptMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A\_ext-v1/AODSIM & 107.66 \\
+      $t\bar{t} \rightarrow \ell\nu\ell\nu + 2 jets$ & /TTJets\_FullLeptMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v2/AODSIM & 25.81 \\
+      \hline
+      $t\bar{t} + W$ & /TTWJets\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 0.232 \\
+      \hline
+      $t\bar{t} + Z$ & /TTZJet_8TeV-madgraph\_v2/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 0.2057 \\
+      \hline
+      $W + jets$ & /WJetsToLNu\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 36257.2 \\
+      \hline
+      $Z/\gamma* + jets$ & /DYJetsToLL\_M-50\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 3503.71 \\
+      \hline
+      Single $t$ & & \\
+      $s$-channel & /T\_s-channel\_TuneZ2star\_8TeV-powheg-tauola/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 3.79 \\
+      $t$-channel & /T\_t-channel\_TuneZ2star\_8TeV-powheg-tauola/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 56.4 \\
+      $tW$ & /T\_tW-channel-DR\_TuneZ2star\_8TeV-powheg-tauola/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 11.1 \\
+      \hline
+      Single $\bar{t}$ & & \\
+      $s$-channel & /Tbar\_s-channel\_TuneZ2star\_8TeV-powheg-tauola/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 1.76 \\
+      $t$-channel & /Tbar\_t-channel\_TuneZ2star\_8TeV-powheg-tauola/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 30.7 \\
+      $tW$ & /T\_tW-channel-DR\_TuneZ2star\_8TeV-powheg-tauola/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 11.1 \\
+      \hline
+      $t\bar{t} + \gamma + jets$ & /TTGJets\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V19-v1/AODSIM & 14.0 \\
+      \hline
+      $t\bar{t} + \gamma\gamma$ & /ttGG\_8TeV-whizard/Summer12\_DR53X-PU\_RD1\_START53\_V7N-v1/AODSIM & 0.146 \\
+      \hline \hline
+    \end{tabular}
+
+
+  \end{center}
+  
+\end{small}
+
+\end{document}
+
+
