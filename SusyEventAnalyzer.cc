@@ -751,7 +751,7 @@ void SusyEventAnalyzer::Acceptance() {
   for(int i = 0; i < nChannels; i++) {
     cout << "---------------- " << channels[i] << " Requirement ----------------" << endl;
     cout << "Signal " << channels[i] << " events : " << nCnt[2][i] << endl;
-    if(nEleReq[chan] == 1) cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
+    if(nEleReq[i] == 1) cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
   }
   cout << endl;
   cout << "----------------Continues, info----------------" << endl;
