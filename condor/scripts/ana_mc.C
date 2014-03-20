@@ -3,7 +3,7 @@ void ana_mc(TString scan = "DATASETNAME", TString discriminant = "CSVM", bool is
   gROOT->Reset();
   gSystem->Load("libSusyEvent.so");
 
-  gROOT->LoadMacro("SusyEventAnalyzer.cc++");
+  gSystem->Load("SusyEventAnalyzer_cc.so");
 
   char* tmp = getenv("CONDOR_SECTION");
   int index = atoi ( tmp );

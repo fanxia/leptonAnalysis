@@ -3,7 +3,7 @@ void ana_data(TString discriminant = "CSVM", bool isMC = false) {
   gROOT->Reset();
   gSystem->Load("libSusyEvent.so");
 
-  gROOT->LoadMacro("SusyEventAnalyzer.cc++");
+  gROOT->LoadMacro("SusyEventAnalyzer_cc.so");
 
   TChain chain("susyTree");
 
