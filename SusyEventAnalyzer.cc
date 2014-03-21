@@ -766,8 +766,6 @@ void SusyEventAnalyzer::Acceptance() {
 
 void SusyEventAnalyzer::phaseSpaceOverlap() {
 
-  durp;
-
   const int NCNT = 50;
   int nCnt[NCNT];
   for(int i = 0; i < NCNT; i++) nCnt[i] = 0;  
@@ -807,61 +805,43 @@ void SusyEventAnalyzer::phaseSpaceOverlap() {
 
     nCnt[0]++; // events
 
-    all.clear();
     photons.clear();
     legs.clear();
 
-    const susy::Particle* top    = 0;
-    const susy::Particle* topBar = 0;
+    // find relevant photons -- coming from tops, b's, or W's
+    for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
+      if(abs(it->pdgId) != 22) continue;
+      
+      int mom_id = abs(event.genParticles[it->motherIndex]->pdgId);
+      if(mom_id != 6 && mom_id != 24 && mom_id != 5) continue;
 
-    for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
-      if(!top && genit->pdgId == 6) top = genit;
-      if(!topBar && genit->pdgId == -6) topBar = genit;
-      if(top && topBar) break;
+      photons.push_back(&*it);
     }
 
-    // find initial state particles
-    findMothers(event, top, all);
-    findMothers(event, topBar, all);
-    
-    // find relevant final states
-    findDaughters(event, top, all);
-    findDaughters(event, topBar, all);
+    susy::Particle * b    = 0;
+    susy::Particle * bbar = 0;
 
-    // find relevant photons
-    for(unsigned int i = 0; i < all.size(); i++) {
-      int p_index = distance(event.genParticles.begin(), find(event.genParticles.begin(), event.genParticles.end(), all[i]));
-      if(p_index == event.genParticles.size()) continue;
-
-      for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
-	if(genit->motherIndex != p_index) continue;
-	if(abs(genit->pdgId) == 22) photons.push_back(&*genit);
-      }
-
-    }
-
-    const susy::Particle* b    = 0;
-    const susy::Particle* bbar = 0;
-    
-    // If there is b --> b+gamma, take the second b as our interesting one
+    // If there is b --> b+gamma, take the second b as our interesting leg
     for(unsigned int i = 0; i < photons.size(); i++) {
+
       if(abs(event.genParticles[photons[i]->motherIndex]) != 5) continue;
 
-      for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
-	if(genit->motherIndex != photon->motherIndex) continue;
-	if(genit->pdgId == 5) b = genit;
-	if(genit->pdgId == -5) bbar = genit;
+      for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
+	if(it->motherIndex != photon->motherIndex) continue;
+	if(it->pdgId == 5) b     = &*it;
+	if(it->pdgId == -5) bbar = &*it;
       }
-
+      
     }
 
     // If a photon didn't come off a b, then the status 3 b's are taken
-    for(int j = all.size() - 1; j > -1; --j) {
-      if(!b && all[j]->status == 3 && all[j]->pdgId == 5) b = all[i];
-      if(!bbar && all[j]->status == 3 && all[j]->pdgId == -5) bbar = all[j];
+    // Go backwards to get the final legs
+    for(vector<susy::Particle>::reverse_iterator rit = event.genParticles.rbegin(); rit != event.genParticles.rend(); ++rit) {
+      if(!b && rit->status == 3 && rit->pdgId == 5) b = &*rit;
+      if(!bbar && rit->status == 3 && rit->pdgId == -5) bbar = &*rit;
       if(b && bbar) break;
     }
-
+    
     // If top didn't decay to W+b, boogie
     if(!(b && bbar)) continue;
     

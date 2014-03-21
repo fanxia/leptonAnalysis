@@ -71,8 +71,8 @@ class SusyEventAnalyzer {
   virtual void PileupWeights(TString puFile);
   virtual void phaseSpaceOverlap();
 
-  void findMothers(susy::Event& ev, const susy::Particle* p, vector<susy::Particle*>& moms);
-  void findDaughters(susy::Event& ev, const susy::Particle* p, vector<susy::Particle*>& all);
+  void findMothers(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& moms);
+  void findDaughters(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& all);
 
   // utility functions
   float deltaR(TLorentzVector& p1, TLorentzVector& p2);
@@ -1033,8 +1033,8 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 
 }
 
-void SusyEventAnalyzer::findMothers(susy::Event& ev, const susy::Particle* p, vector<susy::Particle*>& moms) {
-
+void SusyEventAnalyzer::findMothers(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& moms) {
+  /*
   if(abs(p->pdgId) > 21) return;
 
   bool new_particle = true;
@@ -1049,11 +1049,11 @@ void SusyEventAnalyzer::findMothers(susy::Event& ev, const susy::Particle* p, ve
     moms.push_back(p);
     findMothers(ev, ev.genParticles[p->motherIndex], moms);
   }
-
+  */
 }
 
-void SusyEventAnalyzer::findDaughters(susy::Event& ev, const susy::Particle* p, vector<susy::Particle*>& all) {
-
+void SusyEventAnalyzer::findDaughters(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& all) {
+  /*
   int p_index = distance(ev.genParticles.begin(), find(ev.genParticles.begin(), ev.genParticles.end(), p));
   if(p_index == ev.genParticles.size()) return;
 
@@ -1067,7 +1067,7 @@ void SusyEventAnalyzer::findDaughters(susy::Event& ev, const susy::Particle* p, 
       findDaughters(ev, genit, all);
     }
   }
-
+*/
 }
 
 void SusyEventAnalyzer::IncludeSyncFile(char* file) {
