@@ -812,7 +812,7 @@ void SusyEventAnalyzer::phaseSpaceOverlap() {
     for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
       if(abs(it->pdgId) != 22) continue;
       
-      int mom_id = abs(event.genParticles[it->motherIndex]->pdgId);
+      int mom_id = abs(event.genParticles[it->motherIndex].pdgId);
       if(mom_id != 6 && mom_id != 24 && mom_id != 5) continue;
 
       photons.push_back(&*it);
@@ -824,10 +824,10 @@ void SusyEventAnalyzer::phaseSpaceOverlap() {
     // If there is b --> b+gamma, take the second b as our interesting leg
     for(unsigned int i = 0; i < photons.size(); i++) {
 
-      if(abs(event.genParticles[photons[i]->motherIndex]) != 5) continue;
+      if(abs(event.genParticles[photons[i]->motherIndex].pdgId) != 5) continue;
 
       for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-	if(it->motherIndex != photon->motherIndex) continue;
+	if(it->motherIndex != photons[i]->motherIndex) continue;
 	if(it->pdgId == 5) b     = &*it;
 	if(it->pdgId == -5) bbar = &*it;
       }
