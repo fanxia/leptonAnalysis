@@ -7,7 +7,7 @@ CHANGED=false
 while read file
 do
 
-    if [[ $file -nt ../src.tgz ];
+    if [[ ../$file -nt ../src.tgz ]];
     then
 	CHANGED=true
 	break

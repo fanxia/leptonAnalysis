@@ -67,12 +67,12 @@ class SusyEventAnalyzer {
 
   virtual void Data();
   virtual void Acceptance();
-  virtual void ttggStudy();
   virtual void CalculateBtagEfficiency();
   virtual void PileupWeights(TString puFile);
-  virtual void SignalContent_gg();
-  virtual void PhotonInfo();
-  virtual void qcdStudy();
+  virtual void phaseSpaceOverlap();
+
+  void findMothers(susy::Event& ev, const susy::Particle* p, vector<susy::Particle*>& moms);
+  void findDaughters(susy::Event& ev, const susy::Particle* p, vector<susy::Particle*>& all);
 
   // utility functions
   float deltaR(TLorentzVector& p1, TLorentzVector& p2);
@@ -149,7 +149,7 @@ class SusyEventAnalyzer {
 		vector<BtagInfo>& tagInfos, vector<float>& csvValues, 
 		vector<TLorentzVector>& pfJets_corrP4, vector<TLorentzVector>& btags_corrP4, 
 		float& HT, TLorentzVector& hadronicSystem);
- 
+   
   bool GetDiJetPt(susy::Event& ev, vector<susy::Photon*> candidates, float& diJetPt, float& leadpt, float& trailpt);
   bool PhotonMatchesElectron(susy::Event& ev, vector<susy::Photon*> candidates, int& bothMatchCounter);
   int FigureTTbarDecayMode(susy::Event& ev);
@@ -1029,6 +1029,43 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     treeMap["eventNumber"] = event_.eventNumber;
     treeMap["lumiBlock"] = event_.luminosityBlockNumber;
     treeMap["jentry"] = jentry;
+  }
+
+}
+
+void SusyEventAnalyzer::findMothers(susy::Event& ev, const susy::Particle* p, vector<susy::Particle*>& moms) {
+
+  if(abs(p->pdgId) > 21) return;
+
+  bool new_particle = true;
+  for(unsigned int i = 0; i < moms.size(); i++) {
+    if(moms[i] == p) {
+      new_particle = false;
+      break;
+    }
+  }
+
+  if(new_particle) {
+    moms.push_back(p);
+    findMothers(ev, ev.genParticles[p->motherIndex], moms);
+  }
+
+}
+
+void SusyEventAnalyzer::findDaughters(susy::Event& ev, const susy::Particle* p, vector<susy::Particle*>& all) {
+
+  int p_index = distance(ev.genParticles.begin(), find(ev.genParticles.begin(), ev.genParticles.end(), p));
+  if(p_index == ev.genParticles.size()) return;
+
+  for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
+    if(genit->motherIndex != p_index) continue;
+    int abs_pdg = abs(genit->pdgId);
+    
+    // take only tops, bs and Ws
+    if(abs_pdg == 6 || abs_pdg == 24 || abs_pdg == 5) {
+      all.push_back(&*genit);
+      findDaughters(ev, genit, all);
+    }
   }
 
 }

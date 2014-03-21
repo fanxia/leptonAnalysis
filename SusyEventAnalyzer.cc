@@ -764,18 +764,128 @@ void SusyEventAnalyzer::Acceptance() {
 
 }
 
-void SusyEventAnalyzer::ttggStudy() {
- 
-}
+void SusyEventAnalyzer::phaseSpaceOverlap() {
 
-void SusyEventAnalyzer::SignalContent_gg() {
- 
-}
+  durp;
 
-void SusyEventAnalyzer::PhotonInfo() {
+  const int NCNT = 50;
+  int nCnt[NCNT];
+  for(int i = 0; i < NCNT; i++) nCnt[i] = 0;  
   
-}
+  TString output_code_t = FormatName(scan);
 
-void SusyEventAnalyzer::qcdStudy() {
+  // open histogram file and define histograms
+  TFile * out = new TFile("phaseSpaceOverlap"+output_code_t+".root", "RECREATE");
+  out->cd();
+
+  Float_t leadEt, leadEta, leadPhi, lead_minDRb;
+  Float_t trailEt, trailEta, trailPhi, trail_minDRb;
+
+  TTree * tree = new TTree("tree", "tree");
+  tree->Branch("leadEt", &leadEt);
+  tree->Branch("leadEta", &leadEta);
+  tree->Branch("leadPhi", &leadPhi);
+  tree->Branch("lead_minDRb", &lead_minDRb);
+  tree->Branch("trailEt", &trailEt);
+  tree->Branch("trailEta", &trailEta);
+  tree->Branch("trailPhi", &trailPhi);
+  tree->Branch("trail_minDRb", &trail_minDRb);
+    
+  Long64_t nEntries = fTree->GetEntries();
+  cout << "Total events in files : " << nEntries << endl;
+  cout << "Events to be processed : " << processNEvents << endl;
+
+  vector<susy::Particle*> all, photons, legs;
+
+  // start event looping
+  Long64_t jentry = 0;
+  while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
+
+    if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
+      cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
+    }
+
+    nCnt[0]++; // events
+
+    all.clear();
+    photons.clear();
+    legs.clear();
+
+    const susy::Particle* top    = 0;
+    const susy::Particle* topBar = 0;
+
+    for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
+      if(!top && genit->pdgId == 6) top = genit;
+      if(!topBar && genit->pdgId == -6) topBar = genit;
+      if(top && topBar) break;
+    }
+
+    // find initial state particles
+    findMothers(event, top, all);
+    findMothers(event, topBar, all);
+    
+    // find relevant final states
+    findDaughters(event, top, all);
+    findDaughters(event, topBar, all);
+
+    // find relevant photons
+    for(unsigned int i = 0; i < all.size(); i++) {
+      int p_index = distance(event.genParticles.begin(), find(event.genParticles.begin(), event.genParticles.end(), all[i]));
+      if(p_index == event.genParticles.size()) continue;
+
+      for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
+	if(genit->motherIndex != p_index) continue;
+	if(abs(genit->pdgId) == 22) photons.push_back(&*genit);
+      }
+
+    }
+
+    const susy::Particle* b    = 0;
+    const susy::Particle* bbar = 0;
+    
+    // If there is b --> b+gamma, take the second b as our interesting one
+    for(unsigned int i = 0; i < photons.size(); i++) {
+      if(abs(event.genParticles[photons[i]->motherIndex]) != 5) continue;
+
+      for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
+	if(genit->motherIndex != photon->motherIndex) continue;
+	if(genit->pdgId == 5) b = genit;
+	if(genit->pdgId == -5) bbar = genit;
+      }
+
+    }
+
+    // If a photon didn't come off a b, then the status 3 b's are taken
+    for(int j = all.size() - 1; j > -1; --j) {
+      if(!b && all[j]->status == 3 && all[j]->pdgId == 5) b = all[i];
+      if(!bbar && all[j]->status == 3 && all[j]->pdgId == -5) bbar = all[j];
+      if(b && bbar) break;
+    }
+
+    // If top didn't decay to W+b, boogie
+    if(!(b && bbar)) continue;
+    
+    sort(photons.begin(), photons.end(), EtGreater<susy::Particle>);
+
+    // Fill tree with relevant information
+       
+    leadEt      = (photons.size() > 0) ? photons[0]->momentum.Pt()                         : -100.;
+    leadEta     = (photons.size() > 0) ? photons[0]->momentum.Eta()                        : -100.;
+    leadPhi     = (photons.size() > 0) ? photons[0]->momentum.Phi()                        : -100.;
+    lead_minDRb = (photons.size() > 0) ? min(deltaR(photons[0]->momentum, b->momentum),
+					     deltaR(photons[0]->momentum, bbar->momentum)) : -100.;
+    
+    trailEt      = (photons.size() > 1) ? photons[1]->momentum.Pt()                         : -100.;
+    trailEta     = (photons.size() > 1) ? photons[1]->momentum.Eta()                        : -100.;
+    trailPhi     = (photons.size() > 1) ? photons[1]->momentum.Phi()                        : -100.;
+    trail_minDRb = (photons.size() > 1) ? min(deltaR(photons[1]->momentum, b->momentum),
+					     deltaR(photons[1]->momentum, bbar->momentum)) : -100.;
+
+    tree->Fill();
+
+  } // for entries
+
+  out->Write();
+  out->Close();
 
 }
