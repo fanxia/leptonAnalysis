@@ -913,10 +913,9 @@ void SusyEventAnalyzer::phase_durp() {
     recoPhotons.clear();
     genPhotons.clear();
 
-    map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
+    map<TString, vector<susy::Photon> >::iterator phoMap = event.photons.find("photons");
     if(phoMap != event.photons.end()) {
-      for(vector<susy::Photon>::iterator it = phoMap->second.begin();
-	  it != phoMap->second.end(); it++) {
+      for(vector<susy::Photon>::iterator it = phoMap->second.begin(); it != phoMap->second.end(); it++) {
 	
 	if(is_eg(*it, event.rho25) && it->passelectronveto) recoPhotons.push_back(&*it);
       
