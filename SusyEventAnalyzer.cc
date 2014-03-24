@@ -928,7 +928,7 @@ void SusyEventAnalyzer::phase_durp() {
 
       genPhotons.push_back(&*genit);
     }
-    sort(genPhotons.begin(), genPhotons.end(), EtGreater<susy::Photon>);
+    sort(genPhotons.begin(), genPhotons.end(), EtGreater<susy::Particle>);
 
     
     ////////////////////
