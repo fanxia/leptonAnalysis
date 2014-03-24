@@ -843,6 +843,10 @@ void SusyEventAnalyzer::phaseSpaceOverlap() {
     }
     
     // If top didn't decay to W+b, boogie
+    if(!b) nCnt[1]++;
+    if(!bbar) nCnt[2]++;
+    if(!b && !bbar) nCnt[3]++;
+
     if(!(b && bbar)) continue;
     
     sort(photons.begin(), photons.end(), EtGreater<susy::Particle>);
@@ -865,6 +869,81 @@ void SusyEventAnalyzer::phaseSpaceOverlap() {
 
   } // for entries
 
+  cout << "-------------------Job Summary-----------------" << endl;
+  cout << "Total_events          : " << nCnt[0] << endl;
+  cout << "Didn't find b         : " << nCnt[1] << endl;
+  cout << "Didn't find bbar      : " << nCnt[2] << endl;
+  cout << "Didn't find b or bbar : " << nCnt[3] << endl;
+  cout << "-----------------------------------------------" << endl;
+  cout << endl;
+
+  out->Write();
+  out->Close();
+
+}
+
+void SusyEventAnalyzer::phase_durp() {
+
+  const int NCNT = 50;
+  int nCnt[NCNT];
+  for(int i = 0; i < NCNT; i++) nCnt[i] = 0;  
+  
+  TString output_code_t = FormatName(scan);
+
+  // open histogram file and define histograms
+  TFile * out = new TFile("phaseSpaceOverlap"+output_code_t+".root", "RECREATE");
+  out->cd();
+
+  Long64_t nEntries = fTree->GetEntries();
+  cout << "Total events in files : " << nEntries << endl;
+  cout << "Events to be processed : " << processNEvents << endl;
+
+  vector<susy::Photon*> recoPhotons;
+  vector<susy::Particle*> genPhotons;
+  
+  // start event looping
+  Long64_t jentry = 0;
+  while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
+
+    if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
+      cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
+    }
+
+    nCnt[0]++; // events
+    recoPhotons.clear();
+    genPhotons.clear();
+
+    map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
+    if(phoMap != event.photons.end()) {
+      for(vector<susy::Photon>::iterator it = phoMap->second.begin();
+	  it != phoMap->second.end(); it++) {
+	
+	if(is_eg(*it, event.rho25) && it->passelectronveto) photons.push_back(&*it);
+      
+      } // for photon
+    } // if
+    sort(photons.begin(), photons.end(), EtGreater<susy::Photon>);
+
+    for(vector<susy::Particle>::iterator genit = event.Particles.begin(); genit != event.genParticles.end(); genit++) {
+      if(abs(genit->pdgId) != 22) continue;
+
+      genPhotons.push_back(&*it);
+    }
+    sort(genPhotons.begin(), genPhotons.end(), EtGreater<susy::Photon>);
+
+    
+    ////////////////////
+
+  } // for entries
+
+  cout << "-------------------Job Summary-----------------" << endl;
+  cout << "Total_events         : " << nCnt[0] << endl;
+  cout << "-----------------------------------------------" << endl;
+  cout << endl;
+  //////////////////////////
+  cout << endl;
+  cout << "----------------Continues, info----------------" << endl;
+ 
   out->Write();
   out->Close();
 

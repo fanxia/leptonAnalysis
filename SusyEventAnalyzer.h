@@ -70,6 +70,7 @@ class SusyEventAnalyzer {
   virtual void CalculateBtagEfficiency();
   virtual void PileupWeights(TString puFile);
   virtual void phaseSpaceOverlap();
+  virtual void phase_durp();
 
   void findMothers(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& moms);
   void findDaughters(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& all);
