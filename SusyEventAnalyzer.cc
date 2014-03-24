@@ -918,11 +918,11 @@ void SusyEventAnalyzer::phase_durp() {
       for(vector<susy::Photon>::iterator it = phoMap->second.begin();
 	  it != phoMap->second.end(); it++) {
 	
-	if(is_eg(*it, event.rho25) && it->passelectronveto) photons.push_back(&*it);
+	if(is_eg(*it, event.rho25) && it->passelectronveto) recoPhotons.push_back(&*it);
       
       } // for photon
     } // if
-    sort(photons.begin(), photons.end(), EtGreater<susy::Photon>);
+    sort(recoPhotons.begin(), recoPhotons.end(), EtGreater<susy::Photon>);
 
     for(vector<susy::Particle>::iterator genit = event.Particles.begin(); genit != event.genParticles.end(); genit++) {
       if(abs(genit->pdgId) != 22) continue;
