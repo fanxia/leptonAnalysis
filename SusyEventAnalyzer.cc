@@ -894,6 +894,12 @@ void SusyEventAnalyzer::phase_durp() {
   TFile * out = new TFile("phaseSpaceOverlap"+output_code_t+".root", "RECREATE");
   out->cd();
 
+  Float_t dr_lead_gen, dr_trail_gen;
+
+  TTree * tree = new TTree("tree", "tree");
+  tree->Branch("dr_leadPhoton_genPhoton", &dr_lead_gen);
+  tree->Branch("dr_trailPhoton_genPhoton", &dr_trail_gen);
+
   Long64_t nEntries = fTree->GetEntries();
   cout << "Total events in files : " << nEntries << endl;
   cout << "Events to be processed : " << processNEvents << endl;
@@ -930,6 +936,12 @@ void SusyEventAnalyzer::phase_durp() {
     }
     sort(genPhotons.begin(), genPhotons.end(), EtGreater<susy::Particle>);
 
+    for(unsigned int i = 0; i < genPhotons.size(); i++) {
+      dr_lead_gen = (recoPhotons.size() > 0) ? deltaR(genPhotons[i]->momentum, recoPhotons[0]->caloPosition) : -10;
+      dr_trail_gen = (recoPhotons.size() > 1) ? deltaR(genPhotons[i]->momentum, recoPhotons[1]->caloPosition) : -10;
+      
+      tree->Fill();
+    }
     
     ////////////////////
 
