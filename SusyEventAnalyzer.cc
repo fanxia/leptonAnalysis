@@ -923,10 +923,10 @@ void SusyEventAnalyzer::phase_durp() {
     } // if
     sort(recoPhotons.begin(), recoPhotons.end(), EtGreater<susy::Photon>);
 
-    for(vector<susy::Particle>::iterator genit = event.Particles.begin(); genit != event.genParticles.end(); genit++) {
+    for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
       if(abs(genit->pdgId) != 22) continue;
 
-      genPhotons.push_back(&*it);
+      genPhotons.push_back(&*genit);
     }
     sort(genPhotons.begin(), genPhotons.end(), EtGreater<susy::Photon>);
 
