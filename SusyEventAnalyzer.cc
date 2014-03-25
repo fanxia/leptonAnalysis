@@ -943,11 +943,12 @@ void SusyEventAnalyzer::phase_durp() {
 
     for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
 
-      int mom_id = abs(genit->pdgId);
-      if(mom_id != 24 && mom_id != 5 && mom_id > 6) continue;
-      if(mom_id == 24 && genit->status != 3) continue;
-      if(mom_id < 6 && genit->status != 2) continue;
-      if(mom_id < 5 && mom_id != 24) continue;
+      int pdg_id = abs(genit->pdgId);
+      int mom_id = abs(event.genParticles[genit->motherIndex].pdgId);
+      if(pdg_id != 24 && pdg_id > 6) continue;
+      if(pdg_id == 24 && genit->status != 3) continue;
+      if(pdg_id < 6 && genit->status != 2) continue;
+      if(pdg_id < 5 && mom_id != 24) continue;
 
       genSources.push_back(&*genit);
     }
