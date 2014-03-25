@@ -958,11 +958,11 @@ void SusyEventAnalyzer::phase_durp() {
       dr_trailPhoton = (recoPhotons.size() > 1) ? deltaR(genPhotons[i]->momentum, recoPhotons[1]->caloPosition) : -10;
       
       minDR_sources = 100.;
-      for(unsigned int j = 0; j < genSources[j].size(); j++) {
+      for(unsigned int j = 0; j < genSources.size(); j++) {
 	Float_t thisDR = deltaR(genPhotons[i]->momentum, genSources[j]->momentum);
 	if(thisDR < minDR_sources) {
 	  minDR_sources = thisDR;
-	  minDR_pdgID = genSources[j]->pdgId;
+	  minDR_pdgId = genSources[j]->pdgId;
 	}
       }
 
