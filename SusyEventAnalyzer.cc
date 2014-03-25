@@ -894,11 +894,14 @@ void SusyEventAnalyzer::phase_durp() {
   TFile * out = new TFile("phaseSpaceOverlap"+output_code_t+".root", "RECREATE");
   out->cd();
 
-  Float_t dr_lead_gen, dr_trail_gen;
+  Float_t dr_leadPhoton, dr_trailPhoton;
+  Float_t minDR_sources, minDR_pdgId;
 
   TTree * tree = new TTree("tree", "tree");
-  tree->Branch("dr_leadPhoton_genPhoton", &dr_lead_gen);
-  tree->Branch("dr_trailPhoton_genPhoton", &dr_trail_gen);
+  tree->Branch("dr_leadPhoton", &dr_leadPhoton);
+  tree->Branch("dr_trailPhoton", &dr_trailPhoton);
+  tree->Branch("minDR_sources", &minDR_sources);
+  tree->Branch("minDR_pdgId", &minDR_pdgId);
 
   Long64_t nEntries = fTree->GetEntries();
   cout << "Total events in files : " << nEntries << endl;
@@ -906,6 +909,7 @@ void SusyEventAnalyzer::phase_durp() {
 
   vector<susy::Photon*> recoPhotons;
   vector<susy::Particle*> genPhotons;
+  vector<susy::Particle*> genSources;
   
   // start event looping
   Long64_t jentry = 0;
@@ -918,6 +922,7 @@ void SusyEventAnalyzer::phase_durp() {
     nCnt[0]++; // events
     recoPhotons.clear();
     genPhotons.clear();
+    genSources.clear();
 
     map<TString, vector<susy::Photon> >::iterator phoMap = event.photons.find("photons");
     if(phoMap != event.photons.end()) {
@@ -936,10 +941,31 @@ void SusyEventAnalyzer::phase_durp() {
     }
     sort(genPhotons.begin(), genPhotons.end(), EtGreater<susy::Particle>);
 
+    for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
+
+      int mom_id = abs(genit->pdgId);
+      if(mom_id != 24 && mom_id != 5 && mom_id > 6) continue;
+      if(mom_id == 24 && genit->status != 3) continue;
+      if(mom_id < 6 && genit->status != 2) continue;
+      if(mom_id < 5 && mom_id != 24) continue;
+
+      genSources.push_back(&*genit);
+    }
+    sort(genSources.begin(), genSources.end(), EtGreater<susy::Particle>);
+
     for(unsigned int i = 0; i < genPhotons.size(); i++) {
-      dr_lead_gen = (recoPhotons.size() > 0) ? deltaR(genPhotons[i]->momentum, recoPhotons[0]->caloPosition) : -10;
-      dr_trail_gen = (recoPhotons.size() > 1) ? deltaR(genPhotons[i]->momentum, recoPhotons[1]->caloPosition) : -10;
+      dr_leadPhoton = (recoPhotons.size() > 0) ? deltaR(genPhotons[i]->momentum, recoPhotons[0]->caloPosition) : -10;
+      dr_trailPhoton = (recoPhotons.size() > 1) ? deltaR(genPhotons[i]->momentum, recoPhotons[1]->caloPosition) : -10;
       
+      minDR_sources = 100.;
+      for(unsigned int j = 0; j < genSources[j].size(); j++) {
+	Float_t thisDR = deltaR(genPhotons[i]->momentum, genSources[j]->momentum);
+	if(thisDR < minDR_sources) {
+	  minDR_sources = thisDR;
+	  minDR_pdgID = genSources[j]->pdgId;
+	}
+      }
+
       tree->Fill();
     }
     
