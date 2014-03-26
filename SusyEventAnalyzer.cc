@@ -896,12 +896,14 @@ void SusyEventAnalyzer::phase_durp() {
 
   Float_t dr_leadPhoton, dr_trailPhoton;
   Float_t minDR_sources, minDR_pdgId;
+  Float_t motherId;
 
   TTree * tree = new TTree("tree", "tree");
   tree->Branch("dr_leadPhoton", &dr_leadPhoton);
   tree->Branch("dr_trailPhoton", &dr_trailPhoton);
   tree->Branch("minDR_sources", &minDR_sources);
   tree->Branch("minDR_pdgId", &minDR_pdgId);
+  tree->Branch("motherId", &motherId);
 
   Long64_t nEntries = fTree->GetEntries();
   cout << "Total events in files : " << nEntries << endl;
@@ -958,6 +960,8 @@ void SusyEventAnalyzer::phase_durp() {
       dr_leadPhoton = (recoPhotons.size() > 0) ? deltaR(genPhotons[i]->momentum, recoPhotons[0]->caloPosition) : -10;
       dr_trailPhoton = (recoPhotons.size() > 1) ? deltaR(genPhotons[i]->momentum, recoPhotons[1]->caloPosition) : -10;
       
+      motherId = event.genParticles[genPhotons[i]->motherIndex].pdgId;
+
       minDR_sources = 100.;
       for(unsigned int j = 0; j < genSources.size(); j++) {
 	Float_t thisDR = deltaR(genPhotons[i]->momentum, genSources[j]->momentum);
