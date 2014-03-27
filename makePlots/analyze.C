@@ -159,7 +159,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		   ttHadronicTree, ttSemiLepTree, ttFullLepTree,
 		   tbar_sTree, tbar_tTree, tbar_tWTree,
 		   t_sTree, t_tTree, t_tWTree,
-		   ttwjetsTree, ttwzjetsTree,
+		   ttwjetsTree, ttzjetsTree,
 		   wjetsTree, 
 		   dyjetsTree, dy1jetsTree, dy2jetsTree, dy3jetsTree, dy4jetsTree,
 		   ttgjetsTree, ttggTree,

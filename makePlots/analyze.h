@@ -49,7 +49,12 @@ const Double_t xsec_TTW = 0.232;
 const Double_t xsec_TTZ = 0.2057;
 
 const Double_t xsec_wjets = 36257.2;
+
 const Double_t xsec_dyjets = 3503.71;
+const Double_t xsec_dy1jets = 666.7;
+const Double_t xsec_dy2jets = 215.1;
+const Double_t xsec_dy3jets = 66.07;
+const Double_t xsec_dy4jets = 27.38;
 
 const Double_t xsec_ttgjets = 14.0;
 const Double_t xsec_ttgg = 0.146;
@@ -317,7 +322,8 @@ class PlotMaker : public TObject {
 
  private:
   TTree * ggTree;
-  
+  TTree * qcdTree;
+
   TTree * ttHadronicTree;
   TTree * ttSemiLepTree;
   TTree * ttFullLepTree;
@@ -1225,7 +1231,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttwjets[j]->Scale(intLumi_int * xsec_ttwjets / nGen_ttwjets);
+  for(unsigned int j = 0; j < vars.size(); j++) h_ttwjets[j]->Scale(intLumi_int * xsec_TTW / nGen_ttwjets);
 
   for(int i = 0; i < ttzjetsTree->GetEntries(); i++) {
     ttzjetsTree->GetEntry(i);
@@ -1254,7 +1260,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttzjets[j]->Scale(intLumi_int * xsec_ttzjets / nGen_ttzjets);
+  for(unsigned int j = 0; j < vars.size(); j++) h_ttzjets[j]->Scale(intLumi_int * xsec_TTZ / nGen_ttzjets);
 
   for(int i = 0; i < wjetsTree->GetEntries(); i++) {
     wjetsTree->GetEntry(i);
@@ -1564,7 +1570,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
   dy1jetsTree->ResetBranchAddresses();
   dy2jetsTree->ResetBranchAddresses();
   dy3jetsTree->ResetBranchAddresses();
-  dy4jetstree->ResetBranchAddresses();
+  dy4jetsTree->ResetBranchAddresses();
   ttgjetsTree->ResetBranchAddresses();
   ttggTree->ResetBranchAddresses();
   sigaTree->ResetBranchAddresses();
