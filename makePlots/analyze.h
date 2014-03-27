@@ -2058,7 +2058,7 @@ void prep_signal(TString req, int nPhotons_req) {
       continue;
     }
     
-    TTree * ggTree = (TTree*)f->Get(req+"_signalTree"+code_t);
+    TTree * ggTree = (TTree*)f->Get(req+"_signalTree");
     
     TH1D * gg;
     
@@ -2086,7 +2086,7 @@ void prep_signal(TString req, int nPhotons_req) {
   h_acc->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
   h_acc->GetXaxis()->SetRangeUser(0, 1600);
   h_acc->GetXaxis()->SetLabelSize(0.03);
-  h_acc->GetYaxis()->SetTitle("Bino} mass (GeV/c^{2})");
+  h_acc->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
   h_acc->GetYaxis()->SetTitleOffset(1.3);
   h_acc->GetYaxis()->SetLabelSize(0.03);
   h_acc->GetYaxis()->SetRangeUser(0, 1600);
