@@ -54,86 +54,86 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   TTree * qcdTree = (TTree*)in->Get(channels[channel]+"_eQCDTree");
 
   TFile * fTTHadronic = new TFile("inputs/signal_contamination_ttJetsHadronic.root", "READ");
-  TTree * ttHadronicTree = (TTree*)fTTHadronic->Get(channels[channel]+"_signalTree_ttJetsHadronic");
+  TTree * ttHadronicTree = (TTree*)fTTHadronic->Get(channels[channel]+"_signalTree");
   TH1D * nGen_ttHadronic = (TH1D*)fTTHadronic->Get("nEvents_ttJetsHadronic");
 
   TFile * fTTSemiLep = new TFile("inputs/signal_contamination_ttJetsSemiLep.root", "READ");
-  TTree * ttSemiLepTree = (TTree*)fTTSemiLep->Get(channels[channel]+"_signalTree_ttJetsSemiLep");
+  TTree * ttSemiLepTree = (TTree*)fTTSemiLep->Get(channels[channel]+"_signalTree");
   TH1D * nGen_ttSemiLep = (TH1D*)fTTSemiLep->Get("nEvents_ttJetsSemiLep");
 
   TFile * fTTFullLep = new TFile("inputs/signal_contamination_ttJetsFullLep.root", "READ");
-  TTree * ttFullLepTree = (TTree*)fTTFullLep->Get(channels[channel]+"_signalTree_ttJetsFullLep");
+  TTree * ttFullLepTree = (TTree*)fTTFullLep->Get(channels[channel]+"_signalTree");
   TH1D * nGen_ttFullLep = (TH1D*)fTTFullLep->Get("nEvents_ttJetsFullLep");
 
   TFile * fTBar_s = new TFile("inputs/signal_contamination_TBar_s.root", "READ");
-  TTree * tbar_sTree = (TTree*)fTBar_s->Get(channels[channel]+"_signalTree_TBar_s");
+  TTree * tbar_sTree = (TTree*)fTBar_s->Get(channels[channel]+"_signalTree");
   TH1D * nGen_tbar_s = (TH1D*)fTBar_s->Get("nEvents_TBar_s");
 
   TFile * fTBar_t = new TFile("inputs/signal_contamination_TBar_t.root", "READ");
-  TTree * tbar_tTree = (TTree*)fTBar_t->Get(channels[channel]+"_signalTree_TBar_t");
+  TTree * tbar_tTree = (TTree*)fTBar_t->Get(channels[channel]+"_signalTree");
   TH1D * nGen_tbar_t = (TH1D*)fTBar_t->Get("nEvents_TBar_t");
 
   TFile * fTBar_tW = new TFile("inputs/signal_contamination_TBar_tW.root", "READ");
-  TTree * tbar_tWTree = (TTree*)fTBar_tW->Get(channels[channel]+"_signalTree_TBar_tW");
+  TTree * tbar_tWTree = (TTree*)fTBar_tW->Get(channels[channel]+"_signalTree");
   TH1D * nGen_tbar_tW = (TH1D*)fTBar_tW->Get("nEvents_TBar_tW");
 
   TFile * fT_s = new TFile("inputs/signal_contamination_T_s.root", "READ");
-  TTree * t_sTree = (TTree*)fT_s->Get(channels[channel]+"_signalTree_T_s");
+  TTree * t_sTree = (TTree*)fT_s->Get(channels[channel]+"_signalTree");
   TH1D * nGen_t_s = (TH1D*)fT_s->Get("nEvents_T_s");
 
   TFile * fT_t = new TFile("inputs/signal_contamination_T_t.root", "READ");
-  TTree * t_tTree = (TTree*)fT_t->Get(channels[channel]+"_signalTree_T_t");
+  TTree * t_tTree = (TTree*)fT_t->Get(channels[channel]+"_signalTree");
   TH1D * nGen_t_t = (TH1D*)fT_t->Get("nEvents_T_t");
 
   TFile * fT_tW = new TFile("inputs/signal_contamination_T_tW.root", "READ");
-  TTree * t_tWTree = (TTree*)fT_tW->Get(channels[channel]+"_signalTree_T_tW");
+  TTree * t_tWTree = (TTree*)fT_tW->Get(channels[channel]+"_signalTree");
   TH1D * nGen_t_tW = (TH1D*)fT_tW->Get("nEvents_T_tW");
 
   TFile * fTTW = new TFile("inputs/signal_contamination_TTWJets.root", "READ");
-  TTree * ttwjetsTree = (TTree*)fTTW->Get(channels[channel]+"_signalTree_TTWJets");
+  TTree * ttwjetsTree = (TTree*)fTTW->Get(channels[channel]+"_signalTree");
   TH1D * nGen_ttwjets = (TH1D*)fTTW->Get("nEvents_TTWJets");
 
   TFile * fTTZ = new TFile("inputs/signal_contamination_TTZJets.root", "READ");
-  TTree * ttzjetsTree = (TTree*)fTTZ->Get(channels[channel]+"_signalTree_TTZJets");
+  TTree * ttzjetsTree = (TTree*)fTTZ->Get(channels[channel]+"_signalTree");
   TH1D * nGen_ttzjets = (TH1D*)fTTZ->Get("nEvents_TTZJets");
 
   TFile * fWJets = new TFile("inputs/signal_contamination_WJetsToLNu.root", "READ");
-  TTree * wjetsTree = (TTree*)fWJets->Get(channels[channel]+"_signalTree_WJetsToLNu");
+  TTree * wjetsTree = (TTree*)fWJets->Get(channels[channel]+"_signalTree");
   TH1D * nGen_wjets = (TH1D*)fWJets->Get("nEvents_WJetsToLNu");
 
   TFile * fDYJets = new TFile("inputs/signal_contamination_dyJetsToLL.root", "READ");
-  TTree * dyjetsTree = (TTree*)fDYJets->Get(channels[channel]+"_signalTree_dyJetsToLL");
+  TTree * dyjetsTree = (TTree*)fDYJets->Get(channels[channel]+"_signalTree");
   TH1D * nGen_dyjets = (TH1D*)fDYJets->Get("nEvents_dyJetsToLL");
 
   TFile * fDY1Jets = new TFile("inputs/signal_contamination_dy1JetsToLL.root", "READ");
-  TTree * dy1jetsTree = (TTree*)fDY1Jets->Get(channels[channel]+"_signalTree_dy1JetsToLL");
+  TTree * dy1jetsTree = (TTree*)fDY1Jets->Get(channels[channel]+"_signalTree");
   TH1D * nGen_dy1jets = (TH1D*)fDY1Jets->Get("nEvents_dy1JetsToLL");
 
   TFile * fDY2Jets = new TFile("inputs/signal_contamination_dy2JetsToLL.root", "READ");
-  TTree * dy2jetsTree = (TTree*)fDY2Jets->Get(channels[channel]+"_signalTree_dy2JetsToLL");
+  TTree * dy2jetsTree = (TTree*)fDY2Jets->Get(channels[channel]+"_signalTree");
   TH1D * nGen_dy2jets = (TH1D*)fDY2Jets->Get("nEvents_dy2JetsToLL");
 
   TFile * fDY3Jets = new TFile("inputs/signal_contamination_dy3JetsToLL.root", "READ");
-  TTree * dy3jetsTree = (TTree*)fDY3Jets->Get(channels[channel]+"_signalTree_dy3JetsToLL");
+  TTree * dy3jetsTree = (TTree*)fDY3Jets->Get(channels[channel]+"_signalTree");
   TH1D * nGen_dy3jets = (TH1D*)fDY3Jets->Get("nEvents_dy3JetsToLL");
 
   TFile * fDY4Jets = new TFile("inputs/signal_contamination_dy4JetsToLL.root", "READ");
-  TTree * dy4jetsTree = (TTree*)fDY4Jets->Get(channels[channel]+"_signalTree_dy4JetsToLL");
+  TTree * dy4jetsTree = (TTree*)fDY4Jets->Get(channels[channel]+"_signalTree");
   TH1D * nGen_dy4jets = (TH1D*)fDY4Jets->Get("nEvents_dy4JetsToLL");
 
   TFile * fTTGJets = new TFile("inputs/signal_contamination_ttgjets.root", "READ");
-  TTree * ttgjetsTree = (TTree*)fTTGJets->Get(channels[channel]+"_signalTree_ttgjets");
+  TTree * ttgjetsTree = (TTree*)fTTGJets->Get(channels[channel]+"_signalTree");
   TH1D * nGen_ttgjets = (TH1D*)fTTGJets->Get("nEvents_ttgjets");
 
   TFile * fTTGG = new TFile("inputs/signal_contamination_ttGG.root", "READ");
-  TTree * ttggTree = (TTree*)fTTGG->Get(channels[channel]+"_signalTree_ttGG");
+  TTree * ttggTree = (TTree*)fTTGG->Get(channels[channel]+"_signalTree");
   TH1D * nGen_ttgg = (TH1D*)fTTGG->Get("nEvents_ttGG");
 
   TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
-  TTree * sigaTree = (TTree*)fSigA->Get(channels[channel]+"_signalTree_mst_460_m1_175");
+  TTree * sigaTree = (TTree*)fSigA->Get(channels[channel]+"_signalTree");
 
   TFile * fSigB = new TFile("../acceptance/signal_contamination_mst_560_m1_325.root", "READ");
-  TTree * sigbTree = (TTree*)fSigB->Get(channels[channel]+"_signalTree_mst_560_m1_325");
+  TTree * sigbTree = (TTree*)fSigB->Get(channels[channel]+"_signalTree");
 
   TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
 
