@@ -2058,7 +2058,7 @@ void prep_signal(TString req, int nPhotons_req) {
       continue;
     }
     
-    TTree * ggTree = (TTree*)f->Get("gg_"+req+"_EvtTree"+code_t);
+    TTree * ggTree = (TTree*)f->Get(req+"_signalTree"+code_t);
     
     TH1D * gg;
     
