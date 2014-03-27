@@ -16,15 +16,15 @@ void makePlots() {
   bool blinded = true;
   int nPhotons_req = 0;
 
-  const int nChannels = 6;
-  TString channels[nChannels] = {"ele_b", "ele_jjj", "ele_bjj",
-				 "muon_b", "muon_jjj", "muon_bjj"};
-  int nBtagReq[nChannels] = {1, 0, 1,
-			     1, 0, 1};
+  const int nChannels = 4;
+  TString channels[nChannels] = {"ele_jjj", "ele_bjj",
+				 "muon_jjj", "muon_bjj"};
+  int nBtagReq[nChannels] = {0, 1,
+			     0, 1};
 
   for(int i = 0; i < nChannels; i++) {
-    if(i != 2 && i != 5) continue;
-    if(i < 3) analyze(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
+    if(i != 1 && i != 3) continue;
+    if(i < 2) analyze(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
     else analyze(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
   }  
 
