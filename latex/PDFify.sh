@@ -16,6 +16,8 @@ ps2pdf $NAME.ps
 
 rm $NAME.dvi
 rm $NAME.ps
+rm $NAME.aux
+rm $NAME.log
 
 echo
 echo $NAME.pdf created!
