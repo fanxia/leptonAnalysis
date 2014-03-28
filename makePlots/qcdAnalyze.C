@@ -492,6 +492,8 @@ void qcdAnalyze() {
   h_ttgjets_mva->Draw("hist same");
   h_ttgg_mva->Draw("hist same");
 
+  canv->SaveAs("qcd_mva.png");
+
   TCanvas * canv2 = new TCanvas("canv2", "plot2", 10, 10, 2000, 2000);
 
   h_qcd_iso->Draw("e1");
@@ -502,6 +504,8 @@ void qcdAnalyze() {
   h_ttwz_iso->Draw("hist same");
   h_ttgjets_iso->Draw("hist same");
   h_ttgg_iso->Draw("hist same");
+
+  canv2->SaveAs("qcd_iso.png");
 
 
 }
