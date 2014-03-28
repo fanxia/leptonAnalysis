@@ -275,7 +275,7 @@ void qcdAnalyze() {
     }
   }
 
-  weight = 19712. * xsec_TBar_tW / nGen_tbar_tW;
+  weight = 19712. * xsec_Tbar_tW / nGen_tbar_tW;
   for(int i = 0; i < tbar_tWTree->GetEntries(); i++) {
     tbar_tWTree->GetEntry(i);
     if(nphotons == 0) {
