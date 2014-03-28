@@ -452,6 +452,9 @@ void qcdAnalyze() {
     }
   }
 
+  h_qcd_mva->SetMarkerStyle(20);
+  h_qcd_mva->SetMarkerSize(1.5);
+
   h_ttbar_mva->SetFillColor(kGray);
   h_ttbar_mva->SetMarkerSize(0);
   h_ttbar_mva->SetLineColor(1);
@@ -501,6 +504,9 @@ void qcdAnalyze() {
   h_ttgg_mva->SetMarkerSize(0);
   h_ttgg_mva->SetLineColor(1);
 
+  h_qcd_iso->SetMarkerStyle(20);
+  h_qcd_iso->SetMarkerSize(1.5);
+  
   h_ttbar_iso->SetFillColor(kGray);
   h_ttbar_iso->SetMarkerSize(0);
   h_ttbar_iso->SetLineColor(1);
@@ -549,6 +555,9 @@ void qcdAnalyze() {
   h_ttgg_iso->SetFillColor(kCyan+3);
   h_ttgg_iso->SetMarkerSize(0);
   h_ttgg_iso->SetLineColor(1);
+
+  h_qcd_met->SetMarkerStyle(20);
+  h_qcd_met->SetMarkerSize(1.5);
 
   h_ttbar_met->SetFillColor(kGray);
   h_ttbar_met->SetMarkerSize(0);
@@ -646,7 +655,7 @@ void qcdAnalyze() {
 
   canv->SaveAs("qcd_iso.pdf");
 
-  h_qcd_met->GetYaxis()->SetRangeUser(5e-3, 2e3);
+  h_qcd_met->GetYaxis()->SetRangeUser(5e-3, 2e4);
   h_qcd_met->GetXaxis()->SetTitle("pfMET");
 
   h_qcd_met->Draw("e1");
@@ -657,6 +666,7 @@ void qcdAnalyze() {
   h_ttwz_met->Draw("hist same");
   h_ttgjets_met->Draw("hist same");
   h_ttgg_met->Draw("hist same");
+  h_qcd_met->Draw("e1 same");
   h_qcd_met->Draw("axis same");
   leg->Draw("same");
 
