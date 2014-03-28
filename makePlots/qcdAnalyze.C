@@ -225,23 +225,23 @@ void qcdAnalyze() {
   ttgjetsTree->SetBranchAddress("ele_eta", &eta);
   ttggTree->SetBranchAddress("ele_eta", &eta);
 
-  TH1D * h_qcd_mva = new TH1D("qcd_mva", "qcd_mva", 40, -1, 1); h_qcd_mva->Sumw2();
-  TH1D * h_ttbar_mva = new TH1D("ttbar_mva", "ttbar_mva", 40, -1, 1); h_ttbar_mva->Sumw2();
-  TH1D * h_singleTop_mva = new TH1D("singleTop_mva", "singleTop_mva", 40, -1, 1); h_singleTop_mva->Sumw2();
-  TH1D * h_ttwz_mva = new TH1D("ttwz_mva", "ttwz_mva", 40, -1, 1); h_ttwz_mva->Sumw2();
-  TH1D * h_wjets_mva = new TH1D("wjets_mva", "wjets_mva", 40, -1, 1); h_wjets_mva->Sumw2();
-  TH1D * h_dyjets_mva = new TH1D("dyjets_mva", "dyjets_mva", 40, -1, 1); h_dyjets_mva->Sumw2();
-  TH1D * h_ttgjets_mva = new TH1D("ttgjets_mva", "ttgjets_mva", 40, -1, 1); h_ttgjets_mva->Sumw2();
-  TH1D * h_ttgg_mva = new TH1D("ttgg_mva", "ttgg_mva", 40, -1, 1); h_ttgg_mva->Sumw2();
+  TH1D * h_qcd_mva = new TH1D("qcd_mva", "qcd_mva", 20, -1, 0); h_qcd_mva->Sumw2();
+  TH1D * h_ttbar_mva = new TH1D("ttbar_mva", "ttbar_mva", 20, -1, 0); h_ttbar_mva->Sumw2();
+  TH1D * h_singleTop_mva = new TH1D("singleTop_mva", "singleTop_mva", 20, -1, 0); h_singleTop_mva->Sumw2();
+  TH1D * h_ttwz_mva = new TH1D("ttwz_mva", "ttwz_mva", 20, -1, 0); h_ttwz_mva->Sumw2();
+  TH1D * h_wjets_mva = new TH1D("wjets_mva", "wjets_mva", 20, -1, 0); h_wjets_mva->Sumw2();
+  TH1D * h_dyjets_mva = new TH1D("dyjets_mva", "dyjets_mva", 20, -1, 0); h_dyjets_mva->Sumw2();
+  TH1D * h_ttgjets_mva = new TH1D("ttgjets_mva", "ttgjets_mva", 20, -1, 0); h_ttgjets_mva->Sumw2();
+  TH1D * h_ttgg_mva = new TH1D("ttgg_mva", "ttgg_mva", 20, -1, 0); h_ttgg_mva->Sumw2();
 
-  TH1D * h_qcd_iso = new TH1D("qcd_iso", "qcd_iso", 50, 0, 10); h_qcd_iso->Sumw2();
-  TH1D * h_ttbar_iso = new TH1D("ttbar_iso", "ttbar_iso", 50, 0, 10); h_ttbar_iso->Sumw2();
-  TH1D * h_singleTop_iso = new TH1D("singleTop_iso", "singleTop_iso", 50, 0, 10); h_singleTop_iso->Sumw2();
-  TH1D * h_ttwz_iso = new TH1D("ttwz_iso", "ttwz_iso", 50, 0, 10); h_ttwz_iso->Sumw2();
-  TH1D * h_wjets_iso = new TH1D("wjets_iso", "wjets_iso", 50, 0, 10); h_wjets_iso->Sumw2();
-  TH1D * h_dyjets_iso = new TH1D("dyjets_iso", "dyjets_iso", 50, 0, 10); h_dyjets_iso->Sumw2();
-  TH1D * h_ttgjets_iso = new TH1D("ttgjets_iso", "ttgjets_iso", 50, 0, 10); h_ttgjets_iso->Sumw2();
-  TH1D * h_ttgg_iso = new TH1D("ttgg_iso", "ttgg_iso", 50, 0, 10); h_ttgg_iso->Sumw2();
+  TH1D * h_qcd_iso = new TH1D("qcd_iso", "qcd_iso", 20, 0, 1); h_qcd_iso->Sumw2();
+  TH1D * h_ttbar_iso = new TH1D("ttbar_iso", "ttbar_iso", 20, 0, 1); h_ttbar_iso->Sumw2();
+  TH1D * h_singleTop_iso = new TH1D("singleTop_iso", "singleTop_iso", 20, 0, 1); h_singleTop_iso->Sumw2();
+  TH1D * h_ttwz_iso = new TH1D("ttwz_iso", "ttwz_iso", 20, 0, 1); h_ttwz_iso->Sumw2();
+  TH1D * h_wjets_iso = new TH1D("wjets_iso", "wjets_iso", 20, 0, 1); h_wjets_iso->Sumw2();
+  TH1D * h_dyjets_iso = new TH1D("dyjets_iso", "dyjets_iso", 20, 0, 1); h_dyjets_iso->Sumw2();
+  TH1D * h_ttgjets_iso = new TH1D("ttgjets_iso", "ttgjets_iso", 20, 0, 1); h_ttgjets_iso->Sumw2();
+  TH1D * h_ttgg_iso = new TH1D("ttgg_iso", "ttgg_iso", 20, 0, 1); h_ttgg_iso->Sumw2();
 
   for(int i = 0; i < qcdTree->GetEntries(); i++) {
     qcdTree->GetEntry(i);
