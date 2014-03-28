@@ -505,7 +505,7 @@ void qcdAnalyze() {
   TCanvas * canv = new TCanvas("canv", "plot", 10, 10, 2000, 2000);
   canv->SetLogy(true);
 
-  TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
+  TLegend * leg = new TLegend(0.65, 0.65, 0.88, 0.88, NULL, "brNDC");
   leg->AddEntry(h_qcd_mva, "Data", "LP");
   leg->AddEntry(h_ttbar_mva, "t#bar{t} inclusive", "F");
   leg->AddEntry(h_wjets_mva, "W + Jets", "F");
@@ -517,7 +517,8 @@ void qcdAnalyze() {
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 
-  h_qcd_mva->GetYaxis()->SetRangeUser(5e-3, 8e4);
+  h_qcd_mva->GetYaxis()->SetRangeUser(5e-3, 4e5);
+  h_qcd_mva->GetXaxis()->SetTitle("mvaTrigV0");
 
   h_qcd_mva->Draw("e1");
   h_ttbar_mva->Draw("hist same");
@@ -533,6 +534,7 @@ void qcdAnalyze() {
   canv->SaveAs("qcd_mva.pdf");
 
   h_qcd_iso->GetYaxis()->SetRangeUser(5e-2, 2e5);
+  h_qcd_iso->GetXaxis()->SetTitle("Electron relIso");
 
   h_qcd_iso->Draw("e1");
   h_ttbar_iso->Draw("hist same");
