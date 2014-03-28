@@ -366,8 +366,8 @@ void qcdAnalyze() {
   }
 
   weight = 19712. * xsec_ttgjets / nGen_ttgjets;
-  for(int i = 0; i < ttgjets->GetEntries(); i++) {
-    ttgjets->GetEntry(i);
+  for(int i = 0; i < ttgjetsTree->GetEntries(); i++) {
+    ttgjetsTree->GetEntry(i);
     if(nphotons == 0) {
       h_ttgjets_mva->Fill(mva, weight);
       h_ttgjets_iso->Fill(iso, weight);
