@@ -484,7 +484,7 @@ void qcdAnalyze() {
   TCanvas * canv = new TCanvas("canv", "plot", 10, 10, 2000, 2000);
   canv->SetLogy(true);
 
-  h_qcd_mva->GetYaxis()->SetRangeUser(0.1, 8e4);
+  h_qcd_mva->GetYaxis()->SetRangeUser(1e-2, 8e4);
 
   h_qcd_mva->Draw("e1");
   h_ttbar_mva->Draw("hist same");
@@ -494,10 +494,11 @@ void qcdAnalyze() {
   h_ttwz_mva->Draw("hist same");
   h_ttgjets_mva->Draw("hist same");
   h_ttgg_mva->Draw("hist same");
+  h_qcd_mva->Draw("axis same");
 
   canv->SaveAs("qcd_mva.pdf");
 
-  h_qcd_iso->GetYaxis()->SetRangeUser(0.1, 8e4);
+  h_qcd_iso->GetYaxis()->SetRangeUser(1e-2, 8e4);
 
   h_qcd_iso->Draw("e1");
   h_ttbar_iso->Draw("hist same");
@@ -507,6 +508,7 @@ void qcdAnalyze() {
   h_ttwz_iso->Draw("hist same");
   h_ttgjets_iso->Draw("hist same");
   h_ttgg_iso->Draw("hist same");
+  h_qcd_iso->Draw("axis same");
 
   canv->SaveAs("qcd_iso.pdf");
 
