@@ -315,8 +315,8 @@ void qcdAnalyze() {
   for(int i = 0; i < ttwjetsTree->GetEntries(); i++) {
     ttwjetsTree->GetEntry(i);
     if(nphotons == 0) {
-      h_ttwzjets_mva->Fill(mva, weight);
-      h_ttwzjets_iso->Fill(iso, weight);
+      h_ttwz_mva->Fill(mva, weight);
+      h_ttwz_iso->Fill(iso, weight);
     }
   }
 
@@ -324,8 +324,8 @@ void qcdAnalyze() {
   for(int i = 0; i < ttzjetsTree->GetEntries(); i++) {
     ttzjetsTree->GetEntry(i);
     if(nphotons == 0) {
-      h_ttwzjets_mva->Fill(mva, weight);
-      h_ttwzjets_iso->Fill(iso, weight);
+      h_ttwz_mva->Fill(mva, weight);
+      h_ttwz_iso->Fill(iso, weight);
     }
   }
 
