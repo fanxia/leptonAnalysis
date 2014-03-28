@@ -1,34 +1,34 @@
-const Double_t xsec_ttHadronic = 245.8 * 0.457;
-const Double_t xsec_ttSemiLep = 245.8 * 0.438;
-const Double_t xsec_ttFullLep = 245.8 * 0.105;
-
-const Double_t xsec_T_s = 3.79;
-const Double_t xsec_T_t = 56.4;
-const Double_t xsec_T_tW = 11.1;
-
-const Double_t xsec_Tbar_s = 1.76;
-const Double_t xsec_Tbar_t = 30.7;
-const Double_t xsec_Tbar_tW = 11.1;
-
-const Double_t xsec_TTW = 0.232;
-const Double_t xsec_TTZ = 0.2057;
-
-const Double_t xsec_wjets = 36257.2;
-
-const Double_t xsec_dyjets = 3503.71;
-const Double_t xsec_dy1jets = 666.7;
-const Double_t xsec_dy2jets = 215.1;
-const Double_t xsec_dy3jets = 66.07;
-const Double_t xsec_dy4jets = 27.38;
-
-const Double_t xsec_ttgjets = 14.0;
-const Double_t xsec_ttgg = 0.146;
-
-const Double_t xsec_siga = 0.147492;
-const Double_t xsec_sigb = 0.0399591;
-
 void qcdAnalyze() {
 
+  const Double_t xsec_ttHadronic = 245.8 * 0.457;
+  const Double_t xsec_ttSemiLep = 245.8 * 0.438;
+  const Double_t xsec_ttFullLep = 245.8 * 0.105;
+  
+  const Double_t xsec_T_s = 3.79;
+  const Double_t xsec_T_t = 56.4;
+  const Double_t xsec_T_tW = 11.1;
+  
+  const Double_t xsec_Tbar_s = 1.76;
+  const Double_t xsec_Tbar_t = 30.7;
+  const Double_t xsec_Tbar_tW = 11.1;
+  
+  const Double_t xsec_TTW = 0.232;
+  const Double_t xsec_TTZ = 0.2057;
+  
+  const Double_t xsec_wjets = 36257.2;
+  
+  const Double_t xsec_dyjets = 3503.71;
+  const Double_t xsec_dy1jets = 666.7;
+  const Double_t xsec_dy2jets = 215.1;
+  const Double_t xsec_dy3jets = 66.07;
+  const Double_t xsec_dy4jets = 27.38;
+  
+  const Double_t xsec_ttgjets = 14.0;
+  const Double_t xsec_ttgg = 0.146;
+  
+  const Double_t xsec_siga = 0.147492;
+  const Double_t xsec_sigb = 0.0399591;
+  
   TString sigName = "ele_bjj_signalTree";
   TString qcdName = "ele_bjj_eQCDTree";
 
