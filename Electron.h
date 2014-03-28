@@ -20,7 +20,10 @@ bool isLooseElectron(susy::Electron ele, vector<susy::SuperCluster> superCluster
   float ele_iso = max(0., (ele.photonIso + ele.neutralHadronIso - rho*ea));
   ele_iso += ele.chargedHadronIso;
 
-  bool passes = ele_eta < 2.5 &&
+  bool inCrack = ele_eta > 1.4442 && ele_eta < 1.566;
+
+  bool passes = ele_eta < 2.5 && 
+    !inCrack &&
     ele.momentum.Pt() > 10. &&
     ele.mvaTrig > 0.5 &&
     fabs(d0) < 0.04 &&
@@ -70,7 +73,10 @@ bool isTightElectron(susy::Electron ele, vector<susy::SuperCluster> superCluster
   float ele_iso = max(0., (ele.photonIso + ele.neutralHadronIso - rho*ea));
   ele_iso += ele.chargedHadronIso;
 
+  bool inCrack = ele_eta > 1.4442 && ele_eta < 1.566;
+
   bool passes = ele_eta < 2.5 &&
+    !inCrack &&
     ele.momentum.Pt() > 30. &&
     fabs(d0) < 0.02 &&
     fabs(dz) < 1.0 &&

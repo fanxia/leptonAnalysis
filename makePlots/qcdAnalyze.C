@@ -139,7 +139,7 @@ void qcdAnalyze() {
 
   delete h_nGen;
 
-  Float_t mva, iso, nphotons;
+  Float_t mva, iso, eta, nphotons;
   
   qcdTree->SetBranchAddress("Nphotons", &nphotons);
   ttHadronicTree->SetBranchAddress("Nphotons", &nphotons);
@@ -204,6 +204,27 @@ void qcdAnalyze() {
   ttgjetsTree->SetBranchAddress("ele_relIso", &iso);
   ttggTree->SetBranchAddress("ele_relIso", &iso);
 
+  qcdTree->SetBranchAddress("ele_eta", &eta);
+  ttHadronicTree->SetBranchAddress("ele_eta", &eta);
+  ttSemiLepTree->SetBranchAddress("ele_eta", &eta);
+  ttFullLepTree->SetBranchAddress("ele_eta", &eta);
+  tbar_sTree->SetBranchAddress("ele_eta", &eta);
+  tbar_tTree->SetBranchAddress("ele_eta", &eta);
+  tbar_tWTree->SetBranchAddress("ele_eta", &eta);
+  t_sTree->SetBranchAddress("ele_eta", &eta);
+  t_tTree->SetBranchAddress("ele_eta", &eta);
+  t_tWTree->SetBranchAddress("ele_eta", &eta);
+  ttwjetsTree->SetBranchAddress("ele_eta", &eta);
+  ttzjetsTree->SetBranchAddress("ele_eta", &eta);
+  wjetsTree->SetBranchAddress("ele_eta", &eta);
+  dyjetsTree->SetBranchAddress("ele_eta", &eta);
+  dy1jetsTree->SetBranchAddress("ele_eta", &eta);
+  dy2jetsTree->SetBranchAddress("ele_eta", &eta);
+  dy3jetsTree->SetBranchAddress("ele_eta", &eta);
+  dy4jetsTree->SetBranchAddress("ele_eta", &eta);
+  ttgjetsTree->SetBranchAddress("ele_eta", &eta);
+  ttggTree->SetBranchAddress("ele_eta", &eta);
+
   TH1D * h_qcd_mva = new TH1D("qcd_mva", "qcd_mva", 40, -1, 1); h_qcd_mva->Sumw2();
   TH1D * h_ttbar_mva = new TH1D("ttbar_mva", "ttbar_mva", 40, -1, 1); h_ttbar_mva->Sumw2();
   TH1D * h_singleTop_mva = new TH1D("singleTop_mva", "singleTop_mva", 40, -1, 1); h_singleTop_mva->Sumw2();
@@ -224,7 +245,7 @@ void qcdAnalyze() {
 
   for(int i = 0; i < qcdTree->GetEntries(); i++) {
     qcdTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_qcd_mva->Fill(mva);
       h_qcd_iso->Fill(iso);
     }
@@ -233,7 +254,7 @@ void qcdAnalyze() {
   Double_t weight = 19712. * xsec_ttHadronic / nGen_ttHadronic;
   for(int i = 0; i < ttHadronicTree->GetEntries(); i++) {
     ttHadronicTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_ttbar_mva->Fill(mva, weight);
       h_ttbar_iso->Fill(iso, weight);
     }
@@ -242,7 +263,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_ttSemiLep / nGen_ttSemiLep;
   for(int i = 0; i < ttSemiLepTree->GetEntries(); i++) {
     ttSemiLepTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_ttbar_mva->Fill(mva, weight);
       h_ttbar_iso->Fill(iso, weight);
     }
@@ -251,7 +272,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_ttFullLep / nGen_ttFullLep;
   for(int i = 0; i < ttFullLepTree->GetEntries(); i++) {
     ttFullLepTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_ttbar_mva->Fill(mva, weight);
       h_ttbar_iso->Fill(iso, weight);
     }
@@ -260,7 +281,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_Tbar_s / nGen_tbar_s;
   for(int i = 0; i < tbar_sTree->GetEntries(); i++) {
     tbar_sTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
     }
@@ -269,7 +290,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_Tbar_t / nGen_tbar_t;
   for(int i = 0; i < tbar_tTree->GetEntries(); i++) {
     tbar_tTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
     }
@@ -278,7 +299,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_Tbar_tW / nGen_tbar_tW;
   for(int i = 0; i < tbar_tWTree->GetEntries(); i++) {
     tbar_tWTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
     }
@@ -287,7 +308,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_T_s / nGen_t_s;
   for(int i = 0; i < t_sTree->GetEntries(); i++) {
     t_sTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
     }
@@ -296,7 +317,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_T_t / nGen_t_t;
   for(int i = 0; i < t_tTree->GetEntries(); i++) {
     t_tTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
     }
@@ -305,7 +326,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_T_tW / nGen_t_tW;
   for(int i = 0; i < t_tWTree->GetEntries(); i++) {
     t_tWTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
     }
@@ -314,7 +335,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_TTW / nGen_ttwjets;
   for(int i = 0; i < ttwjetsTree->GetEntries(); i++) {
     ttwjetsTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_ttwz_mva->Fill(mva, weight);
       h_ttwz_iso->Fill(iso, weight);
     }
@@ -323,7 +344,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_TTZ / nGen_ttzjets;
   for(int i = 0; i < ttzjetsTree->GetEntries(); i++) {
     ttzjetsTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_ttwz_mva->Fill(mva, weight);
       h_ttwz_iso->Fill(iso, weight);
     }
@@ -332,7 +353,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_dy1jets / nGen_dy1jets;
   for(int i = 0; i < dy1jetsTree->GetEntries(); i++) {
     dy1jetsTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_dyjets_mva->Fill(mva, weight);
       h_dyjets_iso->Fill(iso, weight);
     }
@@ -341,7 +362,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_dy2jets / nGen_dy2jets;
   for(int i = 0; i < dy2jetsTree->GetEntries(); i++) {
     dy2jetsTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_dyjets_mva->Fill(mva, weight);
       h_dyjets_iso->Fill(iso, weight);
     }
@@ -350,7 +371,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_dy3jets / nGen_dy3jets;
   for(int i = 0; i < dy3jetsTree->GetEntries(); i++) {
     dy3jetsTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_dyjets_mva->Fill(mva, weight);
       h_dyjets_iso->Fill(iso, weight);
     }
@@ -359,7 +380,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_dy4jets / nGen_dy4jets;
   for(int i = 0; i < dy4jetsTree->GetEntries(); i++) {
     dy4jetsTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_dyjets_mva->Fill(mva, weight);
       h_dyjets_iso->Fill(iso, weight);
     }
@@ -368,7 +389,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_ttgjets / nGen_ttgjets;
   for(int i = 0; i < ttgjetsTree->GetEntries(); i++) {
     ttgjetsTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_ttgjets_mva->Fill(mva, weight);
       h_ttgjets_iso->Fill(iso, weight);
     }
@@ -377,7 +398,7 @@ void qcdAnalyze() {
   weight = 19712. * xsec_ttgg / nGen_ttgg;
   for(int i = 0; i < ttggTree->GetEntries(); i++) {
     ttggTree->GetEntry(i);
-    if(nphotons == 0) {
+    if(nphotons == 0 || (fabs(eta) > 1.4442 && fabs(eta) < 1.566)) {
       h_ttgg_mva->Fill(mva, weight);
       h_ttgg_iso->Fill(iso, weight);
     }
