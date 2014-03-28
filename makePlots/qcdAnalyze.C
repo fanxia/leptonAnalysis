@@ -374,7 +374,7 @@ void qcdAnalyze() {
     }
   }
 
-  weight = 19712. * xsec_ttggjets / nGen_ttgg;
+  weight = 19712. * xsec_ttgg / nGen_ttgg;
   for(int i = 0; i < ttgg->GetEntries(); i++) {
     ttgg->GetEntry(i);
     if(nphotons == 0) {
