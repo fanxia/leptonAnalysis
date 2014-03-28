@@ -139,7 +139,7 @@ void qcdAnalyze() {
 
   delete h_nGen;
 
-  Float_t mva, iso, eta, nphotons;
+  Float_t mva, iso, eta, nphotons, met;
   
   qcdTree->SetBranchAddress("Nphotons", &nphotons);
   ttHadronicTree->SetBranchAddress("Nphotons", &nphotons);
@@ -161,6 +161,27 @@ void qcdAnalyze() {
   dy4jetsTree->SetBranchAddress("Nphotons", &nphotons);
   ttgjetsTree->SetBranchAddress("Nphotons", &nphotons);
   ttggTree->SetBranchAddress("Nphotons", &nphotons);
+
+  qcdTree->SetBranchAddress("pfMET", &met);
+  ttHadronicTree->SetBranchAddress("pfMET", &met);
+  ttSemiLepTree->SetBranchAddress("pfMET", &met);
+  ttFullLepTree->SetBranchAddress("pfMET", &met);
+  tbar_sTree->SetBranchAddress("pfMET", &met);
+  tbar_tTree->SetBranchAddress("pfMET", &met);
+  tbar_tWTree->SetBranchAddress("pfMET", &met);
+  t_sTree->SetBranchAddress("pfMET", &met);
+  t_tTree->SetBranchAddress("pfMET", &met);
+  t_tWTree->SetBranchAddress("pfMET", &met);
+  ttwjetsTree->SetBranchAddress("pfMET", &met);
+  ttzjetsTree->SetBranchAddress("pfMET", &met);
+  wjetsTree->SetBranchAddress("pfMET", &met);
+  dyjetsTree->SetBranchAddress("pfMET", &met);
+  dy1jetsTree->SetBranchAddress("pfMET", &met);
+  dy2jetsTree->SetBranchAddress("pfMET", &met);
+  dy3jetsTree->SetBranchAddress("pfMET", &met);
+  dy4jetsTree->SetBranchAddress("pfMET", &met);
+  ttgjetsTree->SetBranchAddress("pfMET", &met);
+  ttggTree->SetBranchAddress("pfMET", &met);
 
   qcdTree->SetBranchAddress("ele_mvaTrigV0", &mva);
   ttHadronicTree->SetBranchAddress("ele_mvaTrigV0", &mva);
@@ -248,6 +269,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_qcd_mva->Fill(mva);
       h_qcd_iso->Fill(iso);
+      h_qcd_mva->Fill(met);
     }
   }
 
@@ -257,6 +279,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_ttbar_mva->Fill(mva, weight);
       h_ttbar_iso->Fill(iso, weight);
+      h_ttbar_iso->Fill(met, weight);
     }
   }
 
@@ -266,6 +289,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_ttbar_mva->Fill(mva, weight);
       h_ttbar_iso->Fill(iso, weight);
+      h_ttbar_met->Fill(met, weight);
     }
   }
 
@@ -275,6 +299,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_ttbar_mva->Fill(mva, weight);
       h_ttbar_iso->Fill(iso, weight);
+      h_ttbar_met->Fill(met, weight);
     }
   }
 
@@ -284,6 +309,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
+      h_singleTop_met->Fill(met, weight);
     }
   }
 
@@ -293,6 +319,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
+      h_singleTop_met->Fill(met, weight);
     }
   }
 
@@ -302,6 +329,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
+      h_singleTop_met->Fill(met, weight);
     }
   }
 
@@ -311,6 +339,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
+      h_singleTop_met->Fill(met, weight);
     }
   }
 
@@ -320,6 +349,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
+      h_singleTop_met->Fill(met, weight);
     }
   }
 
@@ -329,6 +359,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_singleTop_mva->Fill(mva, weight);
       h_singleTop_iso->Fill(iso, weight);
+      h_singleTop_met->Fill(met, weight);
     }
   }
 
@@ -338,6 +369,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_ttwz_mva->Fill(mva, weight);
       h_ttwz_iso->Fill(iso, weight);
+      h_ttwz_met->Fill(met, weight);
     }
   }
 
@@ -347,6 +379,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_ttwz_mva->Fill(mva, weight);
       h_ttwz_iso->Fill(iso, weight);
+      h_ttwz_met->Fill(met, weight);
     }
   }
 
@@ -356,6 +389,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_dyjets_mva->Fill(mva, weight);
       h_dyjets_iso->Fill(iso, weight);
+      h_dyjets_met->Fill(met, weight);
     }
   }
 
@@ -365,6 +399,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_dyjets_mva->Fill(mva, weight);
       h_dyjets_iso->Fill(iso, weight);
+      h_dyjets_met->Fill(met, weight);
     }
   }
 
@@ -374,6 +409,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_dyjets_mva->Fill(mva, weight);
       h_dyjets_iso->Fill(iso, weight);
+      h_dyjets_met->Fill(met, weight);
     }
   }
 
@@ -383,6 +419,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_dyjets_mva->Fill(mva, weight);
       h_dyjets_iso->Fill(iso, weight);
+      h_dyjets_met->Fill(met, weight);
     }
   }
 
@@ -392,6 +429,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_ttgjets_mva->Fill(mva, weight);
       h_ttgjets_iso->Fill(iso, weight);
+      h_ttgjets_met->Fill(met, weight);
     }
   }
 
@@ -401,6 +439,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_ttgg_mva->Fill(mva, weight);
       h_ttgg_iso->Fill(iso, weight);
+      h_ttgg_met->Fill(met, weight);
     }
   }
 
@@ -502,6 +541,55 @@ void qcdAnalyze() {
   h_ttgg_iso->SetMarkerSize(0);
   h_ttgg_iso->SetLineColor(1);
 
+  h_ttbar_met->SetFillColor(kGray);
+  h_ttbar_met->SetMarkerSize(0);
+  h_ttbar_met->SetLineColor(1);
+  h_ttbar_met->Add(h_singleTop_met);
+  h_ttbar_met->Add(h_ttwz_met);
+  h_ttbar_met->Add(h_wjets_met);
+  h_ttbar_met->Add(h_dyjets_met);
+  h_ttbar_met->Add(h_ttgjets_met);
+  h_ttbar_met->Add(h_ttgg_met);
+
+  h_wjets_met->SetFillColor(kOrange-3);
+  h_wjets_met->SetMarkerSize(0);
+  h_wjets_met->SetLineColor(1);
+  h_wjets_met->Add(h_singleTop_met);
+  h_wjets_met->Add(h_ttwz_met);
+  h_ttbar_met->Add(h_dyjets_met);
+  h_ttbar_met->Add(h_ttgjets_met);
+  h_ttbar_met->Add(h_ttgg_met);
+
+  h_dyjets_met->SetFillColor(kYellow);
+  h_dyjets_met->SetMarkerSize(0);
+  h_dyjets_met->SetLineColor(1);
+  h_dyjets_met->Add(h_singleTop_met);
+  h_dyjets_met->Add(h_ttwz_met);
+  h_dyjets_met->Add(h_ttgjets_met);
+  h_dyjets_met->Add(h_ttgg_met);
+
+  h_singleTop_met->SetFillColor(kRed);
+  h_singleTop_met->SetMarkerSize(0);
+  h_singleTop_met->SetLineColor(1);
+  h_singleTop_met->Add(h_ttwz_met);
+  h_singleTop_met->Add(h_ttgjets_met);
+  h_singleTop_met->Add(h_ttgg_met);
+
+  h_ttwz_met->SetFillColor(kAzure-2);
+  h_ttwz_met->SetMarkerSize(0);
+  h_ttwz_met->SetLineColor(1);
+  h_ttwz_met->Add(h_ttgjets_met);
+  h_ttwz_met->Add(h_ttgg_met);
+
+  h_ttgjets_met->SetFillColor(8);
+  h_ttgjets_met->SetMarkerSize(0);
+  h_ttgjets_met->SetLineColor(1);
+  h_ttgjets_met->Add(h_ttgg_met);
+
+  h_ttgg_met->SetFillColor(kCyan+3);
+  h_ttgg_met->SetMarkerSize(0);
+  h_ttgg_met->SetLineColor(1);
+
   TCanvas * canv = new TCanvas("canv", "plot", 10, 10, 2000, 2000);
   canv->SetLogy(true);
 
@@ -548,6 +636,22 @@ void qcdAnalyze() {
   leg->Draw("same");
 
   canv->SaveAs("qcd_iso.pdf");
+
+  h_qcd_met->GetYaxis()->SetRangeUser(5e-2, 2e5);
+  h_qcd_met->GetXaxis()->SetTitle("pfMET");
+
+  h_qcd_met->Draw("e1");
+  h_ttbar_met->Draw("hist same");
+  h_wjets_met->Draw("hist same");
+  h_dyjets_met->Draw("hist same");
+  h_singleTop_met->Draw("hist same");
+  h_ttwz_met->Draw("hist same");
+  h_ttgjets_met->Draw("hist same");
+  h_ttgg_met->Draw("hist same");
+  h_qcd_met->Draw("axis same");
+  leg->Draw("same");
+
+  canv->SaveAs("qcd_met.pdf");
 
 
 }
