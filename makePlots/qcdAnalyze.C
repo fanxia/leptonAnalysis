@@ -264,21 +264,21 @@ void qcdAnalyze() {
   TH1D * h_ttgjets_iso = new TH1D("ttgjets_iso", "ttgjets_iso", 20, 0, 1); h_ttgjets_iso->Sumw2();
   TH1D * h_ttgg_iso = new TH1D("ttgg_iso", "ttgg_iso", 20, 0, 1); h_ttgg_iso->Sumw2();
 
-  TH1D * h_qcd_met = new TH1D("qcd_met", "qcd_met", 200, 0, 2000); h_qcd_met->Sumw2();
-  TH1D * h_ttbar_met = new TH1D("ttbar_met", "ttbar_met", 200, 0, 2000); h_ttbar_met->Sumw2();
-  TH1D * h_singleTop_met = new TH1D("singleTop_met", "singleTop_met", 200, 0, 2000); h_singleTop_met->Sumw2();
-  TH1D * h_ttwz_met = new TH1D("ttwz_met", "ttwz_met", 200, 0, 2000); h_ttwz_met->Sumw2();
-  TH1D * h_wjets_met = new TH1D("wjets_met", "wjets_met", 200, 0, 2000); h_wjets_met->Sumw2();
-  TH1D * h_dyjets_met = new TH1D("dyjets_met", "dyjets_met", 200, 0, 2000); h_dyjets_met->Sumw2();
-  TH1D * h_ttgjets_met = new TH1D("ttgjets_met", "ttgjets_met", 200, 0, 2000); h_ttgjets_met->Sumw2();
-  TH1D * h_ttgg_met = new TH1D("ttgg_met", "ttgg_met", 200, 0, 2000); h_ttgg_met->Sumw2();
+  TH1D * h_qcd_met = new TH1D("qcd_met", "qcd_met", 50, 0, 1000); h_qcd_met->Sumw2();
+  TH1D * h_ttbar_met = new TH1D("ttbar_met", "ttbar_met", 50, 0, 1000); h_ttbar_met->Sumw2();
+  TH1D * h_singleTop_met = new TH1D("singleTop_met", "singleTop_met", 50, 0, 1000); h_singleTop_met->Sumw2();
+  TH1D * h_ttwz_met = new TH1D("ttwz_met", "ttwz_met", 50, 0, 1000); h_ttwz_met->Sumw2();
+  TH1D * h_wjets_met = new TH1D("wjets_met", "wjets_met", 50, 0, 1000); h_wjets_met->Sumw2();
+  TH1D * h_dyjets_met = new TH1D("dyjets_met", "dyjets_met", 50, 0, 1000); h_dyjets_met->Sumw2();
+  TH1D * h_ttgjets_met = new TH1D("ttgjets_met", "ttgjets_met", 50, 0, 1000); h_ttgjets_met->Sumw2();
+  TH1D * h_ttgg_met = new TH1D("ttgg_met", "ttgg_met", 50, 0, 1000); h_ttgg_met->Sumw2();
 
   for(int i = 0; i < qcdTree->GetEntries(); i++) {
     qcdTree->GetEntry(i);
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_qcd_mva->Fill(mva);
       h_qcd_iso->Fill(iso);
-      h_qcd_mva->Fill(met);
+      h_qcd_met->Fill(met);
     }
   }
 
@@ -288,7 +288,7 @@ void qcdAnalyze() {
     if(nphotons == 0 && mva < 0 && iso > 0.2 && iso < 1) {
       h_ttbar_mva->Fill(mva, weight);
       h_ttbar_iso->Fill(iso, weight);
-      h_ttbar_iso->Fill(met, weight);
+      h_ttbar_met->Fill(met, weight);
     }
   }
 
@@ -646,7 +646,7 @@ void qcdAnalyze() {
 
   canv->SaveAs("qcd_iso.pdf");
 
-  h_qcd_met->GetYaxis()->SetRangeUser(5e-2, 2e5);
+  h_qcd_met->GetYaxis()->SetRangeUser(5e-3, 2e3);
   h_qcd_met->GetXaxis()->SetTitle("pfMET");
 
   h_qcd_met->Draw("e1");
