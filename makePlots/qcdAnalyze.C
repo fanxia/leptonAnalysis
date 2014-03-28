@@ -213,14 +213,14 @@ void qcdAnalyze() {
   TH1D * h_ttgjets_mva = new TH1D("ttgjets_mva", "ttgjets_mva", 40, -1, 1); h_ttgjets_mva->Sumw2();
   TH1D * h_ttgg_mva = new TH1D("ttgg_mva", "ttgg_mva", 40, -1, 1); h_ttgg_mva->Sumw2();
 
-  TH1D * h_qcd_iso = new TH1D("qcd_iso", "qcd_iso", 100, 0, 10); h_qcd_iso->Sumw2();
-  TH1D * h_ttbar_iso = new TH1D("ttbar_iso", "ttbar_iso", 100, 0, 10); h_ttbar_iso->Sumw2();
-  TH1D * h_singleTop_iso = new TH1D("singleTop_iso", "singleTop_iso", 100, 0, 10); h_singleTop_iso->Sumw2();
-  TH1D * h_ttwz_iso = new TH1D("ttwz_iso", "ttwz_iso", 100, 0, 10); h_ttwz_iso->Sumw2();
-  TH1D * h_wjets_iso = new TH1D("wjets_iso", "wjets_iso", 100, 0, 10); h_wjets_iso->Sumw2();
-  TH1D * h_dyjets_iso = new TH1D("dyjets_iso", "dyjets_iso", 100, 0, 10); h_dyjets_iso->Sumw2();
-  TH1D * h_ttgjets_iso = new TH1D("ttgjets_iso", "ttgjets_iso", 100, 0, 10); h_ttgjets_iso->Sumw2();
-  TH1D * h_ttgg_iso = new TH1D("ttgg_iso", "ttgg_iso", 100, 0, 10); h_ttgg_iso->Sumw2();
+  TH1D * h_qcd_iso = new TH1D("qcd_iso", "qcd_iso", 50, 0, 10); h_qcd_iso->Sumw2();
+  TH1D * h_ttbar_iso = new TH1D("ttbar_iso", "ttbar_iso", 50, 0, 10); h_ttbar_iso->Sumw2();
+  TH1D * h_singleTop_iso = new TH1D("singleTop_iso", "singleTop_iso", 50, 0, 10); h_singleTop_iso->Sumw2();
+  TH1D * h_ttwz_iso = new TH1D("ttwz_iso", "ttwz_iso", 50, 0, 10); h_ttwz_iso->Sumw2();
+  TH1D * h_wjets_iso = new TH1D("wjets_iso", "wjets_iso", 50, 0, 10); h_wjets_iso->Sumw2();
+  TH1D * h_dyjets_iso = new TH1D("dyjets_iso", "dyjets_iso", 50, 0, 10); h_dyjets_iso->Sumw2();
+  TH1D * h_ttgjets_iso = new TH1D("ttgjets_iso", "ttgjets_iso", 50, 0, 10); h_ttgjets_iso->Sumw2();
+  TH1D * h_ttgg_iso = new TH1D("ttgg_iso", "ttgg_iso", 50, 0, 10); h_ttgg_iso->Sumw2();
 
   for(int i = 0; i < qcdTree->GetEntries(); i++) {
     qcdTree->GetEntry(i);
@@ -484,6 +484,8 @@ void qcdAnalyze() {
   TCanvas * canv = new TCanvas("canv", "plot", 10, 10, 2000, 2000);
   canv->SetLogy(true);
 
+  h_qcd_mva->GetYaxis()->SetRangeUser(0.1, 8e4);
+
   h_qcd_mva->Draw("e1");
   h_ttbar_mva->Draw("hist same");
   h_wjets_mva->Draw("hist same");
@@ -494,6 +496,8 @@ void qcdAnalyze() {
   h_ttgg_mva->Draw("hist same");
 
   canv->SaveAs("qcd_mva.pdf");
+
+  h_qcd_iso->GetYaxis()->SetRangeUser(0.1, 8e4);
 
   h_qcd_iso->Draw("e1");
   h_ttbar_iso->Draw("hist same");
