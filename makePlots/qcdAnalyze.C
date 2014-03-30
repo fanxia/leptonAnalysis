@@ -141,6 +141,7 @@ void qcdAnalyze() {
 
   Float_t mva, iso, eta, nphotons, met;
   
+  ggTree->SetBranchAddress("Nphotons", &nphotons);
   qcdTree->SetBranchAddress("Nphotons", &nphotons);
   ttHadronicTree->SetBranchAddress("Nphotons", &nphotons);
   ttSemiLepTree->SetBranchAddress("Nphotons", &nphotons);
@@ -162,6 +163,7 @@ void qcdAnalyze() {
   ttgjetsTree->SetBranchAddress("Nphotons", &nphotons);
   ttggTree->SetBranchAddress("Nphotons", &nphotons);
 
+  ggTree->SetBranchAddress("pfMET", &met);
   qcdTree->SetBranchAddress("pfMET", &met);
   ttHadronicTree->SetBranchAddress("pfMET", &met);
   ttSemiLepTree->SetBranchAddress("pfMET", &met);
@@ -183,6 +185,7 @@ void qcdAnalyze() {
   ttgjetsTree->SetBranchAddress("pfMET", &met);
   ttggTree->SetBranchAddress("pfMET", &met);
 
+  ggTree->SetBranchAddress("ele_mvaTrigV0", &mva);
   qcdTree->SetBranchAddress("ele_mvaTrigV0", &mva);
   ttHadronicTree->SetBranchAddress("ele_mvaTrigV0", &mva);
   ttSemiLepTree->SetBranchAddress("ele_mvaTrigV0", &mva);
@@ -204,6 +207,7 @@ void qcdAnalyze() {
   ttgjetsTree->SetBranchAddress("ele_mvaTrigV0", &mva);
   ttggTree->SetBranchAddress("ele_mvaTrigV0", &mva);
 
+  ggTree->SetBranchAddress("ele_relIso", &iso);
   qcdTree->SetBranchAddress("ele_relIso", &iso);
   ttHadronicTree->SetBranchAddress("ele_relIso", &iso);
   ttSemiLepTree->SetBranchAddress("ele_relIso", &iso);
@@ -225,6 +229,7 @@ void qcdAnalyze() {
   ttgjetsTree->SetBranchAddress("ele_relIso", &iso);
   ttggTree->SetBranchAddress("ele_relIso", &iso);
 
+  ggTree->SetBranchAddress("ele_eta", &eta);
   qcdTree->SetBranchAddress("ele_eta", &eta);
   ttHadronicTree->SetBranchAddress("ele_eta", &eta);
   ttSemiLepTree->SetBranchAddress("ele_eta", &eta);
