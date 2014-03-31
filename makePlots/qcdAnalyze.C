@@ -707,7 +707,7 @@ void qcdAnalyze() {
 
   TLegend * leg2 = new TLegend(0.55, 0.65, 0.88, 0.88, NULL, "brNDC");
   leg2->AddEntry(h_gg_met, "Isolated Data", "LP");
-  leg2->AddEntry(h_qcd_met, "Anti-isolated Data", "LP");
+  leg2->AddEntry(h_qcd_met, "MC-subtracted, Anti-isolated Data", "LP");
   leg2->SetFillColor(0);
   leg2->SetTextSize(0.028);
 
