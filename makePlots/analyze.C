@@ -31,10 +31,6 @@
 
 using namespace std;
 
-const TString ffColor = "kOrange+10";
-const TString eeColor = "kBlue";
-const TString egColor = "kGreen";
-
 void analyze(TString input, bool addMC, int channel, int intLumi_int, double metCut, int nPhotons_req, int nBtagReq, bool displayKStest, bool blinded) {
 
   gROOT->Reset();
@@ -42,10 +38,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   gROOT->SetStyle("Plain");
   gStyle->SetOptStat(0000);
   gStyle->SetOptTitle(0);
-
-  const int nChannels = 4;
-  TString channels[nChannels] = {"ele_jjj", "ele_bjj",
-				 "muon_jjj", "muon_bjj"};
 
   prep_signal(channels[channel], nPhotons_req);
 
