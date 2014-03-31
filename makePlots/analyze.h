@@ -196,16 +196,7 @@ class PlotMaker : public TObject {
 		  bool drawSignal, bool drawLegend, bool drawPrelim,
 		  TFile*& out);
 
-  void DrawPlot(TH1D * gg, TH1D * qcd,
-		TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
-		TH1D * tbar_s, TH1D * tbar_t, TH1D * tbar_tW,
-		TH1D * t_s, TH1D * t_t, TH1D * t_tW,
-		TH1D * ttwjets, TH1D * ttzjets,
-		TH1D * wjets, 
-		TH1D * dyjets, TH1D * dy1jets, TH1D * dy2jets, TH1D * dy3jets, TH1D * dy4jets,
-		TH1D * ttg, TH1D * ttgg,
-		TH1D * sig_a, TH1D * sig_b,
-		TString variable,
+  void DrawPlot(int variableNumber, TString variable,
 		TString xaxisTitle, TString yaxisTitle,
 		Float_t xmin, Float_t xmax,
 		Float_t ymin, Float_t ymax,

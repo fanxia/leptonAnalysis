@@ -73,31 +73,31 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   bool loadSuccess = true;
   
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 245.8 * 0.457, channel, 0, kGray, "t#bar{t} inclusive");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 245.8 * 0.438, channel, 0, kGray, "t#bar{t} inclusive");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 245.8 * 0.105, channel, 0, kGray, "t#bar{t} inclusive");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 245.8 * 0.457, channel, 0, kGray, "t#bar{t} inclusive");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 245.8 * 0.438, channel, 0, kGray, "t#bar{t} inclusive");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 245.8 * 0.105, channel, 0, kGray, "t#bar{t} inclusive");
 
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 36257.2, channel, 1, kOrange-3, "W + Jets");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 36257.2, channel, 1, kOrange-3, "W + Jets");
 
-  //loadSuccess |= LoadMCBackground("inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 3503.71, channel, 2, kYellow, "Z/#gamma* + Jets");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 666.7, channel, 2, kYellow, "Z/#gamma* + Jets");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_dy2JetsToLL.root", "dy2JetsToLL", 215.1, channel, 2, kYellow, "Z/#gamma* + Jets");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_dy3JetsToLL.root", "dy3JetsToLL", 66.07, channel, 2, kYellow, "Z/#gamma* + Jets");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_dy4JetsToLL.root", "dy4JetsToLL", 27.38, channel, 2, kYellow, "Z/#gamma* + Jets");
+  //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 3503.71, channel, 2, kYellow, "Z/#gamma* + Jets");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 666.7, channel, 2, kYellow, "Z/#gamma* + Jets");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy2JetsToLL.root", "dy2JetsToLL", 215.1, channel, 2, kYellow, "Z/#gamma* + Jets");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy3JetsToLL.root", "dy3JetsToLL", 66.07, channel, 2, kYellow, "Z/#gamma* + Jets");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy4JetsToLL.root", "dy4JetsToLL", 27.38, channel, 2, kYellow, "Z/#gamma* + Jets");
 
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TBar_s.root", "TBar_s", 1.76, channel, 3, kRed, "Single Top");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TBar_t.root", "TBar_t", 30.7, channel, 3, kRed, "Single Top");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TBar_tW.root", "TBar_tW", 11.1, channel, 3, kRed, "Single Top");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_T_s.root", "T_s", 3.79, channel, 3, kRed, "Single Top");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_T_t.root", "T_t", 56.4, channel, 3, kRed, "Single Top");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_T_tW.root", "T_tW", 11.1, channel, 3, kRed, "Single Top");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TBar_s.root", "TBar_s", 1.76, channel, 3, kRed, "Single Top");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TBar_t.root", "TBar_t", 30.7, channel, 3, kRed, "Single Top");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TBar_tW.root", "TBar_tW", 11.1, channel, 3, kRed, "Single Top");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_T_s.root", "T_s", 3.79, channel, 3, kRed, "Single Top");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_T_t.root", "T_t", 56.4, channel, 3, kRed, "Single Top");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_T_tW.root", "T_tW", 11.1, channel, 3, kRed, "Single Top");
 
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TTWJets.root", "TTWJets", 0.232, channel, 4, kAzure-2, "t#bar{t} + W/Z");
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TTZJets.root", "TTZJets", 0.2057, channel, 4, kAzure-2, "t#bar{t} + W/Z");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TTWJets.root", "TTWJets", 0.232, channel, 4, kAzure-2, "t#bar{t} + W/Z");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TTZJets.root", "TTZJets", 0.2057, channel, 4, kAzure-2, "t#bar{t} + W/Z");
 
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 14.0, channel, 5, 8, "t#bar{t} + #gamma");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 14.0, channel, 5, 8, "t#bar{t} + #gamma");
 
-  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");
 
   if(!loadSuccess) return;
 
