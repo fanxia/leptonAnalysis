@@ -459,7 +459,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       mcTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
       mcQCDTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
     }
-durp
+
     sigaTree->SetBranchAddress(variables[i], &(vars[i]));
     sigbTree->SetBranchAddress(variables[i], &(vars[i]));
 
