@@ -290,18 +290,10 @@ PlotMaker::~PlotMaker() {
     delete ggTree;
     delete qcdTree;
 
-    for(unsigned int i = 0; i < mcHistograms.size(); i++) {
-      for(unsigned int j = 0; i < mcHistograms[i].size(); j++) {
-	delete mcHistograms[i][j];
-	delete mcQCDHistograms[i][j];
-      }
-      mcHistograms[i].clear();
-      delete mcTrees[i];
-      delete mcQCDTrees[i];
-      mcFiles[i]->Close();
-    }
     mcHistograms.clear();
+    mcQCDHistograms.clear();
     mcTrees.clear();
+    mcQCDTrees.clear();
     mcFiles.clear();
     mcNGen.clear();
     crossSections.clear();
