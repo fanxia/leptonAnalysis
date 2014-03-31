@@ -548,7 +548,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
     }
 
-    for(unsigned int j = 0; j < vars.size(); j++) mcHistograms[i][j]->Scale(intLumi_int * crossSections[j] / mcNGen[j]);
+    for(unsigned int j = 0; j < vars.size(); j++) mcHistograms[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
   }
 
   for(unsigned int i = 0; i < mcQCDTrees.size(); i++) {
@@ -802,6 +802,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
   bkg->GetYaxis()->SetRangeUser(ymin, ymax);
 
   bkg->Draw("hist");
+  mcHistograms[0][variableNumber]->Draw("same hist");
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
     if(i != 0 && mcLayerNumbers[i] != mcLayerNumbers[i-1]) mcHistograms[i][variableNumber]->Draw("same hist");
   }
