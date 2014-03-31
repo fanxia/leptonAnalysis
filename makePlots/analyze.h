@@ -198,7 +198,7 @@ class PlotMaker : public TObject {
 	    bool blind);
 
   ~PlotMaker();
-
+  
   bool LoadMCBackground(TString fileName, TString scanName, Double_t xsec, int channel, int layer, int color, TString legendEntry);
   
   void SetTrees(TTree * gg, TTree * qcd,
@@ -366,7 +366,7 @@ void PlotMaker::SetTrees(TTree * gg, TTree * qcd,
 
 }
 
-bool PlotMaker::LoadMCBackground(TString fileName, TString scanName, Double_t xsec, int channel, int layer, , int color, TString legendEntry) {
+bool PlotMaker::LoadMCBackground(TString fileName, TString scanName, Double_t xsec, int channel, int layer, int color, TString legendEntry) {
 
   mcFiles.push_back(new TFile(fileName, "READ"));
   if(!mcFiles.back()) {
@@ -460,7 +460,7 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
   }
   
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
-    h_bkg = new TH1D(variable+"_qcd_"+mcNames[i]+"_"+req, variable, nBins, xlo, xhi);
+    h_bkg = new TH1D(variable+"_qcd_"+mcNames[i]+"_"+req, variable, nBins, customBins);
     h_bkg->Sumw2();
     qcdMCHistograms[i].push_back(h_bkg);
   }
@@ -491,7 +491,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
     for(unsigned int j = 0; j < mcTrees.size(); j++) {
       mcTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
-      qcdMCTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
+      mcQCDTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
     }
 
     sigaTree->SetBranchAddress(variables[i], &(vars[i]));
@@ -500,19 +500,19 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
   }
 
   for(unsigned int i = 0; i < mcTrees.size(); i++) {
-    mcTrees->SetBranchAddress("pileupWeight", &puWeight);
-    mcTrees->SetBranchAddress("pileupWeightErr", &puWeightErr);
-    mcTrees->SetBranchAddress("btagWeight", &btagWeight);
-    mcTrees->SetBranchAddress("btagWeightErr", &btagWeightErr);
-    mcTrees->SetBranchAddress("btagWeightUp", &btagWeightUp);
-    mcTrees->SetBranchAddress("btagWeightDown", &btagWeightDown);
+    mcTrees[i]->SetBranchAddress("pileupWeight", &puWeight);
+    mcTrees[i]->SetBranchAddress("pileupWeightErr", &puWeightErr);
+    mcTrees[i]->SetBranchAddress("btagWeight", &btagWeight);
+    mcTrees[i]->SetBranchAddress("btagWeightErr", &btagWeightErr);
+    mcTrees[i]->SetBranchAddress("btagWeightUp", &btagWeightUp);
+    mcTrees[i]->SetBranchAddress("btagWeightDown", &btagWeightDown);
     
-    qcdMCTrees->SetBranchAddress("pileupWeight", &puWeight);
-    qcdMCTrees->SetBranchAddress("pileupWeightErr", &puWeightErr);
-    qcdMCTrees->SetBranchAddress("btagWeight", &btagWeight);
-    qcdMCTrees->SetBranchAddress("btagWeightErr", &btagWeightErr);
-    qcdMCTrees->SetBranchAddress("btagWeightUp", &btagWeightUp);
-    qcdMCTrees->SetBranchAddress("btagWeightDown", &btagWeightDown);
+    qcdMCTrees[i]->SetBranchAddress("pileupWeight", &puWeight);
+    qcdMCTrees[i]->SetBranchAddress("pileupWeightErr", &puWeightErr);
+    qcdMCTrees[i]->SetBranchAddress("btagWeight", &btagWeight);
+    qcdMCTrees[i]->SetBranchAddress("btagWeightErr", &btagWeightErr);
+    qcdMCTrees[i]->SetBranchAddress("btagWeightUp", &btagWeightUp);
+    qcdMCTrees[i]->SetBranchAddress("btagWeightDown", &btagWeightDown);
   }
 
   sigaTree->SetBranchAddress("pileupWeight", &puWeight);
@@ -586,7 +586,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
-	Float_t olderror = mcHistograms[i][k]->GetBinError(mcHistograms[i][k]->FindBin(vars[k]));
+	Float_t oldError = mcHistograms[i][k]->GetBinError(mcHistograms[i][k]->FindBin(vars[k]));
 	Float_t newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms[i][k]->Fill(vars[k]);
 	mcHistograms[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
@@ -597,10 +597,10 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     for(unsigned int j = 0; j < vars.size(); j++) mcHistograms[i][j]->Scale(intLumi_int * crossSections[j] / mcNGen[j]);
   }
 
-  for(unsigned int i = 0; i < qcdMCTrees.size(); i++) {
+  for(unsigned int i = 0; i < mcQCDTrees.size(); i++) {
     
-    for(int j = 0; j < qcdMCTrees[i]->GetEntries(); j++) {
-      qcdMCTrees[i]->GetEntry(j);
+    for(int j = 0; j < mcQCDTrees[i]->GetEntries(); j++) {
+      mcQCDTrees[i]->GetEntry(j);
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -620,7 +620,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
-	Float_t olderror = qcdMCHistograms[i][k]->GetBinError(qcdMCHistograms[i][k]->FindBin(vars[k]));
+	Float_t oldError = qcdMCHistograms[i][k]->GetBinError(qcdMCHistograms[i][k]->FindBin(vars[k]));
 	Float_t newerror = sqrt(oldError*oldError + addError2);
 	qcdMCHistograms[i][k]->Fill(vars[k]);
 	qcdMCHistograms[i][k]->SetBinError(qcdMCHistograms[i][k]->FindBin(vars[k]), newerror);
@@ -693,7 +693,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
   qcdTree->ResetBranchAddresses();
 
   for(unsigned int i = 0; i < mcTrees.size(); i++) mcTrees[i]->ResetBranchAddresses();
-  for(unsigned int i = 0; i < qcdMCTrees.size(); i++) qcdMCTrees[i]->ResetBranchAddresses();
+  for(unsigned int i = 0; i < mcQCDTrees.size(); i++) mcQCDTrees[i]->ResetBranchAddresses();
 
   sigaTree->ResetBranchAddresses();
   sigbTree->ResetBranchAddresses();
