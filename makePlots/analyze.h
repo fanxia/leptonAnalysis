@@ -740,7 +740,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
     }
   }
 
-  TH1D * bkg = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req);
+  TH1D * bkg = (TH1D*)h_qcd->Clone(variable+"_bkg_"+req);
   bkg->Write();
 
   Double_t kolm = h_gg[variableNumber]->KolmogorovTest(bkg);
@@ -815,7 +815,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
 
   bkg->Draw("hist");
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
-    mcHistograms[i][variableNumber]->Draw("same hist");
+    if(i != 0 && mcLayerNumbers[i] != mcLayerNumbers[i-1]) mcHistograms[i][variableNumber]->Draw("same hist");
   }
   errors->Draw("same e2");
   h_gg[variableNumber]->Draw("same e1");
