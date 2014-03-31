@@ -265,30 +265,18 @@ class PlotMaker : public TObject {
 
   }
 
+  bool LoadMCBackground(TString fileName, TString scanName, Double_t xsec, int channel, int layer, int color, TString legendEntry);
+  
   void SetTrees(TTree * gg, TTree * qcd,
-		TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLep,
-		TTree * tbar_s, TTree * tbar_t, TTree * tbar_tW,
-		TTree * t_s, TTree * t_t, TTree * t_tW,
-		TTree * ttwjets, TTree * ttzjets,
-		TTree * wjets, 
-		TTree * dy, TTree * dy1, TTree * dy2, TTree * dy3, TTree * dy4,
-		TTree * ttgjets, TTree * ttgg,
 		TTree * sig_a, TTree * sig_b);
   
-  void SetNGen(TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
-	       TH1D * tbar_s, TH1D * tbar_t, TH1D * tbar_tW,
-	       TH1D * t_s, TH1D * t_t, TH1D * t_tW,
-	       TH1D * ttwjets, TH1D * ttzjets,
-	       TH1D * wjets, 
-	       TH1D * dy, TH1D * dy1, TH1D * dy2, TH1D * dy3, TH1D * dy4,
-	       TH1D * ttgjets, TH1D * ttgg);
-
   void SetDisplayKStest(bool v) { displayKStest = v; }
 
   void BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_t xhi);
   void BookHistogram(TString variable, Int_t nBins, Double_t* customBins);
 
   void FillHistograms(double metCut, int nPhotons_req, int nBtagReq);
+  void SubtractMCFromQCD();
 
   void CreatePlot(TString variable,
 		  bool divideByWidth,
@@ -321,44 +309,34 @@ class PlotMaker : public TObject {
   void PlotKolmogorovValues();
 
  private:
+
+  vector<TFile*> mcFiles;
+  vector<TTree*> mcTrees;
+  vector<TTree*> mcQCDTrees;
+  vector<Double_t> mcNGen;
+  vector<Double_t> crossSections;
+  vector<int> mcLayerNumbers;
+  vector<int> mcLayerColors;
+  vector<TString> mcNames;
+  vector<TString> legendNames;
+  vector< vector<TH1D*> > mcHistograms;
+  vector< vector<TH1D*> > qcdMCHistograms;
+
   TTree * ggTree;
   TTree * qcdTree;
-
-  TTree * ttHadronicTree;
-  TTree * ttSemiLepTree;
-  TTree * ttFullLepTree;
-
-  TTree * tbar_sTree;
-  TTree * tbar_tTree;
-  TTree * tbar_tWTree;
-  TTree * t_sTree;
-  TTree * t_tTree;
-  TTree * t_tWTree;
-
-  TTree * ttwjetsTree;
-  TTree * ttzjetsTree;
-
-  TTree * wjetsTree;
-
-  TTree * dyjetsTree;
-  TTree * dy1jetsTree;
-  TTree * dy2jetsTree;
-  TTree * dy3jetsTree;
-  TTree * dy4jetsTree;
-
-  TTree * ttgjetsTree;
-  TTree * ttggTree;
 
   TTree * sigaTree;
   TTree * sigbTree;
 
-  Double_t nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep;
-  Double_t nGen_tbar_s, nGen_tbar_t, nGen_tbar_tW;
-  Double_t nGen_t_s, nGen_t_t, nGen_t_tW;
-  Double_t nGen_ttwjets, nGen_ttzjets;
-  Double_t nGen_wjets;
-  Double_t nGen_dyjets, nGen_dy1jets, nGen_dy2jets, nGen_dy3jets, nGen_dy4jets;
-  Double_t nGen_ttgjets, nGen_ttgg;
+  vector<TString> variables;
+
+  vector<TH1D*> h_gg;
+  vector<TH1D*> h_qcd;
+
+  vector<TH1D*> h_siga;
+  vector<TH1D*> h_sigb;
+
+  vector<pair<TString, double> > KSscores;
 
   Int_t intLumi_int;
   TString intLumi;
@@ -367,45 +345,10 @@ class PlotMaker : public TObject {
   bool displayKStest;
   bool blinded;
 
-  vector<pair<TString, double> > KSscores;
-
-  vector<TString> variables;
-
-  vector<TH1D*> h_gg;
-  vector<TH1D*> h_qcd;
-
-  vector<TH1D*> h_ttHadronic;
-  vector<TH1D*> h_ttSemiLep;
-  vector<TH1D*> h_ttFullLep;
-
-  vector<TH1D*> h_tbar_s;
-  vector<TH1D*> h_tbar_t;
-  vector<TH1D*> h_tbar_tW;
-  vector<TH1D*> h_t_s;
-  vector<TH1D*> h_t_t;
-  vector<TH1D*> h_t_tW;
-  
-  vector<TH1D*> h_ttwjets;
-  vector<TH1D*> h_ttzjets;
-
-  vector<TH1D*> h_wjets;
-
-  vector<TH1D*> h_dyjets;
-  vector<TH1D*> h_dy1jets;
-  vector<TH1D*> h_dy2jets;
-  vector<TH1D*> h_dy3jets;
-  vector<TH1D*> h_dy4jets;
-
-  vector<TH1D*> h_ttgjets;
-  vector<TH1D*> h_ttgg;
-
-  vector<TH1D*> h_siga;
-  vector<TH1D*> h_sigb;
-  
 };
 
 PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
-intLumi_int(lumi),
+  intLumi_int(lumi),
   req(requirement),
   blinded(blind)
 {
@@ -422,111 +365,110 @@ intLumi_int(lumi),
   h_gg.clear();
   h_qcd.clear();
 
-  h_ttHadronic.clear();
-  h_ttSemiLep.clear();
-  h_ttFullLep.clear();
-
-  h_tbar_s.clear();
-  h_tbar_t.clear();
-  h_tbar_tW.clear();
-  h_t_s.clear();
-  h_t_t.clear();
-  h_t_tW.clear();
-
-  h_ttwjets.clear();
-  h_ttzjets.clear();
-
-  h_wjets.clear();
-
-  h_dyjets.clear();
-  h_dy1jets.clear();
-  h_dy2jets.clear();
-  h_dy3jets.clear();
-  h_dy4jets.clear();
-
-  h_ttgjets.clear();
-  h_ttgg.clear();
-
   h_siga.clear();
   h_sigb.clear();
+
+  mcFiles.clear();
+  mcTrees.clear();
+  mcQCDTrees.clear();
+  mcNGen.clear();
+  crossSections.clear();
+  mcLayerNumbers.clear();
+  mcLayerColors.clear();
+  mcNames.clear();
+  legendNames.clear();
+  mcHistograms.clear();
+  qcdMCHistograms.clear();
+
+}
+
+virtual PlotMaker::~PlotMaker() { 
+
+    KSscores.clear();
+    variables.clear();
+
+    delete ggTree;
+    delete qcdTree;
+
+    for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+      for(unsigned int j = 0; i < mcHistograms[i].size(); j++) {
+	delete mcHistograms[i][j];
+	delete mcQCDHistograms[i][j];
+      }
+      mcHistograms[i].clear();
+      delete mcTrees[i];
+      delete mcQCDTrees[i];
+      mcFiles[i].Close();
+    }
+    mcHistograms.clear();
+    mcTrees.clear();
+    mcFiles.clear();
+    mcNGen.clear();
+    crossSections.clear();
+    mcLayerNumbers.clear();
+    mcLayerColors.clear();
+    mcNames.clear();
+    legendNames.clear();
+
+    delete sigaTree;
+    delete sigbTree;
+    
+    h_gg.clear();
+    h_qcd.clear();
+
+    h_siga.clear();
+    h_sigb.clear();
+
 }
 
 void PlotMaker::SetTrees(TTree * gg, TTree * qcd,
-			 TTree * ttHadronic, TTree * ttSemiLep, TTree * ttFullLep,
-			 TTree * tbar_s, TTree * tbar_t, TTree * tbar_tW,
-			 TTree * t_s, TTree * t_t, TTree * t_tW,
-			 TTree * ttwjets, TTree * ttzjets,
-			 TTree * wjets, 
-			 TTree * dy, TTree * dy1, TTree * dy2, TTree * dy3, TTree * dy4,
-			 TTree * ttgjets, TTree * ttgg,
 			 TTree * sig_a, TTree * sig_b) {
 
   ggTree = gg;
   qcdTree = qcd;
   
-  ttHadronicTree = ttHadronic;
-  ttSemiLepTree = ttSemiLep;
-  ttFullLepTree = ttFullLep;
-
-  tbar_sTree = tbar_s;
-  tbar_tTree = tbar_t;
-  tbar_tWTree = tbar_tW;
-  t_sTree = t_s;
-  t_tTree = t_t;
-  t_tWTree = t_tW;
-
-  ttwjetsTree = ttwjets;
-  ttzjetsTree = ttzjets;
-
-  wjetsTree = wjets;
-
-  dyjetsTree = dy;
-  dy1jetsTree = dy1;
-  dy2jetsTree = dy2;
-  dy3jetsTree = dy3;
-  dy4jetsTree = dy4;
-
-  ttgjetsTree = ttgjets;
-  ttggTree = ttgg;
-
   sigaTree = sig_a;
   sigbTree = sig_b;
 
 }
 
-void PlotMaker::SetNGen(TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
-			TH1D * tbar_s, TH1D * tbar_t, TH1D * tbar_tW,
-			TH1D * t_s, TH1D * t_t, TH1D * t_tW,
-			TH1D * ttwjets, TH1D * ttzjets,
-			TH1D * wjets, 
-			TH1D * dy, TH1D * dy1, TH1D * dy2, TH1D * dy3, TH1D * dy4,
-			TH1D * ttgjets, TH1D * ttgg) {
+bool PlotMaker::LoadMCBackground(TString fileName, TString scanName, Double_t xsec, int channel, int layer, , int color, TString legendEntry) {
 
-  nGen_ttHadronic = ttHadronic->Integral();
-  nGen_ttSemiLep = ttSemiLep->Integral();
-  nGen_ttFullLep = ttFullLep->Integral();
+  mcFiles.push_back(new TFile(fileName, "READ"));
+  if(!mcFiles.back()) {
+    cout << "Could not load TFile " << fileName << endl;
+    return false;
+  }
 
-  nGen_tbar_s = tbar_s->Integral();
-  nGen_tbar_t = tbar_t->Integral();
-  nGen_tbar_tW = tbar_tW->Integral();
-  nGen_t_s = t_s->Integral();
-  nGen_t_t = t_t->Integral();
-  nGen_t_tW = t_tW->Integral();
+  mcTrees.push_back((TTree*)mcFiles.back()->Get(channels[channel]+"_signalTree"));
+  if(!mcTrees.back()) {
+    cout << "Could not load TTree " << channels[channel] << "_signalTree from TFile " << fileName << endl;
+    return false;
+  }
 
-  nGen_ttwjets = ttwjets->Integral();
-  nGen_ttzjets = ttzjets->Integral();
+  mcQCDTrees.push_back((TTree*)mcFiles.back()->Get(channels[channel]+"_eQCDTree"));
+  if(!mcQCDTrees.back()) {
+    cout << "Could not load TTree " << channels[channel] << "_eQCDTree from TFile " << fileName << endl;
+    return false;
+  }
 
-  nGen_wjets = wjets->Integral();
+  TH1D * h_nGen = (TH1D*)mcFiles.back()->Get("nEvents_"+scanName);
+  if(!h_nGen) {
+    cout << "Could not load histogram " << "nEvents_" + << scanName << " from TFile " << fileName << endl;
+    return false;
+  }
+  mcNGen.push_back(h_nGen->Integral());
 
-  nGen_dyjets = dy->Integral();
-  nGen_dy1jets = dy1->Integral();
-  nGen_dy2jets = dy2->Integral();
-  nGen_dy3jets = dy3->Integral();
-  nGen_dy4jets = dy4->Integral();
+  crossSections.push_back(xsec);
+  mcLayerNumbers.push_back(layer);
+  mcLayerColors.push_back(color);
+  mcNames.push_back(scanName);
+  legendNames.push_back(legendEntry);
+
+  mcHistograms.resize(mcHistograms.size() + 1);
+  qcdMCHistograms.resize(qcdMCHistograms.size() + 1);
   
-  nGen_ttgjets = ttgjets->Integral();
-  nGen_ttgg = ttgg->Integral();
-
+  return true;
 }
 
 void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_t xhi) {
@@ -541,82 +483,19 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
   qcd->Sumw2();
   h_qcd.push_back(qcd);
   
-  TH1D * ttHadronic = new TH1D(variable+"_ttHadronic_"+req, variable, nBins, xlo, xhi);
-  ttHadronic->Sumw2();
-  h_ttHadronic.push_back(ttHadronic);
-  
-  TH1D * ttSemiLep = new TH1D(variable+"_ttSemiLep_"+req, variable, nBins, xlo, xhi);
-  ttSemiLep->Sumw2();
-  h_ttSemiLep.push_back(ttSemiLep);
-  
-  TH1D * ttFullLep = new TH1D(variable+"_ttFullLep_"+req, variable, nBins, xlo, xhi);
-  ttFullLep->Sumw2();
-  h_ttFullLep.push_back(ttFullLep);
-  
-  TH1D * tbar_s = new TH1D(variable+"_tbar_s_"+req, variable, nBins, xlo, xhi);
-  tbar_s->Sumw2();
-  h_tbar_s.push_back(tbar_s);
-  
-  TH1D * tbar_t = new TH1D(variable+"_tbar_t_"+req, variable, nBins, xlo, xhi);
-  tbar_t->Sumw2();
-  h_tbar_t.push_back(tbar_t);
-  
-  TH1D * tbar_tW = new TH1D(variable+"_tbar_tW_"+req, variable, nBins, xlo, xhi);
-  tbar_tW->Sumw2();
-  h_tbar_tW.push_back(tbar_tW);
-  
-  TH1D * t_s = new TH1D(variable+"_t_s_"+req, variable, nBins, xlo, xhi);
-  t_s->Sumw2();
-  h_t_s.push_back(t_s);
-  
-  TH1D * t_t = new TH1D(variable+"_t_t_"+req, variable, nBins, xlo, xhi);
-  t_t->Sumw2();
-  h_t_t.push_back(t_t);
-  
-  TH1D * t_tW = new TH1D(variable+"_t_tW_"+req, variable, nBins, xlo, xhi);
-  t_tW->Sumw2();
-  h_t_tW.push_back(t_tW);
-  
-  TH1D * ttwjets = new TH1D(variable+"_ttwjets_"+req, variable, nBins, xlo, xhi);
-  ttwjets->Sumw2();
-  h_ttwjets.push_back(ttwjets);
+  TH1D * h_bkg;
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    h_bkg = new TH1D(variable+"_"+mcNames[i]+"_"+req, variable, nBins, xlo, xhi);
+    h_bkg->Sumw2();
+    mcHistograms[i].push_back(h_bkg);
+  }
 
-  TH1D * ttzjets = new TH1D(variable+"_ttzjets_"+req, variable, nBins, xlo, xhi);
-  ttzjets->Sumw2();
-  h_ttzjets.push_back(ttzjets);
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    h_bkg = new TH1D(variable+"_qcd_"+mcNames[i]+"_"+req, variable, nBins, xlo, xhi);
+    h_bkg->Sumw2();
+    qcdMCHistograms[i].push_back(h_bkg);
+  }
 
-  TH1D * wjets = new TH1D(variable+"_wjets_"+req, variable, nBins, xlo, xhi);
-  wjets->Sumw2();
-  h_wjets.push_back(wjets);
-  
-  TH1D * dyjets = new TH1D(variable+"_dyjets_"+req, variable, nBins, xlo, xhi);
-  dyjets->Sumw2();
-  h_dyjets.push_back(dyjets);
-
-  TH1D * dy1jets = new TH1D(variable+"_dy1jets_"+req, variable, nBins, xlo, xhi);
-  dy1jets->Sumw2();
-  h_dy1jets.push_back(dy1jets);
-
-  TH1D * dy2jets = new TH1D(variable+"_dy2jets_"+req, variable, nBins, xlo, xhi);
-  dy2jets->Sumw2();
-  h_dy2jets.push_back(dy2jets);
-
-  TH1D * dy3jets = new TH1D(variable+"_dy3jets_"+req, variable, nBins, xlo, xhi);
-  dy3jets->Sumw2();
-  h_dy3jets.push_back(dy3jets);
-
-  TH1D * dy4jets = new TH1D(variable+"_dy4jets_"+req, variable, nBins, xlo, xhi);
-  dy4jets->Sumw2();
-  h_dy4jets.push_back(dy4jets);
-  
-  TH1D * ttgjets = new TH1D(variable+"_ttgjets_"+req, variable, nBins, xlo, xhi);
-  ttgjets->Sumw2();
-  h_ttgjets.push_back(ttgjets);
-  
-  TH1D * ttgg = new TH1D(variable+"_ttgg_"+req, variable, nBins, xlo, xhi);
-  ttgg->Sumw2();
-  h_ttgg.push_back(ttgg);
-  
   TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, xlo, xhi);
   sig_a->Sumw2();
   h_siga.push_back(sig_a);
@@ -639,82 +518,19 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
   qcd->Sumw2();
   h_qcd.push_back(qcd);
 
-  TH1D * ttHadronic = new TH1D(variable+"_ttHadronic_"+req, variable, nBins, customBins);
-  ttHadronic->Sumw2();
-  h_ttHadronic.push_back(ttHadronic);
+  TH1D * h_bkg;
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    h_bkg = new TH1D(variable+"_"+mcNames[i]+"_"+req, variable, nBins, customBins);
+    h_bkg->Sumw2();
+    mcHistograms[i].push_back(h_bkg);
+  }
   
-  TH1D * ttSemiLep = new TH1D(variable+"_ttSemiLep_"+req, variable, nBins, customBins);
-  ttSemiLep->Sumw2();
-  h_ttSemiLep.push_back(ttSemiLep);
-  
-  TH1D * ttFullLep = new TH1D(variable+"_ttFullLep_"+req, variable, nBins, customBins);
-  ttFullLep->Sumw2();
-  h_ttFullLep.push_back(ttFullLep);
-  
-  TH1D * tbar_s = new TH1D(variable+"_tbar_s_"+req, variable, nBins, customBins);
-  tbar_s->Sumw2();
-  h_tbar_s.push_back(tbar_s);
-  
-  TH1D * tbar_t = new TH1D(variable+"_tbar_t_"+req, variable, nBins, customBins);
-  tbar_t->Sumw2();
-  h_tbar_t.push_back(tbar_t);
-  
-  TH1D * tbar_tW = new TH1D(variable+"_tbar_tW_"+req, variable, nBins, customBins);
-  tbar_tW->Sumw2();
-  h_tbar_tW.push_back(tbar_tW);
-  
-  TH1D * t_s = new TH1D(variable+"_t_s_"+req, variable, nBins, customBins);
-  t_s->Sumw2();
-  h_t_s.push_back(t_s);
-  
-  TH1D * t_t = new TH1D(variable+"_t_t_"+req, variable, nBins, customBins);
-  t_t->Sumw2();
-  h_t_t.push_back(t_t);
-  
-  TH1D * t_tW = new TH1D(variable+"_t_tW_"+req, variable, nBins, customBins);
-  t_tW->Sumw2();
-  h_t_tW.push_back(t_tW);
-  
-  TH1D * ttwjets = new TH1D(variable+"_ttwjets_"+req, variable, nBins, customBins);
-  ttwjets->Sumw2();
-  h_ttwjets.push_back(ttwjets);
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    h_bkg = new TH1D(variable+"_qcd_"+mcNames[i]+"_"+req, variable, nBins, xlo, xhi);
+    h_bkg->Sumw2();
+    qcdMCHistograms[i].push_back(h_bkg);
+  }
 
-  TH1D * ttzjets = new TH1D(variable+"_ttzjets_"+req, variable, nBins, customBins);
-  ttzjets->Sumw2();
-  h_ttzjets.push_back(ttzjets);
-
-  TH1D * wjets = new TH1D(variable+"_wjets_"+req, variable, nBins, customBins);
-  wjets->Sumw2();
-  h_wjets.push_back(wjets);
-
-  TH1D * dyjets = new TH1D(variable+"_dyjets_"+req, variable, nBins, customBins);
-  dyjets->Sumw2();
-  h_dyjets.push_back(dyjets);
-  
-  TH1D * dy1jets = new TH1D(variable+"_dy1jets_"+req, variable, nBins, customBins);
-  dy1jets->Sumw2();
-  h_dy1jets.push_back(dy1jets);
-
-  TH1D * dy2jets = new TH1D(variable+"_dy2jets_"+req, variable, nBins, customBins);
-  dy2jets->Sumw2();
-  h_dy2jets.push_back(dy2jets);
-
-  TH1D * dy3jets = new TH1D(variable+"_dy3jets_"+req, variable, nBins, customBins);
-  dy3jets->Sumw2();
-  h_dy3jets.push_back(dy3jets);
-
-  TH1D * dy4jets = new TH1D(variable+"_dy4jets_"+req, variable, nBins, customBins);
-  dy4jets->Sumw2();
-  h_dy4jets.push_back(dy4jets);
-
-  TH1D * ttgjets = new TH1D(variable+"_ttgjets_"+req, variable, nBins, customBins);
-  ttgjets->Sumw2();
-  h_ttgjets.push_back(ttgjets);
-  
-  TH1D * ttgg = new TH1D(variable+"_ttgg_"+req, variable, nBins, customBins);
-  ttgg->Sumw2();
-  h_ttgg.push_back(ttgg);
-  
   TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, customBins);
   sig_a->Sumw2();
   h_siga.push_back(sig_a);
@@ -738,162 +554,32 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
     ggTree->SetBranchAddress(variables[i], &(vars[i]));
     qcdTree->SetBranchAddress(variables[i], &(vars[i]));
-    ttHadronicTree->SetBranchAddress(variables[i], &(vars[i]));
-    ttSemiLepTree->SetBranchAddress(variables[i], &(vars[i]));
-    ttFullLepTree->SetBranchAddress(variables[i], &(vars[i]));
-    tbar_sTree->SetBranchAddress(variables[i], &(vars[i]));
-    tbar_tTree->SetBranchAddress(variables[i], &(vars[i]));
-    tbar_tWTree->SetBranchAddress(variables[i], &(vars[i]));
-    t_sTree->SetBranchAddress(variables[i], &(vars[i]));
-    t_tTree->SetBranchAddress(variables[i], &(vars[i]));
-    t_tWTree->SetBranchAddress(variables[i], &(vars[i]));
-    ttwjetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    ttzjetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    wjetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    dyjetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    dy1jetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    dy2jetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    dy3jetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    dy4jetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    ttgjetsTree->SetBranchAddress(variables[i], &(vars[i]));
-    ttggTree->SetBranchAddress(variables[i], &(vars[i]));
+
+    for(unsigned int j = 0; j < mcTrees.size(); j++) {
+      mcTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
+      qcdMCTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
+    }
+
     sigaTree->SetBranchAddress(variables[i], &(vars[i]));
     sigbTree->SetBranchAddress(variables[i], &(vars[i]));
 
   }
 
-  ttHadronicTree->SetBranchAddress("pileupWeight", &puWeight);
-  ttHadronicTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  ttHadronicTree->SetBranchAddress("btagWeight", &btagWeight);
-  ttHadronicTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  ttHadronicTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  ttHadronicTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  ttSemiLepTree->SetBranchAddress("pileupWeight", &puWeight);
-  ttSemiLepTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  ttSemiLepTree->SetBranchAddress("btagWeight", &btagWeight);
-  ttSemiLepTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  ttSemiLepTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  ttSemiLepTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  ttFullLepTree->SetBranchAddress("pileupWeight", &puWeight);
-  ttFullLepTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  ttFullLepTree->SetBranchAddress("btagWeight", &btagWeight);
-  ttFullLepTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  ttFullLepTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  ttFullLepTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  tbar_sTree->SetBranchAddress("pileupWeight", &puWeight);
-  tbar_sTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  tbar_sTree->SetBranchAddress("btagWeight", &btagWeight);
-  tbar_sTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  tbar_sTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  tbar_sTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  tbar_tTree->SetBranchAddress("pileupWeight", &puWeight);
-  tbar_tTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  tbar_tTree->SetBranchAddress("btagWeight", &btagWeight);
-  tbar_tTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  tbar_tTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  tbar_tTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  
-  tbar_tWTree->SetBranchAddress("pileupWeight", &puWeight);
-  tbar_tWTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  tbar_tWTree->SetBranchAddress("btagWeight", &btagWeight);
-  tbar_tWTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  tbar_tWTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  tbar_tWTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  t_sTree->SetBranchAddress("pileupWeight", &puWeight);
-  t_sTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  t_sTree->SetBranchAddress("btagWeight", &btagWeight);
-  t_sTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  t_sTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  t_sTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  t_tTree->SetBranchAddress("pileupWeight", &puWeight);
-  t_tTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  t_tTree->SetBranchAddress("btagWeight", &btagWeight);
-  t_tTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  t_tTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  t_tTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  t_tWTree->SetBranchAddress("pileupWeight", &puWeight);
-  t_tWTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  t_tWTree->SetBranchAddress("btagWeight", &btagWeight);
-  t_tWTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  t_tWTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  t_tWTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  ttwjetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  ttwjetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  ttwjetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  ttwjetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  ttwjetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  ttwjetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  ttzjetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  ttzjetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  ttzjetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  ttzjetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  ttzjetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  ttzjetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  wjetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  wjetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  wjetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  wjetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  wjetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  wjetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  dyjetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  dyjetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  dyjetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  dyjetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  dyjetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  dyjetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  dy1jetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  dy1jetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  dy1jetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  dy1jetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  dy1jetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  dy1jetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  
-  dy2jetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  dy2jetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  dy2jetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  dy2jetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  dy2jetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  dy2jetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  
-  dy3jetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  dy3jetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  dy3jetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  dy3jetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  dy3jetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  dy3jetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  dy4jetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  dy4jetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  dy4jetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  dy4jetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  dy4jetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  dy4jetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  ttgjetsTree->SetBranchAddress("pileupWeight", &puWeight);
-  ttgjetsTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  ttgjetsTree->SetBranchAddress("btagWeight", &btagWeight);
-  ttgjetsTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  ttgjetsTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  ttgjetsTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-
-  ttggTree->SetBranchAddress("pileupWeight", &puWeight);
-  ttggTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  ttggTree->SetBranchAddress("btagWeight", &btagWeight);
-  ttggTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  ttggTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  ttggTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
+  for(unsigned int i = 0; i < mcTrees.size(); i++) {
+    mcTrees->SetBranchAddress("pileupWeight", &puWeight);
+    mcTrees->SetBranchAddress("pileupWeightErr", &puWeightErr);
+    mcTrees->SetBranchAddress("btagWeight", &btagWeight);
+    mcTrees->SetBranchAddress("btagWeightErr", &btagWeightErr);
+    mcTrees->SetBranchAddress("btagWeightUp", &btagWeightUp);
+    mcTrees->SetBranchAddress("btagWeightDown", &btagWeightDown);
+    
+    qcdMCTrees->SetBranchAddress("pileupWeight", &puWeight);
+    qcdMCTrees->SetBranchAddress("pileupWeightErr", &puWeightErr);
+    qcdMCTrees->SetBranchAddress("btagWeight", &btagWeight);
+    qcdMCTrees->SetBranchAddress("btagWeightErr", &btagWeightErr);
+    qcdMCTrees->SetBranchAddress("btagWeightUp", &btagWeightUp);
+    qcdMCTrees->SetBranchAddress("btagWeightDown", &btagWeightDown);
+  }
 
   sigaTree->SetBranchAddress("pileupWeight", &puWeight);
   sigaTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
@@ -943,556 +629,73 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
   }
 
-  for(int i = 0; i < ttHadronicTree->GetEntries(); i++) {
-    ttHadronicTree->GetEntry(i);
+  for(unsigned int i = 0; i < mcTrees.size(); i++) {
     
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
+    for(int j = 0; j < mcTrees[i]->GetEntries(); j++) {
+      mcTrees[i]->GetEntry(j);
+
+      if(nBtagReq == 0) {
+	btagWeight = 1.;
+	btagWeightErr = 0.;
+	btagWeightUp = 1.;
+	btagWeightDown = 1.;
+      }
+
+      if(btagWeight != btagWeight) continue;
+      if(metCut > 0. && vars[1] >= metCut) continue;
+
+      if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
+      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+      
+      for(unsigned int k = 0; k < vars.size(); k++) {
+	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+	Float_t olderror = mcHistograms[i][k]->GetBinError(mcHistograms[i][k]->FindBin(vars[k]));
+	Float_t newerror = sqrt(oldError*oldError + addError2);
+	mcHistograms[i][k]->Fill(vars[k]);
+	mcHistograms[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
+      }
+
     }
 
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
+    for(unsigned int j = 0; j < vars.size(); j++) mcHistograms[i][j]->Scale(intLumi_int * crossSections[j] / mcNGen[j]);
+  }
 
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+  for(unsigned int i = 0; i < qcdMCTrees.size(); i++) {
     
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_ttHadronic[j]->GetBinError(h_ttHadronic[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_ttHadronic[j]->Fill(vars[j], puWeight * btagWeight);
-      h_ttHadronic[j]->SetBinError(h_ttHadronic[j]->FindBin(vars[j]), newerror);
+    for(int j = 0; j < qcdMCTrees[i]->GetEntries(); j++) {
+      qcdMCTrees[i]->GetEntry(j);
+
+      if(nBtagReq == 0) {
+	btagWeight = 1.;
+	btagWeightErr = 0.;
+	btagWeightUp = 1.;
+	btagWeightDown = 1.;
+      }
+
+      if(btagWeight != btagWeight) continue;
+      if(metCut > 0. && vars[1] >= metCut) continue;
+
+      if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
+      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
+      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
+      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+      
+      for(unsigned int k = 0; k < vars.size(); k++) {
+	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+	Float_t olderror = qcdMCHistograms[i][k]->GetBinError(qcdMCHistograms[i][k]->FindBin(vars[k]));
+	Float_t newerror = sqrt(oldError*oldError + addError2);
+	qcdMCHistograms[i][k]->Fill(vars[k]);
+	qcdMCHistograms[i][k]->SetBinError(qcdMCHistograms[i][k]->FindBin(vars[k]), newerror);
+      }
+
     }
 
+    for(unsigned int j = 0; j < vars.size(); j++) qcdMCHistograms[i][j]->Scale(intLumi_int * crossSections[j] / mcNGen[j]);
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttHadronic[j]->Scale(intLumi_int * xsec_ttHadronic / nGen_ttHadronic);
-
-  for(int i = 0; i < ttSemiLepTree->GetEntries(); i++) {
-    ttSemiLepTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_ttSemiLep[j]->GetBinError(h_ttSemiLep[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_ttSemiLep[j]->Fill(vars[j], puWeight * btagWeight);
-      h_ttSemiLep[j]->SetBinError(h_ttSemiLep[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttSemiLep[j]->Scale(intLumi_int * xsec_ttSemiLep / nGen_ttSemiLep);
-
-  for(int i = 0; i < ttFullLepTree->GetEntries(); i++) {
-    ttFullLepTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_ttFullLep[j]->GetBinError(h_ttFullLep[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_ttFullLep[j]->Fill(vars[j], puWeight * btagWeight);
-      h_ttFullLep[j]->SetBinError(h_ttFullLep[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttFullLep[j]->Scale(intLumi_int * xsec_ttFullLep / nGen_ttFullLep);
-
-  for(int i = 0; i < tbar_sTree->GetEntries(); i++) {
-    tbar_sTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_tbar_s[j]->GetBinError(h_tbar_s[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_tbar_s[j]->Fill(vars[j], puWeight * btagWeight);
-      h_tbar_s[j]->SetBinError(h_tbar_s[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_s[j]->Scale(intLumi_int * xsec_Tbar_s / nGen_tbar_s);
-
-  for(int i = 0; i < tbar_tTree->GetEntries(); i++) {
-    tbar_tTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_tbar_t[j]->GetBinError(h_tbar_t[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_tbar_t[j]->Fill(vars[j], puWeight * btagWeight);
-      h_tbar_t[j]->SetBinError(h_tbar_t[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_t[j]->Scale(intLumi_int * xsec_Tbar_t / nGen_tbar_t);
-
-  for(int i = 0; i < tbar_tWTree->GetEntries(); i++) {
-    tbar_tWTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-    
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_tbar_tW[j]->GetBinError(h_tbar_tW[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_tbar_tW[j]->Fill(vars[j], puWeight * btagWeight);
-      h_tbar_tW[j]->SetBinError(h_tbar_tW[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_tbar_tW[j]->Scale(intLumi_int * xsec_Tbar_tW / nGen_tbar_tW);
-
-  for(int i = 0; i < t_sTree->GetEntries(); i++) {
-    t_sTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_t_s[j]->GetBinError(h_t_s[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_t_s[j]->Fill(vars[j], puWeight * btagWeight);
-      h_t_s[j]->SetBinError(h_t_s[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_t_s[j]->Scale(intLumi_int * xsec_T_s / nGen_t_s);
-
-  for(int i = 0; i < t_tTree->GetEntries(); i++) {
-    t_tTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_t_t[j]->GetBinError(h_t_t[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_t_t[j]->Fill(vars[j], puWeight * btagWeight);
-      h_t_t[j]->SetBinError(h_t_t[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_t_t[j]->Scale(intLumi_int * xsec_T_t / nGen_t_t);
-
-  for(int i = 0; i < t_tWTree->GetEntries(); i++) {
-    t_tWTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_t_tW[j]->GetBinError(h_t_tW[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_t_tW[j]->Fill(vars[j], puWeight * btagWeight);
-      h_t_tW[j]->SetBinError(h_t_tW[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_t_tW[j]->Scale(intLumi_int * xsec_T_tW / nGen_t_tW);
-
-  for(int i = 0; i < ttwjetsTree->GetEntries(); i++) {
-    ttwjetsTree->GetEntry(i);
-    
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-    
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_ttwjets[j]->GetBinError(h_ttwjets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_ttwjets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_ttwjets[j]->SetBinError(h_ttwjets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttwjets[j]->Scale(intLumi_int * xsec_TTW / nGen_ttwjets);
-
-  for(int i = 0; i < ttzjetsTree->GetEntries(); i++) {
-    ttzjetsTree->GetEntry(i);
-    
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-    
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_ttzjets[j]->GetBinError(h_ttzjets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_ttzjets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_ttzjets[j]->SetBinError(h_ttzjets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttzjets[j]->Scale(intLumi_int * xsec_TTZ / nGen_ttzjets);
-
-  for(int i = 0; i < wjetsTree->GetEntries(); i++) {
-    wjetsTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_wjets[j]->GetBinError(h_wjets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_wjets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_wjets[j]->SetBinError(h_wjets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_wjets[j]->Scale(intLumi_int * xsec_wjets / nGen_wjets);
-
-  for(int i = 0; i < dyjetsTree->GetEntries(); i++) {
-    dyjetsTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_dyjets[j]->GetBinError(h_dyjets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_dyjets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_dyjets[j]->SetBinError(h_dyjets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_dyjets[j]->Scale(intLumi_int * xsec_dyjets / nGen_dyjets);
-
-  for(int i = 0; i < dy1jetsTree->GetEntries(); i++) {
-    dy1jetsTree->GetEntry(i);
-    
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-    
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_dy1jets[j]->GetBinError(h_dy1jets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_dy1jets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_dy1jets[j]->SetBinError(h_dy1jets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_dy1jets[j]->Scale(intLumi_int * xsec_dy1jets / nGen_dy1jets);
-  
-  for(int i = 0; i < dy2jetsTree->GetEntries(); i++) {
-    dy2jetsTree->GetEntry(i);
-    
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-    
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_dy2jets[j]->GetBinError(h_dy2jets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_dy2jets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_dy2jets[j]->SetBinError(h_dy2jets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_dy2jets[j]->Scale(intLumi_int * xsec_dy2jets / nGen_dy2jets);
-
-  for(int i = 0; i < dy3jetsTree->GetEntries(); i++) {
-    dy3jetsTree->GetEntry(i);
-    
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-    
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_dy3jets[j]->GetBinError(h_dy3jets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_dy3jets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_dy3jets[j]->SetBinError(h_dy3jets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_dy3jets[j]->Scale(intLumi_int * xsec_dy3jets / nGen_dy3jets);
-
-  for(int i = 0; i < dy4jetsTree->GetEntries(); i++) {
-    dy4jetsTree->GetEntry(i);
-    
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-    
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_dy4jets[j]->GetBinError(h_dy4jets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_dy4jets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_dy4jets[j]->SetBinError(h_dy4jets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_dy4jets[j]->Scale(intLumi_int * xsec_dy4jets / nGen_dy4jets);
-
-  for(int i = 0; i < ttgjetsTree->GetEntries(); i++) {
-    ttgjetsTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_ttgjets[j]->GetBinError(h_ttgjets[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_ttgjets[j]->Fill(vars[j], puWeight * btagWeight);
-      h_ttgjets[j]->SetBinError(h_ttgjets[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttgjets[j]->Scale(intLumi_int * xsec_ttgjets / nGen_ttgjets);
-
-  for(int i = 0; i < ttggTree->GetEntries(); i++) {
-    ttggTree->GetEntry(i);
-
-    if(nBtagReq == 0) {
-      btagWeight = 1.;
-      btagWeightErr = 0.;
-      btagWeightUp = 1.;
-      btagWeightDown = 1.;
-    }
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-    Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-    Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-    Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-      Float_t olderror = h_ttgg[j]->GetBinError(h_ttgg[j]->FindBin(vars[j]));
-      Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_ttgg[j]->Fill(vars[j], puWeight * btagWeight);
-      h_ttgg[j]->SetBinError(h_ttgg[j]->FindBin(vars[j]), newerror);
-    }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_ttgg[j]->Scale(intLumi_int * xsec_ttgg / nGen_ttgg);
 
   for(int i = 0; i < sigaTree->GetEntries(); i++) {
     sigaTree->GetEntry(i);
@@ -1554,27 +757,22 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
   ggTree->ResetBranchAddresses();
   qcdTree->ResetBranchAddresses();
-  ttHadronicTree->ResetBranchAddresses();
-  ttSemiLepTree->ResetBranchAddresses();
-  ttFullLepTree->ResetBranchAddresses();
-  tbar_sTree->ResetBranchAddresses();
-  tbar_tTree->ResetBranchAddresses();
-  tbar_tWTree->ResetBranchAddresses();
-  t_sTree->ResetBranchAddresses();
-  t_tTree->ResetBranchAddresses();
-  t_tWTree->ResetBranchAddresses();
-  ttwjetsTree->ResetBranchAddresses();
-  ttzjetsTree->ResetBranchAddresses();
-  wjetsTree->ResetBranchAddresses();
-  dyjetsTree->ResetBranchAddresses();
-  dy1jetsTree->ResetBranchAddresses();
-  dy2jetsTree->ResetBranchAddresses();
-  dy3jetsTree->ResetBranchAddresses();
-  dy4jetsTree->ResetBranchAddresses();
-  ttgjetsTree->ResetBranchAddresses();
-  ttggTree->ResetBranchAddresses();
+
+  for(unsigned int i = 0; i < mcTrees.size(); i++) mcTrees[i]->ResetBranchAddresses();
+  for(unsigned int i = 0; i < qcdMCTrees.size(); i++) qcdMCTrees[i]->ResetBranchAddresses();
+
   sigaTree->ResetBranchAddresses();
   sigbTree->ResetBranchAddresses();
+
+}
+
+void PlotMaker::SubtractMCFromQCD() {
+
+  for(unsigned int i = 0; i < qcdMCHistograms.size(); i++) {
+    for(unsigned int j = 0; j < qcdMCHistograms.size(); j++) {
+      h_qcd[j]->Add(qcdMCHistograms[i][j]);
+    }
+  }
 
 }
 
@@ -1603,39 +801,15 @@ void PlotMaker::CreatePlot(TString variable,
 
     h_gg[var_num] = (TH1D*)DivideByBinWidth(h_gg[var_num]);
     h_qcd[var_num] = (TH1D*)DivideByBinWidth(h_qcd[var_num]);
-    h_ttHadronic[var_num] = (TH1D*)DivideByBinWidth(h_ttHadronic[var_num]);
-    h_ttSemiLep[var_num] = (TH1D*)DivideByBinWidth(h_ttSemiLep[var_num]);
-    h_ttFullLep[var_num] = (TH1D*)DivideByBinWidth(h_ttFullLep[var_num]);
-    h_tbar_s[var_num] = (TH1D*)DivideByBinWidth(h_tbar_s[var_num]);
-    h_tbar_t[var_num] = (TH1D*)DivideByBinWidth(h_tbar_t[var_num]);
-    h_tbar_tW[var_num] = (TH1D*)DivideByBinWidth(h_tbar_tW[var_num]);
-    h_t_s[var_num] = (TH1D*)DivideByBinWidth(h_t_s[var_num]);
-    h_t_t[var_num] = (TH1D*)DivideByBinWidth(h_t_t[var_num]);
-    h_t_tW[var_num] = (TH1D*)DivideByBinWidth(h_t_tW[var_num]);
-    h_ttwjets[var_num] = (TH1D*)DivideByBinWidth(h_ttwjets[var_num]);
-    h_ttzjets[var_num] = (TH1D*)DivideByBinWidth(h_ttzjets[var_num]);
-    h_wjets[var_num] = (TH1D*)DivideByBinWidth(h_wjets[var_num]);
-    h_dyjets[var_num] = (TH1D*)DivideByBinWidth(h_dyjets[var_num]);
-    h_dy1jets[var_num] = (TH1D*)DivideByBinWidth(h_dy1jets[var_num]);
-    h_dy2jets[var_num] = (TH1D*)DivideByBinWidth(h_dy2jets[var_num]);
-    h_dy3jets[var_num] = (TH1D*)DivideByBinWidth(h_dy3jets[var_num]);
-    h_dy4jets[var_num] = (TH1D*)DivideByBinWidth(h_dy4jets[var_num]);
-    h_ttgjets[var_num] = (TH1D*)DivideByBinWidth(h_ttgjets[var_num]);
-    h_ttgg[var_num] = (TH1D*)DivideByBinWidth(h_ttgg[var_num]);
+
+    for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms[i][var_num]);
+    for(unsigned int i = 0; i < qcdMCHistograms.size(); i++) qcdMCHistograms[i][var_num] = (TH1D*)DivideByBinWidth(qcdMCHistograms[i][var_num]);
+
     h_siga[var_num] = (TH1D*)DivideByBinWidth(h_siga[var_num]);
     h_sigb[var_num] = (TH1D*)DivideByBinWidth(h_sigb[var_num]);
   }
 
-  DrawPlot(h_gg[var_num], h_qcd[var_num],
-	   h_ttHadronic[var_num], h_ttSemiLep[var_num], h_ttFullLep[var_num],
-	   h_tbar_s[var_num], h_tbar_t[var_num], h_tbar_tW[var_num],
-	   h_t_s[var_num], h_t_t[var_num], h_t_tW[var_num],
-	   h_ttwjets[var_num], h_ttzjets[var_num],
-	   h_wjets[var_num], 
-	   h_dyjets[var_num], h_dy1jets[var_num], h_dy2jets[var_num], h_dy3jets[var_num], h_dy4jets[var_num],
-	   h_ttgjets[var_num], h_ttgg[var_num],
-	   h_siga[var_num], h_sigb[var_num],
-	   variable,
+  DrawPlot(var_num, variable,
 	   xaxisTitle, yaxisTitle,
 	   xmin, xmax,
 	   ymin, ymax,
@@ -1645,109 +819,48 @@ void PlotMaker::CreatePlot(TString variable,
 
 }
 
-void PlotMaker::DrawPlot(TH1D * gg, TH1D * qcd,
-			 TH1D * ttHadronic, TH1D * ttSemiLep, TH1D * ttFullLep,
-			 TH1D * tbar_s, TH1D * tbar_t, TH1D * tbar_tW,
-			 TH1D * t_s, TH1D * t_t, TH1D * t_tW,
-			 TH1D * ttwjets, TH1D * ttzjets,
-			 TH1D * wjets, 
-			 TH1D * dyjets, TH1D * dy1jets, TH1D * dy2jets, TH1D * dy3jets, TH1D * dy4jets,
-			 TH1D * ttg, TH1D * ttgg,
-			 TH1D * sig_a, TH1D * sig_b,
-			 TString variable,
+void PlotMaker::DrawPlot(int variableNumber, TString variable,
 			 TString xaxisTitle, TString yaxisTitle,
 			 Float_t xmin, Float_t xmax,
 			 Float_t ymin, Float_t ymax,
 			 Float_t ratiomin, Float_t ratiomax,
 			 bool drawSignal, bool drawLegend, bool drawPrelim,
 			 TFile*& out) {
-  /*
-  if(blinded) for(int i = 0; i < gg->GetNbinsX(); i++) {
-      gg->SetBinContent(i+1, 1.e-14);
-      gg->SetBinError(i+1, 1.e-14);
+
+  out->cd();
+  h_gg[variableNumber]->Write();
+  h_qcd[variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
+
+  // Stack histograms; qcd is on top
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    h_qcd[variableNumber]->Add(mcHistograms[i][variableNumber]);
+    for(unsigned int j = i + 1; j < mcHistograms.size(); j++) {
+      mcHistograms[i][variableNumber]->Add(mcHistograms[j][variableNumber]);
     }
-  */
-  TH1D * ttbar = (TH1D*)ttHadronic->Clone(variable+"_ttbar_"+req);
-  ttbar->Add(ttSemiLep);
-  ttbar->Add(ttFullLep);
+  }
 
-  TH1D * singleTop = (TH1D*)tbar_s->Clone(variable+"_singleTop_"+req);
-  singleTop->Add(tbar_t);
-  singleTop->Add(tbar_tW);
-  singleTop->Add(t_s);
-  singleTop->Add(t_t);
-  singleTop->Add(t_tW);
+  TH1D * bkg = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req);
+  bkg->Write();
 
-  TH1D * ttvjets = (TH1D*)ttwjets->Clone(variable+"_ttvjets_"+req);
-  ttvjets->Add(ttzjets);
-
-  TH1D * dyNjets = (TH1D*)dy1jets->Clone(variable+"_dyNjets_"+req);
-  dyNjets->Add(dy2jets);
-  dyNjets->Add(dy3jets);
-  dyNjets->Add(dy4jets);
-
-  TH1D * bkg = (TH1D*)ttbar->Clone(variable+"_bkg_"+req);
-
-  bkg->Add(wjets);
-  bkg->Add(dyNjets);
-  bkg->Add(singleTop);
-  bkg->Add(ttvjets);
-  bkg->Add(ttg);
-  bkg->Add(ttgg);
-  
   Double_t kolm = gg->KolmogorovTest(bkg);
   TString kolmText = Form("KS test probability = %5.3g", kolm);
   TText * tt = new TText(0.92, 0.5, kolmText);
   tt->SetTextAngle(90.);
   tt->SetNDC(); tt->SetTextSize( 0.032 );
 
-  out->cd();
-  gg->Write();
-  qcd->Write();
-  ttbar->Write();
-  singleTop->Write();
-  ttvjets->Write();
-  wjets->Write();
-  dyjets->Write();
-  dyNjets->Write();
-  ttg->Write();
-  ttgg->Write();
-  bkg->Write();
-
-  wjets->Add(dyNjets);
-  wjets->Add(singleTop);
-  wjets->Add(ttvjets);
-  wjets->Add(ttg);
-  wjets->Add(ttgg);
-  
-  dyNjets->Add(singleTop);
-  dyNjets->Add(ttvjets);
-  dyNjets->Add(ttg);
-  dyNjets->Add(ttgg);
-
-  singleTop->Add(ttvjets);
-  singleTop->Add(ttg);
-  singleTop->Add(ttgg);
-
-  ttvjets->Add(ttg);
-  ttvjets->Add(ttgg);
-
-  ttg->Add(ttgg);
-
   TH1D * errors = (TH1D*)bkg->Clone("errors");
 
   if(drawSignal) calculateROC(sig_a, sig_b, bkg, req, variable);
 
   TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
-  leg->AddEntry(gg, "#gamma#gamma Candidate Sample", "LP");
+  leg->AddEntry(h_gg[variableNumber], "#gamma#gamma Candidate Sample", "LP");
   leg->AddEntry(errors, "Total Background Uncertainty", "F");
   leg->AddEntry(bkg, "t#bar{t} inclusive", "F");
-  leg->AddEntry(wjets, "W + Jets", "F");
-  leg->AddEntry(dyNjets, "Z/#gamma* + Jets", "F");
-  leg->AddEntry(singleTop, "Single Top", "F");
-  leg->AddEntry(ttvjets, "t#bar{t} + W/Z", "F");
-  leg->AddEntry(ttg, "t#bar{t} + #gamma", "F");
-  leg->AddEntry(ttgg, "t#bar{t} + #gamma#gamma", "F");
+  leg->AddEntry(h_qcd[variableNumber], "QCD", "F");
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    if(i != 0 && mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
+  }
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 
@@ -1760,41 +873,22 @@ void PlotMaker::DrawPlot(TH1D * gg, TH1D * qcd,
   prelim->AddText("#sqrt{s} = 8 TeV, #intL = "+intLumi+" fb^{-1}");
   prelim->AddText(req+" Requirement");
 
-  gg->SetMarkerStyle(20); 
-  gg->SetMarkerSize(1.5);
+  h_gg[variableNumber]->SetMarkerStyle(20); 
+  h_gg[variableNumber]->SetMarkerSize(1.5);
 
   errors->SetFillColor(kOrange+10);
   errors->SetFillStyle(3154);
   errors->SetMarkerSize(0);
 
-  // new stack: ttbar, wjets, dyjets, ttg, ttgg
   bkg->SetFillColor(kGray);
   bkg->SetMarkerSize(0);
   bkg->SetLineColor(1);
 
-  wjets->SetFillColor(kOrange-3);
-  wjets->SetMarkerSize(0);
-  wjets->SetLineColor(1);
-
-  dyNjets->SetFillColor(kYellow);
-  dyNjets->SetMarkerSize(0);
-  dyNjets->SetLineColor(1);
-
-  singleTop->SetFillColor(kRed);
-  singleTop->SetMarkerSize(0);
-  singleTop->SetLineColor(1);
-
-  ttvjets->SetFillColor(kAzure-2);
-  ttvjets->SetMarkerSize(0);
-  ttvjets->SetLineColor(1);
-
-  ttg->SetFillColor(8);
-  ttg->SetMarkerSize(0);
-  ttg->SetLineColor(1);
-
-  ttgg->SetFillColor(kCyan+3);
-  ttgg->SetMarkerSize(0);
-  ttgg->SetLineColor(1);
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    mcHistograms[i][variableNumber]->SetFillColor(mcLayerColors[i]);
+    mcHistograms[i][variableNumber]->SetMarkerSize(0);
+    mcHistograms[i][variableNumber]->SetLineColor(1);
+  }
 
   TCanvas * can = new TCanvas("can", "Plot", 10, 10, 2000, 2000);
 
@@ -1819,28 +913,24 @@ void PlotMaker::DrawPlot(TH1D * gg, TH1D * qcd,
   if(xmax > xmin) bkg->GetXaxis()->SetRangeUser(xmin, xmax);
   bkg->GetYaxis()->SetRangeUser(ymin, ymax);
 
-  // new stack: ttbar, wjets, dyjets, ttg, ttgg
   bkg->Draw("hist");
-  wjets->Draw("same hist");
-  dyNjets->Draw("same hist");
-  singleTop->Draw("same hist");
-  ttvjets->Draw("same hist");
-  ttg->Draw("same hist");
-  ttgg->Draw("same hist");
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    mcHistograms[i][variableNumber]->Draw("same hist");
+  }
   errors->Draw("same e2");
-  gg->Draw("same e1");
+  h_gg[variableNumber]->Draw("same e1");
   bkg->Draw("same axis");
 
   if(drawSignal) {
-    sig_a->SetLineColor(kMagenta);
-    sig_a->SetLineWidth(3);
-    leg->AddEntry(sig_a, "GGM #gamma#gamma (460_175)", "L");
-    sig_a->Draw("same hist");
+    h_siga[variableNumber]->SetLineColor(kMagenta);
+    h_siga[variableNumber]->SetLineWidth(3);
+    leg->AddEntry(h_siga[variableNumber], "GGM #gamma#gamma (460_175)", "L");
+    h_siga[variableNumber]->Draw("same hist");
     
-    sig_b->SetLineColor(kBlue);
-    sig_b->SetLineWidth(3);
-    leg->AddEntry(sig_b, "GGM #gamma#gamma (560_325)", "L");
-    sig_b->Draw("same hist");
+    h_sigb[variableNumber]->SetLineColor(kBlue);
+    h_sigb[variableNumber]->SetLineWidth(3);
+    leg->AddEntry(h_sigb[variableNumber], "GGM #gamma#gamma (560_325)", "L");
+    h_sigb[variableNumber]->Draw("same hist");
   }
 
   if(drawLegend) leg->Draw("same");
@@ -1854,13 +944,13 @@ void PlotMaker::DrawPlot(TH1D * gg, TH1D * qcd,
   padlo->SetTopMargin(0);
   padlo->SetBottomMargin(0.2);
 
-  TH1D * ratio = (TH1D*)gg->Clone("ratio");
+  TH1D * ratio = (TH1D*)h_gg[variableNumber]->Clone("ratio");
   ratio->Reset();
   ratio->SetTitle("Data / Background");
   for(int i = 0; i < ratio->GetNbinsX(); i++) {
     if(bkg->GetBinContent(i+1) == 0.) continue;
-    ratio->SetBinContent(i+1, gg->GetBinContent(i+1) / bkg->GetBinContent(i+1));
-    ratio->SetBinError(i+1, gg->GetBinError(i+1) / bkg->GetBinContent(i+1));
+    ratio->SetBinContent(i+1, h_gg[variableNumber]->GetBinContent(i+1) / bkg->GetBinContent(i+1));
+    ratio->SetBinError(i+1, h_gg[variableNumber]->GetBinError(i+1) / bkg->GetBinContent(i+1));
   }
 
   TH1D * ratio_sys;

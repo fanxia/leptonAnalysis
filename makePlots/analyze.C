@@ -53,88 +53,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   TTree * ggTree = (TTree*)in->Get(channels[channel]+"_signalTree");
   TTree * qcdTree = (TTree*)in->Get(channels[channel]+"_eQCDTree");
 
-  TFile * fTTHadronic = new TFile("inputs/signal_contamination_ttJetsHadronic.root", "READ");
-  TTree * ttHadronicTree = (TTree*)fTTHadronic->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_ttHadronic = (TH1D*)fTTHadronic->Get("nEvents_ttJetsHadronic");
-
-  TFile * fTTSemiLep = new TFile("inputs/signal_contamination_ttJetsSemiLep.root", "READ");
-  TTree * ttSemiLepTree = (TTree*)fTTSemiLep->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_ttSemiLep = (TH1D*)fTTSemiLep->Get("nEvents_ttJetsSemiLep");
-
-  TFile * fTTFullLep = new TFile("inputs/signal_contamination_ttJetsFullLep.root", "READ");
-  TTree * ttFullLepTree = (TTree*)fTTFullLep->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_ttFullLep = (TH1D*)fTTFullLep->Get("nEvents_ttJetsFullLep");
-
-  TFile * fTBar_s = new TFile("inputs/signal_contamination_TBar_s.root", "READ");
-  TTree * tbar_sTree = (TTree*)fTBar_s->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_tbar_s = (TH1D*)fTBar_s->Get("nEvents_TBar_s");
-
-  TFile * fTBar_t = new TFile("inputs/signal_contamination_TBar_t.root", "READ");
-  TTree * tbar_tTree = (TTree*)fTBar_t->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_tbar_t = (TH1D*)fTBar_t->Get("nEvents_TBar_t");
-
-  TFile * fTBar_tW = new TFile("inputs/signal_contamination_TBar_tW.root", "READ");
-  TTree * tbar_tWTree = (TTree*)fTBar_tW->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_tbar_tW = (TH1D*)fTBar_tW->Get("nEvents_TBar_tW");
-
-  TFile * fT_s = new TFile("inputs/signal_contamination_T_s.root", "READ");
-  TTree * t_sTree = (TTree*)fT_s->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_t_s = (TH1D*)fT_s->Get("nEvents_T_s");
-
-  TFile * fT_t = new TFile("inputs/signal_contamination_T_t.root", "READ");
-  TTree * t_tTree = (TTree*)fT_t->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_t_t = (TH1D*)fT_t->Get("nEvents_T_t");
-
-  TFile * fT_tW = new TFile("inputs/signal_contamination_T_tW.root", "READ");
-  TTree * t_tWTree = (TTree*)fT_tW->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_t_tW = (TH1D*)fT_tW->Get("nEvents_T_tW");
-
-  TFile * fTTW = new TFile("inputs/signal_contamination_TTWJets.root", "READ");
-  TTree * ttwjetsTree = (TTree*)fTTW->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_ttwjets = (TH1D*)fTTW->Get("nEvents_TTWJets");
-
-  TFile * fTTZ = new TFile("inputs/signal_contamination_TTZJets.root", "READ");
-  TTree * ttzjetsTree = (TTree*)fTTZ->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_ttzjets = (TH1D*)fTTZ->Get("nEvents_TTZJets");
-
-  TFile * fWJets = new TFile("inputs/signal_contamination_WJetsToLNu.root", "READ");
-  TTree * wjetsTree = (TTree*)fWJets->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_wjets = (TH1D*)fWJets->Get("nEvents_WJetsToLNu");
-
-  TFile * fDYJets = new TFile("inputs/signal_contamination_dyJetsToLL.root", "READ");
-  TTree * dyjetsTree = (TTree*)fDYJets->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_dyjets = (TH1D*)fDYJets->Get("nEvents_dyJetsToLL");
-
-  TFile * fDY1Jets = new TFile("inputs/signal_contamination_dy1JetsToLL.root", "READ");
-  TTree * dy1jetsTree = (TTree*)fDY1Jets->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_dy1jets = (TH1D*)fDY1Jets->Get("nEvents_dy1JetsToLL");
-
-  TFile * fDY2Jets = new TFile("inputs/signal_contamination_dy2JetsToLL.root", "READ");
-  TTree * dy2jetsTree = (TTree*)fDY2Jets->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_dy2jets = (TH1D*)fDY2Jets->Get("nEvents_dy2JetsToLL");
-
-  TFile * fDY3Jets = new TFile("inputs/signal_contamination_dy3JetsToLL.root", "READ");
-  TTree * dy3jetsTree = (TTree*)fDY3Jets->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_dy3jets = (TH1D*)fDY3Jets->Get("nEvents_dy3JetsToLL");
-
-  TFile * fDY4Jets = new TFile("inputs/signal_contamination_dy4JetsToLL.root", "READ");
-  TTree * dy4jetsTree = (TTree*)fDY4Jets->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_dy4jets = (TH1D*)fDY4Jets->Get("nEvents_dy4JetsToLL");
-
-  TFile * fTTGJets = new TFile("inputs/signal_contamination_ttgjets.root", "READ");
-  TTree * ttgjetsTree = (TTree*)fTTGJets->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_ttgjets = (TH1D*)fTTGJets->Get("nEvents_ttgjets");
-
-  TFile * fTTGG = new TFile("inputs/signal_contamination_ttGG.root", "READ");
-  TTree * ttggTree = (TTree*)fTTGG->Get(channels[channel]+"_signalTree");
-  TH1D * nGen_ttgg = (TH1D*)fTTGG->Get("nEvents_ttGG");
-
-  TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
-  TTree * sigaTree = (TTree*)fSigA->Get(channels[channel]+"_signalTree");
-
-  TFile * fSigB = new TFile("../acceptance/signal_contamination_mst_560_m1_325.root", "READ");
-  TTree * sigbTree = (TTree*)fSigB->Get(channels[channel]+"_signalTree");
-
   TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
 
   // Make the correlation plot for MET filters
@@ -155,23 +73,38 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], blinded);
 
-  pMaker->SetTrees(ggTree, qcdTree,
-		   ttHadronicTree, ttSemiLepTree, ttFullLepTree,
-		   tbar_sTree, tbar_tTree, tbar_tWTree,
-		   t_sTree, t_tTree, t_tWTree,
-		   ttwjetsTree, ttzjetsTree,
-		   wjetsTree, 
-		   dyjetsTree, dy1jetsTree, dy2jetsTree, dy3jetsTree, dy4jetsTree,
-		   ttgjetsTree, ttggTree,
-		   sigaTree, sigbTree);
+  bool loadSuccess = true;
+  
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 245.8 * 0.457, channel, 0, kGray, "t#bar{t} inclusive");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 245.8 * 0.438, channel, 0, kGray, "t#bar{t} inclusive");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 245.8 * 0.105, channel, 0, kGray, "t#bar{t} inclusive");
 
-  pMaker->SetNGen(nGen_ttHadronic, nGen_ttSemiLep, nGen_ttFullLep,
-		  nGen_tbar_s, nGen_tbar_t, nGen_tbar_tW,
-		  nGen_t_s, nGen_t_t, nGen_t_tW,
-		  nGen_ttwjets, nGen_ttzjets,
-		  nGen_wjets, 
-		  nGen_dyjets, nGen_dy1jets, nGen_dy2jets, nGen_dy3jets, nGen_dy4jets,
-		  nGen_ttgjets, nGen_ttgg);
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 36257.2, channel, 1, kOrange-3, "W + Jets");
+
+  //loadSuccess |= LoadMCBackground("inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 3503.71, channel, 2, kYellow, "Z/#gamma* + Jets");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 666.7, channel, 2, kYellow, "Z/#gamma* + Jets");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_dy2JetsToLL.root", "dy2JetsToLL", 215.1, channel, 2, kYellow, "Z/#gamma* + Jets");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_dy3JetsToLL.root", "dy3JetsToLL", 66.07, channel, 2, kYellow, "Z/#gamma* + Jets");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_dy4JetsToLL.root", "dy4JetsToLL", 27.38, channel, 2, kYellow, "Z/#gamma* + Jets");
+
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TBar_s.root", "TBar_s", 1.76, channel, 3, kRed, "Single Top");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TBar_t.root", "TBar_t", 30.7, channel, 3, kRed, "Single Top");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TBar_tW.root", "TBar_tW", 11.1, channel, 3, kRed, "Single Top");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_T_s.root", "T_s", 3.79, channel, 3, kRed, "Single Top");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_T_t.root", "T_t", 56.4, channel, 3, kRed, "Single Top");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_T_tW.root", "T_tW", 11.1, channel, 3, kRed, "Single Top");
+
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TTWJets.root", "TTWJets", 0.232, channel, 4, kAzure-2, "t#bar{t} + W/Z");
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_TTZJets.root", "TTZJets", 0.2057, channel, 4, kAzure-2, "t#bar{t} + W/Z");
+
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 14.0, channel, 5, 8, "t#bar{t} + #gamma");
+
+  loadSuccess |= LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");
+
+  if(!loadSuccess) return;
+
+  pMaker->SetTrees(ggTree, qcdTree,
+		   sigaTree, sigbTree);
 
   pMaker->SetDisplayKStest(displayKStest);
 
@@ -224,6 +157,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   }
 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq);
+  pMaker->SubtractMCFromQCD();
 
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
@@ -531,25 +465,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   out->Close();
 
   in->Close();
-  fTTHadronic->Close();
-  fTTSemiLep->Close();
-  fTTFullLep->Close();
-  fTBar_s->Close();
-  fTBar_t->Close();
-  fTBar_tW->Close();
-  fT_s->Close();
-  fT_t->Close();
-  fT_tW->Close();
-  fTTW->Close();
-  fTTZ->Close();
-  fWJets->Close();
-  fDYJets->Close();
-  fDY1Jets->Close();
-  fDY2Jets->Close();
-  fDY3Jets->Close();
-  fDY4Jets->Close();
-  fTTGJets->Close();
-  fTTGG->Close();
   fSigA->Close();
   fSigB->Close();
 
