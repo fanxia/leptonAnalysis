@@ -748,10 +748,10 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
   TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
   leg->AddEntry(h_gg[variableNumber], "#gamma#gamma Candidate Sample", "LP");
   leg->AddEntry(errors, "Total Background Uncertainty", "F");
-  leg->AddEntry(bkg, "t#bar{t} inclusive", "F");
-  leg->AddEntry(h_qcd[variableNumber], "QCD", "F");
-  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
-    if(i != 0 && mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
+  leg->AddEntry(bkg, "QCD", "F");
+  leg->AddEntry(mcHistograms[0][variableNumber], legendNames[0], "F");
+  for(unsigned int i = 1; i < mcHistograms.size(); i++) {
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
   }
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
@@ -772,7 +772,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
   errors->SetFillStyle(3154);
   errors->SetMarkerSize(0);
 
-  bkg->SetFillColor(kGray);
+  bkg->SetFillColor(kSpring);
   bkg->SetMarkerSize(0);
   bkg->SetLineColor(1);
 
