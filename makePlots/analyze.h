@@ -512,10 +512,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
-      if(blinded && vars[0] == 2) continue;
-      if(blinded && vars[0] == 1 && variables[j] == "pfMET" && vars[1] > 50.) continue;
-      if(blinded && vars[0] == 1 && variables[j] == "HT" && vars[2] > 400.) continue;
-
       h_qcd[j]->Fill(vars[j]);
     }
 
