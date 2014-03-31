@@ -459,7 +459,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       mcTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
       mcQCDTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
     }
-
+durp
     sigaTree->SetBranchAddress(variables[i], &(vars[i]));
     sigbTree->SetBranchAddress(variables[i], &(vars[i]));
 
@@ -669,8 +669,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 void PlotMaker::SubtractMCFromQCD() {
 
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
-    for(unsigned int j = 0; j < mcQCDHistograms.size(); j++) {
-      h_qcd[j]->Add(mcQCDHistograms[i][j]);
+    for(unsigned int j = 0; j < mcQCDHistograms[i].size(); j++) {
+      h_qcd[j]->Add(mcQCDHistograms[i][j], -1.);
     }
   }
 
