@@ -732,7 +732,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
     }
   }
 
-  TH1D * bkg = (TH1D*)h_qcd->Clone(variable+"_bkg_"+req);
+  TH1D * bkg = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req);
   bkg->Write();
 
   Double_t kolm = h_gg[variableNumber]->KolmogorovTest(bkg);
