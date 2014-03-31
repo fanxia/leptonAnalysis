@@ -45,6 +45,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   TTree * ggTree = (TTree*)in->Get(channels[channel]+"_signalTree");
   TTree * qcdTree = (TTree*)in->Get(channels[channel]+"_eQCDTree");
 
+  TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
+  TTree * sigaTree = (TTree*)fSigA->Get(channels[channel]+"_signalTree_mst_460_m1_175");
+
+  TFile * fSigB = new TFile("../acceptance/signal_contamination_mst_560_m1_325.root", "READ");
+  TTree * sigbTree = (TTree*)fSigB->Get(channels[channel]+"_signalTree_mst_560_m1_325");
+
   TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
 
   // Make the correlation plot for MET filters
