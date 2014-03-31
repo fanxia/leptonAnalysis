@@ -196,74 +196,8 @@ class PlotMaker : public TObject {
   PlotMaker(Int_t lumi,
 	    TString requirement,
 	    bool blind);
-  virtual ~PlotMaker() { 
 
-    KSscores.clear();
-
-    variables.clear();
-
-    delete ggTree;
-    delete qcdTree;
-
-    delete ttHadronicTree;
-    delete ttSemiLepTree;
-    delete ttFullLepTree;
-
-    delete tbar_sTree;
-    delete tbar_tTree;
-    delete tbar_tWTree;
-    delete t_sTree;
-    delete t_tTree;
-    delete t_tWTree;
-
-    delete ttwjetsTree;
-    delete ttzjetsTree;
-    
-    delete wjetsTree;
-
-    delete dyjetsTree;
-    delete dy1jetsTree;
-    delete dy2jetsTree;
-    delete dy3jetsTree;
-    delete dy4jetsTree;
-
-    delete ttgjetsTree;
-    delete ttggTree;
-
-    delete sigaTree;
-    delete sigbTree;
-    
-    h_gg.clear();
-    h_qcd.clear();
-
-    h_ttHadronic.clear();
-    h_ttSemiLep.clear();
-    h_ttFullLep.clear();
-
-    h_tbar_s.clear();
-    h_tbar_t.clear();
-    h_tbar_tW.clear();
-    h_t_s.clear();
-    h_t_t.clear();
-    h_t_tW.clear();
-
-    h_ttwjets.clear();
-    h_ttzjets.clear();
-
-    h_wjets.clear();
-
-    h_dyjets.clear();
-    h_dy1jets.clear();
-    h_dy2jets.clear();
-    h_dy3jets.clear();
-    h_dy4jets.clear();
-
-    h_ttgjets.clear();
-    h_ttgg.clear();
-    h_siga.clear();
-    h_sigb.clear();
-
-  }
+  ~PlotMaker();
 
   bool LoadMCBackground(TString fileName, TString scanName, Double_t xsec, int channel, int layer, int color, TString legendEntry);
   
@@ -382,7 +316,7 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
 
 }
 
-virtual PlotMaker::~PlotMaker() { 
+PlotMaker::~PlotMaker() { 
 
     KSscores.clear();
     variables.clear();
