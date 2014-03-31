@@ -701,33 +701,18 @@ void qcdAnalyze() {
 
   canv->SaveAs("qcd_met.pdf");
 
-  //h_qcd_met->Add(h_ttbar_met, -1.);
+  h_qcd_met->Add(h_ttbar_met, -1.);
   
   h_gg_met->GetXaxis()->SetTitle("pfMET");
 
-  TLegend * leg2 = new TLegend(0.65, 0.65, 0.88, 0.88, NULL, "brNDC");
+  TLegend * leg2 = new TLegend(0.55, 0.65, 0.88, 0.88, NULL, "brNDC");
   leg2->AddEntry(h_gg_met, "Isolated Data", "LP");
   leg2->AddEntry(h_qcd_met, "Anti-isolated Data", "LP");
-  leg2->AddEntry(h_wjets_mva, "W + Jets", "F");
-  leg2->AddEntry(h_dyjets_mva, "Z/#gamma* + Jets", "F");
-  leg2->AddEntry(h_singleTop_mva, "Single Top", "F");
-  leg2->AddEntry(h_ttwz_mva, "t#bar{t} + W/Z", "F");
-  leg2->AddEntry(h_ttgjets_mva, "t#bar{t} + #gamma", "F");
-  leg2->AddEntry(h_ttgg_mva, "t#bar{t} + #gamma#gamma", "F");
   leg2->SetFillColor(0);
   leg2->SetTextSize(0.028);
 
   h_gg_met->Draw("e1");
   h_qcd_met->Draw("e1 same");
-  h_ttbar_met->Draw("hist same");
-  h_wjets_met->Draw("hist same");
-  h_dyjets_met->Draw("hist same");
-  h_singleTop_met->Draw("hist same");
-  h_ttwz_met->Draw("hist same");
-  h_ttgjets_met->Draw("hist same");
-  h_ttgg_met->Draw("hist same");
-  h_qcd_met->Draw("e1 same");
-  h_qcd_met->Draw("axis same");
   leg2->Draw("same");
 
   canv->SaveAs("subtracted_met.pdf");
