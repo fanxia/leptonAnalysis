@@ -743,7 +743,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
   TH1D * bkg = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req);
   bkg->Write();
 
-  Double_t kolm = gg->KolmogorovTest(bkg);
+  Double_t kolm = h_gg[variableNumber]->KolmogorovTest(bkg);
   TString kolmText = Form("KS test probability = %5.3g", kolm);
   TText * tt = new TText(0.92, 0.5, kolmText);
   tt->SetTextAngle(90.);
@@ -751,7 +751,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
 
   TH1D * errors = (TH1D*)bkg->Clone("errors");
 
-  if(drawSignal) calculateROC(sig_a, sig_b, bkg, req, variable);
+  if(drawSignal) calculateROC(h_siga[variableNumber], h_sigb[variableNumber], bkg, req, variable);
 
   TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
   leg->AddEntry(h_gg[variableNumber], "#gamma#gamma Candidate Sample", "LP");
