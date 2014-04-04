@@ -73,9 +73,15 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   bool loadSuccess = true;
   
-  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 245.8 * 0.457, channel, 0, kGray, "t#bar{t} inclusive");
-  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 245.8 * 0.438, channel, 0, kGray, "t#bar{t} inclusive");
-  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 245.8 * 0.105, channel, 0, kGray, "t#bar{t} inclusive");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
+					  245.8 * 0.457, 2.5, 3.4, 2.6,
+					  channel, 0, kGray, "t#bar{t} inclusive");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 
+					  245.8 * 0.438, 2.5, 3.4, 2.6,
+					  channel, 0, kGray, "t#bar{t} inclusive");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 
+					  245.8 * 0.105, 2.5, 3.4, 2.6,
+					  channel, 0, kGray, "t#bar{t} inclusive");
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 36257.2, channel, 1, kOrange-3, "W + Jets");
 
@@ -97,7 +103,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 14.0, channel, 5, 8, "t#bar{t} + #gamma");
 
-  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");
+  //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");
 
   if(!loadSuccess) return;
 
