@@ -69,7 +69,6 @@ class SusyEventAnalyzer {
   virtual void Acceptance();
   virtual void CalculateBtagEfficiency();
   virtual void PileupWeights(TString puFile);
-  virtual void phaseSpaceOverlap();
 
   // utility functions
   float deltaR(TLorentzVector& p1, TLorentzVector& p2);
@@ -938,7 +937,7 @@ void SusyEventAnalyzer::ttbar_phaseSpace(susy::Event& ev, TH2D*& h) {
     double dr_b    = deltaR(photons[i]->momentum, b->momentum);
     double dr_bbar = deltaR(photons[i]->momentum, bbar->momentum);
 
-    h->Fill(photon[i]->momentum.Pt(), min(dr_b, dr_bbar));
+    h->Fill(photons[i]->momentum.Pt(), min(dr_b, dr_bbar));
   }
 
 }
