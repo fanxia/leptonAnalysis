@@ -175,7 +175,7 @@ class PlotMaker : public TObject {
   ~PlotMaker();
   
   bool LoadMCBackground(TString fileName, TString scanName,
-			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfError,
+			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 			int channel, int layer, int color, TString legendEntry);
   
   void SetTrees(TTree * gg, TTree * qcd,
@@ -219,7 +219,8 @@ class PlotMaker : public TObject {
   vector<Double_t> crossSections;
   vector<Double_t> scaleErrUp;
   vector<Double_t> scaleErrDown;
-  vector<Double_t> pdfErr;
+  vector<Double_t> pdfErrUp;
+  vector<Double_t> pdfErrDown;
   vector<int> mcLayerNumbers;
   vector<int> mcLayerColors;
   vector<TString> mcNames;
@@ -280,7 +281,8 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   crossSections.clear();
   scaleErrUp.clear();
   scaleErrDown.clear();
-  pdfErr.clear();
+  pdfErrUp.clear();
+  pdfErrDown.clear();
   mcLayerNumbers.clear();
   mcLayerColors.clear();
   mcNames.clear();
@@ -307,7 +309,8 @@ PlotMaker::~PlotMaker() {
     crossSections.clear();
     scaleErrUp.clear();
     scaleErrDown.clear();
-    pdfErr.clear();
+    pdfErrUp.clear();
+    pdfErrDown.clear();
     mcLayerNumbers.clear();
     mcLayerColors.clear();
     mcNames.clear();
@@ -336,7 +339,7 @@ void PlotMaker::SetTrees(TTree * gg, TTree * qcd,
 }
 
 bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
-				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfError,
+				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 				 int channel, int layer, int color, TString legendEntry) {
 
   mcFiles.push_back(new TFile(fileName, "READ"));
@@ -367,7 +370,8 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   crossSections.push_back(xsec);
   scaleErrUp.push_back(scaleErrorUp);
   scaleErrDown.push_back(scaleErrorDown);
-  pdfErr.push_back(pdfError);
+  pdfErrUp.push_back(pdfErrorUp);
+  pdfErrDown.push_back(pdfErrorDown);  
   mcLayerNumbers.push_back(layer);
   mcLayerColors.push_back(color);
   mcNames.push_back(scanName);
