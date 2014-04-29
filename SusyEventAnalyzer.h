@@ -849,7 +849,7 @@ void SusyEventAnalyzer::ttA_phaseSpace(susy::Event& ev, TH2D*& h) {
 
   for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
     if(it->status != 3) continue;
-    if(abs(ev.genParticles[ev.genParticles[it->motherIndex]->motherIndex]->pdgId) != 2212 || abs(ev.genParticles[it->motherIndex]->pdgId) != 2212) continue;
+    if(abs(ev.genParticles[ev.genParticles[it->motherIndex].motherIndex].pdgId) != 2212 || abs(ev.genParticles[it->motherIndex].pdgId) != 2212) continue;
 
     if(abs(it->pdgId) == 24) {
       nW++;
@@ -931,12 +931,12 @@ void SusyEventAnalyzer::ttbar_phaseSpace(susy::Event& ev, TH2D*& h) {
   }
   
   // If top didn't decay to W+b, boogie
-  if(!(b && bbar)) return false;
+  if(!(b && bbar)) return;
 
   for(unsigned int i = 0; i < photons.size(); i++) {
 
-    double dr_b    = deltaR(photon[i]->momentum, b->momentum);
-    double dr_bbar = delta(photon[i]->momentum, bbar->momentum);
+    double dr_b    = deltaR(photons[i]->momentum, b->momentum);
+    double dr_bbar = deltaR(photons[i]->momentum, bbar->momentum);
 
     h->Fill(photon[i]->momentum.Pt(), min(dr_b, dr_bbar));
   }
@@ -994,7 +994,7 @@ bool SusyEventAnalyzer::overlaps_ttA(susy::Event& ev) {
     if(photons[i]->momentum.Pt() > 20) {
 
       for(unsigned int j = 0; j < legs.size(); j++) {
-	if(deltaR(photon[i]->momentum, leg[j]->momentum) < 0.1) return true;
+	if(deltaR(photons[i]->momentum, legs[j]->momentum) < 0.1) return true;
       }
 
     }
