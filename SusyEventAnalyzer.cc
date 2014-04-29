@@ -539,7 +539,10 @@ void SusyEventAnalyzer::Acceptance() {
 
   TH1D * h_nEvents = new TH1D("nEvents"+output_code_t, "nEvents"+output_code_t, 1, 0, 1);
 
-  const int nTreeVariables = 71;
+  TH2D * h_ttA_phaseSpace = new TH2D("ttA_phaseSpace"+output_code_t, "ttA_phaseSpace"+output_code_t, 2000, 0, 2000, 1000, 0, 1);
+  TH2D * h_ttbar_phaseSpace = new TH2D("ttbar_phaseSpace"+output_code_t, "ttbar_phaseSpace"+output_code_t, 2000, 0, 2000, 1000, 0, 1);
+
+  const int nTreeVariables = 72;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
@@ -559,7 +562,8 @@ void SusyEventAnalyzer::Acceptance() {
     "pileupWeight", "pileupWeightErr",
     "btagWeight", "btagWeightUp", "btagWeightDown", "btagWeightErr",
     "metFilterBit",
-    "ttbarDecayMode"};
+    "ttbarDecayMode",
+    "overlaps_ttA"};
     
   map<TString, float> treeMap;
   for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;
@@ -634,6 +638,9 @@ void SusyEventAnalyzer::Acceptance() {
     int nPVertex = GetNumberPV(event);
     if(nPVertex == 0) continue;
     
+    ttA_phaseSpace(event, h_ttA_phaseSpace);
+    ttbar_phaseSpace(event, h_ttbar_phaseSpace);
+
     for(int qcdMode = kSignal; qcdMode <= kElectronQCD; qcdMode++) {
       
       float HT = 0.;
@@ -764,229 +771,3 @@ void SusyEventAnalyzer::Acceptance() {
 
 }
 
-void SusyEventAnalyzer::phaseSpaceOverlap() {
-
-  const int NCNT = 50;
-  int nCnt[NCNT];
-  for(int i = 0; i < NCNT; i++) nCnt[i] = 0;  
-  
-  TString output_code_t = FormatName(scan);
-
-  // open histogram file and define histograms
-  TFile * out = new TFile("phaseSpaceOverlap"+output_code_t+".root", "RECREATE");
-  out->cd();
-
-  Float_t leadEt, leadEta, leadPhi, lead_minDRb;
-  Float_t trailEt, trailEta, trailPhi, trail_minDRb;
-
-  TTree * tree = new TTree("tree", "tree");
-  tree->Branch("leadEt", &leadEt);
-  tree->Branch("leadEta", &leadEta);
-  tree->Branch("leadPhi", &leadPhi);
-  tree->Branch("lead_minDRb", &lead_minDRb);
-  tree->Branch("trailEt", &trailEt);
-  tree->Branch("trailEta", &trailEta);
-  tree->Branch("trailPhi", &trailPhi);
-  tree->Branch("trail_minDRb", &trail_minDRb);
-    
-  Long64_t nEntries = fTree->GetEntries();
-  cout << "Total events in files : " << nEntries << endl;
-  cout << "Events to be processed : " << processNEvents << endl;
-
-  vector<susy::Particle*> all, photons, legs;
-
-  // start event looping
-  Long64_t jentry = 0;
-  while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
-
-    if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
-      cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
-    }
-
-    nCnt[0]++; // events
-
-    photons.clear();
-    legs.clear();
-
-    // find relevant photons -- coming from tops, b's, or W's
-    for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-      if(abs(it->pdgId) != 22) continue;
-      
-      int mom_id = abs(event.genParticles[it->motherIndex].pdgId);
-      if(mom_id != 6 && mom_id != 24 && mom_id != 5) continue;
-
-      photons.push_back(&*it);
-    }
-
-    susy::Particle * b    = 0;
-    susy::Particle * bbar = 0;
-
-    // If there is b --> b+gamma, take the second b as our interesting leg
-    for(unsigned int i = 0; i < photons.size(); i++) {
-
-      if(abs(event.genParticles[photons[i]->motherIndex].pdgId) != 5) continue;
-
-      for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-	if(it->motherIndex != photons[i]->motherIndex) continue;
-	if(it->pdgId == 5) b     = &*it;
-	if(it->pdgId == -5) bbar = &*it;
-      }
-      
-    }
-
-    // If a photon didn't come off a b, then the status 3 b's are taken
-    // Go backwards to get the final legs
-    for(vector<susy::Particle>::reverse_iterator rit = event.genParticles.rbegin(); rit != event.genParticles.rend(); ++rit) {
-      if(!b && rit->status == 3 && rit->pdgId == 5) b = &*rit;
-      if(!bbar && rit->status == 3 && rit->pdgId == -5) bbar = &*rit;
-      if(b && bbar) break;
-    }
-    
-    // If top didn't decay to W+b, boogie
-    if(!b) nCnt[1]++;
-    if(!bbar) nCnt[2]++;
-    if(!b && !bbar) nCnt[3]++;
-
-    if(!(b && bbar)) continue;
-    
-    sort(photons.begin(), photons.end(), EtGreater<susy::Particle>);
-
-    // Fill tree with relevant information
-       
-    leadEt      = (photons.size() > 0) ? photons[0]->momentum.Pt()                         : -100.;
-    leadEta     = (photons.size() > 0) ? photons[0]->momentum.Eta()                        : -100.;
-    leadPhi     = (photons.size() > 0) ? photons[0]->momentum.Phi()                        : -100.;
-    lead_minDRb = (photons.size() > 0) ? min(deltaR(photons[0]->momentum, b->momentum),
-					     deltaR(photons[0]->momentum, bbar->momentum)) : -100.;
-    
-    trailEt      = (photons.size() > 1) ? photons[1]->momentum.Pt()                         : -100.;
-    trailEta     = (photons.size() > 1) ? photons[1]->momentum.Eta()                        : -100.;
-    trailPhi     = (photons.size() > 1) ? photons[1]->momentum.Phi()                        : -100.;
-    trail_minDRb = (photons.size() > 1) ? min(deltaR(photons[1]->momentum, b->momentum),
-					     deltaR(photons[1]->momentum, bbar->momentum)) : -100.;
-
-    tree->Fill();
-
-  } // for entries
-
-  cout << "-------------------Job Summary-----------------" << endl;
-  cout << "Total_events          : " << nCnt[0] << endl;
-  cout << "Didn't find b         : " << nCnt[1] << endl;
-  cout << "Didn't find bbar      : " << nCnt[2] << endl;
-  cout << "Didn't find b or bbar : " << nCnt[3] << endl;
-  cout << "-----------------------------------------------" << endl;
-  cout << endl;
-
-  out->Write();
-  out->Close();
-
-}
-
-void SusyEventAnalyzer::phase_durp() {
-
-  const int NCNT = 50;
-  int nCnt[NCNT];
-  for(int i = 0; i < NCNT; i++) nCnt[i] = 0;  
-  
-  TString output_code_t = FormatName(scan);
-
-  // open histogram file and define histograms
-  TFile * out = new TFile("phaseSpaceOverlap"+output_code_t+".root", "RECREATE");
-  out->cd();
-
-  Float_t dr_leadPhoton, dr_trailPhoton;
-  Float_t minDR_sources, minDR_pdgId;
-  Float_t motherId;
-
-  TTree * tree = new TTree("tree", "tree");
-  tree->Branch("dr_leadPhoton", &dr_leadPhoton);
-  tree->Branch("dr_trailPhoton", &dr_trailPhoton);
-  tree->Branch("minDR_sources", &minDR_sources);
-  tree->Branch("minDR_pdgId", &minDR_pdgId);
-  tree->Branch("motherId", &motherId);
-
-  Long64_t nEntries = fTree->GetEntries();
-  cout << "Total events in files : " << nEntries << endl;
-  cout << "Events to be processed : " << processNEvents << endl;
-
-  vector<susy::Photon*> recoPhotons;
-  vector<susy::Particle*> genPhotons;
-  vector<susy::Particle*> genSources;
-  
-  // start event looping
-  Long64_t jentry = 0;
-  while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
-
-    if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
-      cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
-    }
-
-    nCnt[0]++; // events
-    recoPhotons.clear();
-    genPhotons.clear();
-    genSources.clear();
-
-    map<TString, vector<susy::Photon> >::iterator phoMap = event.photons.find("photons");
-    if(phoMap != event.photons.end()) {
-      for(vector<susy::Photon>::iterator it = phoMap->second.begin(); it != phoMap->second.end(); it++) {
-	
-	if(is_eg(*it, event.rho25) && it->passelectronveto) recoPhotons.push_back(&*it);
-      
-      } // for photon
-    } // if
-    sort(recoPhotons.begin(), recoPhotons.end(), EtGreater<susy::Photon>);
-
-    for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
-      if(abs(genit->pdgId) != 22) continue;
-
-      genPhotons.push_back(&*genit);
-    }
-    sort(genPhotons.begin(), genPhotons.end(), EtGreater<susy::Particle>);
-
-    for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
-
-      int pdg_id = abs(genit->pdgId);
-      int mom_id = abs(event.genParticles[genit->motherIndex].pdgId);
-      if(pdg_id != 24 && pdg_id > 6) continue;
-      if(pdg_id == 24 && genit->status != 3) continue;
-      if(pdg_id < 6 && genit->status != 2) continue;
-      if(pdg_id < 5 && mom_id != 24) continue;
-
-      genSources.push_back(&*genit);
-    }
-    sort(genSources.begin(), genSources.end(), EtGreater<susy::Particle>);
-
-    for(unsigned int i = 0; i < genPhotons.size(); i++) {
-      dr_leadPhoton = (recoPhotons.size() > 0) ? deltaR(genPhotons[i]->momentum, recoPhotons[0]->caloPosition) : -10;
-      dr_trailPhoton = (recoPhotons.size() > 1) ? deltaR(genPhotons[i]->momentum, recoPhotons[1]->caloPosition) : -10;
-      
-      motherId = event.genParticles[genPhotons[i]->motherIndex].pdgId;
-
-      minDR_sources = 100.;
-      for(unsigned int j = 0; j < genSources.size(); j++) {
-	Float_t thisDR = deltaR(genPhotons[i]->momentum, genSources[j]->momentum);
-	if(thisDR < minDR_sources) {
-	  minDR_sources = thisDR;
-	  minDR_pdgId = genSources[j]->pdgId;
-	}
-      }
-
-      tree->Fill();
-    }
-    
-    ////////////////////
-
-  } // for entries
-
-  cout << "-------------------Job Summary-----------------" << endl;
-  cout << "Total_events         : " << nCnt[0] << endl;
-  cout << "-----------------------------------------------" << endl;
-  cout << endl;
-  //////////////////////////
-  cout << endl;
-  cout << "----------------Continues, info----------------" << endl;
- 
-  out->Write();
-  out->Close();
-
-}

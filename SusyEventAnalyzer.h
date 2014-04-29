@@ -70,10 +70,6 @@ class SusyEventAnalyzer {
   virtual void CalculateBtagEfficiency();
   virtual void PileupWeights(TString puFile);
   virtual void phaseSpaceOverlap();
-  virtual void phase_durp();
-
-  void findMothers(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& moms);
-  void findDaughters(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& all);
 
   // utility functions
   float deltaR(TLorentzVector& p1, TLorentzVector& p2);
@@ -154,7 +150,11 @@ class SusyEventAnalyzer {
   bool GetDiJetPt(susy::Event& ev, vector<susy::Photon*> candidates, float& diJetPt, float& leadpt, float& trailpt);
   bool PhotonMatchesElectron(susy::Event& ev, vector<susy::Photon*> candidates, int& bothMatchCounter);
   int FigureTTbarDecayMode(susy::Event& ev);
-
+  
+  void ttA_phaseSpace(susy::Event& ev, TH2D*& h);
+  void ttbar_phaseSpace(susy::Event& ev, TH2D*& h);
+  bool overlaps_ttA(susy::Event& ev);
+  
   void SetTreeValues(map<TString, float>& treeMap,
 		     susy::Event& event_,
 		     vector<susy::Muon*> tightMuons, vector<susy::Electron*> tightEles, 
@@ -838,6 +838,174 @@ int SusyEventAnalyzer::FigureTTbarDecayMode(susy::Event& ev) {
   return decayMode;
 }
 
+void SusyEventAnalyzer::ttA_phaseSpace(susy::Event& ev, TH2D*& h) {
+
+  susy::Particle * gamma = 0;
+
+  vector<susy::Particle*> all;
+
+  int nW = 0;
+  int nB = 0;
+
+  for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+    if(it->status != 3) continue;
+    if(abs(ev.genParticles[ev.genParticles[it->motherIndex]->motherIndex]->pdgId) != 2212 || abs(ev.genParticles[it->motherIndex]->pdgId) != 2212) continue;
+
+    if(abs(it->pdgId) == 24) {
+      nW++;
+      all.push_back(&*it);
+    }
+
+    if(abs(it->pdgId) == 5) {
+      nB++;
+      all.push_back(&*it);
+    }
+  }
+
+  if(nW != 2 || nB != 2) return;
+
+  for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+    if(it->status != 1 || abs(it->pdgId) != 22) continue;
+
+    int nSisters = 0;
+    for(unsigned int i = 0; i < all.size(); i++) {
+      if(it->motherIndex == all[i]->motherIndex) nSisters++;
+    }
+
+    if(nSisters == 5) {
+      gamma = &*it;
+      break;
+    }
+
+  }
+
+  if(!gamma) return;
+
+  double minDR = 100;
+
+  for(unsigned int i = 0; i < all.size(); i++) {
+    if(abs(all[i]->pdgId) != 5) continue;
+    double thisDR = deltaR(gamma->momentum, all[i]->momentum);
+    if(thisDR < minDR) minDR = thisDR;
+  }
+
+  h->Fill(gamma->momentum.Pt(), minDR);
+}
+
+void SusyEventAnalyzer::ttbar_phaseSpace(susy::Event& ev, TH2D*& h) {
+
+  vector<susy::Particle*> photons;
+
+  // find relevant photons -- coming from tops, b's, or W's
+  for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+    if(abs(it->pdgId) != 22) continue;
+    
+    int mom_id = abs(event.genParticles[it->motherIndex].pdgId);
+    if(mom_id != 6 && mom_id != 24 && mom_id != 5) continue;
+    
+    photons.push_back(&*it);
+  }
+  
+  susy::Particle * b    = 0;
+  susy::Particle * bbar = 0;
+  
+  // If there is b --> b+gamma, take the second b as our interesting leg
+  for(unsigned int i = 0; i < photons.size(); i++) {
+    
+    if(abs(event.genParticles[photons[i]->motherIndex].pdgId) != 5) continue;
+    
+    for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+      if(it->motherIndex != photons[i]->motherIndex) continue;
+      if(it->pdgId == 5) b     = &*it;
+      if(it->pdgId == -5) bbar = &*it;
+    }
+    
+  }
+  
+  // If a photon didn't come off a b, then the status 3 b's are taken
+  // Go backwards to get the final legs
+  for(vector<susy::Particle>::reverse_iterator rit = ev.genParticles.rbegin(); rit != ev.genParticles.rend(); ++rit) {
+    if(!b && rit->status == 3 && rit->pdgId == 5) b = &*rit;
+    if(!bbar && rit->status == 3 && rit->pdgId == -5) bbar = &*rit;
+    if(b && bbar) break;
+  }
+  
+  // If top didn't decay to W+b, boogie
+  if(!(b && bbar)) return false;
+
+  for(unsigned int i = 0; i < photons.size(); i++) {
+
+    double dr_b    = deltaR(photon[i]->momentum, b->momentum);
+    double dr_bbar = delta(photon[i]->momentum, bbar->momentum);
+
+    h->Fill(photon[i]->momentum.Pt(), min(dr_b, dr_bbar));
+  }
+
+}
+
+
+bool SusyEventAnalyzer::overlaps_ttA(susy::Event& ev) {
+
+  vector<susy::Particle*> photons;
+
+  // find relevant photons -- coming from tops, b's, or W's
+  for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+    if(abs(it->pdgId) != 22) continue;
+    
+    int mom_id = abs(event.genParticles[it->motherIndex].pdgId);
+    if(mom_id != 6 && mom_id != 24 && mom_id != 5) continue;
+    
+    photons.push_back(&*it);
+  }
+  
+  susy::Particle * b    = 0;
+  susy::Particle * bbar = 0;
+  
+  // If there is b --> b+gamma, take the second b as our interesting leg
+  for(unsigned int i = 0; i < photons.size(); i++) {
+    
+    if(abs(event.genParticles[photons[i]->motherIndex].pdgId) != 5) continue;
+    
+    for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+      if(it->motherIndex != photons[i]->motherIndex) continue;
+      if(it->pdgId == 5) b     = &*it;
+      if(it->pdgId == -5) bbar = &*it;
+    }
+    
+  }
+  
+  // If a photon didn't come off a b, then the status 3 b's are taken
+  // Go backwards to get the final legs
+  for(vector<susy::Particle>::reverse_iterator rit = ev.genParticles.rbegin(); rit != ev.genParticles.rend(); ++rit) {
+    if(!b && rit->status == 3 && rit->pdgId == 5) b = &*rit;
+    if(!bbar && rit->status == 3 && rit->pdgId == -5) bbar = &*rit;
+    if(b && bbar) break;
+  }
+  
+  // If top didn't decay to W+b, boogie
+  if(!(b && bbar)) return false;
+
+  vector<susy::Particle*> legs;
+  legs.push_back(b);
+  legs.push_back(bbar);
+  
+  for(unsigned int i = 0; i < photons.size(); i++) {
+
+    if(photons[i]->momentum.Pt() > 20) {
+
+      for(unsigned int j = 0; j < legs.size(); j++) {
+	if(deltaR(photon[i]->momentum, leg[j]->momentum) < 0.1) return true;
+      }
+
+    }
+
+  }
+    
+  return false;
+  
+}
+  
+
 void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 				      susy::Event& event_,
 				      vector<susy::Muon*> tightMuons, vector<susy::Electron*> tightEles, 
@@ -856,6 +1024,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["nPV"] = nPVertex;
   treeMap["metFilterBit"] = event_.metFilterBit;
   if(isMC && scan == "stop-bino") treeMap["ttbarDecayMode"] = FigureTTbarDecayMode(event_);
+  if(isMC) treeMap["overlaps_ttA"] = overlaps_ttA(event_);
   treeMap["Nphotons"] = photons.size();
   treeMap["Njets"] = pfJets.size();
   treeMap["Nbtags"] = btags.size();
@@ -1032,43 +1201,6 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     treeMap["jentry"] = jentry;
   }
 
-}
-
-void SusyEventAnalyzer::findMothers(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& moms) {
-  /*
-  if(abs(p->pdgId) > 21) return;
-
-  bool new_particle = true;
-  for(unsigned int i = 0; i < moms.size(); i++) {
-    if(moms[i] == p) {
-      new_particle = false;
-      break;
-    }
-  }
-
-  if(new_particle) {
-    moms.push_back(p);
-    findMothers(ev, ev.genParticles[p->motherIndex], moms);
-  }
-  */
-}
-
-void SusyEventAnalyzer::findDaughters(susy::Event& ev, susy::Particle* p, vector<susy::Particle*>& all) {
-  /*
-  int p_index = distance(ev.genParticles.begin(), find(ev.genParticles.begin(), ev.genParticles.end(), p));
-  if(p_index == ev.genParticles.size()) return;
-
-  for(vector<susy::Particle>::iterator genit = event.genParticles.begin(); genit != event.genParticles.end(); genit++) {
-    if(genit->motherIndex != p_index) continue;
-    int abs_pdg = abs(genit->pdgId);
-    
-    // take only tops, bs and Ws
-    if(abs_pdg == 6 || abs_pdg == 24 || abs_pdg == 5) {
-      all.push_back(&*genit);
-      findDaughters(ev, genit, all);
-    }
-  }
-*/
 }
 
 void SusyEventAnalyzer::IncludeSyncFile(char* file) {
