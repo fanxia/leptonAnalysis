@@ -182,6 +182,7 @@ class PlotMaker : public TObject {
 		TTree * sig_a, TTree * sig_b);
   
   void SetDisplayKStest(bool v) { displayKStest = v; }
+  void SetUseWHIZARD(bool v) { useWHIZARD = v; }
 
   void BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_t xhi);
   void BookHistogram(TString variable, Int_t nBins, Double_t* customBins);
@@ -190,7 +191,7 @@ class PlotMaker : public TObject {
   void SubtractMCFromQCD();
 
   void CreatePlot(TString variable,
-		  bool divideByWidth,
+		  bool divideByWidth, bool needsQCD,
 		  TString xaxisTitle, TString yaxisTitle,
 		  Float_t xmin, Float_t xmax,
 		  Float_t ymin, Float_t ymax,
@@ -259,6 +260,8 @@ class PlotMaker : public TObject {
   bool displayKStest;
   bool blinded;
 
+  bool useWHIZARD;
+
 };
 
 PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
@@ -271,6 +274,7 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   intLumi = buffer;
 
   displayKStest = false;
+  useWHIZARD = false;
 
   KSscores.clear();
 
@@ -428,22 +432,22 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
     mcHistograms[i].push_back(h_bkg);
 
     TH1D * h_bkg_btagWeightUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_btagWeightUp");
-    mcHistogroms_btagWeightUp[i].push_back(h_bkg_btagWeightUp);
+    mcHistograms_btagWeightUp[i].push_back(h_bkg_btagWeightUp);
 
     TH1D * h_bkg_btagWeightDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_btagWeightDown");
-    mcHistogroms_btagWeightDown[i].push_back(h_bkg_btagWeightDown);
+    mcHistograms_btagWeightDown[i].push_back(h_bkg_btagWeightDown);
 
     TH1D * h_bkg_scaleUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleUp");
-    mcHistogroms_scaleUp[i].push_back(h_bkg_scaleUp);
+    mcHistograms_scaleUp[i].push_back(h_bkg_scaleUp);
 
     TH1D * h_bkg_scaleDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleDown");
-    mcHistogroms_scaleDown[i].push_back(h_bkg_scaleDown);
+    mcHistograms_scaleDown[i].push_back(h_bkg_scaleDown);
 
     TH1D * h_bkg_pdfUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_pdfUp");
-    mcHistogroms_pdfUp[i].push_back(h_bkg_pdfUp);
+    mcHistograms_pdfUp[i].push_back(h_bkg_pdfUp);
 
     TH1D * h_bkg_pdfDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_pdfDown");
-    mcHistogroms_pdfDown[i].push_back(h_bkg_pdfDown);
+    mcHistograms_pdfDown[i].push_back(h_bkg_pdfDown);
   }
 
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
@@ -481,22 +485,22 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
     mcHistograms[i].push_back(h_bkg);
 
     TH1D * h_bkg_btagWeightUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_btagWeightUp");
-    mcHistogroms_btagWeightUp[i].push_back(h_bkg_btagWeightUp);
+    mcHistograms_btagWeightUp[i].push_back(h_bkg_btagWeightUp);
 
     TH1D * h_bkg_btagWeightDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_btagWeightDown");
-    mcHistogroms_btagWeightDown[i].push_back(h_bkg_btagWeightDown);
+    mcHistograms_btagWeightDown[i].push_back(h_bkg_btagWeightDown);
 
     TH1D * h_bkg_scaleUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleUp");
-    mcHistogroms_scaleUp[i].push_back(h_bkg_scaleUp);
+    mcHistograms_scaleUp[i].push_back(h_bkg_scaleUp);
 
     TH1D * h_bkg_scaleDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleDown");
-    mcHistogroms_scaleDown[i].push_back(h_bkg_scaleDown);
+    mcHistograms_scaleDown[i].push_back(h_bkg_scaleDown);
 
     TH1D * h_bkg_pdfUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_pdfUp");
-    mcHistogroms_pdfUp[i].push_back(h_bkg_pdfUp);
+    mcHistograms_pdfUp[i].push_back(h_bkg_pdfUp);
 
     TH1D * h_bkg_pdfDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_pdfDown");
-    mcHistogroms_pdfDown[i].push_back(h_bkg_pdfDown);
+    mcHistograms_pdfDown[i].push_back(h_bkg_pdfDown);
   }
   
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
@@ -523,6 +527,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
   Float_t puWeight, btagWeight;
   Float_t puWeightErr, btagWeightErr, btagWeightUp, btagWeightDown;
+  Float_t overlaps_ttA;
 
   for(unsigned int i = 0; i < variables.size(); i++) {
 
@@ -553,6 +558,12 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     mcQCDTrees[i]->SetBranchAddress("btagWeightErr", &btagWeightErr);
     mcQCDTrees[i]->SetBranchAddress("btagWeightUp", &btagWeightUp);
     mcQCDTrees[i]->SetBranchAddress("btagWeightDown", &btagWeightDown);
+
+    if(i < 3) {
+      mcTrees[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
+      mcQCDTrees[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
+    }
+
   }
 
   sigaTree->SetBranchAddress("pileupWeight", &puWeight);
@@ -611,6 +622,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 	btagWeightDown = 1.;
       }
 
+      if(useWHIZARD && i < 3 && overlaps_ttA > 0.001) continue;
+
       if(btagWeight != btagWeight) continue;
       if(metCut > 0. && vars[1] >= metCut) continue;
 
@@ -646,10 +659,10 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 	Double_t content = mcHistograms[i][j]->GetBinContent(k+1);
 	Double_t error = mcHistograms[i][j]->GetBinError(k+1);
       
-	mcHistogroms_scaleUp[i][j]->SetBinContent(k+1, content);
-	mcHistogroms_scaleDown[i][j]->SetBinContent(k+1, content);
-	mcHistogroms_pdfUp[i][j]->SetBinContent(k+1, content);
-	mcHistogroms_pdfDown[i][j]->SetBinContent(k+1, content);
+	mcHistograms_scaleUp[i][j]->SetBinContent(k+1, content);
+	mcHistograms_scaleDown[i][j]->SetBinContent(k+1, content);
+	mcHistograms_pdfUp[i][j]->SetBinContent(k+1, content);
+	mcHistograms_pdfDown[i][j]->SetBinContent(k+1, content);
       }
     }
 
@@ -778,7 +791,7 @@ void PlotMaker::SubtractMCFromQCD() {
 }
 
 void PlotMaker::CreatePlot(TString variable,
-			   bool divideByWidth,
+			   bool divideByWidth, bool needsQCD,
 			   TString xaxisTitle, TString yaxisTitle,
 			   Float_t xmin, Float_t xmax,
 			   Float_t ymin, Float_t ymax,
@@ -801,9 +814,16 @@ void PlotMaker::CreatePlot(TString variable,
     yaxisTitle = "Number of Events / GeV";
 
     h_gg[var_num] = (TH1D*)DivideByBinWidth(h_gg[var_num]);
-    h_qcd[var_num] = (TH1D*)DivideByBinWidth(h_qcd[var_num]);
+    if(needsQCD) h_qcd[var_num] = (TH1D*)DivideByBinWidth(h_qcd[var_num]);
 
     for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms[i][var_num]);
+    for(unsigned int i = 0; i < mcHistograms_btagWeightUp.size(); i++) mcHistograms_btagWeightUp[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_btagWeightUp[i][var_num]);
+    for(unsigned int i = 0; i < mcHistograms_btagWeightDown.size(); i++) mcHistograms_btagWeightDown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_btagWeightDown[i][var_num]);
+    for(unsigned int i = 0; i < mcHistograms_scaleUp.size(); i++) mcHistograms_scaleUp[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_scaleUp[i][var_num]);
+    for(unsigned int i = 0; i < mcHistograms_scaleDown.size(); i++) mcHistograms_scaleDown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_scaleDown[i][var_num]);
+    for(unsigned int i = 0; i < mcHistograms_pdfUp.size(); i++) mcHistograms_pdfUp[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_pdfUp[i][var_num]);
+    for(unsigned int i = 0; i < mcHistograms_pdfDown.size(); i++) mcHistograms_pdfDown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_pdfDown[i][var_num]);
+    
     for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) mcQCDHistograms[i][var_num] = (TH1D*)DivideByBinWidth(mcQCDHistograms[i][var_num]);
 
     h_siga[var_num] = (TH1D*)DivideByBinWidth(h_siga[var_num]);
@@ -830,19 +850,66 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
 
   out->cd();
   h_gg[variableNumber]->Write();
-  h_qcd[variableNumber]->Write();
+  if(needsQCD) h_qcd[variableNumber]->Write();
   for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
 
+  TH1D *bkg, *bkg_btagWeightUp, *bkg_btagWeightDown, *bkg_scaleUp, *bkg_scaleDown, *bkg_pdfUp, *bkg_pdfDown;
+
   // Stack histograms; qcd is on top
-  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
-    h_qcd[variableNumber]->Add(mcHistograms[i][variableNumber]);
-    for(unsigned int j = i + 1; j < mcHistograms.size(); j++) {
-      mcHistograms[i][variableNumber]->Add(mcHistograms[j][variableNumber]);
+  if(needsQCD) {
+    bkg = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req);
+    bkg_btagWeightUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightUp");
+    bkg_btagWeightDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightDown");
+    bkg_scaleUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_scaleUp");
+    bkg_scaleDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_scaleDown");
+    bkg_pdfUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfUp");
+    bkg_pdfDown (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
+
+    for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+      bkg->Add(mcHistograms[i][variableNumber]);
+      bkg_btagWeightUp->Add(mcHistograms_btagWeightUp[i][variableNumber]);
+      bkg_btagWeightDown->Add(mcHistograms_btagWeightDown[i][variableNumber]);
+      bkg_scaleUp->Add(mcHistograms_scaleUp[i][variableNumber]);
+      bkg_scaleDown->Add(mcHistograms_scaleDown[i][variableNumber]);
+      bkg_pdfUp->Add(mcHistograms_pdfUp[i][variableNumber]);
+      bkg_pdfDown->Add(mcHistograms_pdfDown[i][variableNumber]);
+
+      for(unsigned int j = i + 1; j < mcHistograms.size(); j++) {
+	mcHistograms[i][variableNumber]->Add(mcHistograms[j][variableNumber]);
+      }
     }
   }
+  else {
+    bkg = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req);
+    bkg_btagWeightUp = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightUp");
+    bkg_btagWeightDown = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightDown");
+    bkg_scaleUp = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_scaleUp");
+    bkg_scaleDown = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_scaleDown");
+    bkg_pdfUp = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_pdfUp");
+    bkg_pdfDown (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
 
-  TH1D * bkg = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req);
+    for(unsigned int i = 1; i < mcHistograms.size(); i++) {
+      bkg->Add(mcHistograms[i][variableNumber]);
+      bkg_btagWeightUp->Add(mcHistograms_btagWeightUp[i][variableNumber]);
+      bkg_btagWeightDown->Add(mcHistograms_btagWeightDown[i][variableNumber]);
+      bkg_scaleUp->Add(mcHistograms_scaleUp[i][variableNumber]);
+      bkg_scaleDown->Add(mcHistograms_scaleDown[i][variableNumber]);
+      bkg_pdfUp->Add(mcHistograms_pdfUp[i][variableNumber]);
+      bkg_pdfDown->Add(mcHistograms_pdfDown[i][variableNumber]);
+
+      for(unsigned int j = i + 1; j < mcHistograms.size(); j++) {
+	mcHistograms[i][variableNumber]->Add(mcHistograms[j][variableNumber]);
+      }
+    }
+  }
+   
   bkg->Write();
+  bkg_btagWeightUp->Write();
+  bkg_btagWeightDown->Write();
+  bkg_scaleUp->Write();
+  bkg_scaleDown->Write();
+  bkg_pdfUp->Write();
+  bkg_pdfDown->Write();
 
   Double_t kolm = h_gg[variableNumber]->KolmogorovTest(bkg);
   TString kolmText = Form("KS test probability = %5.3g", kolm);
@@ -856,8 +923,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
 
   TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
   leg->AddEntry(h_gg[variableNumber], "#gamma#gamma Candidate Sample", "LP");
-  leg->AddEntry(errors, "Total Background Uncertainty", "F");
-  leg->AddEntry(bkg, "QCD", "F");
+  leg->AddEntry(errors, "Stat. Errors", "F");
+  if(needsQCD) leg->AddEntry(bkg, "QCD", "F");
   leg->AddEntry(mcHistograms[0][variableNumber], legendNames[0], "F");
   for(unsigned int i = 1; i < mcHistograms.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
@@ -881,7 +948,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
   errors->SetFillStyle(3154);
   errors->SetMarkerSize(0);
 
-  bkg->SetFillColor(kSpring);
+  if(needsQCD) bkg->SetFillColor(kSpring);
+  else bkg->SetFillColor(mcLayerColors[0]);
   bkg->SetMarkerSize(0);
   bkg->SetLineColor(1);
 
@@ -915,7 +983,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
   bkg->GetYaxis()->SetRangeUser(ymin, ymax);
 
   bkg->Draw("hist");
-  mcHistograms[0][variableNumber]->Draw("same hist");
+  if(!needsQCD) mcHistograms[0][variableNumber]->Draw("same hist");
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
     if(i != 0 && mcLayerNumbers[i] != mcLayerNumbers[i-1]) mcHistograms[i][variableNumber]->Draw("same hist");
   }
@@ -955,15 +1023,46 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
     ratio->SetBinError(i+1, h_gg[variableNumber]->GetBinError(i+1) / bkg->GetBinContent(i+1));
   }
 
+  TH1D * ratio_stat;
+  ratio_stat = (TH1D*)bkg->Clone("ratio_stat");
+  for(int i = 0; i < ratio_stat->GetNbinsX(); i++) {
+    ratio_stat->SetBinContent(i+1, 1.);
+    if(bkg->GetBinContent(i+1) == 0.) ratio_stat->SetBinError(i+1, 0.);
+    else ratio_stat->SetBinError(i+1, ratio_stat->GetBinError(i+1) / bkg->GetBinContent(i+1));
+  }
+
   TH1D * ratio_sys;
   ratio_sys = (TH1D*)bkg->Clone("ratio_sys");
   for(int i = 0; i < ratio_sys->GetNbinsX(); i++) {
+
+    Double_t stat = bkg->GetBinError(i+1);
+
+    Double_t btagUp = bkg_btagWeightUp->GetBinError(i+1);
+    Double_t btagDown = bkg_btagWeightDown->GetBinError(i+1);
+    Double_t btag_sys = fabs(btagUp - btagDown) / 2.;
+
+    Double_t scaleUp = bkg_scaleUp->GetBinError(i+1);
+    Double_t scaleDown = bkg_scaleDown->GetBinError(i+1);
+    Double_t scale_sys = fabs(scaleUp - scaleDown) / 2.;
+    
+    Double_t pdfUp = bkg_pdfUp->GetBinError(i+1);
+    Double_t pdfDown = bkg_pdfDown->GetBinError(i+1);
+    Double_t pdf_sys = fabs(pdfUp - pdfDown) / 2.;
+
+    Double_t totalError2 = stat*stat + btag_sys*btag_sys + scale_sys*scale_sys + pdf_sys*pdf_sys;
+
     ratio_sys->SetBinContent(i+1, 1.);
+
     if(bkg->GetBinContent(i+1) == 0.) ratio_sys->SetBinError(i+1, 0.);
-    else ratio_sys->SetBinError(i+1, ratio_sys->GetBinError(i+1) / bkg->GetBinContent(i+1));
+    else ratio_sys->SetBinError(i+1, sqrt(totalError2) / bkg->GetBinContent(i+1));
   }
 
   if(xmax > xmin) ratio->GetXaxis()->SetRangeUser(xmin, xmax);
+
+  ratio_stat->SetFillStyle(1001);
+  ratio_stat->SetFillColor(kGray+1);
+  ratio_stat->SetLineColor(kGray+1);
+  ratio_stat->SetMarkerColor(kGray+1);
 
   ratio_sys->SetFillStyle(1001);
   ratio_sys->SetFillColor(kGray);
@@ -985,6 +1084,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable,
 
   ratio->Draw("e1");
   ratio_sys->Draw("e2 same");
+  ratio_stat->Draw("e2 same");
   ratio->Draw("e1 same");
   ratio->Draw("axis same");
 

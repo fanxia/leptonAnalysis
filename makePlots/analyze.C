@@ -136,6 +136,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/WhizardMCTeeTeeGamma#2_to_5_All_ttbar_decay_channels
   //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttA_2to5.root", "ttA_2to5", .9081 * 2, .9081 * .5, .9081 * .5, .9081 * 2 * 0.076, .9081 * 2 * 0.099, channel, 5, 8, "t#bar{t} + #gamma");
+  //pMaker->SetUseWHIZARD(true);
 
   //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");
 
@@ -200,8 +201,10 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
+  bool needsQCD = (channel < 2);
+
   pMaker->CreatePlot("Nphotons",
-		     false,
+		     false, needsQCD,
 		     "Number of #gamma's", "Number of Events",
 		     0, 4,
 		     2.e-3, 3.e6,
@@ -210,7 +213,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("pfMET",
-		     true,
+		     true, needsQCD,
 		     "#slash{E}_{T} (GeV)", "Number of Events",
 		     xbins_met[0], xbins_met[nMetBins],
 		     7.e-3, 2.5e4,
@@ -219,7 +222,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("Njets",
-		     false,
+		     false, needsQCD,
 		     "nJets", "Number of Events",
 		     0, 14, 
 		     2.e-2, 3.e6,
@@ -228,7 +231,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
   
   pMaker->CreatePlot("Nbtags",
-		     false,
+		     false, needsQCD,
 		     "nBtags", "Number of Events",
 		     0, 6, 
 		     2.e-2, 3.e6,
@@ -237,7 +240,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
    pMaker->CreatePlot("max_csv",
-		      false,
+		      false, needsQCD,
 		     "max csv", "Number of Events",
 		     0.65, 1., 
 		     2.e-2, 3.e6,
@@ -246,7 +249,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("submax_csv",
-		     false,
+		     false, needsQCD,
 		     "sub-max csv", "Number of Events",
 		     0, 4, 
 		     2.e-2, 3.e5,
@@ -255,7 +258,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("HT_jets",
-		     true,
+		     true, needsQCD,
 		     "HT (jets only) (GeV/c^{2})", "Number of Events",
 		     0, 2000, 
 		     2.e-4, 4.e3,
@@ -264,7 +267,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("hadronic_pt",
-		     true,
+		     true, needsQCD,
 		     "MHT (GeV/c)", "Number of Events",
 		     0, 1500, 
 		     2.e-4, 5.8e3,
@@ -273,7 +276,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("HT",
-		     true,
+		     true, needsQCD,
 		     "HT (GeV)", "Number of Events",
 		     0, 2000, 
 		     2.e-4, 2.8e3,
@@ -282,7 +285,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("jet1_pt",
-		     true,
+		     true, needsQCD,
 		     "Pt of leading jet", "Number of Events",
 		     0, 1500, 
 		     2.e-4, 8.e3,
@@ -291,7 +294,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("jet2_pt",
-		     true,
+		     true, needsQCD,
 		     "Pt of sub-leading jet", "Number of Events",
 		     0, 1200, 
 		     2.e-4, 1.3e4,
@@ -300,7 +303,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("jet3_pt",
-		     true,
+		     true, needsQCD,
 		     "Pt of third-leading jet", "Number of Events",
 		     0, 800, 
 		     2.e-5, 8.e4,
@@ -309,7 +312,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("btag1_pt",
-		     true,
+		     true, needsQCD,
 		     "Pt of leading btag", "Number of Events",
 		     0, 1400, 
 		     2.e-4, 8.e3,
@@ -318,7 +321,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
   
   pMaker->CreatePlot("w_mT",
-		     true,
+		     true, needsQCD,
 		     "Transverse Mass", "Number of Events",
 		     0, 1000, 
 		     2.e-4, 8.e3,
@@ -327,7 +330,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("m3",
-		     true,
+		     true, needsQCD,
 		     "M3 (GeV/c^{2})", "Number of Events",
 		     0, 2000, 
 		     2.e-4, 2.8e3,
@@ -336,7 +339,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("ele_pt",
-		     true,
+		     true, needsQCD,
 		     "Pt of electron", "Number of Events",
 		     0, 1500, 
 		     2.e-4, 8.e3,
@@ -345,7 +348,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("muon_pt",
-		     true,
+		     true, needsQCD,
 		     "Pt of #mu", "Number of Events",
 		     0, 1500, 
 		     2.e-4, 8.e3,
@@ -355,7 +358,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   if(nPhotons_req >= 1) {
     pMaker->CreatePlot("leadPhotonEta",
-		       false,
+		       false, needsQCD,
 		       "#eta of leading #gamma", "Number of Events",
 		       -1.5, 1.5, 
 		       2.e-3, 3.e4,
@@ -364,7 +367,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       out);
 
     pMaker->CreatePlot("leadPhotonPhi",
-		       false,
+		       false, needsQCD,
 		       "#phi of leading #gamma", "Number of Events",
 		       -3.2, 3.2, 
 		       2.e-3, 3.e4,
@@ -373,7 +376,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       out);
 
     pMaker->CreatePlot("leadPhotonEt",
-		       true,
+		       true, needsQCD,
 		       "Et of leading #gamma", "Number of Events",
 		       0, 1200, 
 		       2.e-3, 5.e4,
@@ -382,7 +385,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       out);
 
     pMaker->CreatePlot("leadSigmaIetaIeta",
-		       false,
+		       false, needsQCD,
 		       "Lead #gamma #sigma_{i#etai#eta}", "Number of Events",
 		       0, 0.015,
 		       2.3-3, 5.e4,
@@ -391,7 +394,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       out);
 
     pMaker->CreatePlot("leadChargedHadronIso",
-		       false,
+		       false, needsQCD,
 		       "Lead #gamma ChHadIso", "Number of Events",
 		       0, 15,
 		       2.3e-4, 5.e3,
@@ -403,7 +406,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   if(nPhotons_req >= 2) {
     pMaker->CreatePlot("photon_dR",
-		       false,
+		       false, needsQCD,
 		       "#DeltaR_{#gamma#gamma}", "Number of Events",
 		       0.5, 5., 
 		       2.e-2, 3.e5,
@@ -412,7 +415,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       out);
 
     pMaker->CreatePlot("photon_dPhi",
-		       false,
+		       false, needsQCD,
 		       "#Delta#phi_{#gamma#gamma}", "Number of Events",
 		       0., 3.14159, 
 		       2.e-2, 3.e5,
@@ -421,7 +424,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       out);
 
   pMaker->CreatePlot("trailPhotonEta",
-		     false,
+		     false, needsQCD,
 		     "#eta of trailing #gamma", "Number of Events",
 		     -1.5, 1.5, 
 		     2.e-3, 3.e4,
@@ -430,7 +433,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("trailPhotonPhi",
-		     false,
+		     false, needsQCD,
 		     "#phi of trailing #gamma", "Number of Events",
 		     -3.2, 3.2, 
 		     2.e-3, 3.e4,
@@ -439,7 +442,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
   
   pMaker->CreatePlot("trailSigmaIetaIeta",
-		     false,
+		     false, needsQCD,
 		     "#sigma_{i#etai#eta} of Trail #gamma", "Number of Events",
 		     0, 0.015,
 		     2.3-3, 5.e4,
@@ -448,7 +451,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
   
   pMaker->CreatePlot("trailChargedHadronIso",
-		     false,
+		     false, needsQCD,
 		     "Ch. Hadron Iso. of Trail #gamma", "Number of Events",
 		     0, 15,
 		     2.3e-4, 5.e3,
@@ -457,7 +460,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("photon_invmass",
-		     true,
+		     true, needsQCD,
 		     "m_{#gamma#gamma} (GeV/c^{2})", "Number of Events",
 		     0, 2000, 
 		     2.e-3, 3.e4,
@@ -466,7 +469,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("trailPhotonEt",
-		     true,
+		     true, needsQCD,
 		     "Et of trailing #gamma", "Number of Events",
 		     0, 1200, 
 		     2.e-3, 5.e4,
@@ -475,7 +478,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   pMaker->CreatePlot("diEMpT",
-		     true,
+		     true, needsQCD,
 		     "di-EM Pt", "Number of Events",
 		     0, 1200, 
 		     2.e-3, 5.e4,
@@ -484,7 +487,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
   
   pMaker->CreatePlot("diJetPt",
-		     true,
+		     true, needsQCD,
 		     "di-Jet Pt", "Number of Events",
 		     0, 1400, 
 		     2.e-3, 5.e4,
