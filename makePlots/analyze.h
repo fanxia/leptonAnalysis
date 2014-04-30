@@ -199,7 +199,7 @@ class PlotMaker : public TObject {
 		  bool drawSignal, bool drawLegend, bool drawPrelim,
 		  TFile*& out);
 
-  void DrawPlot(int variableNumber, TString variable,
+  void DrawPlot(int variableNumber, TString variable, bool needsQCD,
 		TString xaxisTitle, TString yaxisTitle,
 		Float_t xmin, Float_t xmax,
 		Float_t ymin, Float_t ymax,
@@ -663,6 +663,11 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 	mcHistograms_scaleDown[i][j]->SetBinContent(k+1, content);
 	mcHistograms_pdfUp[i][j]->SetBinContent(k+1, content);
 	mcHistograms_pdfDown[i][j]->SetBinContent(k+1, content);
+
+	mcHistograms_scaleUp[i][j]->SetBinError(k+1, error);
+	mcHistograms_scaleDown[i][j]->SetBinError(k+1, error);
+	mcHistograms_pdfUp[i][j]->SetBinError(k+1, error);
+	mcHistograms_pdfDown[i][j]->SetBinError(k+1, error);
       }
     }
 
@@ -830,7 +835,7 @@ void PlotMaker::CreatePlot(TString variable,
     h_sigb[var_num] = (TH1D*)DivideByBinWidth(h_sigb[var_num]);
   }
 
-  DrawPlot(var_num, variable,
+  DrawPlot(var_num, variable, needsQCD,
 	   xaxisTitle, yaxisTitle,
 	   xmin, xmax,
 	   ymin, ymax,
@@ -840,7 +845,7 @@ void PlotMaker::CreatePlot(TString variable,
 
 }
 
-void PlotMaker::DrawPlot(int variableNumber, TString variable,
+void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
 			 TString xaxisTitle, TString yaxisTitle,
 			 Float_t xmin, Float_t xmax,
 			 Float_t ymin, Float_t ymax,
