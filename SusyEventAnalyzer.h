@@ -847,31 +847,30 @@ void SusyEventAnalyzer::ttA_phaseSpace(susy::Event& ev, TH2D*& h) {
   int nB = 0;
 
   for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
-    if(it->status != 3) continue;
-    if(abs(ev.genParticles[ev.genParticles[it->motherIndex].motherIndex].pdgId) != 2212 || abs(ev.genParticles[it->motherIndex].pdgId) != 2212) continue;
 
-    if(abs(it->pdgId) == 24) {
+    //if(abs(ev.genParticles[ev.genParticles[it->motherIndex].motherIndex].pdgId) != 2212 || abs(ev.genParticles[it->motherIndex].pdgId) != 2212) continue;
+
+    if(abs(it->pdgId) == 24 && it->status == 3) {
       nW++;
       all.push_back(&*it);
     }
 
-    if(abs(it->pdgId) == 5) {
+    if(abs(it->pdgId) == 5 && it->status == 2) {
       nB++;
       all.push_back(&*it);
     }
   }
-
-  if(nW != 2 || nB != 2) return;
 
   for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
     if(it->status != 1 || abs(it->pdgId) != 22) continue;
 
     int nSisters = 0;
     for(unsigned int i = 0; i < all.size(); i++) {
-      if(it->motherIndex == all[i]->motherIndex) nSisters++;
+      if(it->motherIndex == all[i]->motherIndex && 
+	 (abs(all[i]->pdgId) == 5 || abs(all[i]->pdgId) == 24)) nSisters++;
     }
 
-    if(nSisters == 5) {
+    if(nSisters == 4) {
       gamma = &*it;
       break;
     }
