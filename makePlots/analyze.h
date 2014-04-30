@@ -225,7 +225,15 @@ class PlotMaker : public TObject {
   vector<int> mcLayerColors;
   vector<TString> mcNames;
   vector<TString> legendNames;
+
   vector< vector<TH1D*> > mcHistograms;
+  vector< vector<TH1D*> > mcHistograms_btagWeightUp;
+  vector< vector<TH1D*> > mcHistograms_btagWeightDown;
+  vector< vector<TH1D*> > mcHistograms_scaleUp;
+  vector< vector<TH1D*> > mcHistograms_scaleDown;
+  vector< vector<TH1D*> > mcHistograms_pdfUp;
+  vector< vector<TH1D*> > mcHistograms_pdfDown;
+
   vector< vector<TH1D*> > mcQCDHistograms;
 
   TTree * ggTree;
@@ -288,6 +296,12 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   mcNames.clear();
   legendNames.clear();
   mcHistograms.clear();
+  mcHistograms_btagWeightUp.clear();
+  mcHistograms_btagWeightDown.clear();
+  mcHistograms_scaleUp.clear();
+  mcHistograms_scaleDown.clear();
+  mcHistograms_pdfUp.clear();
+  mcHistograms_pdfDown.clear();
   mcQCDHistograms.clear();
 
 }
@@ -301,6 +315,12 @@ PlotMaker::~PlotMaker() {
     delete qcdTree;
 
     mcHistograms.clear();
+    mcHistograms_btagWeightUp.clear();
+    mcHistograms_btagWeightDown.clear();
+    mcHistograms_scaleUp.clear();
+    mcHistograms_scaleDown.clear();
+    mcHistograms_pdfUp.clear();
+    mcHistograms_pdfDown.clear();
     mcQCDHistograms.clear();
     mcTrees.clear();
     mcQCDTrees.clear();
@@ -378,6 +398,12 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   legendNames.push_back(legendEntry);
 
   mcHistograms.resize(mcHistograms.size() + 1);
+  mcHistograms_btagWeightUp.resize(mcHistograms.size() + 1);
+  mcHistograms_btagWeightDown.resize(mcHistograms.size() + 1);
+  mcHistograms_scaleUp.resize(mcHistograms.size() + 1);
+  mcHistograms_scaleDown.resize(mcHistograms.size() + 1);
+  mcHistograms_pdfUp.resize(mcHistograms.size() + 1);
+  mcHistograms_pdfDown.resize(mcHistograms.size() + 1);
   mcQCDHistograms.resize(mcQCDHistograms.size() + 1);
   
   return true;
@@ -400,6 +426,24 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
     h_bkg = new TH1D(variable+"_"+mcNames[i]+"_"+req, variable, nBins, xlo, xhi);
     h_bkg->Sumw2();
     mcHistograms[i].push_back(h_bkg);
+
+    TH1D * h_bkg_btagWeightUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_btagWeightUp");
+    mcHistogroms_btagWeightUp[i].push_back(h_bkg_btagWeightUp);
+
+    TH1D * h_bkg_btagWeightDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_btagWeightDown");
+    mcHistogroms_btagWeightDown[i].push_back(h_bkg_btagWeightDown);
+
+    TH1D * h_bkg_scaleUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleUp");
+    mcHistogroms_scaleUp[i].push_back(h_bkg_scaleUp);
+
+    TH1D * h_bkg_scaleDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleDown");
+    mcHistogroms_scaleDown[i].push_back(h_bkg_scaleDown);
+
+    TH1D * h_bkg_pdfUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_pdfUp");
+    mcHistogroms_pdfUp[i].push_back(h_bkg_pdfUp);
+
+    TH1D * h_bkg_pdfDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_pdfDown");
+    mcHistogroms_pdfDown[i].push_back(h_bkg_pdfDown);
   }
 
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
@@ -435,6 +479,24 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
     h_bkg = new TH1D(variable+"_"+mcNames[i]+"_"+req, variable, nBins, customBins);
     h_bkg->Sumw2();
     mcHistograms[i].push_back(h_bkg);
+
+    TH1D * h_bkg_btagWeightUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_btagWeightUp");
+    mcHistogroms_btagWeightUp[i].push_back(h_bkg_btagWeightUp);
+
+    TH1D * h_bkg_btagWeightDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_btagWeightDown");
+    mcHistogroms_btagWeightDown[i].push_back(h_bkg_btagWeightDown);
+
+    TH1D * h_bkg_scaleUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleUp");
+    mcHistogroms_scaleUp[i].push_back(h_bkg_scaleUp);
+
+    TH1D * h_bkg_scaleDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleDown");
+    mcHistogroms_scaleDown[i].push_back(h_bkg_scaleDown);
+
+    TH1D * h_bkg_pdfUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_pdfUp");
+    mcHistogroms_pdfUp[i].push_back(h_bkg_pdfUp);
+
+    TH1D * h_bkg_pdfDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_pdfDown");
+    mcHistogroms_pdfDown[i].push_back(h_bkg_pdfDown);
   }
   
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
@@ -553,22 +615,54 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       if(metCut > 0. && vars[1] >= metCut) continue;
 
       if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-      
+
+      Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+      Float_t addError2_puOnly = btagWeight*btagWeight*puWeightErr*puWeightErr;
+
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
 	Float_t oldError = mcHistograms[i][k]->GetBinError(mcHistograms[i][k]->FindBin(vars[k]));
 	Float_t newerror = sqrt(oldError*oldError + addError2);
-	mcHistograms[i][k]->Fill(vars[k]);
+	mcHistograms[i][k]->Fill(vars[k], puWeight * btagWeight);
 	mcHistograms[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
+
+	oldError = mcHistograms_btagWeightUp[i][k]->GetBinError(mcHistograms_btagWeightUp[i][k]->FindBin(vars[k]));
+	newerror = sqrt(oldError*oldError + addError2_puOnly);
+	mcHistograms_btagWeightUp[i][k]->Fill(vars[k], puWeight * btagWeightUp);
+	mcHistograms_btagWeightUp[i][k]->SetBinError(mcHistograms_btagWeightUp[i][k]->FindBin(vars[k]), newerror);
+
+	oldError = mcHistograms_btagWeightDown[i][k]->GetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]));
+	newerror = sqrt(oldError*oldError + addError2_puOnly);
+	mcHistograms_btagWeightDown[i][k]->Fill(vars[k], puWeight * btagWeightDown);
+	mcHistograms_btagWeightDown[i][k]->SetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]), newerror);
+
       }
 
     }
 
-    for(unsigned int j = 0; j < vars.size(); j++) mcHistograms[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      for(int k = 0; k < mcHistograms[i][j]->GetNbinsX(); k++) {
+	Double_t content = mcHistograms[i][j]->GetBinContent(k+1);
+	Double_t error = mcHistograms[i][j]->GetBinError(k+1);
+      
+	mcHistogroms_scaleUp[i][j]->SetBinContent(k+1, content);
+	mcHistogroms_scaleDown[i][j]->SetBinContent(k+1, content);
+	mcHistogroms_pdfUp[i][j]->SetBinContent(k+1, content);
+	mcHistogroms_pdfDown[i][j]->SetBinContent(k+1, content);
+      }
+    }
+
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      mcHistograms[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+      mcHistograms_btagWeightUp[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+      mcHistograms_btagWeightDown[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+      mcHistograms_scaleUp[i][j]->Scale(intLumi_int * (crossSections[i] + scaleErrUp[i]) / mcNGen[i]);
+      mcHistograms_scaleDown[i][j]->Scale(intLumi_int * (crossSections[i] - scaleErrDown[i]) / mcNGen[i]);
+      mcHistograms_pdfUp[i][j]->Scale(intLumi_int * (crossSections[i] + pdfErrUp[i]) / mcNGen[i]);
+      mcHistograms_pdfDown[i][j]->Scale(intLumi_int * (crossSections[i] - pdfErrDown[i]) / mcNGen[i]);
+    }
+
   }
 
   for(unsigned int i = 0; i < mcQCDTrees.size(); i++) {
@@ -587,16 +681,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       if(metCut > 0. && vars[1] >= metCut) continue;
 
       if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
-      Float_t btagSFsys = (fabs(btagWeight - btagWeightUp) + fabs(btagWeight - btagWeightDown))/2.;
-      Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
-      Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
-      
+
+      Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
 	Float_t oldError = mcQCDHistograms[i][k]->GetBinError(mcQCDHistograms[i][k]->FindBin(vars[k]));
 	Float_t newerror = sqrt(oldError*oldError + addError2);
-	mcQCDHistograms[i][k]->Fill(vars[k]);
+	mcQCDHistograms[i][k]->Fill(vars[k], puWeight * btagWeight);
 	mcQCDHistograms[i][k]->SetBinError(mcQCDHistograms[i][k]->FindBin(vars[k]), newerror);
       }
 
