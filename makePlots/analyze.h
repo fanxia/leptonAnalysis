@@ -402,12 +402,12 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   legendNames.push_back(legendEntry);
 
   mcHistograms.resize(mcHistograms.size() + 1);
-  mcHistograms_btagWeightUp.resize(mcHistograms.size() + 1);
-  mcHistograms_btagWeightDown.resize(mcHistograms.size() + 1);
-  mcHistograms_scaleUp.resize(mcHistograms.size() + 1);
-  mcHistograms_scaleDown.resize(mcHistograms.size() + 1);
-  mcHistograms_pdfUp.resize(mcHistograms.size() + 1);
-  mcHistograms_pdfDown.resize(mcHistograms.size() + 1);
+  mcHistograms_btagWeightUp.resize(mcHistograms_btagWeightUp.size() + 1);
+  mcHistograms_btagWeightDown.resize(mcHistograms_btagWeightDown.size() + 1);
+  mcHistograms_scaleUp.resize(mcHistograms_scaleUp.size() + 1);
+  mcHistograms_scaleDown.resize(mcHistograms_scaleDown.size() + 1);
+  mcHistograms_pdfUp.resize(mcHistograms_pdfUp.size() + 1);
+  mcHistograms_pdfDown.resize(mcHistograms_pdfDown.size() + 1);
   mcQCDHistograms.resize(mcQCDHistograms.size() + 1);
   
   return true;
@@ -868,7 +868,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     bkg_scaleUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_scaleUp");
     bkg_scaleDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_scaleDown");
     bkg_pdfUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfUp");
-    bkg_pdfDown (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
+    bkg_pdfDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
 
     for(unsigned int i = 0; i < mcHistograms.size(); i++) {
       bkg->Add(mcHistograms[i][variableNumber]);
@@ -891,7 +891,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     bkg_scaleUp = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_scaleUp");
     bkg_scaleDown = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_scaleDown");
     bkg_pdfUp = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_pdfUp");
-    bkg_pdfDown (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
+    bkg_pdfDown = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
 
     for(unsigned int i = 1; i < mcHistograms.size(); i++) {
       bkg->Add(mcHistograms[i][variableNumber]);
@@ -988,7 +988,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   bkg->GetYaxis()->SetRangeUser(ymin, ymax);
 
   bkg->Draw("hist");
-  if(!needsQCD) mcHistograms[0][variableNumber]->Draw("same hist");
+  if(needsQCD) mcHistograms[0][variableNumber]->Draw("same hist");
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
     if(i != 0 && mcLayerNumbers[i] != mcLayerNumbers[i-1]) mcHistograms[i][variableNumber]->Draw("same hist");
   }
@@ -1028,30 +1028,28 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     ratio->SetBinError(i+1, h_gg[variableNumber]->GetBinError(i+1) / bkg->GetBinContent(i+1));
   }
 
-  TH1D * ratio_stat;
-  ratio_stat = (TH1D*)bkg->Clone("ratio_stat");
+  TH1D * ratio_stat = (TH1D*)bkg->Clone("ratio_stat");
   for(int i = 0; i < ratio_stat->GetNbinsX(); i++) {
     ratio_stat->SetBinContent(i+1, 1.);
     if(bkg->GetBinContent(i+1) == 0.) ratio_stat->SetBinError(i+1, 0.);
-    else ratio_stat->SetBinError(i+1, ratio_stat->GetBinError(i+1) / bkg->GetBinContent(i+1));
+    else ratio_stat->SetBinError(i+1, bkg->GetBinError(i+1) / bkg->GetBinContent(i+1));
   }
 
-  TH1D * ratio_sys;
-  ratio_sys = (TH1D*)bkg->Clone("ratio_sys");
+  TH1D * ratio_sys = (TH1D*)bkg->Clone("ratio_sys");
   for(int i = 0; i < ratio_sys->GetNbinsX(); i++) {
 
     Double_t stat = bkg->GetBinError(i+1);
 
-    Double_t btagUp = bkg_btagWeightUp->GetBinError(i+1);
-    Double_t btagDown = bkg_btagWeightDown->GetBinError(i+1);
+    Double_t btagUp = bkg_btagWeightUp->GetBinContent(i+1);
+    Double_t btagDown = bkg_btagWeightDown->GetBinContent(i+1);
     Double_t btag_sys = fabs(btagUp - btagDown) / 2.;
 
-    Double_t scaleUp = bkg_scaleUp->GetBinError(i+1);
-    Double_t scaleDown = bkg_scaleDown->GetBinError(i+1);
+    Double_t scaleUp = bkg_scaleUp->GetBinContent(i+1);
+    Double_t scaleDown = bkg_scaleDown->GetBinContent(i+1);
     Double_t scale_sys = fabs(scaleUp - scaleDown) / 2.;
     
-    Double_t pdfUp = bkg_pdfUp->GetBinError(i+1);
-    Double_t pdfDown = bkg_pdfDown->GetBinError(i+1);
+    Double_t pdfUp = bkg_pdfUp->GetBinContent(i+1);
+    Double_t pdfDown = bkg_pdfDown->GetBinContent(i+1);
     Double_t pdf_sys = fabs(pdfUp - pdfDown) / 2.;
 
     Double_t totalError2 = stat*stat + btag_sys*btag_sys + scale_sys*scale_sys + pdf_sys*pdf_sys;
@@ -1065,9 +1063,9 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   if(xmax > xmin) ratio->GetXaxis()->SetRangeUser(xmin, xmax);
 
   ratio_stat->SetFillStyle(1001);
-  ratio_stat->SetFillColor(kGray+1);
-  ratio_stat->SetLineColor(kGray+1);
-  ratio_stat->SetMarkerColor(kGray+1);
+  ratio_stat->SetFillColor(kGray+2);
+  ratio_stat->SetLineColor(kGray+2);
+  ratio_stat->SetMarkerColor(kGray+2);
 
   ratio_sys->SetFillStyle(1001);
   ratio_sys->SetFillColor(kGray);
