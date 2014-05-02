@@ -922,13 +922,37 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   tt->SetTextAngle(90.);
   tt->SetNDC(); tt->SetTextSize( 0.032 );
 
-  TH1D * errors = (TH1D*)bkg->Clone("errors");
+  TH1D * errors_stat = (TH1D*)bkg->Clone("errors_stat");
+
+  TH1D * errors_sys = (TH1D*)bkg->Clone("errors_sys");
+  for(int i = 0; i < ratio_sys->GetNbinsX(); i++) {
+
+    Double_t stat = bkg->GetBinError(i+1);
+
+    Double_t btagUp = bkg_btagWeightUp->GetBinContent(i+1);
+    Double_t btagDown = bkg_btagWeightDown->GetBinContent(i+1);
+    Double_t btag_sys = fabs(btagUp - btagDown) / 2.;
+
+    Double_t scaleUp = bkg_scaleUp->GetBinContent(i+1);
+    Double_t scaleDown = bkg_scaleDown->GetBinContent(i+1);
+    Double_t scale_sys = fabs(scaleUp - scaleDown) / 2.;
+    
+    Double_t pdfUp = bkg_pdfUp->GetBinContent(i+1);
+    Double_t pdfDown = bkg_pdfDown->GetBinContent(i+1);
+    Double_t pdf_sys = fabs(pdfUp - pdfDown) / 2.;
+
+    Double_t totalError2 = stat*stat + btag_sys*btag_sys + scale_sys*scale_sys + pdf_sys*pdf_sys;
+
+    if(bkg->GetBinContent(i+1) == 0.) ratio_sys->SetBinError(i+1, 0.);
+    else ratio_sys->SetBinError(i+1, sqrt(totalError2));
+  }
 
   if(drawSignal) calculateROC(h_siga[variableNumber], h_sigb[variableNumber], bkg, req, variable);
 
   TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
+  leg->SetNColumns(2);
   leg->AddEntry(h_gg[variableNumber], "#gamma#gamma Candidate Sample", "LP");
-  leg->AddEntry(errors, "Stat. Errors", "F");
+  leg->AddEntry(errors_sys, "Stat. #oplus Syst. Errors", "F");
   if(needsQCD) leg->AddEntry(bkg, "QCD", "F");
   leg->AddEntry(mcHistograms[0][variableNumber], legendNames[0], "F");
   for(unsigned int i = 1; i < mcHistograms.size(); i++) {
@@ -937,21 +961,28 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 
-  TPaveText * prelim = new TPaveText(0.50, 0.42, 0.85, 0.62, "NDC");
-  prelim->SetFillColor(0);
-  prelim->SetFillStyle(0);
-  prelim->SetLineColor(0);
-  prelim->AddText("CMS Preliminary 2013");
-  prelim->AddText(" ");
-  prelim->AddText("#sqrt{s} = 8 TeV, #intL = "+intLumi+" fb^{-1}");
-  prelim->AddText(req+" Requirement");
+  TPaveText * reqText = new TPaveText(0.50, 0.42, 0.85, 0.62, "NDC");
+  reqText->SetFillColor(0);
+  reqText->SetFillStyle(0);
+  reqText->SetLineColor(0);
+  reqText->AddText(req+" Requirement");
 
+  TPaveText * lumiHeader = new TPaveText(0.1, 0.901, 0.9, 0.94, "NDC");
+  lumiHeader->SetFillColor(0);
+  lumiHeader->SetFillStyle(0);
+  lumiHeader->SetLineColor(0);
+  lumiHeader->AddText("CMS Preliminary 2014     #sqrt{s} = 8 TeV     #intL = "+intLumi+" fb^{-1}");
+  
   h_gg[variableNumber]->SetMarkerStyle(20); 
   h_gg[variableNumber]->SetMarkerSize(1.5);
 
-  errors->SetFillColor(kOrange+10);
-  errors->SetFillStyle(3154);
-  errors->SetMarkerSize(0);
+  errors_stat->SetFillColor(kOrange+10);
+  errors_stat->SetFillStyle(3154);
+  errors_stat->SetMarkerSize(0);
+
+  errors_sys->SetFillColor(kOrange+10);
+  errors_sys->SetFillStyle(3154);
+  errors_sys->SetMarkerSize(0);
 
   if(needsQCD) bkg->SetFillColor(kSpring);
   else bkg->SetFillColor(mcLayerColors[0]);
@@ -992,7 +1023,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
     if(i != 0 && mcLayerNumbers[i] != mcLayerNumbers[i-1]) mcHistograms[i][variableNumber]->Draw("same hist");
   }
-  errors->Draw("same e2");
+  //errors_stat->Draw("same e2");
+  errors_sys->Draw("same e2");
   h_gg[variableNumber]->Draw("same e1");
   bkg->Draw("same axis");
 
@@ -1008,8 +1040,9 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     h_sigb[variableNumber]->Draw("same hist");
   }
 
+  lumiHeader->Draw("same");
   if(drawLegend) leg->Draw("same");
-  if(drawPrelim && drawLegend) prelim->Draw("same");
+  if(drawPrelim && drawLegend) reqText->Draw("same");
   if(displayKStest) {
     tt->AppendPad();
     KSscores.push_back(make_pair(variable, kolm));
@@ -1063,9 +1096,9 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   if(xmax > xmin) ratio->GetXaxis()->SetRangeUser(xmin, xmax);
 
   ratio_stat->SetFillStyle(1001);
-  ratio_stat->SetFillColor(kGray+2);
-  ratio_stat->SetLineColor(kGray+2);
-  ratio_stat->SetMarkerColor(kGray+2);
+  ratio_stat->SetFillColor(kGray+1);
+  ratio_stat->SetLineColor(kGray+1);
+  ratio_stat->SetMarkerColor(kGray+1);
 
   ratio_sys->SetFillStyle(1001);
   ratio_sys->SetFillColor(kGray);
@@ -1085,11 +1118,18 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   ratio->GetYaxis()->SetRangeUser(ratiomin, ratiomax);
   ratio->GetYaxis()->SetNdivisions(508);
 
+  TLegend * leg2 = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
+  leg2->AddEntry(ratio_stat, "Stat.", "LP");
+  leg2->AddEntry(ratio_sys, "Stat. #oplus Syst.", "LP");
+  leg2->SetFillColor(0);
+  leg2->SetTextSize(0.028);
+
   ratio->Draw("e1");
   ratio_sys->Draw("e2 same");
   ratio_stat->Draw("e2 same");
   ratio->Draw("e1 same");
   ratio->Draw("axis same");
+  leg2->Draw("same");
 
   TLine * oneLine = new TLine(xmin, 1, xmax, 1);
   oneLine->SetLineStyle(2);
