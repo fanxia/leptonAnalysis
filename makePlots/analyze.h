@@ -925,7 +925,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   TH1D * errors_stat = (TH1D*)bkg->Clone("errors_stat");
 
   TH1D * errors_sys = (TH1D*)bkg->Clone("errors_sys");
-  for(int i = 0; i < ratio_sys->GetNbinsX(); i++) {
+  for(int i = 0; i < errors_sys->GetNbinsX(); i++) {
 
     Double_t stat = bkg->GetBinError(i+1);
 
@@ -943,8 +943,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
 
     Double_t totalError2 = stat*stat + btag_sys*btag_sys + scale_sys*scale_sys + pdf_sys*pdf_sys;
 
-    if(bkg->GetBinContent(i+1) == 0.) ratio_sys->SetBinError(i+1, 0.);
-    else ratio_sys->SetBinError(i+1, sqrt(totalError2));
+    if(bkg->GetBinContent(i+1) == 0.) errors_sys->SetBinError(i+1, 0.);
+    else errors_sys->SetBinError(i+1, sqrt(totalError2));
   }
 
   if(drawSignal) calculateROC(h_siga[variableNumber], h_sigb[variableNumber], bkg, req, variable);
@@ -952,12 +952,15 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
   leg->SetNColumns(2);
   leg->AddEntry(h_gg[variableNumber], "#gamma#gamma Candidate Sample", "LP");
+  leg->AddEntry((TObject*)0, "", "");
   leg->AddEntry(errors_sys, "Stat. #oplus Syst. Errors", "F");
+  leg->AddEntry((TObject*)0, "", "");
   if(needsQCD) leg->AddEntry(bkg, "QCD", "F");
   leg->AddEntry(mcHistograms[0][variableNumber], legendNames[0], "F");
   for(unsigned int i = 1; i < mcHistograms.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
   }
+  leg->AddEntry((TObject*)0, "", "");
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 
@@ -1118,9 +1121,10 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   ratio->GetYaxis()->SetRangeUser(ratiomin, ratiomax);
   ratio->GetYaxis()->SetNdivisions(508);
 
-  TLegend * leg2 = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
-  leg2->AddEntry(ratio_stat, "Stat.", "LP");
-  leg2->AddEntry(ratio_sys, "Stat. #oplus Syst.", "LP");
+  TLegend * leg2 = new TLegend(0.65, 0.75, 0.95, 0.95, NULL, "brNDC");
+  leg2->SetNColumns(2);
+  leg2->AddEntry(ratio_stat, "Stat.", "F");
+  leg2->AddEntry(ratio_sys, "Stat. #oplus Syst.", "F");
   leg2->SetFillColor(0);
   leg2->SetTextSize(0.028);
 
