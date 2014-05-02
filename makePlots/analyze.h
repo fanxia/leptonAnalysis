@@ -949,9 +949,9 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
 
   if(drawSignal) calculateROC(h_siga[variableNumber], h_sigb[variableNumber], bkg, req, variable);
 
-  TLegend * leg = new TLegend(0.50, 0.65, 0.85, 0.85, NULL, "brNDC");
+  TLegend * leg = new TLegend(0.5, 0.6, 0.85, 0.85, NULL, "brNDC");
   leg->SetNColumns(2);
-  leg->AddEntry(h_gg[variableNumber], "#gamma#gamma Candidate Sample", "LP");
+  leg->AddEntry(h_gg[variableNumber], "Data", "LP");
   leg->AddEntry((TObject*)0, "", "");
   leg->AddEntry(errors_sys, "Stat. #oplus Syst. Errors", "F");
   leg->AddEntry((TObject*)0, "", "");
@@ -1034,12 +1034,12 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   if(drawSignal) {
     h_siga[variableNumber]->SetLineColor(kMagenta);
     h_siga[variableNumber]->SetLineWidth(3);
-    leg->AddEntry(h_siga[variableNumber], "GGM #gamma#gamma (460_175)", "L");
+    leg->AddEntry(h_siga[variableNumber], "GGM (460_175)", "L");
     h_siga[variableNumber]->Draw("same hist");
     
     h_sigb[variableNumber]->SetLineColor(kBlue);
     h_sigb[variableNumber]->SetLineWidth(3);
-    leg->AddEntry(h_sigb[variableNumber], "GGM #gamma#gamma (560_325)", "L");
+    leg->AddEntry(h_sigb[variableNumber], "GGM (560_325)", "L");
     h_sigb[variableNumber]->Draw("same hist");
   }
 
@@ -1121,7 +1121,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   ratio->GetYaxis()->SetRangeUser(ratiomin, ratiomax);
   ratio->GetYaxis()->SetNdivisions(508);
 
-  TLegend * leg2 = new TLegend(0.65, 0.75, 0.95, 0.95, NULL, "brNDC");
+  TLegend * leg2 = new TLegend(0.65, 0.75, 0.85, 0.95, NULL, "brNDC");
   leg2->SetNColumns(2);
   leg2->AddEntry(ratio_stat, "Stat.", "F");
   leg2->AddEntry(ratio_sys, "Stat. #oplus Syst.", "F");
