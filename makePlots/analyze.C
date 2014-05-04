@@ -130,13 +130,13 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					  channel, 4, kAzure-2, "t#bar{t} + W/Z");
 
   // http://arxiv.org/abs/1102.1967
-  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 
-					  2.166, 2.166 * .25, 2.166 * .25, 2.166 * 0.076, 2.166 * 0.099,
-					  channel, 5, 8, "t#bar{t} + #gamma");
+  //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 
+  //2.166, 2.166 * .25, 2.166 * .25, 2.166 * 0.076, 2.166 * 0.099,
+  //channel, 5, 8, "t#bar{t} + #gamma");
 
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/WhizardMCTeeTeeGamma#2_to_5_All_ttbar_decay_channels
-  //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttA_2to5.root", "ttA_2to5", .9081 * 2, .9081 * .5, .9081 * .5, .9081 * 2 * 0.076, .9081 * 2 * 0.099, channel, 5, 8, "t#bar{t} + #gamma");
-  //pMaker->SetUseWHIZARD(true);
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttA_2to5.root", "ttA_2to5", .9081 * 2, .9081 * .5, .9081 * .5, .9081 * 2 * 0.076, .9081 * 2 * 0.099, channel, 5, 8, "t#bar{t} + #gamma");
+  pMaker->SetUseWHIZARD(true);
 
   //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");
 
@@ -179,7 +179,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);
     pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("leadSigmaIetaIeta", 40, 0., 0.02);
-    pMaker->BookHistogram("leadChargedHadronIso", 75, 0, 15.0);
+    pMaker->BookHistogram("leadChargedHadronIso", 35, 0, 15.0);
   }
 
   if(nPhotons_req >= 2) {
@@ -187,7 +187,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);
     pMaker->BookHistogram("trailSigmaIetaIeta", 40, 0, 0.02);
-    pMaker->BookHistogram("trailChargedHadronIso", 75, 0, 15.0);
+    pMaker->BookHistogram("trailChargedHadronIso", 35, 0, 15.0);
     pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("diJetPt", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("photon_invmass", nKinematicBins, xbins_kinematic);
@@ -425,17 +425,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->CreatePlot("leadSigmaIetaIeta",
 		       false, needsQCD,
 		       "Lead #gamma #sigma_{i#etai#eta}", "Number of Events",
-		       0, 0.015,
+		       0, 0.02,
 		       2.3e-3, 5.e4,
 		       0., 5.1,
-		       true, true, true,
+		       true, false, false,
 		       out);
 
     pMaker->CreatePlot("leadChargedHadronIso",
 		       false, needsQCD,
 		       "Lead #gamma ChHadIso", "Number of Events",
 		       0, 15,
-		       2.3e-4, 5.e3,
+		       2.3e-4, 2.5e4,
 		       0., 1.8,
 		       true, true, false,
 		       out);
@@ -482,10 +482,10 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreatePlot("trailSigmaIetaIeta",
 		     false, needsQCD,
 		     "#sigma_{i#etai#eta} of Trail #gamma", "Number of Events",
-		     0, 0.015,
+		     0, 0.02,
 		     2.3e-3, 5.e4,
 		     0., 5.1,
-		     true, true, true,
+		     true, false, false,
 		     out);
   
   pMaker->CreatePlot("trailChargedHadronIso",

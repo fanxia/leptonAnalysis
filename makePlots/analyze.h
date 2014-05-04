@@ -1390,7 +1390,7 @@ void prep_signal(TString req, int nPhotons_req) {
     double n = 15000.;
 
     double acceptance = gg->Integral();
-    if(n > 0) h_acc->Fill(index1, index2, acceptance / n);
+    if(n > 0) h_acc->Fill(index1, index2, acceptance / (0.438/3.) / n);
 
     f->Close();
   }
