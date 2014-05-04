@@ -189,6 +189,7 @@ class PlotMaker : public TObject {
 
   void FillHistograms(double metCut, int nPhotons_req, int nBtagReq);
   void SubtractMCFromQCD();
+  void NormalizeQCD();
 
   void CreatePlot(TString variable,
 		  bool divideByWidth, bool needsQCD,
@@ -698,6 +699,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       if(btagWeight != btagWeight) continue;
       if(metCut > 0. && vars[1] >= metCut) continue;
 
+      if(useWHIZARD && i < 3 && overlaps_ttA > 0.001) continue;
+
       if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
 
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -713,7 +716,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
     }
 
-    for(unsigned int j = 0; j < vars.size(); j++) mcQCDHistograms[i][j]->Scale(intLumi_int * crossSections[j] / mcNGen[j]);
+    for(unsigned int j = 0; j < vars.size(); j++) mcQCDHistograms[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
   }
 
   for(int i = 0; i < sigaTree->GetEntries(); i++) {
@@ -790,11 +793,81 @@ void PlotMaker::SubtractMCFromQCD() {
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
     for(unsigned int j = 0; j < mcQCDHistograms[i].size(); j++) {
       h_qcd[j]->Add(mcQCDHistograms[i][j], -1.);
-    }
+     }
   }
 
 }
 
+void PlotMaker::NormalizeQCD() {
+
+  double n_qcd_before = h_qcd[1]->Integral();
+
+  const int endBin = h_gg[1]->GetXaxis()->FindBin(20) - 1;
+
+  double n_sig = h_gg[1]->Integral(0, endBin);
+  double n_qcd = h_qcd[1]->Integral(0, endBin);
+
+  if(n_qcd < 1) continue;
+
+  double n_mc = 0;
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) n_mc += mcHistograms[i][1]->Integral(0, mcHistograms[i][1]->GetXaxis()->FindBin(20) - 1);
+
+  double sigma_sig = 0;
+  double sigma_qcd = 0;
+  double sigma_mc = 0;
+  
+  for(int i = 0; i < endBin; i++) {
+    sigma_sig += h_gg[1]->GetBinError(i+1) * h_gg[1]->GetBinError(i+1);
+    sigma_qcd += h_qcd[1]->GetBinError(i+1) * h_qcd[1]->GetBinError(i+1);
+
+    for(unsigned int j = 0; j < mcHistograms.size(); j++) sigma_mc += mcHistograms[j][1]->GetBinError(i+1) * mcHistorams[j][1]->GetBinError(i+1);
+  }
+
+  sigma_sig = sqrt(sigma_sig);
+  sigma_qcd = sqrt(sigma_qcd);
+  sigma_mc = sqrt(sigma_mc);
+
+  double scale = (n_sig - n_mc) / n_qcd;
+  
+  for(unsigned int i = 0; i < h_qcd.size(); i++) {
+    double newError_lowBins[endBin];
+
+    for(int j = 0; j < endBin; j++) {
+      newError_lowBins[j] = h_qcd[1]->GetBinContent(j+1) * h_qcd[1]->GetBinContent(j+1);
+      newError_lowBins[j] *= sigma_sig*sigma_sig + sigma_mc*sigma_mc;
+      newError_lowBins[j] += scale*scale * h_qcd[1]->GetBinError(j+1)*h_qcd[1]->GetBinError(j+1) * (n_qcd - h_qcd[1]->GetBinContent(j+1))*(n_qcd - h_qcd[1]->GetBinContent(j+1));
+      for(int k = 0; k < endBin; k++) {
+	if(k == j) continue;
+	newError_lowBins[j] += scale*scale * h_qcd[1]->GetBinError(k+1)*h_qcd[1]->GetBinError(k+1) * h_qcd[1]->GetBinContent(k+1)*h_qcd[1]->GetBinContent(k+1);
+      }
+      newError_lowBins[j] /= n_qcd*n_qcd;
+      newError_lowBins[j] = sqrt(newError_lowBins[j]);
+    }
+
+    for(int j = 0; j < h_qcd[i]->GetNbinsX(); j++) {
+      if(j < endBin+1) {
+	h_qcd[i]->SetBinContent(j+1, h_qcd[i]->GetBinContent(j+1) * scale);
+	h_qcd[i]->SetBinError(j+1, newError_lowBins[j]);
+      }
+      else {
+	double newError = sigma_sig*sigma_sig + sigma_mc*sigma_mc + scale*scale*sigma_qcd*sigma_qcd;
+	newError *= h_qcd[i]->GetBinContent(j+1)*h_qcd[i]->GetBinContent(j+1) / (n_qcd*n_qcd);
+	newError += h_qcd[i]->GetBinError(j+1)*h_qcd[i]->GetBinError(j+1) * scale*scale;
+	newError = sqrt(newError);
+
+	h_qcd[i]->SetBinContent(j+1, h_qcd[i]->GetBinContent(j+1) * scale);
+	h_qcd[i]->SetBinError(j+1, newError);
+      }
+    }
+
+  }
+
+  double n_qcd_after = h_qcd[1]->Integral();
+
+  cout << endl << "NormalizeQCD(): Overall scaling factor of " << n_qcd_after / n_qcd_before << " applied." << endl << endl;
+
+}
+    
 void PlotMaker::CreatePlot(TString variable,
 			   bool divideByWidth, bool needsQCD,
 			   TString xaxisTitle, TString yaxisTitle,
@@ -857,6 +930,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   h_gg[variableNumber]->Write();
   if(needsQCD) h_qcd[variableNumber]->Write();
   for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) mcQCDHistograms[i][variableNumber]->Write();
 
   TH1D *bkg, *bkg_btagWeightUp, *bkg_btagWeightDown, *bkg_scaleUp, *bkg_scaleDown, *bkg_pdfUp, *bkg_pdfDown;
 
@@ -949,22 +1023,23 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
 
   if(drawSignal) calculateROC(h_siga[variableNumber], h_sigb[variableNumber], bkg, req, variable);
 
-  TLegend * leg = new TLegend(0.5, 0.6, 0.85, 0.85, NULL, "brNDC");
+  TLegend * leg = new TLegend(0.45, 0.6, 0.85, 0.85, NULL, "brNDC");
   leg->SetNColumns(2);
   leg->AddEntry(h_gg[variableNumber], "Data", "LP");
   leg->AddEntry((TObject*)0, "", "");
   leg->AddEntry(errors_sys, "Stat. #oplus Syst. Errors", "F");
   leg->AddEntry((TObject*)0, "", "");
   if(needsQCD) leg->AddEntry(bkg, "QCD", "F");
+  
   leg->AddEntry(mcHistograms[0][variableNumber], legendNames[0], "F");
   for(unsigned int i = 1; i < mcHistograms.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
   }
-  leg->AddEntry((TObject*)0, "", "");
+  if(needsQCD) leg->AddEntry((TObject*)0, "", "");
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 
-  TPaveText * reqText = new TPaveText(0.50, 0.42, 0.85, 0.62, "NDC");
+  TPaveText * reqText = new TPaveText(0.45, 0.47, 0.85, 0.57, "NDC");
   reqText->SetFillColor(0);
   reqText->SetFillStyle(0);
   reqText->SetLineColor(0);
@@ -1121,12 +1196,12 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   ratio->GetYaxis()->SetRangeUser(ratiomin, ratiomax);
   ratio->GetYaxis()->SetNdivisions(508);
 
-  TLegend * leg2 = new TLegend(0.65, 0.75, 0.85, 0.95, NULL, "brNDC");
-  leg2->SetNColumns(2);
+  TLegend * leg2 = new TLegend(0.78, 0.7, 0.88, 0.95, NULL, "brNDC");
+  //leg2->SetNColumns(2);
   leg2->AddEntry(ratio_stat, "Stat.", "F");
   leg2->AddEntry(ratio_sys, "Stat. #oplus Syst.", "F");
   leg2->SetFillColor(0);
-  leg2->SetTextSize(0.028);
+  leg2->SetTextSize(0.032);
 
   ratio->Draw("e1");
   ratio_sys->Draw("e2 same");

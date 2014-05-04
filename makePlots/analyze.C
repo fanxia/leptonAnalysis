@@ -131,7 +131,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   // http://arxiv.org/abs/1102.1967
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 
-					  14.0, -1, -1, -1, -1,
+					  2.166, 2.166 * .25, 2.166 * .25, 2.166 * 0.076, 2.166 * 0.099,
 					  channel, 5, 8, "t#bar{t} + #gamma");
 
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/WhizardMCTeeTeeGamma#2_to_5_All_ttbar_decay_channels
@@ -197,6 +197,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq);
   pMaker->SubtractMCFromQCD();
+  pMaker->NormalizeQCD();
 
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
@@ -388,7 +389,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       false, needsQCD,
 		       "Lead #gamma #sigma_{i#etai#eta}", "Number of Events",
 		       0, 0.015,
-		       2.3-3, 5.e4,
+		       2.3e-3, 5.e4,
 		       0., 5.1,
 		       true, true, true,
 		       out);
