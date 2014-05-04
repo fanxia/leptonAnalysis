@@ -204,60 +204,97 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   bool needsQCD = (channel < 2);
 
-  pMaker->CreatePlot("Nphotons",
-		     false, needsQCD,
-		     "Number of #gamma's", "Number of Events",
-		     0, 4,
-		     2.e-3, 3.e6,
-		     0., 1.3,
+  pMaker->CreatePlot("Nphotons", false, needsQCD, "Number of #gamma's", "Number of Events",
+		     0, 4, 2.e-2, 3.e6,
+		     0.5, 1.5,
 		     true, true, false,
 		     out);
 
-  pMaker->CreatePlot("pfMET",
-		     true, needsQCD,
-		     "#slash{E}_{T} (GeV)", "Number of Events",
-		     xbins_met[0], xbins_met[nMetBins],
-		     7.e-3, 2.5e4,
-		     0., 2.8,
-		     true, true, true,
-		     out);
+  // pfMET
+  if(nPhotons_req == 0) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
+					   xbins_met[0], xbins_met[nMetBins], 7.e-3, 2.5e4,
+					   0.7, 1.3,
+					   true, true, true,
+					   out);
+  else if(nPhotons_req == 1) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
+						xbins_met[0], xbins_met[nMetBins], 7.e-4, 2.5e2,
+						0.5, 1.5,
+						true, true, true,
+						out);
+  else if(nPhotons_req == 2) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
+						xbins_met[0], xbins_met[nMetBins], 7.e-6, 9.,
+						0., 2.1,
+						true, true, true,
+						out);
 
-  pMaker->CreatePlot("Njets",
-		     false, needsQCD,
-		     "nJets", "Number of Events",
-		     0, 14, 
-		     2.e-2, 3.e6,
-		     0., 1.8,
-		     true, true, false,
-		     out);
+  // Njets
+  if(nPhotons_req == 0) pMaker->CreatePlot("Njets", false, needsQCD, "nJets", "Number of Events",
+					   2, 14, 2.e-3, 9.e5,
+					   0.6, 2.3,
+					   true, true, false,
+					   out);
+  else if(nPhotons_req == 1) pMaker->CreatePlot("Njets", false, needsQCD, "nJets", "Number of Events",
+						2, 14, 2.e-3, 9.e4,
+						0., 2.3,
+						true, true, false,
+						out);
+  else if(nPhotons_req == 2) pMaker->CreatePlot("Njets", false, needsQCD, "nJets", "Number of Events",
+						2, 14, 2.e-4, 9.e2,
+						0., 2.3,
+						true, true, false,
+						out);
   
-  pMaker->CreatePlot("Nbtags",
-		     false, needsQCD,
-		     "nBtags", "Number of Events",
-		     0, 6, 
-		     2.e-2, 3.e6,
-		     0., 1.8,
-		     true, true, false,
-		     out);
-
-   pMaker->CreatePlot("max_csv",
-		      false, needsQCD,
-		     "max csv", "Number of Events",
-		     0.65, 1., 
-		     2.e-2, 3.e6,
-		     0., 1.8,
-		     true, false, false,
-		     out);
-
-  pMaker->CreatePlot("submax_csv",
-		     false, needsQCD,
-		     "sub-max csv", "Number of Events",
-		     0, 4, 
-		     2.e-2, 3.e5,
-		     0., 1.8,
-		     true, false, false,
-		     out);
-
+  // Nbtags
+  if(nPhotons_req == 0) pMaker->CreatePlot("Nbtags", false, needsQCD, "nBtags", "Number of Events",
+					   0, 8, 2.e-3, 3.e6, 
+					   0.6, 1.6,
+					   true, true, false,
+					   out);
+  else if(nPhotons_req == 1) pMaker->CreatePlot("Nbtags", false, needsQCD, "nBtags", "Number of Events",
+						0, 8, 2.e-3, 9.e4,
+						0., 1.8,
+						true, true, false,
+						out);
+  else if(nPhotons_req == 2) pMaker->CreatePlot("Nbtags", false, needsQCD, "nBtags", "Number of Events",
+						0, 8, 2.e-3, 9.e2,
+						0., 1.8,
+						true, true, false,
+						out);
+  
+  // max_csv
+  if(nPhotons_req == 0) pMaker->CreatePlot("max_csv", false, needsQCD, "max csv", "Number of Events",
+					   0.65, 1., 2.e-2, 3.e6,
+					   0.7, 1.3,
+					   true, false, false,
+					   out);
+  else if(nPhotons_req == 1) pMaker->CreatePlot("max_csv", false, needsQCD, "max csv", "Number of Events",
+						0.65, 1., 2.e-2, 5.e3,
+						0., 1.8,
+						true, false, false,
+						out);
+  else if(nPhotons_req == 2) pMaker->CreatePlot("max_csv", false, needsQCD, "max csv", "Number of Events",
+						0.65, 1., 2.e-3, 8.e2,
+						0., 2.1,
+						true, false, false,
+						out);
+  
+  // submax_csv
+  if(nPhotons_req == 0) pMaker->CreatePlot("submax_csv", false, needsQCD, "sub-max csv", "Number of Events",
+					   0, 1, 2.e-2, 3.e5,
+					   0.6, 1.6,
+					   true, false, false,
+					   out);
+  else if(nPhotons_req == 1) pMaker->CreatePlot("submax_csv", false, needsQCD, "sub-max csv", "Number of Events",
+						0, 1, 2.e-2, 3.e3,
+						0.6, 1.8,
+						true, false, false,
+						out);
+  else if(nPhotons_req == 2) pMaker->CreatePlot("submax_csv", false, needsQCD, "sub-max csv", "Number of Events",
+						0, 1, 2.e-4, 3.e1,
+						0., 1.8,
+						true, false, false,
+						out);
+  
   pMaker->CreatePlot("HT_jets",
 		     true, needsQCD,
 		     "HT (jets only) (GeV/c^{2})", "Number of Events",
@@ -446,7 +483,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     false, needsQCD,
 		     "#sigma_{i#etai#eta} of Trail #gamma", "Number of Events",
 		     0, 0.015,
-		     2.3-3, 5.e4,
+		     2.3e-3, 5.e4,
 		     0., 5.1,
 		     true, true, true,
 		     out);

@@ -191,11 +191,8 @@ class PlotMaker : public TObject {
   void SubtractMCFromQCD();
   void NormalizeQCD();
 
-  void CreatePlot(TString variable,
-		  bool divideByWidth, bool needsQCD,
-		  TString xaxisTitle, TString yaxisTitle,
-		  Float_t xmin, Float_t xmax,
-		  Float_t ymin, Float_t ymax,
+  void CreatePlot(TString variable, bool divideByWidth, bool needsQCD, TString xaxisTitle, TString yaxisTitle,
+		  Float_t xmin, Float_t xmax, Float_t ymin, Float_t ymax,
 		  Float_t ratiomin, Float_t ratiomax,
 		  bool drawSignal, bool drawLegend, bool drawPrelim,
 		  TFile*& out);
@@ -807,7 +804,7 @@ void PlotMaker::NormalizeQCD() {
   double n_sig = h_gg[1]->Integral(0, endBin);
   double n_qcd = h_qcd[1]->Integral(0, endBin);
 
-  if(n_qcd < 1) continue;
+  if(n_qcd < 1) return;
 
   double n_mc = 0;
   for(unsigned int i = 0; i < mcHistograms.size(); i++) n_mc += mcHistograms[i][1]->Integral(0, mcHistograms[i][1]->GetXaxis()->FindBin(20) - 1);
@@ -820,7 +817,7 @@ void PlotMaker::NormalizeQCD() {
     sigma_sig += h_gg[1]->GetBinError(i+1) * h_gg[1]->GetBinError(i+1);
     sigma_qcd += h_qcd[1]->GetBinError(i+1) * h_qcd[1]->GetBinError(i+1);
 
-    for(unsigned int j = 0; j < mcHistograms.size(); j++) sigma_mc += mcHistograms[j][1]->GetBinError(i+1) * mcHistorams[j][1]->GetBinError(i+1);
+    for(unsigned int j = 0; j < mcHistograms.size(); j++) sigma_mc += mcHistograms[j][1]->GetBinError(i+1) * mcHistograms[j][1]->GetBinError(i+1);
   }
 
   sigma_sig = sqrt(sigma_sig);
@@ -832,20 +829,23 @@ void PlotMaker::NormalizeQCD() {
   for(unsigned int i = 0; i < h_qcd.size(); i++) {
     double newError_lowBins[endBin];
 
-    for(int j = 0; j < endBin; j++) {
-      newError_lowBins[j] = h_qcd[1]->GetBinContent(j+1) * h_qcd[1]->GetBinContent(j+1);
-      newError_lowBins[j] *= sigma_sig*sigma_sig + sigma_mc*sigma_mc;
-      newError_lowBins[j] += scale*scale * h_qcd[1]->GetBinError(j+1)*h_qcd[1]->GetBinError(j+1) * (n_qcd - h_qcd[1]->GetBinContent(j+1))*(n_qcd - h_qcd[1]->GetBinContent(j+1));
-      for(int k = 0; k < endBin; k++) {
-	if(k == j) continue;
-	newError_lowBins[j] += scale*scale * h_qcd[1]->GetBinError(k+1)*h_qcd[1]->GetBinError(k+1) * h_qcd[1]->GetBinContent(k+1)*h_qcd[1]->GetBinContent(k+1);
+    if(i == 1) {
+      for(int j = 0; j < endBin; j++) {
+	newError_lowBins[j] = h_qcd[1]->GetBinContent(j+1) * h_qcd[1]->GetBinContent(j+1);
+	newError_lowBins[j] *= sigma_sig*sigma_sig + sigma_mc*sigma_mc;
+	newError_lowBins[j] += scale*scale * h_qcd[1]->GetBinError(j+1)*h_qcd[1]->GetBinError(j+1) * (n_qcd - h_qcd[1]->GetBinContent(j+1))*(n_qcd - h_qcd[1]->GetBinContent(j+1));
+	for(int k = 0; k < endBin; k++) {
+	  if(k == j) continue;
+	  newError_lowBins[j] += scale*scale * h_qcd[1]->GetBinError(k+1)*h_qcd[1]->GetBinError(k+1) * h_qcd[1]->GetBinContent(k+1)*h_qcd[1]->GetBinContent(k+1);
+	}
+	newError_lowBins[j] /= n_qcd*n_qcd;
+	newError_lowBins[j] = sqrt(newError_lowBins[j]);
       }
-      newError_lowBins[j] /= n_qcd*n_qcd;
-      newError_lowBins[j] = sqrt(newError_lowBins[j]);
     }
 
     for(int j = 0; j < h_qcd[i]->GetNbinsX(); j++) {
-      if(j < endBin+1) {
+      // do something different for pfMET < 20
+      if(j < endBin+1 && i == 1) {
 	h_qcd[i]->SetBinContent(j+1, h_qcd[i]->GetBinContent(j+1) * scale);
 	h_qcd[i]->SetBinError(j+1, newError_lowBins[j]);
       }
