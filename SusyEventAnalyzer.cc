@@ -542,7 +542,7 @@ void SusyEventAnalyzer::Acceptance() {
   TH2D * h_ttA_phaseSpace = new TH2D("ttA_phaseSpace"+output_code_t, "ttA_phaseSpace"+output_code_t, 500, 0, 1000, 500, 0, 5);
   TH2D * h_ttbar_phaseSpace = new TH2D("ttbar_phaseSpace"+output_code_t, "ttbar_phaseSpace"+output_code_t, 500, 0, 1000, 500, 0, 5);
 
-  const int nTreeVariables = 72;
+  const int nTreeVariables = 73;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
@@ -563,7 +563,8 @@ void SusyEventAnalyzer::Acceptance() {
     "btagWeight", "btagWeightUp", "btagWeightDown", "btagWeightErr",
     "metFilterBit",
     "ttbarDecayMode",
-    "overlaps_ttA"};
+    "overlaps_ttA",
+    "TopPtReweighting"};
     
   map<TString, float> treeMap;
   for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;

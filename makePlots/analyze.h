@@ -83,12 +83,16 @@ void calculateROC(TH1D * sig_a, TH1D * sig_b, TH1D * bkg, TString req, TString t
 
     x_a[i] = s / sig_a->Integral();
     y_a[i] = b / bkg->Integral();
-    srootb_a->SetBinContent(i+1, x_a[i] / sqrt(y_a[i]));
+    srootb_a->SetBinContent(i+1, s / sqrt(b));
+    Double_t error = (s / sqrt(b)) * sqrt(serr*serr/(s*s) + berr*berr/(4*b*b));
+    srootb_a->SetBinError(i+1, error);
 
     s = sig_b->IntegralAndError(i+1, -1, serr, "");
     x_b[i] = s / sig_b->Integral();
     y_b[i] = b / bkg->Integral();
-    srootb_b->SetBinContent(i+1, x_b[i] / sqrt(y_b[i]));
+    srootb_b->SetBinContent(i+1, s / sqrt(b));
+    error = (s / sqrt(b)) * sqrt(serr*serr/(s*s) + berr*berr/(4*b*b));
+    srootb_b->SetBinContent(i+1, error);
 
   }
 
@@ -145,19 +149,19 @@ void calculateROC(TH1D * sig_a, TH1D * sig_b, TH1D * bkg, TString req, TString t
   else srootb_a->GetYaxis()->SetRangeUser(0, 1.1 * srootb_a->GetMaximum());
   srootb_a->GetXaxis()->SetTitle("Lower cut on "+title);
   srootb_a->GetYaxis()->SetTitle("S / #sqrt{B}");
-  srootb_a->Draw("hist");
-  srootb_b->Draw("hist same");
+  srootb_a->Draw("e1");
+  srootb_b->Draw("e1 same");
 
   float lineMaxY = (srootb_b->GetMaximum() > srootb_a->GetMaximum()) ? 1.1 * srootb_b->GetMaximum() : 1.1 * srootb_a->GetMaximum();
 
   TLine * bestCutLine_a = new TLine(srootb_a->GetBinLowEdge(bestCutBin_a), 0, srootb_a->GetBinLowEdge(bestCutBin_a), lineMaxY);
   bestCutLine_a->SetLineColor(kMagenta);
   bestCutLine_a->SetLineWidth(2);
-  bestCutLine_a->Draw("same");
+  //bestCutLine_a->Draw("same");
   TLine * bestCutLine_b = new TLine(srootb_b->GetBinLowEdge(bestCutBin_b), 0, srootb_b->GetBinLowEdge(bestCutBin_b), lineMaxY);
   bestCutLine_b->SetLineColor(kBlue);
   bestCutLine_b->SetLineWidth(2);
-  bestCutLine_b->Draw("same");
+  //bestCutLine_b->Draw("same");
 
   canv->SaveAs("roc_"+title+"_"+req+".pdf");
 
