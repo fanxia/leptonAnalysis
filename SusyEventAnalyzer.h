@@ -862,13 +862,18 @@ double SusyEventAnalyzer::TopPtReweighting(susy::Event& ev) {
     if(wplus && wminus) break;
   }
 
-  if(!wplus || !wminus) return -1;
+  if(!wplus || !wminus) {
+    double weight = 0.156 - 0.00137*top->momentum.Pt();
+    weight += 0.156 - 0.00137*antitop->momentum.Pt();
+    weight = exp(weight / 2.);
+    return weight;
+  }
 
   int leptonicWs = 0;
 
   for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
     if(it->mother == wplus) {
-      if(abs(it->pdgId) >= 11 && abs(it->pdgId) =< 16) {
+      if(abs(it->pdgId) >= 11 && abs(it->pdgId) <= 16) {
 	leptonicWs++;
 	break;
       }
@@ -877,7 +882,7 @@ double SusyEventAnalyzer::TopPtReweighting(susy::Event& ev) {
 
   for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
     if(it->mother == wminus) {
-      if(abs(it->pdgId) >= 11 && abs(it->pdgId) =< 16) {
+      if(abs(it->pdgId) >= 11 && abs(it->pdgId) <= 16) {
 	leptonicWs++;
 	break;
       }
