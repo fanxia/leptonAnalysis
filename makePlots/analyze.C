@@ -168,19 +168,18 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->SetDisplayKStest(displayKStest);
 
-  int nMetBins_[3] = {17, 11, 11};
-  const int nMetBins = nMetBins_[nPhotons_req];
+  int nMetBins_all[3] = {17, 11, 11};
+  const int nMetBins = nMetBins_all[nPhotons_req];
   Double_t xbins_met[3][nMetBins+1] = {{0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 100, 150, 300, 650},
-						     {0, 10, 20, 30, 40, 50, 65, 80, 100, 150, 300, 650},
-						     {0, 10, 20, 30, 40, 50, 65, 80, 100, 150, 300, 650}};
+				       {0, 10, 20, 30, 40, 50, 65, 80, 100, 150, 300, 650},
+				       {0, 10, 20, 30, 40, 50, 65, 80, 100, 150, 300, 650}};
 
-  int nKinematicBins_[3] = {28, 15, 15};
-  const int nKinematicBins = nKinematicBins_[nPhotons_req];
+  int nKinematicBins_all[3] = {28, 15, 15};
+  const int nKinematicBins = nKinematicBins_all[nPhotons_req];
   Double_t xbins_kinematic[nKinematicBins+1] = {{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000},
 							      {0, 20, 40, 60, 80, 100, 125, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000},
 							      {0, 20, 40, 60, 80, 100, 125, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000}};
   
-
   // has to start with nphotons then met, then HT
   pMaker->BookHistogram("Nphotons", 4, 0., 4.);
   pMaker->BookHistogram("pfMET", nMetBins, xbins_met[nPhotons_req]);
