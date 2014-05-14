@@ -1325,12 +1325,15 @@ void PlotMaker::CreateTable() {
   }
   
   Double_t val, err;
-  Double_t bkgval, bkgerr2;
+  Double_t bkgval = 0;
+  Double_t bkgerr2 = 0;
   
   for(int i = 0; i < nBins; i++) {
     
     if(req.Contains("ele")) {
       val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+      bkgval += val;
+      bkgerr2 += err*err;
       fprintf(tableFile, "qcdval%dx:%.0f\nqcdstat%dx:%.1f\n", i+1, val, i+1, err);
     }
     else fprintf(tableFile, "qcdval%dx:%.0f\nqcdstat%dx:%.1f\n", i+1, 0., i+1, 0.);
@@ -1344,8 +1347,8 @@ void PlotMaker::CreateTable() {
     totalerr2 += err*err;
     val += mcHistograms[2][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
     totalerr2 += err*err;
-    bkgval = val;
-    bkgerr2 = totalerr2;
+    bkgval += val;
+    bkgerr2 += totalerr2;
     fprintf(tableFile, "ttInclusiveval%dx:%.0f\nttInclusivestat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
     
     // V Jets
@@ -1393,7 +1396,7 @@ void PlotMaker::CreateTable() {
     val = mcHistograms[16][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
     bkgval += val;
     bkgerr2 += err*err;
-    fprintf(tableFile, "ttVval%dx:%.0f\nttVstat%dx:%.1f\n", i+1, val, i+1, err);
+    fprintf(tableFile, "ttgammaval%dx:%.0f\nttgammastat%dx:%.1f\n", i+1, val, i+1, err);
 
     // total background
     fprintf(tableFile, "bkgval%dx:%.0f\nbkgstat%dx:%.1f\n", i+1, bkgval, i+1, sqrt(bkgerr2));

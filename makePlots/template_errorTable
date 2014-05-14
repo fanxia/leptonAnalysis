@@ -60,11 +60,11 @@
         \hline
 
         $t\bar{t}\gamma$ & 
-        \begin{tabular}{@{}c@{}} ttVval1x \\ $\pm$ ttVstat1x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttVval2x \\ $\pm$ ttVstat2x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttVval3x \\ $\pm$ ttVstat3x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttVval4x \\ $\pm$ ttVstat4x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttVval5x \\ $\pm$ ttVstat5x \\ \end{tabular} \\ 
+        \begin{tabular}{@{}c@{}} ttgammaval1x \\ $\pm$ ttgammastat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttgammaval2x \\ $\pm$ ttgammastat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttgammaval3x \\ $\pm$ ttgammastat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttgammaval4x \\ $\pm$ ttgammastat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttgammaval5x \\ $\pm$ ttgammastat5x \\ \end{tabular} \\ 
         \hline
         \hline
 
