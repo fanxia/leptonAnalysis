@@ -220,6 +220,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->SubtractMCFromQCD();
   pMaker->NormalizeQCD();
 
+  pMaker->CreateTable();
+
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
@@ -593,8 +595,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     out);
 
   }
-
-  //pMaker->CreateTable();
 
   pMaker->PlotKolmogorovValues();
   

@@ -1141,7 +1141,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   errors_sys->SetFillStyle(3154);
   errors_sys->SetMarkerSize(0);
 
-  if(needsQCD) bkg->SetFillColor(kSpring);
+  if(needsQCD) bkg->SetFillColor(kSpring-6);
   else bkg->SetFillColor(mcLayerColors[0]);
   bkg->SetMarkerSize(0);
   bkg->SetLineColor(1);
@@ -1242,7 +1242,11 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     Double_t pdfDown = bkg_pdfDown->GetBinContent(i+1);
     Double_t pdf_sys = fabs(pdfUp - pdfDown) / 2.;
 
-    Double_t totalError2 = stat*stat + btag_sys*btag_sys + scale_sys*scale_sys + pdf_sys*pdf_sys;
+    Double_t topPtUp = bkg_topPtUp->GetBinContent(i+1);
+    Double_t topPtDown = bkg_topPtDown->GetBinContent(i+1);
+    Double_t topPt_sys = fabs(topPtUp - topPtDown) / 2.;
+
+    Double_t totalError2 = stat*stat + btag_sys*btag_sys + scale_sys*scale_sys + pdf_sys*pdf_sys + topPt_sys*topPt_sys;
 
     ratio_sys->SetBinContent(i+1, 1.);
 
@@ -1302,95 +1306,109 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
 }
 
 void PlotMaker::CreateTable() {
-  /*
-    const int nBins = 5;
-    Double_t xbins[nBins+1] = {0, 20, 50, 80, 100, 1000};
 
-    Double_t rangeLow[nBins] = {0, 0, 50, 80, 100};
-    Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
+  // pfMET
+  int variableNumber = 1;
 
-    TH1D * h_gg = HistoFromTree("pfMET", ggTree, "pfMet2_gg_"+req, "pfMet2", nBins, xbins, -1.);
-    TH1D * h_ewk = HistoFromTree("pfMET", egTree, "pfMet2_eg_"+req, "pfMet2", nBins, xbins, -1.);
+  const int nBins = 5;
+  Double_t xbins[nBins+1] = {0, 20, 50, 80, 100, 1000};
   
-    TH1D * ewk_noNorm = (TH1D*)h_ewk->Clone();
-    h_ewk->Scale(egScale);
-    for(int i = 0; i < h_ewk->GetNbinsX(); i++) {
-    Float_t normerr = egScaleErr*(ewk_noNorm->GetBinContent(i+1));
-    Float_t staterr = h_ewk->GetBinError(i+1);
-    Float_t new_err = sqrt(normerr*normerr + staterr*staterr);
-    h_ewk->SetBinError(i+1, new_err);
-    }
-
-    TH1D * qcd30to40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 2.35E-4 * 1.019 * 1.019 / 6061407., true, "pfMET", qcd30to40Tree, "pfMet2_qcd30to40_"+req, "pfMet2", nBins, xbins, -1.);
-    TH1D * qcd40 = SignalHistoFromTree(intLumi_int * 5.195E7 * 0.002175 * 1.019 * 1.019 / 9782735., true, "pfMET", qcd40Tree, "pfMet2_qcd40_"+req, "pfMet2", nBins, xbins, -1.);
-    TH1D * h_qcd = (TH1D*)qcd30to40->Clone("pfMet2_qcd_"+req);
-    h_qcd->Add(qcd40);
-
-    TH1D * gjet20to40 = SignalHistoFromTree(intLumi_int * 81930.0 * 0.001835 * 1.019 * 1.019 / 5907942., true, "pfMET", gjet20to40Tree, "pfMet2_gjet20to40_"+req, "pfMet2", nBins, xbins, -1.);
-    TH1D * gjet40 = SignalHistoFromTree(intLumi_int * 8884.0 * 0.05387 * 1.019 * 1.019 / 5956149., true, "pfMET", gjet40Tree, "pfMet2_gjet40_"+req, "pfMet2", nBins, xbins, -1.);
-    TH1D * h_gjet = (TH1D*)gjet20to40->Clone("pfMet2_gjet_"+req);
-    h_gjet->Add(gjet40);
-
-    TH1D * diphotonjets = SignalHistoFromTree(intLumi_int * 75.39 * 1.019 * 1.019 / 1156030., true, "pfMET", diphotonjetsTree, "pfMet2_diphotonjets_"+req, "pfMet2", nBins, xbins, -1.);
-
-    TH1D * ttHadronic = SignalHistoFromTree(intLumi_int * 53.4 * 1.019 * 1.019 / 10537444., true, "pfMET", ttHadronicTree, "pfMet2_ttHadronic_"+req, "pfMet2", nBins, xbins, -1.);
-    TH1D * ttSemiLep = SignalHistoFromTree(intLumi_int * 53.2 * 1.019 * 1.019 / 25424818., true, "pfMET", ttSemiLepTree, "pfMet2_ttSemiLep_"+req, "pfMet2", nBins, xbins, -1.);
-    TH1D * ttbar = (TH1D*)ttHadronic->Clone("pfMet2_ttbar_"+req);
-    ttbar->Add(ttSemiLep);
-
-    TH1D * h_ttg = SignalHistoFromTree(intLumi_int * 1.019 * 1.019 * 14.0 / 1719954., true, "pfMET", ttgjetsTree, "pfMet2_ttgjets_"+req, "pfMet2", nBins, xbins, -1.);
-
-    TH1D * bkg = (TH1D*)h_qcd->Clone("pfMet2_bkg_"+req);
-
-    bkg->Add(h_gjet);
-    bkg->Add(diphotonjets);
-    bkg->Add(h_ewk);
-    bkg->Add(h_ttg);
-
-    // Calculate entries
-
-    FILE * tableFile = fopen("errorTable_"+req+".temp", "w");
-
-    Double_t binLow[nBins], binHigh[nBins];
-    for(int i = 0; i < nBins; i++) {
-    binLow[i] = h_gg->GetXaxis()->FindBin(rangeLow[i]);
-    binHigh[i] = (rangeHigh[i] == -1) ? -1 : h_gg->GetXaxis()->FindBin(rangeHigh[i]) - 1;
-    }
-
-    for(int i = 0; i < nBins; i++) {
-
-    Double_t gg, ggerr;
-    gg = h_gg->IntegralAndError(binLow[i], binHigh[i], ggerr);
-    fprintf(tableFile, "ggval%dx:%.0f\nggstat%dx:%.1f\n", i+1, gg, i+1, ggerr);
-
-    Double_t qcd, qcderr;
-    qcd = h_qcd->IntegralAndError(binLow[i], binHigh[i], qcderr);
-    fprintf(tableFile, "qcdval%dx:%.0f\nqcdstat%dx:%.1f\n", i+1, qcd, i+1, qcderr);
-
-    Double_t gjet, gjeterr;
-    gjet = h_gjet->IntegralAndError(binLow[i], binHigh[i], gjeterr);
-    fprintf(tableFile, "gjetval%dx:%.0f\ngjetstat%dx:%.1f\n", i+1, gjet, i+1, gjeterr);
-
-    Double_t dipho, diphoerr;
-    dipho = diphotonjets->IntegralAndError(binLow[i], binHigh[i], diphoerr);
-    fprintf(tableFile, "diphoval%dx:%.0f\ndiphostat%dx:%.1f\n", i+1, dipho, i+1, diphoerr);
-
-    Double_t ewk, ewkerr;
-    ewk = h_ewk->IntegralAndError(binLow[i], binHigh[i], ewkerr);
-    fprintf(tableFile, "ewkval%dx:%.1f\newkstat%dx:%.2f\n", i+1, ewk, i+1, ewkerr);
+  Double_t rangeLow[nBins] = {0, 0, 50, 80, 100};
+  Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
+  
+  FILE * tableFile = fopen("errorTable_"+req+".temp", "w");
+  
+  Double_t binLow[nBins], binHigh[nBins];
+  for(int i = 0; i < nBins; i++) {
+    binLow[i] = h_gg[variableNumber]->GetXaxis()->FindBin(rangeLow[i]);
+    binHigh[i] = (rangeHigh[i] == -1) ? -1 : h_gg[variableNumber]->GetXaxis()->FindBin(rangeHigh[i]) - 1;
+  }
+  
+  Double_t val, err;
+  Double_t bkgval, bkgerr2;
+  
+  for(int i = 0; i < nBins; i++) {
     
-    Double_t ttgg, ttggerr;
-    ttgg = h_ttg->IntegralAndError(binLow[i], binHigh[i], ttggerr);
-    fprintf(tableFile, "ttgval%dx:%.1f\nttgstat%dx:%.2f\n", i+1, ttgg, i+1, ttggerr);
-
-    Double_t total, totalerr;
-    total = bkg->IntegralAndError(binLow[i], binHigh[i], totalerr);
-    fprintf(tableFile, "bkgval%dx:%.1f\nbkgstat%dx:%.2f\n", i+1, total, i+1, totalerr);
-
+    if(needsQCD) {
+      val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+      fprintf(tableFile, "qcdval%dx:%.0f\nqcdstat%dx:%.1f\n", i+1, val, i+1, err);
     }
+    else fprintf(tableFile, "qcdval%dx:%.0f\nqcdstat%dx:%.1f\n", i+1, 0., i+1, 0.);
+    
+    Double_t totalerr2;
+    
+    // tt inclusive
+    val = mcHistograms[0][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 = err*err;
+    val += mcHistograms[1][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    val += mcHistograms[2][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    bkgval = val;
+    bkgerr2 = totalerr2;
+    fprintf(tableFile, "ttInclusiveval%dx:%.0f\nttInclusivestat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
+    
+    // V Jets
+    val = mcHistograms[3][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 = err*err;
+    val += mcHistograms[4][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    val += mcHistograms[5][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    val += mcHistograms[6][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    val += mcHistograms[7][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    bkgval += val;
+    bkgerr2 += totalerr2;
+    fprintf(tableFile, "vJetsval%dx:%.0f\nvJetsstat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
+    
+    // Single top
+    val = mcHistograms[8][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 = err*err;
+    val += mcHistograms[9][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    val += mcHistograms[10][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    val += mcHistograms[11][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    val += mcHistograms[12][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    val += mcHistograms[13][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    bkgval += val;
+    bkgerr2 += totalerr2;
+    fprintf(tableFile, "singleTopval%dx:%.0f\nsingleTopstat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
+    
+    // tt+V
+    val = mcHistograms[14][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 = err*err;
+    val += mcHistograms[15][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    totalerr2 += err*err;
+    bkgval += val;
+    bkgerr2 += totalerr2;
+    fprintf(tableFile, "ttVval%dx:%.0f\nttVstat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
 
-    fclose(tableFile);
-  */
+    // tt+gamma
+    val = mcHistograms[16][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    bkgval += val;
+    bkgerr2 += err*err;
+    fprintf(tableFile, "ttVval%dx:%.0f\nttVstat%dx:%.1f\n", i+1, val, i+1, err);
+
+    // total background
+    fprintf(tableFile, "bkgval%dx:%.0f\nbkgstat%dx:%.1f\n", i+1, bkgval, i+1, sqrt(bkgerr2));
+
+    // Data
+    if(!blinded) {
+      val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+      fprintf(tableFile, "dataval%dx:%.0f\n", i+1, val);
+    }
+    else fprintf(tableFile, "dataval%dx:xyz\n", i+1);
+
+  }
+
+  fclose(tableFile);
+
 }
 
 void PlotMaker::PlotKolmogorovValues() {

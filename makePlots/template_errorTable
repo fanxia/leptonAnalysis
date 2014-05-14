@@ -19,70 +19,78 @@
         \hline
         \hline
         
-        $\gamma\gamma$ Observed & 
-        \begin{tabular}{@{}c@{}} ggval1x \\ $\pm$ ggstat1x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ggval2x \\ $\pm$ ggstat2x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ggval3x \\ $\pm$ ggstat3x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ggval4x \\ $\pm$ ggstat4x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ggval5x \\ $\pm$ ggstat5x(stat.) \\ \end{tabular} \\ 
-        \hline
-        \hline
-        
         QCD & 
-        \begin{tabular}{@{}c@{}} qcdval1x \\ $\pm$ qcdstat1x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} qcdval2x \\ $\pm$ qcdstat2x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} qcdval3x \\ $\pm$ qcdstat3x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} qcdval4x \\ $\pm$ qcdstat4x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} qcdval5x \\ $\pm$ qcdstat5x(stat.) \\ \end{tabular} \\ 
+        \begin{tabular}{@{}c@{}} qcdval1x \\ $\pm$ qcdstat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} qcdval2x \\ $\pm$ qcdstat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} qcdval3x \\ $\pm$ qcdstat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} qcdval4x \\ $\pm$ qcdstat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} qcdval5x \\ $\pm$ qcdstat5x \\ \end{tabular} \\ 
         \hline
 
-        $\gamma+jets$ & 
-        \begin{tabular}{@{}c@{}} gjetval1x \\ $\pm$ gjetstat1x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} gjetval2x \\ $\pm$ gjetstat2x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} gjetval3x \\ $\pm$ gjetstat3x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} gjetval4x \\ $\pm$ gjetstat4x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} gjetval5x \\ $\pm$ gjetstat5x(stat.) \\ \end{tabular} \\ 
+        $t\bar{t}+jets$ & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval1x \\ $\pm$ ttInclusivestat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval2x \\ $\pm$ ttInclusivestat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval3x \\ $\pm$ ttInclusivestat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval4x \\ $\pm$ ttInclusivestat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval5x \\ $\pm$ ttInclusivestat5x \\ \end{tabular} \\ 
         \hline
 
-        $\gamma\gamma+jets$ & 
-        \begin{tabular}{@{}c@{}} diphoval1x \\ $\pm$ diphostat1x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} diphoval2x \\ $\pm$ diphostat2x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} diphoval3x \\ $\pm$ diphostat3x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} diphoval4x \\ $\pm$ diphostat4x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} diphoval5x \\ $\pm$ diphostat5x(stat.) \\ \end{tabular} \\ 
-        \hline
-        
-        Electroweak & 
-        \begin{tabular}{@{}c@{}} ewkval1x \\ $\pm$ ewkstat1x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ewkval2x \\ $\pm$ ewkstat2x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ewkval3x \\ $\pm$ ewkstat3x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ewkval4x \\ $\pm$ ewkstat4x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ewkval5x \\ $\pm$ ewkstat5x(stat.) \\ \end{tabular} \\ 
+	$V+jets$ & 
+        \begin{tabular}{@{}c@{}} vJetsval1x \\ $\pm$ vJetsstat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} vJetsval2x \\ $\pm$ vJetsstat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} vJetsval3x \\ $\pm$ vJetsstat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} vJetsval4x \\ $\pm$ vJetsstat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} vJetsval5x \\ $\pm$ vJetsstat5x \\ \end{tabular} \\ 
         \hline
 
-        $t\bar{t}+\gamma+jets$ & 
-        \begin{tabular}{@{}c@{}} ttgval1x \\ $\pm$ ttgstat1x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttgval2x \\ $\pm$ ttgstat2x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttgval3x \\ $\pm$ ttgstat3x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttgval4x \\ $\pm$ ttgstat4x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttgval5x \\ $\pm$ ttgstat5x(stat.) \\ \end{tabular} \\ 
+	Single $t$ & 
+        \begin{tabular}{@{}c@{}} singleTopval1x \\ $\pm$ singleTopstat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} singleTopval2x \\ $\pm$ singleTopstat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} singleTopval3x \\ $\pm$ singleTopstat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} singleTopval4x \\ $\pm$ singleTopstat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} singleTopval5x \\ $\pm$ singleTopstat5x \\ \end{tabular} \\ 
+        \hline
+
+	$t\bar{t}V$ & 
+        \begin{tabular}{@{}c@{}} ttVval1x \\ $\pm$ ttVstat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval2x \\ $\pm$ ttVstat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval3x \\ $\pm$ ttVstat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval4x \\ $\pm$ ttVstat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval5x \\ $\pm$ ttVstat5x \\ \end{tabular} \\ 
+        \hline
+
+        $t\bar{t}\gamma$ & 
+        \begin{tabular}{@{}c@{}} ttVval1x \\ $\pm$ ttVstat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval2x \\ $\pm$ ttVstat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval3x \\ $\pm$ ttVstat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval4x \\ $\pm$ ttVstat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval5x \\ $\pm$ ttVstat5x \\ \end{tabular} \\ 
         \hline
         \hline
 
         Total Background & 
-        \begin{tabular}{@{}c@{}} bkgval1x \\ $\pm$ bkgstat1x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} bkgval2x \\ $\pm$ bkgstat2x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} bkgval3x \\ $\pm$ bkgstat3x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} bkgval4x \\ $\pm$ bkgstat4x(stat.) \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} bkgval5x \\ $\pm$ bkgstat5x(stat.) \\ \end{tabular} \\ 
+        \begin{tabular}{@{}c@{}} bkgval1x \\ $\pm$ bkgstat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} bkgval2x \\ $\pm$ bkgstat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} bkgval3x \\ $\pm$ bkgstat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} bkgval4x \\ $\pm$ bkgstat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} bkgval5x \\ $\pm$ bkgstat5x \\ \end{tabular} \\ 
         \hline
+	\hline
         
+	Data & 
+	dataval1x &
+	dataval2x &
+	dataval3x &
+	dataval4x &
+	dataval5x \\
+        \hline
+
       \end{tabular}
-      }
-    \end{center}
-    
-  \end{small}
+    }
+  \end{center}
   
+\end{small}
+
 \end{document}
 
 
