@@ -26,30 +26,28 @@ rm signal_contamination_stop.root
 rm contamination_stop.root
 rm plots_*.root
 
-if [ 1 -eq 0 ]; then
-    for x in ele
+for x in ele
+do
+    
+    cp template_errorTable.tex errorTable_$x.tex
+    
+    while read line
     do
+	code=`echo $line | cut -d : -f 1`
+	value=`echo $line | cut -d : -f 2`
 	
-	cp template_errorTable.tex errorTable_$x.tex
-	
-	while read line
-	do
-	    code=`echo $line | cut -d : -f 1`
-	    value=`echo $line | cut -d : -f 2`
-	    
-	    sed -i "s/${code}/${value}/g" errorTable_$x.tex
-	done < errorTable_$x.temp
-	
-	rm errorTable_$x.temp
-	
-	latex errorTable_$x.tex
-	dvips -Ppdf -t landscape errorTable_$x.dvi
-	ps2pdf errorTable_$x.ps
-	
-	rm errorTable_$x.log errorTable_$x.dvi errorTable_$x.aux errorTable_$x.ps
-	
-    done
-fi
+	sed -i "s/${code}/${value}/g" errorTable_$x.tex
+    done < errorTable_$x.temp
+    
+    rm errorTable_$x.temp
+    
+    latex errorTable_$x.tex
+    dvips -Ppdf -t landscape errorTable_$x.dvi
+    ps2pdf errorTable_$x.ps
+    
+    rm errorTable_$x.log errorTable_$x.dvi errorTable_$x.aux errorTable_$x.ps
+    
+done
 
 hadd contamination_stop.root signal_*.root
 rm signal_*.root
