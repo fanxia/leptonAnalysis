@@ -14,7 +14,7 @@ void makePlots() {
 
   bool displayKStest = true;
   bool blinded = true;
-  int nPhotons_req = 0;
+  int nPhotons_req = NUM_PHOTONS_REQUIRED;
 
   const int nChannels = 4;
   TString channels[nChannels] = {"ele_jjj", "ele_bjj",

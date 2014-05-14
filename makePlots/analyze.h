@@ -1324,19 +1324,19 @@ void PlotMaker::CreateTable() {
     binHigh[i] = (rangeHigh[i] == -1) ? -1 : h_gg[variableNumber]->GetXaxis()->FindBin(rangeHigh[i]) - 1;
   }
   
-  Double_t val, err;
-  Double_t bkgval = 0;
-  Double_t bkgerr2 = 0;
-  
   for(int i = 0; i < nBins; i++) {
     
+    Double_t val, err;
+    Double_t bkgval = 0;
+    Double_t bkgerr2 = 0;
+
     if(req.Contains("ele")) {
       val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
       bkgval += val;
       bkgerr2 += err*err;
-      fprintf(tableFile, "qcdval%dx:%.0f\nqcdstat%dx:%.1f\n", i+1, val, i+1, err);
+      fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, val, i+1, err);
     }
-    else fprintf(tableFile, "qcdval%dx:%.0f\nqcdstat%dx:%.1f\n", i+1, 0., i+1, 0.);
+    else fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, 0., i+1, 0.);
     
     Double_t totalerr2;
     
@@ -1349,7 +1349,7 @@ void PlotMaker::CreateTable() {
     totalerr2 += err*err;
     bkgval += val;
     bkgerr2 += totalerr2;
-    fprintf(tableFile, "ttInclusiveval%dx:%.0f\nttInclusivestat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
+    fprintf(tableFile, "ttInclusiveval%dx:%.1f\nttInclusivestat%dx:%.2f\n", i+1, val, i+1, sqrt(totalerr2));
     
     // V Jets
     val = mcHistograms[3][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
@@ -1364,7 +1364,7 @@ void PlotMaker::CreateTable() {
     totalerr2 += err*err;
     bkgval += val;
     bkgerr2 += totalerr2;
-    fprintf(tableFile, "vJetsval%dx:%.0f\nvJetsstat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
+    fprintf(tableFile, "vJetsval%dx:%.1f\nvJetsstat%dx:%.2f\n", i+1, val, i+1, sqrt(totalerr2));
     
     // Single top
     val = mcHistograms[8][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
@@ -1381,7 +1381,7 @@ void PlotMaker::CreateTable() {
     totalerr2 += err*err;
     bkgval += val;
     bkgerr2 += totalerr2;
-    fprintf(tableFile, "singleTopval%dx:%.0f\nsingleTopstat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
+    fprintf(tableFile, "singleTopval%dx:%.1f\nsingleTopstat%dx:%.2f\n", i+1, val, i+1, sqrt(totalerr2));
     
     // tt+V
     val = mcHistograms[14][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
@@ -1390,23 +1390,20 @@ void PlotMaker::CreateTable() {
     totalerr2 += err*err;
     bkgval += val;
     bkgerr2 += totalerr2;
-    fprintf(tableFile, "ttVval%dx:%.0f\nttVstat%dx:%.1f\n", i+1, val, i+1, sqrt(totalerr2));
+    fprintf(tableFile, "ttVval%dx:%.1f\nttVstat%dx:%.2f\n", i+1, val, i+1, sqrt(totalerr2));
 
     // tt+gamma
     val = mcHistograms[16][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
     bkgval += val;
     bkgerr2 += err*err;
-    fprintf(tableFile, "ttgammaval%dx:%.0f\nttgammastat%dx:%.1f\n", i+1, val, i+1, err);
+    fprintf(tableFile, "ttgammaval%dx:%.1f\nttgammastat%dx:%.2f\n", i+1, val, i+1, err);
 
     // total background
-    fprintf(tableFile, "bkgval%dx:%.0f\nbkgstat%dx:%.1f\n", i+1, bkgval, i+1, sqrt(bkgerr2));
+    fprintf(tableFile, "bkgval%dx:%.1f\nbkgstat%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgerr2));
 
     // Data
-    if(!blinded) {
-      val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-      fprintf(tableFile, "dataval%dx:%.0f\n", i+1, val);
-    }
-    else fprintf(tableFile, "dataval%dx:xyz\n", i+1);
+    val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
+    fprintf(tableFile, "dataval%dx:%.1f\n", i+1, val);
 
   }
 

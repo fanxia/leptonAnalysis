@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 2 ]; then
+if [ $# -ne 3 ]; then
 	echo
-	echo "Need root file inputs"
+	echo "Usage: ./go_plots.sh nPhotons electrons.root muons.root"
 	echo
 	exit 0
 fi
@@ -12,10 +12,12 @@ source $VO_CMS_SW_DIR/cmsset_default.sh
 export SCRAM_ARCH=slc5_amd64_gcc462
 eval `scramv1 runtime -sh`
 
-ELE_FILE_TO_RUN=$1
-MUON_FILE_TO_RUN=$2
-cat makePlots_template.C | sed s:ELE_FILE_TO_RUN:$ELE_FILE_TO_RUN: | sed s:MUON_FILE_TO_RUN:$MUON_FILE_TO_RUN: > makePlots.C
-root -b -q -l makePlots.C | sed '/Error in <TFile::TFile>: file/d'
+NUM_PHOTONS_REQUIRED=$1
+ELE_FILE_TO_RUN=$2
+MUON_FILE_TO_RUN=$3
+
+cat makePlots_template.C | sed s:ELE_FILE_TO_RUN:$ELE_FILE_TO_RUN: | sed s:MUON_FILE_TO_RUN:$MUON_FILE_TO_RUN: | sed s:NUM_PHOTONS_REQUIRED:$NUM_PHOTONS_REQUIRED: > makePlots.C
+root -b -q -l makePlots.C | sed '/does not exist/d'
 rm makePlots.C
 
 file=`date +"%b%d"`
