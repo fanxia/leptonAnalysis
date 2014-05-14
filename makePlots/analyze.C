@@ -168,38 +168,40 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->SetDisplayKStest(displayKStest);
 
-  const int nMetBins[3] = {17, 11, 11};
-  Double_t xbins_met[3][nMetBins[nPhotons_req]+1] = {{0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 100, 150, 300, 650},
+  int nMetBins_[3] = {17, 11, 11};
+  const int nMetBins = nMetBins_[nPhotons_req];
+  Double_t xbins_met[3][nMetBins+1] = {{0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 100, 150, 300, 650},
 						     {0, 10, 20, 30, 40, 50, 65, 80, 100, 150, 300, 650},
 						     {0, 10, 20, 30, 40, 50, 65, 80, 100, 150, 300, 650}};
 
-  const int nKinematicBins[3] = 28;
+  int nKinematicBins_[3] = {28, 15, 15};
+  const int nKinematicBins = nKinematicBins_[nPhotons_req];
   Double_t xbins_kinematic[nKinematicBins+1] = {{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000},
-						{0, 20, 40, 60, 80, 100, 125, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000},
-						{0, 20, 40, 60, 80, 100, 125, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000}};
+							      {0, 20, 40, 60, 80, 100, 125, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000},
+							      {0, 20, 40, 60, 80, 100, 125, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000}};
   
 
   // has to start with nphotons then met, then HT
   pMaker->BookHistogram("Nphotons", 4, 0., 4.);
-  pMaker->BookHistogram("pfMET", nMetBins[nPhotons_req], xbins_met[nPhotons_req]);
-  pMaker->BookHistogram("HT", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("pfMET", nMetBins, xbins_met[nPhotons_req]);
+  pMaker->BookHistogram("HT", nKinematicBins, xbins_kinematic[nPhotons_req]);
   pMaker->BookHistogram("Njets", 20, 0., 20.);
   pMaker->BookHistogram("Nbtags", 20, 0., 20.);
   pMaker->BookHistogram("max_csv", 20, 0., 1.);
   pMaker->BookHistogram("submax_csv", 20, 0., 1.);
-  pMaker->BookHistogram("HT_jets", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("hadronic_pt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("jet1_pt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("jet2_pt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("jet3_pt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("btag1_pt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("w_mT", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("m3", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("ele_pt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-  pMaker->BookHistogram("muon_pt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("HT_jets", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("hadronic_pt", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("jet1_pt", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("jet2_pt", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("jet3_pt", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("btag1_pt", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("w_mT", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("m3", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("ele_pt", nKinematicBins, xbins_kinematic[nPhotons_req]);
+  pMaker->BookHistogram("muon_pt", nKinematicBins, xbins_kinematic[nPhotons_req]);
 
   if(nPhotons_req >= 1) {
-    pMaker->BookHistogram("leadPhotonEt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
+    pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic[nPhotons_req]);
     pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);
     pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("leadSigmaIetaIeta", 40, 0., 0.02);
@@ -207,14 +209,14 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   }
 
   if(nPhotons_req >= 2) {
-    pMaker->BookHistogram("trailPhotonEt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
+    pMaker->BookHistogram("trailPhotonEt", nKinematicBins, xbins_kinematic[nPhotons_req]);
     pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);
     pMaker->BookHistogram("trailSigmaIetaIeta", 40, 0, 0.02);
     pMaker->BookHistogram("trailChargedHadronIso", 35, 0, 15.0);
-    pMaker->BookHistogram("diEMpT", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-    pMaker->BookHistogram("diJetPt", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
-    pMaker->BookHistogram("photon_invmass", nKinematicBins[nPhotons_req], xbins_kinematic[nPhotons_req]);
+    pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic[nPhotons_req]);
+    pMaker->BookHistogram("diJetPt", nKinematicBins, xbins_kinematic[nPhotons_req]);
+    pMaker->BookHistogram("photon_invmass", nKinematicBins, xbins_kinematic[nPhotons_req]);
     pMaker->BookHistogram("photon_dR", 50, 0., 5.);
     pMaker->BookHistogram("photon_dPhi", 35, 0., 3.14159);
   }
@@ -238,17 +240,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   // pfMET
   if(nPhotons_req == 0) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
-					   xbins_met[nPhotons_req][0], xbins_met[nPhotons_req][nMetBins[nPhotons_req]], 7.e-3, 2.5e4,
+					   xbins_met[nPhotons_req][0], xbins_met[nPhotons_req][nMetBins], 7.e-3, 2.5e4,
 					   0.7, 1.3,
 					   true, true, true,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
-						xbins_met[nPhotons_req][0], xbins_met[nPhotons_req][nMetBins[nPhotons_req]], 7.e-4, 2.5e2,
+						xbins_met[nPhotons_req][0], xbins_met[nPhotons_req][nMetBins], 7.e-4, 2.5e2,
 						0.5, 1.5,
 						true, true, true,
 						out);
   else if(nPhotons_req == 2) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
-						xbins_met[nPhotons_req][0], xbins_met[nPhotons_req][nMetBins[nPhotons_req]], 7.e-6, 9.,
+						xbins_met[nPhotons_req][0], xbins_met[nPhotons_req][nMetBins], 7.e-6, 9.,
 						0., 2.1,
 						true, true, true,
 						out);
