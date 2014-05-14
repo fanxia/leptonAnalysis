@@ -694,13 +694,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 	mcHistograms_btagWeightDown[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_btagWeightDown[i][k]->SetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]), newerror);
 
-	if(reweightingTopPt[i]) totalWeight *= topPtReweighting;
+	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_topPtUp[i][k]->GetBinError(mcHistograms_topPtUp[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtUp[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_topPtUp[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
-	if(reweightingTopPt[i]) totalWeight *= puWeight * btagWeight;
+	if(reweightTopPt[i]) totalWeight *= puWeight * btagWeight;
 	oldError = mcHistograms_topPtDown[i][k]->GetBinError(mcHistograms_topPtDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtDown[i][k]->Fill(vars[k], totalWeight);
@@ -997,7 +997,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) mcQCDHistograms[i][variableNumber]->Write();
 
-  TH1D *bkg, *bkg_btagWeightUp, *bkg_btagWeightDown, *bkg_scaleUp, *bkg_scaleDown, *bkg_pdfUp, *bkg_pdfDown;
+  TH1D *bkg, *bkg_btagWeightUp, *bkg_btagWeightDown, *bkg_scaleUp, *bkg_scaleDown, *bkg_pdfUp, *bkg_pdfDown, *bkg_topPtUp, *bkg_topPtDown;
 
   // Stack histograms; qcd is on top
   if(needsQCD) {
@@ -1329,7 +1329,7 @@ void PlotMaker::CreateTable() {
   
   for(int i = 0; i < nBins; i++) {
     
-    if(needsQCD) {
+    if(req.Contains("ele")) {
       val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
       fprintf(tableFile, "qcdval%dx:%.0f\nqcdstat%dx:%.1f\n", i+1, val, i+1, err);
     }
