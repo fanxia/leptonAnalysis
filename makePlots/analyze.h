@@ -1330,8 +1330,9 @@ void PlotMaker::CreateTable() {
   
   for(int i = 0; i < nBins; i++) {
     
-    Double_t this_val, this_err;
-    Double_t this_staterr2, this_syserr2_up, this_syserr2_down;
+    Double_t this_val, this_err, this_staterr2, this_syserr2_up, this_syserr2_down;
+    Double_t this_btagUp, this_scaleUp, this_pdfUp, this_topPtUp;
+    Double_t this_btagDown, this_scaleDown, this_pdfDown, this_topPtDown;
 
     Double_t bkgval = 0;
     Double_t bkgstat2 = 0;
@@ -1352,41 +1353,52 @@ void PlotMaker::CreateTable() {
 
       this_val = 0;
       this_staterr2 = 0;
-      this_syserr2_up = 0;
-      this_syserr2_down = 0;
+      
+      this_btagUp = 0;
+      this_scaleUp = 0;
+      this_pdfUp = 0;
+      this_topPtUp = 0;
+
+      this_btagDown = 0;
+      this_scaleDown = 0;
+      this_pdfDown = 0;
+      this_topPtDown = 0;
 
       for(unsigned int k = j; k < mcHistograms.size() && tableNames[k] == tableNames[j]; k++) {
 
 	this_val += mcHistograms[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
 	this_staterr2 += this_err*this_err;
-		
-	Double_t temperr;
-	Double_t tempval = mcHistograms_btagWeightUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
-	tempval = mcHistograms_scaleUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
-	tempval = mcHistograms_pdfUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
-	tempval = mcHistograms_topPtUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
 
-	tempval = mcHistograms_btagWeightDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
-	tempval = mcHistograms_scaleDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
-	tempval = mcHistograms_pdfDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
-	tempval = mcHistograms_topPtDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
+	Double_t temperr;
+	this_btagUp += mcHistograms_btagWeightUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_scaleUp += mcHistograms_scaleUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_pdfUp += mcHistograms_pdfUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_topPtUp += mcHistograms_topPtUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+
+	this_btagDown += mcHistograms_btagWeightDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_scaleDown += mcHistograms_scaleDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_pdfDown += mcHistograms_pdfDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_topPtDown += mcHistograms_topPtDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
       }
 
       bkgval += this_val;
       bkgstat2 += this_staterr2;
-      bkgsys2_up += this_syserr2_up + this_staterr2;
-      bkgsys2_down += this_syserr2_down + this_staterr2;
 
-      TString fullTableName = tableNames[j] + "val%%ux:%%.1f\\n" + tableNames[j] + "errorup%%ux:%%.2f\\n" + tableNames[j] + "errordown%%ux:%%.2f\\n";
+      this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
+	(this_scaleUp - this_val)*(this_scaleUp - this_val) +
+	(this_pdfUp - this_val)*(this_pdfUp - this_val) +
+	(this_topPtUp - this_val)*(this_topPtUp - this_val);
+
+      this_syserr2_down = (this_btagDown - this_val)*(this_btagDown - this_val) +
+	(this_scaleDown - this_val)*(this_scaleDown - this_val) +
+	(this_pdfDown - this_val)*(this_pdfDown - this_val) +
+	(this_topPtDown - this_val)*(this_topPtDown - this_val);
+
+      bkgsys2_up += this_staterr2 + this_syserr2_up;
+      bkgsys2_down += this_staterr2 + this_syserr2_down;
+
+      TString fullTableName = tableNames[j] + "val%%ux:%%.1f\n" + tableNames[j] + "errorup%%ux:%%.2f\n" + tableNames[j] + "errordown%%ux:%%.2f\n";
       char* buffer[200];
       sprintf(buffer, fullTableName.Data());
 
