@@ -181,7 +181,7 @@ class PlotMaker : public TObject {
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 			bool removeTTA, bool reweightTop,
-			int channel, int layer, int color, TString legendEntry);
+			int channel, int layer, int color, TString legendEntry, TString tableEntry);
   
   void SetTrees(TTree * gg, TTree * qcd,
 		TTree * sig_a, TTree * sig_b);
@@ -229,6 +229,7 @@ class PlotMaker : public TObject {
   vector<int> mcLayerColors;
   vector<TString> mcNames;
   vector<TString> legendNames;
+  vector<TString> tableNames;
   vector<bool> removeTTAoverlap;
   vector<bool> reweightTopPt;
 
@@ -306,6 +307,7 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   mcLayerColors.clear();
   mcNames.clear();
   legendNames.clear();
+  tableNames.clear();
   removeTTAoverlap.clear();
   reweightTopPt.clear();
 
@@ -354,6 +356,7 @@ PlotMaker::~PlotMaker() {
     mcLayerColors.clear();
     mcNames.clear();
     legendNames.clear();
+    tableNames.clear();
     removeTTAoverlap.clear();
     reweightTopPt.clear();
 
@@ -382,7 +385,7 @@ void PlotMaker::SetTrees(TTree * gg, TTree * qcd,
 bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
 				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 				 bool removeTTA, bool reweightTop,
-				 int channel, int layer, int color, TString legendEntry) {
+				 int channel, int layer, int color, TString legendEntry, TString tableEntry) {
 
   mcFiles.push_back(new TFile(fileName, "READ"));
   if(!mcFiles.back()) {
@@ -418,6 +421,7 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   mcLayerColors.push_back(color);
   mcNames.push_back(scanName);
   legendNames.push_back(legendEntry);
+  tableNames.push_back(tableEntry);
   removeTTAoverlap.push_back(removeTTA);
   reweightTopPt.push_back(reweightTop);
 
@@ -669,6 +673,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       if(metCut > 0. && vars[1] >= metCut) continue;
 
       if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
+
+      if(topPtReweighting < 0) topPtReweighting = 1.;
 
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t addError2_puOnly = btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -1326,84 +1332,79 @@ void PlotMaker::CreateTable() {
   
   for(int i = 0; i < nBins; i++) {
     
-    Double_t val, err;
+    Double_t this_val, this_err;
+    Double_t this_staterr2, this_syserr2_up, this_syserr2_down;
+
     Double_t bkgval = 0;
-    Double_t bkgerr2 = 0;
+    Double_t bkgstat2 = 0;
+    Double_t bkgsys2_up = 0;
+    Double_t bkgsys2_down = 0;
 
     if(req.Contains("ele")) {
-      val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-      bkgval += val;
-      bkgerr2 += err*err;
-      fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, val, i+1, err);
+      this_val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
+      bkgval += thisval;
+      bkgstat2 += this_err*this_err;
+      fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
     }
     else fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, 0., i+1, 0.);
     
-    Double_t totalerr2;
-    
-    // tt inclusive
-    val = mcHistograms[0][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 = err*err;
-    val += mcHistograms[1][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    val += mcHistograms[2][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    bkgval += val;
-    bkgerr2 += totalerr2;
-    fprintf(tableFile, "ttInclusiveval%dx:%.1f\nttInclusivestat%dx:%.2f\n", i+1, val, i+1, sqrt(totalerr2));
-    
-    // V Jets
-    val = mcHistograms[3][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 = err*err;
-    val += mcHistograms[4][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    val += mcHistograms[5][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    val += mcHistograms[6][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    val += mcHistograms[7][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    bkgval += val;
-    bkgerr2 += totalerr2;
-    fprintf(tableFile, "vJetsval%dx:%.1f\nvJetsstat%dx:%.2f\n", i+1, val, i+1, sqrt(totalerr2));
-    
-    // Single top
-    val = mcHistograms[8][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 = err*err;
-    val += mcHistograms[9][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    val += mcHistograms[10][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    val += mcHistograms[11][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    val += mcHistograms[12][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    val += mcHistograms[13][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    bkgval += val;
-    bkgerr2 += totalerr2;
-    fprintf(tableFile, "singleTopval%dx:%.1f\nsingleTopstat%dx:%.2f\n", i+1, val, i+1, sqrt(totalerr2));
-    
-    // tt+V
-    val = mcHistograms[14][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 = err*err;
-    val += mcHistograms[15][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    totalerr2 += err*err;
-    bkgval += val;
-    bkgerr2 += totalerr2;
-    fprintf(tableFile, "ttVval%dx:%.1f\nttVstat%dx:%.2f\n", i+1, val, i+1, sqrt(totalerr2));
+    for(unsigned int j = 0; j < mcHistograms.size(); j++) {
 
-    // tt+gamma
-    val = mcHistograms[16][variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    bkgval += val;
-    bkgerr2 += err*err;
-    fprintf(tableFile, "ttgammaval%dx:%.1f\nttgammastat%dx:%.2f\n", i+1, val, i+1, err);
+      if(j > 0 && tableNames[j] == tableNames[j-1]) continue;
+
+      this_val = 0;
+      this_staterr2 = 0;
+      this_syserr2_up = 0;
+      this_syserr2_down = 0;
+
+      for(unsigned int k = j; k < mcHistograms.size() && tableNames[k] == tableNames[j]; k++) {
+
+	this_val += mcHistograms[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
+	bkgval += this_val;
+	this_staterr2 += this_err*this_err;
+	bkgstat2 += this_staterr2;
+	
+	Double_t temperr;
+	Double_t tempval = mcHistograms_btagWeightUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
+	tempval = mcHistograms_scaleUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
+	tempval = mcHistograms_pdfUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
+	tempval = mcHistograms_topPtUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
+
+	tempval = mcHistograms_btagWeightDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
+	tempval = mcHistograms_scaleDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
+	tempval = mcHistograms_pdfDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
+	tempval = mcHistograms_topPtDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
+
+	bkgsys2_up += this_syserr2_up;
+	bkgsys2_down += this_syserr2_down;
+
+      }
+
+      TString fullTableName = tableNames[j] + "val%dx:%.1f\n" + tableNames[j] + "stat%dx:%.2f\n" + tableNames[j] + "sysup%dx:%.2f\n" + tableNames[j] + "sysdown%dx:%.2f\n";
+      char * buffer[200];
+      sprintf(buffer, fullTableName.Data());
+
+      fprintf(buffer,
+	      j+1, this_val, 
+	      j+1, sqrt(this_staterr2),
+	      j+1, sqrt(this_syserr2_up),
+	      j+1, sqrt(this_syserr2_down));
+    }
 
     // total background
-    fprintf(tableFile, "bkgval%dx:%.1f\nbkgstat%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgerr2));
+    fprintf(tableFile, "bkgval%dx:%.1f\nbkgstat%dx:%.2f\nbkgsysup%dx:%.2f\nbkgsysdown%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgstat2), i+1, sqrt(bkgsys2_up), i+1, sqrt(bkgsys2_down));
 
     // Data
-    val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], err);
-    fprintf(tableFile, "dataval%dx:%.1f\n", i+1, val);
+    this_val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
+    fprintf(tableFile, "dataval%dx:%.1f\n", i+1, this_val);
 
   }
 
