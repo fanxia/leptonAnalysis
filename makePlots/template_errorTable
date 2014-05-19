@@ -19,61 +19,61 @@
         \hline
         \hline
         
-        QCD & 
-        \begin{tabular}{@{}c@{}} qcdval1x \\ $\pm$ qcdstat1x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} qcdval2x \\ $\pm$ qcdstat2x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} qcdval3x \\ $\pm$ qcdstat3x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} qcdval4x \\ $\pm$ qcdstat4x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} qcdval5x \\ $\pm$ qcdstat5x \\ \end{tabular} \\ 
+	QCD & 
+        qcdval1x $\pm$ qcdstat1x &
+	qcdval2x $\pm$ qcdstat2x &
+	qcdval3x $\pm$ qcdstat3x &
+	qcdval4x $\pm$ qcdstat4x &
+	qcdval5x $\pm$ qcdstat5x \\
         \hline
 
-        $t\bar{t}+jets$ & 
-        \begin{tabular}{@{}c@{}} ttInclusiveval1x \\ $\pm$ ttInclusivestat1x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttInclusiveval2x \\ $\pm$ ttInclusivestat2x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttInclusiveval3x \\ $\pm$ ttInclusivestat3x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttInclusiveval4x \\ $\pm$ ttInclusivestat4x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttInclusiveval5x \\ $\pm$ ttInclusivestat5x \\ \end{tabular} \\ 
+	$t\bar{t}+jets$ & 
+        ttInclusiveval1x $^{+ttInclusiveerrorup1x}_{-ttInclusiveerrordown1x}$ &
+	ttInclusiveval2x $^{+ttInclusiveerrorup2x}_{-ttInclusiveerrordown2x}$ &
+	ttInclusiveval3x $^{+ttInclusiveerrorup3x}_{-ttInclusiveerrordown3x}$ &
+	ttInclusiveval4x $^{+ttInclusiveerrorup4x}_{-ttInclusiveerrordown4x}$ &
+	ttInclusiveval5x $^{+ttInclusiveerrorup5x}_{-ttInclusiveerrordown5x}$ \\
         \hline
 
 	$V+jets$ & 
-        \begin{tabular}{@{}c@{}} vJetsval1x \\ $\pm$ vJetsstat1x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} vJetsval2x \\ $\pm$ vJetsstat2x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} vJetsval3x \\ $\pm$ vJetsstat3x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} vJetsval4x \\ $\pm$ vJetsstat4x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} vJetsval5x \\ $\pm$ vJetsstat5x \\ \end{tabular} \\ 
+	vJetsval1x $^{+vJetserrorup1x}_{-vJetserrordown1x}$ &
+	vJetsval2x $^{+vJetserrorup2x}_{-vJetserrordown2x}$ &
+	vJetsval3x $^{+vJetserrorup3x}_{-vJetserrordown3x}$ &
+	vJetsval4x $^{+vJetserrorup4x}_{-vJetserrordown4x}$ &
+	vJetsval5x $^{+vJetserrorup5x}_{-vJetserrordown5x}$ \\
         \hline
 
 	Single $t$ & 
-        \begin{tabular}{@{}c@{}} singleTopval1x \\ $\pm$ singleTopstat1x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} singleTopval2x \\ $\pm$ singleTopstat2x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} singleTopval3x \\ $\pm$ singleTopstat3x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} singleTopval4x \\ $\pm$ singleTopstat4x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} singleTopval5x \\ $\pm$ singleTopstat5x \\ \end{tabular} \\ 
+	singleTopval1x $^{+singleToperrorup1x}_{-singleToperrordown1x}$ &
+	singleTopval2x $^{+singleToperrorup2x}_{-singleToperrordown2x}$ &
+	singleTopval3x $^{+singleToperrorup3x}_{-singleToperrordown3x}$ &
+	singleTopval4x $^{+singleToperrorup4x}_{-singleToperrordown4x}$ &
+	singleTopval5x $^{+singleToperrorup5x}_{-singleToperrordown5x}$ \\
         \hline
 
 	$t\bar{t}V$ & 
-        \begin{tabular}{@{}c@{}} ttVval1x \\ $\pm$ ttVstat1x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttVval2x \\ $\pm$ ttVstat2x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttVval3x \\ $\pm$ ttVstat3x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttVval4x \\ $\pm$ ttVstat4x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttVval5x \\ $\pm$ ttVstat5x \\ \end{tabular} \\ 
+	ttVval1x $^{+ttVerrorup1x}_{-ttVerrordown1x}$ &
+	ttVval2x $^{+ttVerrorup2x}_{-ttVerrordown2x}$ &
+	ttVval3x $^{+ttVerrorup3x}_{-ttVerrordown3x}$ &
+	ttVval4x $^{+ttVerrorup4x}_{-ttVerrordown4x}$ &
+	ttVval5x $^{+ttVerrorup5x}_{-ttVerrordown5x}$ \\
         \hline
 
         $t\bar{t}\gamma$ & 
-        \begin{tabular}{@{}c@{}} ttgammaval1x \\ $\pm$ ttgammastat1x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttgammaval2x \\ $\pm$ ttgammastat2x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttgammaval3x \\ $\pm$ ttgammastat3x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttgammaval4x \\ $\pm$ ttgammastat4x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} ttgammaval5x \\ $\pm$ ttgammastat5x \\ \end{tabular} \\ 
+	ttgammaval1x $^{+ttgammaerrorup1x}_{-ttgammaerrordown1x}$ &
+	ttgammaval2x $^{+ttgammaerrorup2x}_{-ttgammaerrordown2x}$ &
+	ttgammaval3x $^{+ttgammaerrorup3x}_{-ttgammaerrordown3x}$ &
+	ttgammaval4x $^{+ttgammaerrorup4x}_{-ttgammaerrordown4x}$ &
+	ttgammaval5x $^{+ttgammaerrorup5x}_{-ttgammaerrordown5x}$ \\
         \hline
         \hline
 
         Total Background & 
-        \begin{tabular}{@{}c@{}} bkgval1x \\ $\pm$ bkgstat1x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} bkgval2x \\ $\pm$ bkgstat2x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} bkgval3x \\ $\pm$ bkgstat3x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} bkgval4x \\ $\pm$ bkgstat4x \\ \end{tabular} & 
-        \begin{tabular}{@{}c@{}} bkgval5x \\ $\pm$ bkgstat5x \\ \end{tabular} \\ 
+	bkgval1x $^{+bkgerrorup1x}_{-bkgerrordown1x}$ &
+	bkgval2x $^{+bkgerrorup2x}_{-bkgerrordown2x}$ &
+	bkgval3x $^{+bkgerrorup3x}_{-bkgerrordown3x}$ &
+	bkgval4x $^{+bkgerrorup4x}_{-bkgerrordown4x}$ &
+	bkgval5x $^{+bkgerrorup5x}_{-bkgerrordown5x}$ \\
         \hline
 	\hline
         

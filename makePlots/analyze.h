@@ -706,7 +706,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 	mcHistograms_topPtUp[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_topPtUp[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
-	if(reweightTopPt[i]) totalWeight *= puWeight * btagWeight;
+	if(reweightTopPt[i]) totalWeight = puWeight * btagWeight;
 	oldError = mcHistograms_topPtDown[i][k]->GetBinError(mcHistograms_topPtDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtDown[i][k]->Fill(vars[k], totalWeight);
@@ -1317,8 +1317,6 @@ void PlotMaker::CreateTable() {
   int variableNumber = 1;
 
   const int nBins = 5;
-  Double_t xbins[nBins+1] = {0, 20, 50, 80, 100, 1000};
-  
   Double_t rangeLow[nBins] = {0, 0, 50, 80, 100};
   Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
   
@@ -1342,7 +1340,7 @@ void PlotMaker::CreateTable() {
 
     if(req.Contains("ele")) {
       this_val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
-      bkgval += thisval;
+      bkgval += this_val;
       bkgstat2 += this_err*this_err;
       fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
     }
@@ -1360,10 +1358,8 @@ void PlotMaker::CreateTable() {
       for(unsigned int k = j; k < mcHistograms.size() && tableNames[k] == tableNames[j]; k++) {
 
 	this_val += mcHistograms[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
-	bkgval += this_val;
 	this_staterr2 += this_err*this_err;
-	bkgstat2 += this_staterr2;
-	
+		
 	Double_t temperr;
 	Double_t tempval = mcHistograms_btagWeightUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_syserr2_up += fabs(this_val - tempval) * fabs(this_val - tempval);
@@ -1383,28 +1379,29 @@ void PlotMaker::CreateTable() {
 	tempval = mcHistograms_topPtDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_syserr2_down += fabs(this_val - tempval) * fabs(this_val - tempval);
 
-	bkgsys2_up += this_syserr2_up;
-	bkgsys2_down += this_syserr2_down;
-
       }
 
-      TString fullTableName = tableNames[j] + "val%dx:%.1f\n" + tableNames[j] + "stat%dx:%.2f\n" + tableNames[j] + "sysup%dx:%.2f\n" + tableNames[j] + "sysdown%dx:%.2f\n";
-      char * buffer[200];
+      bkgval += this_val;
+      bkgstat2 += this_staterr2;
+      bkgsys2_up += this_syserr2_up + this_staterr2;
+      bkgsys2_down += this_syserr2_down + this_staterr2;
+
+      TString fullTableName = tableNames[j] + "val%%ux:%%.1f\\n" + tableNames[j] + "errorup%%ux:%%.2f\\n" + tableNames[j] + "errordown%%ux:%%.2f\\n";
+      char* buffer[200];
       sprintf(buffer, fullTableName.Data());
 
-      fprintf(buffer,
-	      j+1, this_val, 
-	      j+1, sqrt(this_staterr2),
-	      j+1, sqrt(this_syserr2_up),
-	      j+1, sqrt(this_syserr2_down));
+      fprintf(tableFile, buffer,
+	      i+1, this_val, 
+	      i+1, sqrt(this_syserr2_up),
+	      i+1, sqrt(this_syserr2_down));
     }
 
     // total background
-    fprintf(tableFile, "bkgval%dx:%.1f\nbkgstat%dx:%.2f\nbkgsysup%dx:%.2f\nbkgsysdown%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgstat2), i+1, sqrt(bkgsys2_up), i+1, sqrt(bkgsys2_down));
+    fprintf(tableFile, "bkgval%dx:%.1f\nbkgerrorup%dx:%.2f\nbkgerrordown%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgsys2_up), i+1, sqrt(bkgsys2_down));
 
     // Data
     this_val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
-    fprintf(tableFile, "dataval%dx:%.1f\n", i+1, this_val);
+    fprintf(tableFile, "dataval%dx:%.0f\n", i+1, this_val);
 
   }
 
