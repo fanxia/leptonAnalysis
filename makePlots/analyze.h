@@ -1406,13 +1406,13 @@ void PlotMaker::CreateTable() {
 
       bkg_btagUp2 += (this_btagUp - this_val)*(this_btagUp - this_val);
       bkg_scaleUp2 += (this_scaleUp - this_val)*(this_scaleUp - this_val);
-      bkg_pdfUp += (this_pdfUp - this_val)*(this_pdfUp - this_val);
-      bkg_topPtUp += (this_topPtUp - this_val)*(this_topPtUp - this_val);
+      bkg_pdfUp2 += (this_pdfUp - this_val)*(this_pdfUp - this_val);
+      bkg_topPtUp2 += (this_topPtUp - this_val)*(this_topPtUp - this_val);
 
       bkg_btagDown2 += (this_btagDown - this_val)*(this_btagDown - this_val);
       bkg_scaleDown2 += (this_scaleDown - this_val)*(this_scaleDown - this_val);
-      bkg_pdfDown += (this_pdfDown - this_val)*(this_pdfDown - this_val);
-      bkg_topPtDown += (this_topPtDown - this_val)*(this_topPtDown - this_val);
+      bkg_pdfDown2 += (this_pdfDown - this_val)*(this_pdfDown - this_val);
+      bkg_topPtDown2 += (this_topPtDown - this_val)*(this_topPtDown - this_val);
 
       this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
 	(this_scaleUp - this_val)*(this_scaleUp - this_val) +
@@ -1448,12 +1448,12 @@ void PlotMaker::CreateTable() {
     fprintf(tableFile, "dataval%dx:%.0f\n", i+1, this_val);
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
-      fprintf(tableFile, "bkgstat5y:%.1f\n", sqrt(bkgstat2));
-      fprintf(tableFile, "bkgsysup5y%.1f\nbkgsysdown5y%.1f\n", sqrt(bkgsys2_up), sqrt(bkgsys2_down));
-      fprintf(tableFile, "bkgscaleup5y%.1f\nbkgscaledown5y%.1f\n", sqrt(bkg_scaleUp2), sqrt(bkg_scaleDown2));
-      fprintf(tableFile, "bkgpdfup5y%.1f\nbkgpdfdown5y%.1f\n", sqrt(bkg_pdfUp2), sqrt(bkg_pdfDown2));
-      fprintf(tableFile, "bkgtopptup5y%.1f\nbkgtopptdown5y%.1f\n", sqrt(bkg_topPtUp2), sqrt(bkg_topPtDown2));
-      fprintf(tableFile, "bkgbtagup5y%.1f\nbkgbtagdown5y%.1f\n", sqrt(bkg_btagUp2), sqrt(bkg_btagDown2));
+      fprintf(tableFile, "bkgstat5y:%.1f\n", sqrt(bkgstat2) / bkgval);
+      fprintf(tableFile, "bkgsysup5y:%.1f\nbkgsysdown5y:%.1f\n", sqrt(bkgsys2_up) / bkgval, sqrt(bkgsys2_down) / bkgval);
+      fprintf(tableFile, "bkgscaleup5y:%.1f\nbkgscaledown5y:%.1f\n", sqrt(bkg_scaleUp2) / bkgval, sqrt(bkg_scaleDown2) / bkgval);
+      fprintf(tableFile, "bkgpdfup5y:%.1f\nbkgpdfdown5y:%.1f\n", sqrt(bkg_pdfUp2) / bkgval, sqrt(bkg_pdfDown2) / bkgval);
+      fprintf(tableFile, "bkgtopptup5y:%.1f\nbkgtopptdown5y:%.1f\n", sqrt(bkg_topPtUp2) / bkgval, sqrt(bkg_topPtDown2) / bkgval);
+      fprintf(tableFile, "bkgbtagup5y:%.1f\nbkgbtagdown5y:%.1f\n", sqrt(bkg_btagUp2) / bkgval, sqrt(bkg_btagDown2) / bkgval);
     }
 
   }
