@@ -1448,12 +1448,12 @@ void PlotMaker::CreateTable() {
     fprintf(tableFile, "dataval%dx:%.0f\n", i+1, this_val);
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
-      fprintf(tableFile, "bkgstat5y:%.1f\n", sqrt(bkgstat2) / bkgval);
-      fprintf(tableFile, "bkgsysup5y:%.1f\nbkgsysdown5y:%.1f\n", sqrt(bkgsys2_up) / bkgval, sqrt(bkgsys2_down) / bkgval);
-      fprintf(tableFile, "bkgscaleup5y:%.1f\nbkgscaledown5y:%.1f\n", sqrt(bkg_scaleUp2) / bkgval, sqrt(bkg_scaleDown2) / bkgval);
-      fprintf(tableFile, "bkgpdfup5y:%.1f\nbkgpdfdown5y:%.1f\n", sqrt(bkg_pdfUp2) / bkgval, sqrt(bkg_pdfDown2) / bkgval);
-      fprintf(tableFile, "bkgtopptup5y:%.1f\nbkgtopptdown5y:%.1f\n", sqrt(bkg_topPtUp2) / bkgval, sqrt(bkg_topPtDown2) / bkgval);
-      fprintf(tableFile, "bkgbtagup5y:%.1f\nbkgbtagdown5y:%.1f\n", sqrt(bkg_btagUp2) / bkgval, sqrt(bkg_btagDown2) / bkgval);
+      fprintf(tableFile, "bkgstat5y:%.1f\n", 100. * sqrt(bkgstat2) / bkgval);
+      fprintf(tableFile, "bkgsysup5y:%.1f\nbkgsysdown5y:%.1f\n", 100. * sqrt(bkgsys2_up) / bkgval, 100. * sqrt(bkgsys2_down) / bkgval);
+      fprintf(tableFile, "bkgscaleup5y:%.1f\nbkgscaledown5y:%.1f\n", 100. * sqrt(bkg_scaleUp2) / bkgval, 100. * sqrt(bkg_scaleDown2) / bkgval);
+      fprintf(tableFile, "bkgpdfup5y:%.1f\nbkgpdfdown5y:%.1f\n", 100. * sqrt(bkg_pdfUp2) / bkgval, 100. * sqrt(bkg_pdfDown2) / bkgval);
+      fprintf(tableFile, "bkgtopptup5y:%.1f\nbkgtopptdown5y:%.1f\n", 100. * sqrt(bkg_topPtUp2) / bkgval, 100. * sqrt(bkg_topPtDown2) / bkgval);
+      fprintf(tableFile, "bkgbtagup5y:%.1f\nbkgbtagdown5y:%.1f\n", 100. * sqrt(bkg_btagUp2) / bkgval, 100. * sqrt(bkg_btagDown2) / bkgval);
     }
 
   }
