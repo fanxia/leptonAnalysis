@@ -1,6 +1,7 @@
 \documentclass[landscape]{article}
 \usepackage[english]{babel}
 \usepackage{graphicx}
+\usepackage{multirow}
 
 \begin{document}
 
@@ -19,61 +20,61 @@
         \hline
         \hline
         
-	QCD & 
-        qcdval1x $\pm$ qcdstat1x &
-	qcdval2x $\pm$ qcdstat2x &
-	qcdval3x $\pm$ qcdstat3x &
-	qcdval4x $\pm$ qcdstat4x &
-	qcdval5x $\pm$ qcdstat5x \\
+        QCD & 
+        \begin{tabular}{@{}c@{}} qcdval1x \vspace{1 mm} \\ $\pm$ qcdstat1x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} qcdval2x \vspace{1 mm} \\ $\pm$ qcdstat2x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} qcdval3x \vspace{1 mm} \\ $\pm$ qcdstat3x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} qcdval4x \vspace{1 mm} \\ $\pm$ qcdstat4x \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} qcdval5x \vspace{1 mm} \\ $\pm$ qcdstat5x \\ \end{tabular} \\ 
         \hline
 
-	$t\bar{t}+jets$ & 
-        ttInclusiveval1x $^{+ttInclusiveerrorup1x}_{-ttInclusiveerrordown1x}$ &
-	ttInclusiveval2x $^{+ttInclusiveerrorup2x}_{-ttInclusiveerrordown2x}$ &
-	ttInclusiveval3x $^{+ttInclusiveerrorup3x}_{-ttInclusiveerrordown3x}$ &
-	ttInclusiveval4x $^{+ttInclusiveerrorup4x}_{-ttInclusiveerrordown4x}$ &
-	ttInclusiveval5x $^{+ttInclusiveerrorup5x}_{-ttInclusiveerrordown5x}$ \\
+        $t\bar{t}+jets$ & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval1x \vspace{1 mm} \\ $^{+ttInclusiveerrorup1x}_{-ttInclusiveerrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval2x \vspace{1 mm} \\ $^{+ttInclusiveerrorup2x}_{-ttInclusiveerrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval3x \vspace{1 mm} \\ $^{+ttInclusiveerrorup3x}_{-ttInclusiveerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval4x \vspace{1 mm} \\ $^{+ttInclusiveerrorup4x}_{-ttInclusiveerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttInclusiveval5x \vspace{1 mm} \\ $^{+ttInclusiveerrorup5x}_{-ttInclusiveerrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
 	$V+jets$ & 
-	vJetsval1x $^{+vJetserrorup1x}_{-vJetserrordown1x}$ &
-	vJetsval2x $^{+vJetserrorup2x}_{-vJetserrordown2x}$ &
-	vJetsval3x $^{+vJetserrorup3x}_{-vJetserrordown3x}$ &
-	vJetsval4x $^{+vJetserrorup4x}_{-vJetserrordown4x}$ &
-	vJetsval5x $^{+vJetserrorup5x}_{-vJetserrordown5x}$ \\
+	\begin{tabular}{@{}c@{}} vJetsval1x \vspace{1 mm} \\ $^{+vJetserrorup1x}_{-vJetserrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} vJetsval2x \vspace{1 mm} \\ $^{+vJetserrorup2x}_{-vJetserrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} vJetsval3x \vspace{1 mm} \\ $^{+vJetserrorup3x}_{-vJetserrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} vJetsval4x \vspace{1 mm} \\ $^{+vJetserrorup4x}_{-vJetserrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} vJetsval5x \vspace{1 mm} \\ $^{+vJetserrorup5x}_{-vJetserrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
 	Single $t$ & 
-	singleTopval1x $^{+singleToperrorup1x}_{-singleToperrordown1x}$ &
-	singleTopval2x $^{+singleToperrorup2x}_{-singleToperrordown2x}$ &
-	singleTopval3x $^{+singleToperrorup3x}_{-singleToperrordown3x}$ &
-	singleTopval4x $^{+singleToperrorup4x}_{-singleToperrordown4x}$ &
-	singleTopval5x $^{+singleToperrorup5x}_{-singleToperrordown5x}$ \\
+	\begin{tabular}{@{}c@{}} singleTopval1x \vspace{1 mm} \\ $^{+singleToperrorup1x}_{-singleToperrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} singleTopval2x \vspace{1 mm} \\ $^{+singleToperrorup2x}_{-singleToperrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} singleTopval3x \vspace{1 mm} \\ $^{+singleToperrorup3x}_{-singleToperrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} singleTopval4x \vspace{1 mm} \\ $^{+singleToperrorup4x}_{-singleToperrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} singleTopval5x \vspace{1 mm} \\ $^{+singleToperrorup5x}_{-singleToperrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
 	$t\bar{t}V$ & 
-	ttVval1x $^{+ttVerrorup1x}_{-ttVerrordown1x}$ &
-	ttVval2x $^{+ttVerrorup2x}_{-ttVerrordown2x}$ &
-	ttVval3x $^{+ttVerrorup3x}_{-ttVerrordown3x}$ &
-	ttVval4x $^{+ttVerrorup4x}_{-ttVerrordown4x}$ &
-	ttVval5x $^{+ttVerrorup5x}_{-ttVerrordown5x}$ \\
+	\begin{tabular}{@{}c@{}} ttVval1x \vspace{1 mm} \\ $^{+ttVerrorup1x}_{-ttVerrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval2x \vspace{1 mm} \\ $^{+ttVerrorup2x}_{-ttVerrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval3x \vspace{1 mm} \\ $^{+ttVerrorup3x}_{-ttVerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval4x \vspace{1 mm} \\ $^{+ttVerrorup4x}_{-ttVerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttVval5x \vspace{1 mm} \\ $^{+ttVerrorup5x}_{-ttVerrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
         $t\bar{t}\gamma$ & 
-	ttgammaval1x $^{+ttgammaerrorup1x}_{-ttgammaerrordown1x}$ &
-	ttgammaval2x $^{+ttgammaerrorup2x}_{-ttgammaerrordown2x}$ &
-	ttgammaval3x $^{+ttgammaerrorup3x}_{-ttgammaerrordown3x}$ &
-	ttgammaval4x $^{+ttgammaerrorup4x}_{-ttgammaerrordown4x}$ &
-	ttgammaval5x $^{+ttgammaerrorup5x}_{-ttgammaerrordown5x}$ \\
+	\begin{tabular}{@{}c@{}} ttgammaval1x \vspace{1 mm} \\ $^{+ttgammaerrorup1x}_{-ttgammaerrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttgammaval2x \vspace{1 mm} \\ $^{+ttgammaerrorup2x}_{-ttgammaerrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttgammaval3x \vspace{1 mm} \\ $^{+ttgammaerrorup3x}_{-ttgammaerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttgammaval4x \vspace{1 mm} \\ $^{+ttgammaerrorup4x}_{-ttgammaerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} ttgammaval5x \vspace{1 mm} \\ $^{+ttgammaerrorup5x}_{-ttgammaerrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
         \hline
 
         Total Background & 
-	bkgval1x $^{+bkgerrorup1x}_{-bkgerrordown1x}$ &
-	bkgval2x $^{+bkgerrorup2x}_{-bkgerrordown2x}$ &
-	bkgval3x $^{+bkgerrorup3x}_{-bkgerrordown3x}$ &
-	bkgval4x $^{+bkgerrorup4x}_{-bkgerrordown4x}$ &
-	bkgval5x $^{+bkgerrorup5x}_{-bkgerrordown5x}$ \\
+	\begin{tabular}{@{}c@{}} bkgval1x \vspace{1 mm} \\ $^{+bkgerrorup1x}_{-bkgerrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} bkgval2x \vspace{1 mm} \\ $^{+bkgerrorup2x}_{-bkgerrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} bkgval3x \vspace{1 mm} \\ $^{+bkgerrorup3x}_{-bkgerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} bkgval4x \vspace{1 mm} \\ $^{+bkgerrorup4x}_{-bkgerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} bkgval5x \vspace{1 mm} \\ $^{+bkgerrorup5x}_{-bkgerrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 	\hline
         
@@ -87,10 +88,29 @@
 
       \end{tabular}
     }
+
+    \vspace{6 mm}
+
+    \begin{tabular}{ | l | c c | }
+        \hline
+	\hline
+	Source (MET $\ge$ 100) & \multicolumn{2}{ c | }{Uncertainty (\%)} \\
+	 & Up & Down \\
+	\hline
+	Statistical & \multicolumn{2}{ c | }{$\pm$ bkgstat5y} \\
+	Systematic & + bkgsysup5y & - bkgsysdown5y \\
+	\hline
+	\hline
+	Contributions: & & \\
+	\hspace{3 mm} $Q^{2}$ Scaling & + bkgscaleup5y & - bkgscaledown5y \\
+	\hspace{3 mm} PDF & + bkgpdfup5y & - bkgpdfdown5y \\
+	\hspace{3 mm} top-quark $p_{T}$ & + bkgtopup5y & - bkgtopdown5y \\
+	\hspace{3 mm} b-tag & + bkgbtagup5y & - bkgbtagdown5y \\
+	\hline
+    \end{tabular}
+
   \end{center}
   
 \end{small}
 
 \end{document}
-
-
