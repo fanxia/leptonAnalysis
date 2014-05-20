@@ -104,7 +104,7 @@
 	Contributions: & & \\
 	\hspace{3 mm} $Q^{2}$ Scaling & + bkgscaleup5y & - bkgscaledown5y \\
 	\hspace{3 mm} PDF & + bkgpdfup5y & - bkgpdfdown5y \\
-	\hspace{3 mm} top-quark $p_{T}$ & + bkgtopup5y & - bkgtopdown5y \\
+	\hspace{3 mm} top-quark $p_{T}$ & + bkgtopptup5y & - bkgtopptdown5y \\
 	\hspace{3 mm} b-tag & + bkgbtagup5y & - bkgbtagdown5y \\
 	\hline
     \end{tabular}

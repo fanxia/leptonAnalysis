@@ -1440,21 +1440,6 @@ void PlotMaker::CreateTable() {
 
     }
 
-    Double_t bkgval = 0;
-    Double_t bkgstat2 = 0;
-    Double_t bkgsys2_up = 0;
-    Double_t bkgsys2_down = 0;
-
-    Double_t bkg_btagUp2 = 0;
-    Double_t bkg_scaleUp2 = 0;
-    Double_t bkg_pdfUp2 = 0;
-    Double_t bkg_topPtUp2 = 0;
-
-    Double_t bkg_btagDown2 = 0;
-    Double_t bkg_scaleDown2 = 0;
-    Double_t bkg_pdfDown2 = 0;
-    Double_t bkg_topPtDown2 = 0;
-
     // total background
     fprintf(tableFile, "bkgval%dx:%.1f\nbkgerrorup%dx:%.2f\nbkgerrordown%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgsys2_up + bkgstat2), i+1, sqrt(bkgsys2_down + bkgstat2));
 
@@ -1467,7 +1452,7 @@ void PlotMaker::CreateTable() {
       fprintf(tableFile, "bkgsysup5y%.1f\nbkgsysdown5y%.1f\n", sqrt(bkgsys2_up), sqrt(bkgsys2_down));
       fprintf(tableFile, "bkgscaleup5y%.1f\nbkgscaledown5y%.1f\n", sqrt(bkg_scaleUp2), sqrt(bkg_scaleDown2));
       fprintf(tableFile, "bkgpdfup5y%.1f\nbkgpdfdown5y%.1f\n", sqrt(bkg_pdfUp2), sqrt(bkg_pdfDown2));
-      fprintf(tableFile, "bkgtopup5y%.1f\nbkgtopdown5y%.1f\n", sqrt(bkg_topUp2), sqrt(bkg_topDown2));
+      fprintf(tableFile, "bkgtopptup5y%.1f\nbkgtopptdown5y%.1f\n", sqrt(bkg_topPtUp2), sqrt(bkg_topPtDown2));
       fprintf(tableFile, "bkgbtagup5y%.1f\nbkgbtagdown5y%.1f\n", sqrt(bkg_btagUp2), sqrt(bkg_btagDown2));
     }
 
