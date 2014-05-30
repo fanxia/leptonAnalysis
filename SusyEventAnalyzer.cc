@@ -285,13 +285,13 @@ void SusyEventAnalyzer::Data() {
   // Reweighting trees
   /////////////////////////////////
 
-  const int nTreeVariables = 67;
+  const int nTreeVariables = 68;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
     "pfMET_sysShift", "pfMET_sysShift_phi",
     "pfMET_t1", "pfMET_t1p2", "pfMET_t01", "pfMET_t01p2", "pfNoPUMET", "pfMVAMET",
-    "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons",
+    "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons", "NfakePhotons",
     "HT", "HT_jets", "hadronic_pt", "w_mT", "m3",
     "ele_pt", "ele_phi", "ele_eta", "ele_mvaTrigV0", "ele_relIso",
     "muon_pt", "muon_phi", "muon_eta", "muon_relIso",
@@ -333,7 +333,7 @@ void SusyEventAnalyzer::Data() {
   vector<susy::PFJet*> pfJets, btags;
   vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
   vector<float> csvValues;
-  vector<susy::Photon*> photons;
+  vector<susy::Photon*> photons, fakePhotons;
   vector<BtagInfo> tagInfos;
 
   // start event looping
@@ -402,6 +402,7 @@ void SusyEventAnalyzer::Data() {
       btags_corrP4.clear();
       csvValues.clear();
       photons.clear();
+      fakePhotons.clear();
       tagInfos.clear();
       
       findMuons(event, tightMuons, looseMuons, HT, qcdMode);
@@ -452,13 +453,20 @@ void SusyEventAnalyzer::Data() {
 		  pfJets_corrP4,
 		  tightMuons, looseMuons,
 		  tightEles, looseEles,
-		  HT);
+		  HT, false);
 		
+      findPhotons(event, 
+		  fakePhotons,
+		  pfJets_corrP4,
+		  tightMuons, looseMuons,
+		  tightEles, looseEles,
+		  HT, true);
+
       SetTreeValues(treeMap,
 		    event,
 		    tightMuons, tightEles, 
 		    pfJets, btags,
-		    photons,
+		    photons, fakePhotons,
 		    pfJets_corrP4, btags_corrP4,
 		    csvValues,
 		    hadronicSystem,
@@ -542,13 +550,13 @@ void SusyEventAnalyzer::Acceptance() {
   TH2D * h_ttA_phaseSpace = new TH2D("ttA_phaseSpace"+output_code_t, "ttA_phaseSpace"+output_code_t, 500, 0, 1000, 500, 0, 5);
   TH2D * h_ttbar_phaseSpace = new TH2D("ttbar_phaseSpace"+output_code_t, "ttbar_phaseSpace"+output_code_t, 500, 0, 1000, 500, 0, 5);
 
-  const int nTreeVariables = 73;
+  const int nTreeVariables = 74;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
     "pfMET_sysShift", "pfMET_sysShift_phi",
     "pfMET_t1", "pfMET_t1p2", "pfMET_t01", "pfMET_t01p2", "pfNoPUMET", "pfMVAMET", "genMET",
-    "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons",
+    "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons", "NfakePhotons",
     "HT", "HT_jets", "hadronic_pt", "w_mT", "m3",
     "ele_pt", "ele_phi", "ele_eta", "ele_mvaTrigV0", "ele_relIso",
     "muon_pt", "muon_phi", "muon_eta", "muon_relIso",
@@ -611,7 +619,7 @@ void SusyEventAnalyzer::Acceptance() {
   vector<susy::PFJet*> pfJets, btags;
   vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
   vector<float> csvValues;
-  vector<susy::Photon*> photons;
+  vector<susy::Photon*> photons, fakePhotons;
   vector<BtagInfo> tagInfos;
 
   // start event looping
@@ -672,6 +680,7 @@ void SusyEventAnalyzer::Acceptance() {
 	btags_corrP4.clear();
 	csvValues.clear();
 	photons.clear();
+	fakePhotons.clear();
 	tagInfos.clear();
 	
 	findMuons(event, tightMuons, looseMuons, HT, qcdMode);
@@ -708,7 +717,14 @@ void SusyEventAnalyzer::Acceptance() {
 		    pfJets_corrP4,
 		    tightMuons, looseMuons,
 		    tightEles, looseEles,
-		    HT);
+		    HT, false);
+
+	findPhotons(event, 
+		    fakePhotons,
+		    pfJets_corrP4,
+		    tightMuons, looseMuons,
+		    tightEles, looseEles,
+		    HT, true);
 	
 	float btagWeight[nChannels];
 	float btagWeightUp[nChannels];
@@ -730,7 +746,7 @@ void SusyEventAnalyzer::Acceptance() {
 		      event,
 		      tightMuons, tightEles, 
 		      pfJets, btags,
-		      photons,
+		      photons, fakePhotons,
 		      pfJets_corrP4, btags_corrP4,
 		      csvValues,
 		      hadronicSystem,
