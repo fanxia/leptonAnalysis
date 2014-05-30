@@ -137,26 +137,39 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					  false, false,
 					  channel, 3, kRed, "Single Top", "singleTop");
 
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WW.root", "WW",
+					  57.1097, 2.3, 2.3, 2.0, 2.0,
+					  false, false,
+					  channel, 4, kCyan, "Diboson", "diboson");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WZ.root", "WZ",
+					  32.3161, 1.3, 1.3, 1.3, 1.3,
+					  false, false,
+					  channel, 4, kCyan, "Diboson", "diboson");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ZZ.root", "ZZ",
+					  8.25561, 0.3, 0.3, 0.3, 0.3,
+					  false, false,
+					  channel, 4, kCyan, "Diboson", "diboson");
+  
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TTWJets.root", "TTWJets", 
 					  0.232, 0.067, 0.067, 0.03, 0.03,
 					  false, false,
-					  channel, 4, kAzure-2, "t#bar{t} + W/Z", "ttV");
+					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TTZJets.root", "TTZJets", 
 					  0.2057, -1, -1, 0.019, 0.024,
 					  false, false,
-					  channel, 4, kAzure-2, "t#bar{t} + W/Z", "ttV");
+					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
 
   // http://arxiv.org/abs/1102.1967
   //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 
   //2.166, 2.166 * .25, 2.166 * .25, 2.166 * 0.076, 2.166 * 0.099,
   //false, true,
-  //channel, 5, 8, "t#bar{t} + #gamma", "ttgamma");
+  //channel, 6, 8, "t#bar{t} + #gamma", "ttgamma");
 
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/WhizardMCTeeTeeGamma#2_to_5_All_ttbar_decay_channels
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttA_2to5.root", "ttA_2to5", 
 					  .9081 * 2, .9081 * .5, .9081 * .5, .9081 * 2 * 0.076, .9081 * 2 * 0.099, 
 					  false, false,
-					  channel, 5, 8, "t#bar{t} + #gamma", "ttgamma");
+					  channel, 6, 8, "t#bar{t} + #gamma", "ttgamma");
   pMaker->SetUseWHIZARD(true);
 
   //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");

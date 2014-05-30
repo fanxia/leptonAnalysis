@@ -104,8 +104,10 @@
 	Contributions: & & \\
 	\hspace{3 mm} $Q^{2}$ Scaling & + bkgscaleup5y & - bkgscaledown5y \\
 	\hspace{3 mm} PDF & + bkgpdfup5y & - bkgpdfdown5y \\
+	\hspace{3 mm} Jet Energy Scale & + bkgjecup5y & - bkgjecdown5y \\
 	\hspace{3 mm} top-quark $p_{T}$ & + bkgtopptup5y & - bkgtopptdown5y \\
 	\hspace{3 mm} b-tag & + bkgbtagup5y & - bkgbtagdown5y \\
+	\hline
 	\hline
     \end{tabular}
 

@@ -137,6 +137,7 @@ class SusyEventAnalyzer {
 		   vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
 		   vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
 		   float& HT);
+  // in data
   void findJets(susy::Event& ev, 
 		vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
 		vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
@@ -145,7 +146,17 @@ class SusyEventAnalyzer {
 		vector<BtagInfo>& tagInfos, vector<float>& csvValues, 
 		vector<TLorentzVector>& pfJets_corrP4, vector<TLorentzVector>& btags_corrP4, 
 		float& HT, TLorentzVector& hadronicSystem);
-   
+
+  void findJets_inMC(susy::Event& ev, 
+		     vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
+		     vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
+		     vector<susy::PFJet*>& pfJets, vector<susy::PFJet*>& btags, 
+		     ScaleFactorInfo sf,
+		     vector<BtagInfo>& tagInfos, vector<float>& csvValues, 
+		     vector<TLorentzVector>& pfJets_corrP4, vector<TLorentzVector>& btags_corrP4, 
+		     float& HT, TLorentzVector& hadronicSystem,
+		     int systematic);
+     
   bool GetDiJetPt(susy::Event& ev, vector<susy::Photon*> candidates, float& diJetPt, float& leadpt, float& trailpt);
   bool PhotonMatchesElectron(susy::Event& ev, vector<susy::Photon*> candidates, int& bothMatchCounter);
   int FigureTTbarDecayMode(susy::Event& ev);
@@ -560,6 +571,68 @@ void SusyEventAnalyzer::findJets(susy::Event& ev,
   sort(btags_corrP4.begin(), btags_corrP4.end(), CorrPtGreater);
 
 }
+
+void SusyEventAnalyzer::findJets_inMC(susy::Event& ev, 
+				      vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
+				      vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
+				      vector<susy::PFJet*>& pfJets, vector<susy::PFJet*>& btags, 
+				      ScaleFactorInfo sf,
+				      vector<BtagInfo>& tagInfos, vector<float>& csvValues, 
+				      vector<TLorentzVector>& pfJets_corrP4, vector<TLorentzVector>& btags_corrP4, 
+				      float& HT, TLorentzVector& hadronicSystem,
+				      int systematic) {
+  
+  map<TString, susy::PFJetCollection>::iterator pfJets_it = ev.pfJets.find("ak5");
+  if(pfJets_it != ev.pfJets.end()) {
+    susy::PFJetCollection& jetColl = pfJets_it->second;
+      
+    for(vector<susy::PFJet>::iterator it = jetColl.begin();
+	it != jetColl.end(); it++) {
+	
+      map<TString, Float_t>::iterator s_it = it->jecScaleFactors.find("L1FastL2L3");
+      float scale = s_it->second;
+      float jecScaleUncertainty = it->jecUncertainty;
+
+      if(systematic == kJECup) scale *= (1.0 + jecScaleUncertainty);
+      else if(systematic == kJECdown) *= (1.0 - jecScaleUncertainty);
+
+      TLorentzVector corrP4 = scale * it->momentum;
+
+      if(!isGoodJet(*it, corrP4)) continue;
+      if(JetOverlapsElectron(corrP4, tightEles, looseEles)) continue;
+      if(JetOverlapsMuon(corrP4, tightMuons, looseMuons)) continue;
+
+      pfJets.push_back(&*it);
+      csvValues.push_back(it->bTagDiscriminators[susy::kCSV]);
+      HT += corrP4.Pt();
+      hadronicSystem += corrP4;
+      pfJets_corrP4.push_back(corrP4);
+	
+      if(fabs(corrP4.Eta()) < 2.4) {
+	if(isMC) {
+	  BtagInfo info((*it), corrP4, btagger, 1., isMC, isFastSim, sf, btagTechnicalStop, (15906. + 77789.) / 328124., 117192. / 328124., 117237. / 328124.);
+	  tagInfos.push_back(info);
+	}
+
+	if((btagger == "CSVL" && it->bTagDiscriminators[susy::kCSV] > 0.244) ||
+	   (btagger == "CSVM" && it->bTagDiscriminators[susy::kCSV] > 0.679) ||
+	   (btagger == "CSVT" && it->bTagDiscriminators[susy::kCSV] > 0.898)) {
+	  btags.push_back(&*it);
+	  btags_corrP4.push_back(corrP4);
+	}
+	 
+      }
+   
+    } // loop over jet coll
+  } // if the jet coll exists
+  sort(pfJets.begin(), pfJets.end(), EtGreater<susy::PFJet>);
+  sort(btags.begin(), btags.end(), EtGreater<susy::PFJet>);
+  sort(csvValues.begin(), csvValues.end(), greater<float>());
+  sort(pfJets_corrP4.begin(), pfJets_corrP4.end(), CorrPtGreater);
+  sort(btags_corrP4.begin(), btags_corrP4.end(), CorrPtGreater);
+
+}
+
 
 void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuons, vector<susy::Muon*>& looseMuons, float& HT, int mode) {
 

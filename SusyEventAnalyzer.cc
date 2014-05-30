@@ -93,7 +93,7 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
   int nCnt[NCNT][nChannels];
   for(int i = 0; i < NCNT; i++) {
     for(int j = 0; j < nChannels; j++) {
-    nCnt[i][j] = 0;
+      nCnt[i][j] = 0;
     }
   }
   
@@ -340,7 +340,7 @@ void SusyEventAnalyzer::Data() {
   Long64_t jentry = 0;
   while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
 
-  if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
+    if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
       cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
     }
     
@@ -435,60 +435,60 @@ void SusyEventAnalyzer::Data() {
 	continue;
       }
 
-    float HT_jets = 0.;
-    TLorentzVector hadronicSystem(0., 0., 0., 0.);
+      float HT_jets = 0.;
+      TLorentzVector hadronicSystem(0., 0., 0., 0.);
 
-    findJets(event, 
-	     tightMuons, looseMuons,
-	     tightEles, looseEles,
-	     pfJets, btags,
-	     sf,
-	     tagInfos, csvValues, 
-	     pfJets_corrP4, btags_corrP4, 
-	     HT_jets, hadronicSystem);
+      findJets(event, 
+	       tightMuons, looseMuons,
+	       tightEles, looseEles,
+	       pfJets, btags,
+	       sf,
+	       tagInfos, csvValues, 
+	       pfJets_corrP4, btags_corrP4, 
+	       HT_jets, hadronicSystem);
 
-    findPhotons(event, 
-		photons,
-		pfJets_corrP4,
-		tightMuons, looseMuons,
-		tightEles, looseEles,
-		HT);
-		
-    SetTreeValues(treeMap,
-		  event,
-		  tightMuons, tightEles, 
-		  pfJets, btags,
+      findPhotons(event, 
 		  photons,
-		  pfJets_corrP4, btags_corrP4,
-		  csvValues,
-		  hadronicSystem,
-		  HT, HT_jets,
-		  nPVertex,
-		  0, 0,
-		  jentry);
+		  pfJets_corrP4,
+		  tightMuons, looseMuons,
+		  tightEles, looseEles,
+		  HT);
+		
+      SetTreeValues(treeMap,
+		    event,
+		    tightMuons, tightEles, 
+		    pfJets, btags,
+		    photons,
+		    pfJets_corrP4, btags_corrP4,
+		    csvValues,
+		    hadronicSystem,
+		    HT, HT_jets,
+		    nPVertex,
+		    0, 0,
+		    jentry);
 
-    ////////////////////
+      ////////////////////
 
-    for(unsigned int chan = 0; chan < nChannels; chan++) {
+      for(unsigned int chan = 0; chan < nChannels; chan++) {
       
-      if(pfJets.size() < nJetReq[chan]) continue;
-      if(btags.size() < nBtagReq[chan]) continue;
+	if(pfJets.size() < nJetReq[chan]) continue;
+	if(btags.size() < nBtagReq[chan]) continue;
       
-      if(tightEles.size() != nEleReq[chan]) continue;
-      if(tightMuons.size() != nMuonReq[chan]) continue;
+	if(tightEles.size() != nEleReq[chan]) continue;
+	if(tightMuons.size() != nMuonReq[chan]) continue;
       
-      if(qcdMode == kSignal) {
-	nCnt[2][chan]++;
-	signalTrees[chan]->Fill();
-      }
-      else if(qcdMode == kElectronQCD) {
-	nCnt[3][chan]++;
-	eQCDTrees[chan]->Fill();
-      }
+	if(qcdMode == kSignal) {
+	  nCnt[2][chan]++;
+	  signalTrees[chan]->Fill();
+	}
+	else if(qcdMode == kElectronQCD) {
+	  nCnt[3][chan]++;
+	  eQCDTrees[chan]->Fill();
+	}
       
-    } // loop over jet/btag req channels
+      } // loop over jet/btag req channels
     
-    ///////////////////////////////////
+      ///////////////////////////////////
     
     } // for qcd modes
 
@@ -527,7 +527,7 @@ void SusyEventAnalyzer::Acceptance() {
   int nCnt[NCNT][nChannels];
   for(int i = 0; i < NCNT; i++) {
     for(int j = 0; j < nChannels; j++) {
-    nCnt[i][j] = 0;
+      nCnt[i][j] = 0;
     }
   }
   
@@ -569,11 +569,23 @@ void SusyEventAnalyzer::Acceptance() {
   map<TString, float> treeMap;
   for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;
 
-  vector<TTree*> signalTrees, eQCDTrees;
+  vector<TTree*> signalTrees, signalTrees_JECup, signalTrees_JECdown;
+  vector<TTree*> eQCDTrees;
+
   for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree(channels[i]+"_signalTree", "An event tree for final analysis");
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
     signalTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_signalTree_JECup", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    signalTrees_JECup.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_signalTree_JECdown", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    signalTrees_JECdown.push_back(tree);
   }
   for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree(channels[i]+"_eQCDTree", "An event tree for final analysis");
@@ -641,113 +653,127 @@ void SusyEventAnalyzer::Acceptance() {
     
     ttA_phaseSpace(event, h_ttA_phaseSpace);
     ttbar_phaseSpace(event, h_ttbar_phaseSpace);
-
-    for(int qcdMode = kSignal; qcdMode <= kElectronQCD; qcdMode++) {
-      
-      float HT = 0.;
-      
-      tightMuons.clear();
-      looseMuons.clear();
-      tightEles.clear();
-      looseEles.clear();
-      pfJets.clear();
-      btags.clear();
-      pfJets_corrP4.clear();
-      btags_corrP4.clear();
-      csvValues.clear();
-      photons.clear();
-      tagInfos.clear();
-      
-      findMuons(event, tightMuons, looseMuons, HT, qcdMode);
-      if(tightMuons.size() > 1 || looseMuons.size() > 0) continue;
-      
-      findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT, qcdMode);
-      if(tightEles.size() > 1 || looseEles.size() > 0) continue;
-      
-      if(tightMuons.size() + tightEles.size() != 1) continue;
-      if(looseMuons.size() + looseEles.size() != 0) continue;
-      
-      bool passHLT = true;
-      if(useTrigger) {
-	if(tightEles.size() == 1) passHLT = PassTriggers(1);
-	else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
-      }
-      if(!passHLT) continue;
-      
-      float HT_jets = 0.;
-      TLorentzVector hadronicSystem(0., 0., 0., 0.);
-      
-      findJets(event, 
-	       tightMuons, looseMuons,
-	       tightEles, looseEles,
-	       pfJets, btags,
-	       sf,
-	       tagInfos, csvValues, 
-	       pfJets_corrP4, btags_corrP4, 
-	       HT_jets, hadronicSystem);
-      
-      findPhotons(event, 
-		  photons,
-		  pfJets_corrP4,
-		  tightMuons, looseMuons,
-		  tightEles, looseEles,
-		  HT);
-      
-      float btagWeight[nChannels];
-      float btagWeightUp[nChannels];
-      float btagWeightDown[nChannels];
-      float btagWeightError[nChannels];
-      for(int chan = 0; chan < nChannels; chan++) {
-	BtagWeight * tagWeight = new BtagWeight(nBtagReq[chan]);
-	pair<float, float> weightResult = tagWeight->weight(tagInfos, btags.size(), 0., false);
-	btagWeight[chan] = weightResult.first;
-	btagWeightError[chan] = weightResult.second;
-	
-	btagWeightUp[chan] = (tagWeight->weight(tagInfos, btags.size(), 1., true)).first;
-	btagWeightDown[chan] = (tagWeight->weight(tagInfos, btags.size(), -1., true)).first;
-	
-	delete tagWeight;
-      }
-      
-      SetTreeValues(treeMap,
-		    event,
-		    tightMuons, tightEles, 
-		    pfJets, btags,
-		    photons,
-		    pfJets_corrP4, btags_corrP4,
-		    csvValues,
-		    hadronicSystem,
-		    HT, HT_jets,
-		    nPVertex,
-		    eventWeight, eventWeightErr,
-		    0);
-      
-      ////////////////////
-      
-      for(unsigned int chan = 0; chan < nChannels; chan++) {
-	
-	if(pfJets.size() < nJetReq[chan]) continue;
-	if(btags.size() < nBtagReq[chan]) continue;
-	
-	if(tightEles.size() != nEleReq[chan]) continue;
-	if(tightMuons.size() != nMuonReq[chan]) continue;
-      
-	treeMap["btagWeight"] = btagWeight[chan];
-	treeMap["btagWeightErr"] = btagWeightError[chan];
-	treeMap["btagWeightUp"] = btagWeightUp[chan];
-	treeMap["btagWeightDown"] = btagWeightDown[chan];
-	
-	if(qcdMode == kSignal) {
-	  nCnt[2][chan]++;
-	  signalTrees[chan]->Fill();
-	}
-	else if(qcdMode == kElectronQCD) {
-	  nCnt[3][chan]++;
-	  eQCDTrees[chan]->Fill();
-	}
-	
-      } // for channels
     
+    for(int qcdMode = kSignal; qcdMode <= kElectronQCD; qcdMode++) {
+      for(int jetSyst = kCentral; jetSyst < kNumJetSytematics; jetSyst++) {
+
+	if(qcdMode != kSignal) continue;
+	if(jetSyst == kJERup || jetSyst == kJERdown) continue;
+
+	float HT = 0.;
+	
+	tightMuons.clear();
+	looseMuons.clear();
+	tightEles.clear();
+	looseEles.clear();
+	pfJets.clear();
+	btags.clear();
+	pfJets_corrP4.clear();
+	btags_corrP4.clear();
+	csvValues.clear();
+	photons.clear();
+	tagInfos.clear();
+	
+	findMuons(event, tightMuons, looseMuons, HT, qcdMode);
+	if(tightMuons.size() > 1 || looseMuons.size() > 0) continue;
+	
+	findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT, qcdMode);
+	if(tightEles.size() > 1 || looseEles.size() > 0) continue;
+	
+	if(tightMuons.size() + tightEles.size() != 1) continue;
+	if(looseMuons.size() + looseEles.size() != 0) continue;
+	
+	bool passHLT = true;
+	if(useTrigger) {
+	  if(tightEles.size() == 1) passHLT = PassTriggers(1);
+	  else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
+	}
+	if(!passHLT) continue;
+	
+	float HT_jets = 0.;
+	TLorentzVector hadronicSystem(0., 0., 0., 0.);
+	
+	findJets_inMC(event, 
+		      tightMuons, looseMuons,
+		      tightEles, looseEles,
+		      pfJets, btags,
+		      sf,
+		      tagInfos, csvValues, 
+		      pfJets_corrP4, btags_corrP4, 
+		      HT_jets, hadronicSystem,
+		      jetSyst);
+      
+	findPhotons(event, 
+		    photons,
+		    pfJets_corrP4,
+		    tightMuons, looseMuons,
+		    tightEles, looseEles,
+		    HT);
+	
+	float btagWeight[nChannels];
+	float btagWeightUp[nChannels];
+	float btagWeightDown[nChannels];
+	float btagWeightError[nChannels];
+	for(int chan = 0; chan < nChannels; chan++) {
+	  BtagWeight * tagWeight = new BtagWeight(nBtagReq[chan]);
+	  pair<float, float> weightResult = tagWeight->weight(tagInfos, btags.size(), 0., false);
+	  btagWeight[chan] = weightResult.first;
+	  btagWeightError[chan] = weightResult.second;
+	  
+	  btagWeightUp[chan] = (tagWeight->weight(tagInfos, btags.size(), 1., true)).first;
+	  btagWeightDown[chan] = (tagWeight->weight(tagInfos, btags.size(), -1., true)).first;
+	  
+	  delete tagWeight;
+	}
+	
+	SetTreeValues(treeMap,
+		      event,
+		      tightMuons, tightEles, 
+		      pfJets, btags,
+		      photons,
+		      pfJets_corrP4, btags_corrP4,
+		      csvValues,
+		      hadronicSystem,
+		      HT, HT_jets,
+		      nPVertex,
+		      eventWeight, eventWeightErr,
+		      0);
+	
+	////////////////////
+	
+	for(unsigned int chan = 0; chan < nChannels; chan++) {
+	  
+	  if(pfJets.size() < nJetReq[chan]) continue;
+	  if(btags.size() < nBtagReq[chan]) continue;
+	  
+	  if(tightEles.size() != nEleReq[chan]) continue;
+	  if(tightMuons.size() != nMuonReq[chan]) continue;
+	  
+	  treeMap["btagWeight"] = btagWeight[chan];
+	  treeMap["btagWeightErr"] = btagWeightError[chan];
+	  treeMap["btagWeightUp"] = btagWeightUp[chan];
+	  treeMap["btagWeightDown"] = btagWeightDown[chan];
+	  
+	  for(int jetSyst = kCentral; jetSyst < kNumJetSytematics; jetSyst++)
+
+	    if(qcdMode == kSignal) {
+	      if(jetSyst == kCentral) {
+		nCnt[2][chan]++;
+		signalTrees[chan]->Fill();
+	      }
+	      else if(jetSyst == kJECup) signalTrees_JECup[chan]->Fill();
+	      else if(jetSyst == kJECdown) signalTrees_JECdown[chan]->Fill();
+	    }
+
+	    else if(qcdMode == kElectronQCD) {
+	      nCnt[3][chan]++;
+	      eQCDTrees[chan]->Fill();
+	    }
+	  
+	} // for channels
+	
+      } // for jet systematic modes
+
     } // for qcd modes
 
   } // for entries
