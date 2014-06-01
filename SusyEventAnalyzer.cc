@@ -110,8 +110,6 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
   TH1F * num_ljets = new TH1F("ljets"+output_code_t, "ljets"+output_code_t, 200, 0, 1000); num_ljets->Sumw2();
   TH1F * num_ltags = new TH1F("ltags"+output_code_t, "ltags"+output_code_t, 200, 0, 1000); num_ltags->Sumw2();
 
-  TH2F * h_DR_jet_gg = new TH2F("DR_jet_gg", "#DeltaR between jets and lead/trailing #gamma#gamma candidates;#DeltaR_{lead #gamma, jet};#DeltaR_{trail #gamma, jet}", 50, 0, 5, 50, 0, 5);
-
   ScaleFactorInfo sf(btagger);
 
   Long64_t nEntries = fTree->GetEntries();
@@ -134,8 +132,6 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
     }
 
     nCnt[0][0]++; // events
-
-    int event_type = 0;
 
     int nPVertex = GetNumberPV(event);
     if(nPVertex == 0) continue;
@@ -278,8 +274,6 @@ void SusyEventAnalyzer::Data() {
     h_metFilter->GetXaxis()->SetBinLabel(i+1, metFilterNames[i]);
     h_metFilter->GetYaxis()->SetBinLabel(i+1, metFilterNames[i]);
   }
-
-  TH2F * h_DR_jet_gg = new TH2F("DR_jet_gg", "#DeltaR between jets and lead/trailing #gamma#gamma candidates;#DeltaR_{lead #gamma, jet};#DeltaR_{trail #gamma, jet}", 50, 0, 5, 50, 0, 5);
 
   /////////////////////////////////
   // Reweighting trees
@@ -770,21 +764,19 @@ void SusyEventAnalyzer::Acceptance() {
 	  treeMap["btagWeightUp"] = btagWeightUp[chan];
 	  treeMap["btagWeightDown"] = btagWeightDown[chan];
 	  
-	  for(int jetSyst = kCentral; jetSyst < kNumJetSytematics; jetSyst++)
-
-	    if(qcdMode == kSignal) {
-	      if(jetSyst == kCentral) {
-		nCnt[2][chan]++;
-		signalTrees[chan]->Fill();
-	      }
-	      else if(jetSyst == kJECup) signalTrees_JECup[chan]->Fill();
-	      else if(jetSyst == kJECdown) signalTrees_JECdown[chan]->Fill();
+	  if(qcdMode == kSignal) {
+	    if(jetSyst == kCentral) {
+	      nCnt[2][chan]++;
+	      signalTrees[chan]->Fill();
 	    }
-
-	    else if(qcdMode == kElectronQCD) {
-	      nCnt[3][chan]++;
-	      eQCDTrees[chan]->Fill();
-	    }
+	    else if(jetSyst == kJECup) signalTrees_JECup[chan]->Fill();
+	    else if(jetSyst == kJECdown) signalTrees_JECdown[chan]->Fill();
+	  }
+	  
+	  else if(qcdMode == kElectronQCD) {
+	    nCnt[3][chan]++;
+	    eQCDTrees[chan]->Fill();
+	  }
 	  
 	} // for channels
 	
