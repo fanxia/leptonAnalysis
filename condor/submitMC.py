@@ -191,9 +191,14 @@ if not test:
     tar.close()
 
     if njobs != 1 or runStaged:
-        os.system("condor_submit pileup_"+name_jdl)
-        os.system("condor_submit btag_"+name_jdl)
-        os.system("cat ../doc/staged_mc_warning.txt")
+        if os.path.isfile("saved_weights/btagEfficiency_"+datasetName+".root") and os.path.isfile("saved_weights/pileupReweighting_"+datasetName+".root"):
+            os.system("cp saved_weights/btagEfficiency_"+datasetName+".root "+baseOutdir)
+            os.system("cp saved_weights/pileupReweighting_"+datasetName+".root "+baseOutdir)
+            os.system("condor_submit acceptance_"+name_jdl)
+        else:
+            os.system("condor_submit pileup_"+name_jdl)
+            os.system("condor_submit btag_"+name_jdl)
+            os.system("cat ../doc/staged_mc_warning.txt")
     else:
         os.system("condor_submit "+name_jdl)
 
