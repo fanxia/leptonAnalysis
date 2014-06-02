@@ -418,8 +418,8 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   }
 
   mcTrees_JECdown.push_back((TTree*)mcFiles.back()->Get(channels[channel]+"_signalTree_JECdown"));
-  if(!mcTrees_JECup.back()) {
-    cout << "Could not load TTree " << channels[channel] << "_signalTree_JECup from TFile " << fileName << endl;
+  if(!mcTrees_JECdown.back()) {
+    cout << "Could not load TTree " << channels[channel] << "_signalTree_JECdown from TFile " << fileName << endl;
     return false;
   }
 
@@ -507,6 +507,11 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
     TH1D * h_bkg_topPtDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_topPtDown");
     mcHistograms_topPtDown[i].push_back(h_bkg_topPtDown);
 
+    TH1D * h_bkg_JECup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECup");
+    mcHistograms_JECup[i].push_back(h_bkg_JECup);
+
+    TH1D * h_bkg_JECdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECdown");
+    mcHistograms_JECdown[i].push_back(h_bkg_JECdown);
   }
 
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
@@ -566,6 +571,12 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
 
     TH1D * h_bkg_topPtDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_topPtDown");
     mcHistograms_topPtDown[i].push_back(h_bkg_topPtDown);
+
+    TH1D * h_bkg_JECup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECup");
+    mcHistograms_JECup[i].push_back(h_bkg_JECup);
+
+    TH1D * h_bkg_JECdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECdown");
+    mcHistograms_JECdown[i].push_back(h_bkg_JECdown);
   }
   
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
