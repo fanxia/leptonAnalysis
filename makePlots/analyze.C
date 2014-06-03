@@ -70,7 +70,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   }
 
   PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], blinded);
-  pMaker->LoadLeptonSFs("../data/muon_scaleFactors_8TeV_53x.root", channel);
+  pMaker->LoadLeptonSFs(channel);
 
   bool loadSuccess = true;
   

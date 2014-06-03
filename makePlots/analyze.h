@@ -178,7 +178,7 @@ class PlotMaker : public TObject {
 
   ~PlotMaker();
   
-  bool LoadLeptonSFs(TString fileName, int chan);
+  bool LoadLeptonSFs(int chan);
 
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
@@ -385,7 +385,7 @@ PlotMaker::~PlotMaker() {
     removeTTAoverlap.clear();
     reweightTopPt.clear();
 
-    fSF.Close();
+    fSF->Close();
 
     delete sigaTree;
     delete sigbTree;
@@ -413,11 +413,11 @@ bool PlotMaker::LoadLeptonSFs(int chan) {
 
   if(chan < 2) {
     cout << "Using muons for electron SFs for now..." << endl;
-    fSF = new TFile("muon_scaleFactors_8TeV_53x.root", "READ");
+    fSF = new TFile("../data/muon_scaleFactors_8TeV_53x.root", "READ");
     sf_lepton = (TH2D*)fSF->Get("muTight_SF_full");
   }
   else {
-    fSF = new TFile("muon_scaleFactors_8TeV_53x.root", "READ");
+    fSF = new TFile("../data/muon_scaleFactors_8TeV_53x.root", "READ");
     sf_lepton = (TH2D*)fSF->Get("muTight_SF_full");
   }
 
@@ -1737,11 +1737,11 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
   Float_t pt, eta;
 
   if(chan < 2) {
-    pt = min(vars[15], 299.);
+    pt = min(vars[15], (float)299.);
     eta = fabs(vars[16]);
   }
   else {
-    pt = min(vars[17], 299.);
+    pt = min(vars[17], (float)299.);
     eta = fabs(vars[18]);
   }
 
