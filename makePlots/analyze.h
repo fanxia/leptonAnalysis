@@ -178,6 +178,8 @@ class PlotMaker : public TObject {
 
   ~PlotMaker();
   
+  bool LoadLeptonSFs(TString fileName, int chan);
+
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 			bool removeTTA, bool reweightTop,
@@ -192,7 +194,7 @@ class PlotMaker : public TObject {
   void BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_t xhi);
   void BookHistogram(TString variable, Int_t nBins, Double_t* customBins);
 
-  void FillHistograms(double metCut, int nPhotons_req, int nBtagReq);
+  void FillHistograms(double metCut, int nPhotons_req, int nBtagReq, int chan);
   void SubtractMCFromQCD();
   void NormalizeQCD();
 
@@ -213,6 +215,8 @@ class PlotMaker : public TObject {
   void CreateTable();
 
   void PlotKolmogorovValues();
+
+  void GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down);
 
  private:
 
@@ -246,6 +250,8 @@ class PlotMaker : public TObject {
   vector< vector<TH1D*> > mcHistograms_topPtDown;
   vector< vector<TH1D*> > mcHistograms_JECup;
   vector< vector<TH1D*> > mcHistograms_JECdown;
+  vector< vector<TH1D*> > mcHistograms_leptonSFup;
+  vector< vector<TH1D*> > mcHistograms_leptonSFdown;
 
   vector< vector<TH1D*> > mcQCDHistograms;
 
@@ -264,6 +270,9 @@ class PlotMaker : public TObject {
   vector<TH1D*> h_sigb;
 
   vector<pair<TString, double> > KSscores;
+
+  TFile * fSF;
+  TH2D * sf_lepton;
 
   Int_t intLumi_int;
   TString intLumi;
@@ -328,6 +337,8 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   mcHistograms_topPtDown.clear();
   mcHistograms_JECup.clear();
   mcHistograms_JECdown.clear();
+  mcHistograms_leptonSFup.clear();
+  mcHistograms_leptonSFdown.clear();
 
   mcQCDHistograms.clear();
 
@@ -352,6 +363,8 @@ PlotMaker::~PlotMaker() {
     mcHistograms_topPtDown.clear();
     mcHistograms_JECup.clear();
     mcHistograms_JECdown.clear();
+    mcHistograms_leptonSFup.clear();
+    mcHistograms_leptonSFdown.clear();
     mcQCDHistograms.clear();
     mcTrees.clear();
     mcTrees_JECup.clear();
@@ -371,6 +384,8 @@ PlotMaker::~PlotMaker() {
     tableNames.clear();
     removeTTAoverlap.clear();
     reweightTopPt.clear();
+
+    fSF.Close();
 
     delete sigaTree;
     delete sigbTree;
@@ -393,6 +408,22 @@ void PlotMaker::SetTrees(TTree * gg, TTree * qcd,
   sigbTree = sig_b;
 
 }
+
+bool PlotMaker::LoadLeptonSFs(int chan) {
+
+  if(chan < 2) {
+    cout << "Using muons for electron SFs for now..." << endl;
+    fSF = new TFile("muon_scaleFactors_8TeV_53x.root", "READ");
+    sf_lepton = (TH2D*)fSF->Get("muTight_SF_full");
+  }
+  else {
+    fSF = new TFile("muon_scaleFactors_8TeV_53x.root", "READ");
+    sf_lepton = (TH2D*)fSF->Get("muTight_SF_full");
+  }
+
+}
+
+  
 
 bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
 				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
@@ -460,6 +491,8 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   mcHistograms_topPtDown.resize(mcHistograms_topPtDown.size() + 1);
   mcHistograms_JECup.resize(mcHistograms_JECup.size() + 1);
   mcHistograms_JECdown.resize(mcHistograms_JECdown.size() + 1);
+  mcHistograms_leptonSFup.resize(mcHistograms_leptonSFup.size() + 1);
+  mcHistograms_leptonSFdown.resize(mcHistograms_leptonSFdown.size() + 1);
   mcQCDHistograms.resize(mcQCDHistograms.size() + 1);
   
   return true;
@@ -512,6 +545,12 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
 
     TH1D * h_bkg_JECdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECdown");
     mcHistograms_JECdown[i].push_back(h_bkg_JECdown);
+
+    TH1D * h_bkg_leptonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFup");
+    mcHistograms_leptonSFup[i].push_back(h_bkg_leptonSFup);
+
+    TH1D * h_bkg_leptonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFdown");
+    mcHistograms_leptonSFdown[i].push_back(h_bkg_leptonSFdown);
   }
 
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
@@ -577,6 +616,12 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
 
     TH1D * h_bkg_JECdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECdown");
     mcHistograms_JECdown[i].push_back(h_bkg_JECdown);
+
+    TH1D * h_bkg_leptonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFup");
+    mcHistograms_leptonSFup[i].push_back(h_bkg_leptonSFup);
+
+    TH1D * h_bkg_leptonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFdown");
+    mcHistograms_leptonSFdown[i].push_back(h_bkg_leptonSFdown);
   }
   
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
@@ -596,7 +641,7 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
 }
 
 // expects BookHistogram on nphotons, then met, then others
-void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
+void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, int chan) {
 
   vector<Float_t> vars;
   vars.resize(variables.size());
@@ -703,6 +748,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
   }
 
+  Float_t leptonSF, leptonSFup, leptonSFdown;
+
   for(unsigned int i = 0; i < mcTrees.size(); i++) {
     
     for(int j = 0; j < mcTrees[i]->GetEntries(); j++) {
@@ -724,13 +771,15 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
+      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t addError2_puOnly = btagWeight*btagWeight*puWeightErr*puWeightErr;
 
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
-	double totalWeight = puWeight * btagWeight;
+	double totalWeight = puWeight * btagWeight * leptonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 
 	Float_t oldError = mcHistograms[i][k]->GetBinError(mcHistograms[i][k]->FindBin(vars[k]));
@@ -747,6 +796,18 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_btagWeightDown[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_btagWeightDown[i][k]->SetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]), newerror);
+
+	totalWeight = puWeight * btagWeight;
+	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	oldError = mcHistograms_leptonSFup[i][k]->GetBinError(mcHistograms_leptonSFup[i][k]->FindBin(vars[k]));
+	newerror = sqrt(oldError*oldError + addError2);
+	mcHistograms_leptonSFup[i][k]->Fill(vars[k], totalWeight * leptonSFup);
+	mcHistograms_leptonSFup[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
+
+	oldError = mcHistograms_leptonSFdown[i][k]->GetBinError(mcHistograms_leptonSFdown[i][k]->FindBin(vars[k]));
+	newerror = sqrt(oldError*oldError + addError2);
+	mcHistograms_leptonSFdown[i][k]->Fill(vars[k], totalWeight * leptonSFdown);
+	mcHistograms_leptonSFdown[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_topPtUp[i][k]->GetBinError(mcHistograms_topPtUp[i][k]->FindBin(vars[k]));
@@ -791,6 +852,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
       mcHistograms_pdfDown[i][j]->Scale(intLumi_int * (crossSections[i] - pdfErrDown[i]) / mcNGen[i]);
       mcHistograms_topPtUp[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
       mcHistograms_topPtDown[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+      mcHistograms_leptonSFup[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+      mcHistograms_leptonSFdown[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     }
 
   }
@@ -809,12 +872,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
+      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+
+      double totalWeight = puWeight * btagWeight * leptonSF;
+      if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-
-	double totalWeight = puWeight * btagWeight;
-	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
-
 	mcHistograms_JECup[i][k]->Fill(vars[k], totalWeight);
       }
 
@@ -838,12 +902,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
+      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+
+      double totalWeight = puWeight * btagWeight * leptonSF;
+      if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-
-	double totalWeight = puWeight * btagWeight;
-	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
-
 	mcHistograms_JECdown[i][k]->Fill(vars[k], totalWeight);
       }
 
@@ -874,12 +939,14 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
 
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
+      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+
+      double totalWeight = puWeight * btagWeight * leptonSF;
+      if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
-	double totalWeight = puWeight * btagWeight;
-	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
-	
 	Float_t oldError = mcQCDHistograms[i][k]->GetBinError(mcQCDHistograms[i][k]->FindBin(vars[k]));
 	Float_t newerror = sqrt(oldError*oldError + addError2);
 	mcQCDHistograms[i][k]->Fill(vars[k], totalWeight);
@@ -909,11 +976,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
+    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+
+    double totalWeight = puWeight * btagWeight * leptonSF;
+    //if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_siga[j]->GetBinError(h_siga[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_siga[j]->Fill(vars[j], puWeight * btagWeight);
+      h_siga[j]->Fill(vars[j], totalWeight);
       h_siga[j]->SetBinError(h_siga[j]->FindBin(vars[j]), newerror);
     }
 
@@ -938,11 +1010,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq) {
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
+    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+
+    double totalWeight = puWeight * btagWeight * leptonSF;
+    //if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
       Float_t olderror = h_sigb[j]->GetBinError(h_sigb[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
-      h_sigb[j]->Fill(vars[j], puWeight * btagWeight);
+      h_sigb[j]->Fill(vars[j], totalWeight);
       h_sigb[j]->SetBinError(h_sigb[j]->FindBin(vars[j]), newerror);
     }
 
@@ -1091,6 +1168,8 @@ void PlotMaker::CreatePlot(TString variable,
     for(unsigned int i = 0; i < mcHistograms_topPtDown.size(); i++) mcHistograms_topPtDown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_topPtDown[i][var_num]);
     for(unsigned int i = 0; i < mcHistograms_JECup.size(); i++) mcHistograms_JECup[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_JECup[i][var_num]);
     for(unsigned int i = 0; i < mcHistograms_JECdown.size(); i++) mcHistograms_JECdown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_JECdown[i][var_num]);
+    for(unsigned int i = 0; i < mcHistograms_leptonSFup.size(); i++) mcHistograms_leptonSFup[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_leptonSFup[i][var_num]);
+    for(unsigned int i = 0; i < mcHistograms_leptonSFdown.size(); i++) mcHistograms_leptonSFdown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_leptonSFdown[i][var_num]);
 
     for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) mcQCDHistograms[i][var_num] = (TH1D*)DivideByBinWidth(mcQCDHistograms[i][var_num]);
 
@@ -1122,7 +1201,13 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) mcQCDHistograms[i][variableNumber]->Write();
 
-  TH1D *bkg, *bkg_btagWeightUp, *bkg_btagWeightDown, *bkg_scaleUp, *bkg_scaleDown, *bkg_pdfUp, *bkg_pdfDown, *bkg_topPtUp, *bkg_topPtDown, *bkg_JECup, *bkg_JECdown;
+  TH1D *bkg, 
+    *bkg_btagWeightUp, *bkg_btagWeightDown, 
+    *bkg_scaleUp, *bkg_scaleDown, 
+    *bkg_pdfUp, *bkg_pdfDown, 
+    *bkg_topPtUp, *bkg_topPtDown, 
+    *bkg_JECup, *bkg_JECdown,
+    *bkg_leptonSFup, *bkg_leptonSFdown;
 
   // Stack histograms; qcd is on top
   if(needsQCD) {
@@ -1137,6 +1222,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     bkg_topPtDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_topPtDown");
     bkg_JECup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECup");
     bkg_JECdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECdown");
+    bkg_leptonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFup");
+    bkg_leptonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFdown");
 
     for(unsigned int i = 0; i < mcHistograms.size(); i++) {
       bkg->Add(mcHistograms[i][variableNumber]);
@@ -1150,6 +1237,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
       bkg_topPtDown->Add(mcHistograms_topPtDown[i][variableNumber]);
       bkg_JECup->Add(mcHistograms_JECup[i][variableNumber]);
       bkg_JECdown->Add(mcHistograms_JECdown[i][variableNumber]);
+      bkg_leptonSFup->Add(mcHistograms_leptonSFup[i][variableNumber]);
+      bkg_leptonSFdown->Add(mcHistograms_leptonSFdown[i][variableNumber]);
 
       for(unsigned int j = i + 1; j < mcHistograms.size(); j++) {
 	mcHistograms[i][variableNumber]->Add(mcHistograms[j][variableNumber]);
@@ -1168,6 +1257,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     bkg_topPtDown = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_topPtDown");
     bkg_JECup = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_JECup");
     bkg_JECdown = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_JECdown");
+    bkg_leptonSFup = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFup");
+    bkg_leptonSFdown = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFdown");
 
     for(unsigned int i = 1; i < mcHistograms.size(); i++) {
       bkg->Add(mcHistograms[i][variableNumber]);
@@ -1181,6 +1272,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
       bkg_topPtDown->Add(mcHistograms_topPtDown[i][variableNumber]);
       bkg_JECup->Add(mcHistograms_JECup[i][variableNumber]);
       bkg_JECdown->Add(mcHistograms_JECdown[i][variableNumber]);
+      bkg_leptonSFup->Add(mcHistograms_leptonSFup[i][variableNumber]);
+      bkg_leptonSFdown->Add(mcHistograms_leptonSFdown[i][variableNumber]);
 
       for(unsigned int j = i + 1; j < mcHistograms.size(); j++) {
 	mcHistograms[i][variableNumber]->Add(mcHistograms[j][variableNumber]);
@@ -1199,6 +1292,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   bkg_topPtDown->Write();
   bkg_JECup->Write();
   bkg_JECdown->Write();
+  bkg_leptonSFup->Write();
+  bkg_leptonSFdown->Write();
 
   Double_t kolm = h_gg[variableNumber]->KolmogorovTest(bkg);
   TString kolmText = Form("KS test probability = %5.3g", kolm);
@@ -1233,7 +1328,11 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     Double_t JECdown = bkg_JECdown->GetBinContent(i+1);
     Double_t JEC_sys = fabs(JECup - JECdown) / 2.;
 
-    Double_t totalError2 = stat*stat + btag_sys*btag_sys + scale_sys*scale_sys + pdf_sys*pdf_sys + topPt_sys*topPt_sys + JEC_sys*JEC_sys;
+    Double_t leptonSFup = bkg_leptonSFup->GetBinContent(i+1);
+    Double_t leptonSFdown = bkg_leptonSFdown->GetBinContent(i+1);
+    Double_t leptonSF_sys = fabs(leptonSFup - leptonSFdown) / 2.;
+
+    Double_t totalError2 = stat*stat + btag_sys*btag_sys + scale_sys*scale_sys + pdf_sys*pdf_sys + topPt_sys*topPt_sys + JEC_sys*JEC_sys + leptonSF_sys*leptonSF_sys;
 
     if(bkg->GetBinContent(i+1) == 0.) errors_sys->SetBinError(i+1, 0.);
     else errors_sys->SetBinError(i+1, sqrt(totalError2));
@@ -1468,8 +1567,8 @@ void PlotMaker::CreateTable() {
   for(int i = 0; i < nBins; i++) {
     
     Double_t this_val, this_err, this_staterr2, this_syserr2_up, this_syserr2_down;
-    Double_t this_btagUp, this_scaleUp, this_pdfUp, this_topPtUp, this_JECup;
-    Double_t this_btagDown, this_scaleDown, this_pdfDown, this_topPtDown, this_JECdown;
+    Double_t this_btagUp, this_scaleUp, this_pdfUp, this_topPtUp, this_JECup, this_leptonSFup;
+    Double_t this_btagDown, this_scaleDown, this_pdfDown, this_topPtDown, this_JECdown, this_leptonSFdown;
 
     Double_t bkgval = 0;
     Double_t bkgstat2 = 0;
@@ -1481,12 +1580,14 @@ void PlotMaker::CreateTable() {
     Double_t bkg_pdfUp2 = 0;
     Double_t bkg_topPtUp2 = 0;
     Double_t bkg_JECup2 = 0;
+    Double_t bkg_leptonSFup2 = 0;
 
     Double_t bkg_btagDown2 = 0;
     Double_t bkg_scaleDown2 = 0;
     Double_t bkg_pdfDown2 = 0;
     Double_t bkg_topPtDown2 = 0;
     Double_t bkg_JECdown2 = 0;
+    Double_t bkg_leptonSFdown2 = 0;
 
     if(req.Contains("ele")) {
       this_val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
@@ -1508,12 +1609,14 @@ void PlotMaker::CreateTable() {
       this_pdfUp = 0;
       this_topPtUp = 0;
       this_JECup = 0;
+      this_leptonSFup = 0;
 
       this_btagDown = 0;
       this_scaleDown = 0;
       this_pdfDown = 0;
       this_topPtDown = 0;
       this_JECdown = 0;
+      this_leptonSFdown = 0;
 
       for(unsigned int k = j; k < mcHistograms.size() && tableNames[k] == tableNames[j]; k++) {
 
@@ -1526,12 +1629,14 @@ void PlotMaker::CreateTable() {
 	this_pdfUp += mcHistograms_pdfUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_topPtUp += mcHistograms_topPtUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_JECup += mcHistograms_JECup[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_leptonSFup += mcHistograms_leptonSFup[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
 	this_btagDown += mcHistograms_btagWeightDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_scaleDown += mcHistograms_scaleDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_pdfDown += mcHistograms_pdfDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_topPtDown += mcHistograms_topPtDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_JECdown += mcHistograms_JECdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_leptonSFdown += mcHistograms_JECdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
       }
 
@@ -1543,24 +1648,28 @@ void PlotMaker::CreateTable() {
       bkg_pdfUp2 += (this_pdfUp - this_val)*(this_pdfUp - this_val);
       bkg_topPtUp2 += (this_topPtUp - this_val)*(this_topPtUp - this_val);
       bkg_JECup2 += (this_JECup - this_val)*(this_JECup - this_val);
+      bkg_leptonSFup2 += (this_leptonSFup - this_val)*(this_leptonSFup - this_val);
 
       bkg_btagDown2 += (this_btagDown - this_val)*(this_btagDown - this_val);
       bkg_scaleDown2 += (this_scaleDown - this_val)*(this_scaleDown - this_val);
       bkg_pdfDown2 += (this_pdfDown - this_val)*(this_pdfDown - this_val);
       bkg_topPtDown2 += (this_topPtDown - this_val)*(this_topPtDown - this_val);
       bkg_JECdown2 += (this_JECdown - this_val)*(this_JECdown - this_val);
+      bkg_leptonSFdown2 += (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val);
 
       this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
 	(this_scaleUp - this_val)*(this_scaleUp - this_val) +
 	(this_pdfUp - this_val)*(this_pdfUp - this_val) +
 	(this_topPtUp - this_val)*(this_topPtUp - this_val) +
-	(this_JECup - this_val)*(this_JECup - this_val);
+	(this_JECup - this_val)*(this_JECup - this_val) +
+	(this_leptonSFup - this_val)*(this_leptonSFup - this_val);
 
       this_syserr2_down = (this_btagDown - this_val)*(this_btagDown - this_val) +
 	(this_scaleDown - this_val)*(this_scaleDown - this_val) +
 	(this_pdfDown - this_val)*(this_pdfDown - this_val) +
 	(this_topPtDown - this_val)*(this_topPtDown - this_val) +
-	(this_JECdown - this_val)*(this_JECdown - this_val);
+	(this_JECdown - this_val)*(this_JECdown - this_val) +
+	(this_leptonSFdown - this_val)*(this_leptonSFdown - this_val);
 
       bkgsys2_up += this_syserr2_up;
       bkgsys2_down += this_syserr2_down;
@@ -1592,7 +1701,8 @@ void PlotMaker::CreateTable() {
       fprintf(tableFile, "bkgpdfup5y:%.1f\nbkgpdfdown5y:%.1f\n", 100. * sqrt(bkg_pdfUp2) / bkgval, 100. * sqrt(bkg_pdfDown2) / bkgval);
       fprintf(tableFile, "bkgjecup5y:%.1f\nbkgjecdown5y:%.1f\n", 100. * sqrt(bkg_JECup2) / bkgval, 100. * sqrt(bkg_JECdown2) / bkgval);
       fprintf(tableFile, "bkgtopptup5y:%.1f\nbkgtopptdown5y:%.1f\n", 100. * sqrt(bkg_topPtUp2) / bkgval, 100. * sqrt(bkg_topPtDown2) / bkgval);
-      fprintf(tableFile, "bkgbtagup5y:%.2f\nbkgbtagdown5y:%.2f\n", 100. * sqrt(bkg_btagUp2) / bkgval, 100. * sqrt(bkg_btagDown2) / bkgval);
+      fprintf(tableFile, "bkgbtagup5y:%.3f\nbkgbtagdown5y:%.3f\n", 100. * sqrt(bkg_btagUp2) / bkgval, 100. * sqrt(bkg_btagDown2) / bkgval);
+      fprintf(tableFile, "bkgleptonSFup5y:%.1f\nbkgleptonSFdown5y:%.1f\n", 100. * sqrt(bkg_leptonSFup2) / bkgval, 100. * sqrt(bkg_leptonSFdown2) / bkgval);
     }
 
   }
@@ -1620,6 +1730,26 @@ void PlotMaker::PlotKolmogorovValues() {
 
   delete can;
 
+}
+
+void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down) {
+
+  Float_t pt, eta;
+
+  if(chan < 2) {
+    pt = min(vars[15], 299.);
+    eta = fabs(vars[16]);
+  }
+  else {
+    pt = min(vars[17], 299.);
+    eta = fabs(vars[18]);
+  }
+
+  central = sf_lepton->GetBinContent(sf_lepton->FindBin(pt, eta));
+  Float_t error = sf_lepton->GetBinError(sf_lepton->FindBin(pt, eta));
+
+  up = central + error;
+  down = central - error;
 }
 
 void prep_signal(TString req, int nPhotons_req) {

@@ -52,6 +52,14 @@
         \begin{tabular}{@{}c@{}} singleTopval5x \vspace{1 mm} \\ $^{+singleToperrorup5x}_{-singleToperrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
+	Di-boson & 
+	\begin{tabular}{@{}c@{}} dibosonval1x \vspace{1 mm} \\ $^{+dibosonerrorup1x}_{-dibosonerrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} dibosonval2x \vspace{1 mm} \\ $^{+dibosonerrorup2x}_{-dibosonerrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} dibosonval3x \vspace{1 mm} \\ $^{+dibosonerrorup3x}_{-dibosonerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} dibosonval4x \vspace{1 mm} \\ $^{+dibosonerrorup4x}_{-dibosonerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} dibosonval5x \vspace{1 mm} \\ $^{+dibosonerrorup5x}_{-dibosonerrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+        \hline
+
 	$t\bar{t}V$ & 
 	\begin{tabular}{@{}c@{}} ttVval1x \vspace{1 mm} \\ $^{+ttVerrorup1x}_{-ttVerrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} ttVval2x \vspace{1 mm} \\ $^{+ttVerrorup2x}_{-ttVerrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
@@ -107,6 +115,7 @@
 	\hspace{3 mm} Jet Energy Scale & + bkgjecup5y & - bkgjecdown5y \\
 	\hspace{3 mm} top-quark $p_{T}$ & + bkgtopptup5y & - bkgtopptdown5y \\
 	\hspace{3 mm} b-tag & + bkgbtagup5y & - bkgbtagdown5y \\
+	\hspace{3 mm} Lepton ID/Iso/Trigger & + bkgleptonSFup5y & - bkgleptonSFdown5y \\
 	\hline
 	\hline
     \end{tabular}

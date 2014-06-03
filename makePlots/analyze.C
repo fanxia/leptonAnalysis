@@ -70,6 +70,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   }
 
   PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], blinded);
+  pMaker->LoadLeptonSFs("../data/muon_scaleFactors_8TeV_53x.root", channel);
 
   bool loadSuccess = true;
   
@@ -203,8 +204,10 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->BookHistogram("btag1_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("w_mT", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("m3", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("ele_pt", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("muon_pt", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("ele_pt", nKinematicBins, xbins_kinematic);  // 15
+  pMaker->BookHistogram("ele_eta", 60, -2.5, 2.5);                   // 16
+  pMaker->BookHistogram("muon_pt", nKinematicBins, xbins_kinematic); // 17
+  pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);                  // 18
 
   if(nPhotons_req >= 1) {
     pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic);
@@ -227,7 +230,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("photon_dPhi", 35, 0., 3.14159);
   }
 
-  pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq);
+  pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
   pMaker->SubtractMCFromQCD();
   pMaker->NormalizeQCD();
 
