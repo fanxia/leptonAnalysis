@@ -178,7 +178,7 @@ class PlotMaker : public TObject {
 
   ~PlotMaker();
   
-  bool LoadLeptonSFs(int chan);
+  void LoadLeptonSFs(int chan);
 
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
@@ -409,7 +409,7 @@ void PlotMaker::SetTrees(TTree * gg, TTree * qcd,
 
 }
 
-bool PlotMaker::LoadLeptonSFs(int chan) {
+void PlotMaker::LoadLeptonSFs(int chan) {
 
   if(chan < 2) {
     cout << "Using muons for electron SFs for now..." << endl;
@@ -787,35 +787,42 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	mcHistograms[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
+	totalWeight = puWeight * btagWeightUp * leptonSF;
+	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_btagWeightUp[i][k]->GetBinError(mcHistograms_btagWeightUp[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_btagWeightUp[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_btagWeightUp[i][k]->SetBinError(mcHistograms_btagWeightUp[i][k]->FindBin(vars[k]), newerror);
 
+	totalWeight = puWeight * btagWeightDown * leptonSF;
+	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_btagWeightDown[i][k]->GetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_btagWeightDown[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_btagWeightDown[i][k]->SetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]), newerror);
 
-	totalWeight = puWeight * btagWeight;
+	totalWeight = puWeight * btagWeight * leptonSFup;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_leptonSFup[i][k]->GetBinError(mcHistograms_leptonSFup[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
-	mcHistograms_leptonSFup[i][k]->Fill(vars[k], totalWeight * leptonSFup);
+	mcHistograms_leptonSFup[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_leptonSFup[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
+	totalWeight = puWeight * btagWeight * leptonSFdown;
+	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_leptonSFdown[i][k]->GetBinError(mcHistograms_leptonSFdown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
-	mcHistograms_leptonSFdown[i][k]->Fill(vars[k], totalWeight * leptonSFdown);
+	mcHistograms_leptonSFdown[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_leptonSFdown[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
-	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	totalWeight = puWeight * btagWeight * leptonSF;
+	if(reweightTopPt[i]) totalWeight *= topPtReweighting * topPtReweighting;
 	oldError = mcHistograms_topPtUp[i][k]->GetBinError(mcHistograms_topPtUp[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtUp[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_topPtUp[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
-	if(reweightTopPt[i]) totalWeight = puWeight * btagWeight;
+	totalWeight = puWeight * btagWeight * leptonSF;
 	oldError = mcHistograms_topPtDown[i][k]->GetBinError(mcHistograms_topPtDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtDown[i][k]->Fill(vars[k], totalWeight);
