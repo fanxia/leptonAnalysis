@@ -187,8 +187,9 @@ class PlotMaker : public TObject {
 			int channel, int layer, int color, TString legendEntry, TString tableEntry);
   
   void SetTrees(TTree * gg, TTree * qcd,
-		TTree * sig_a, TTree * sig_b);
-  
+		TTree * sig_a, TTree * sig_a_JECup, TTree * sig_a_JECdown,
+		TTree * sig_b, TTree * sig_b_JECup, TTree * sig_b_JECdown);
+
   void SetDisplayKStest(bool v) { displayKStest = v; }
   void SetUseWHIZARD(bool v) { useWHIZARD = v; }
 
@@ -772,75 +773,75 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
     mcQCDHistograms[i].push_back(h_bkg);
   }
 
-  TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, xlo, xhi);
+  TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, customBins);
   sig_a->Sumw2();
   h_siga.push_back(sig_a);
 
-  TH1D * sig_a_btagWeightUp = new TH1D(variable+"_a_"+req+"_btagWeightUp", variable, nBins, xlo, xhi);
+  TH1D * sig_a_btagWeightUp = new TH1D(variable+"_a_"+req+"_btagWeightUp", variable, nBins, customBins);
   sig_a_btagWeightUp->Sumw2();
   h_siga_btagWeightUp.push_back(sig_a_btagWeightUp);
 
-  TH1D * sig_a_btagWeightDown = new TH1D(variable+"_a_"+req+"_btagWeightDown", variable, nBins, xlo, xhi);
+  TH1D * sig_a_btagWeightDown = new TH1D(variable+"_a_"+req+"_btagWeightDown", variable, nBins, customBins);
   sig_a_btagWeightDown->Sumw2();
   h_siga_btagWeightDown.push_back(sig_a_btagWeightDown);
 
-  TH1D * sig_a_topPtUp = new TH1D(variable+"_a_"+req+"_topPtUp", variable, nBins, xlo, xhi);
+  TH1D * sig_a_topPtUp = new TH1D(variable+"_a_"+req+"_topPtUp", variable, nBins, customBins);
   sig_a_topPtUp->Sumw2();
   h_siga_topPtUp.push_back(sig_a_topPtUp);
 
-  TH1D * sig_a_topPtDown = new TH1D(variable+"_a_"+req+"_topPtDown", variable, nBins, xlo, xhi);
+  TH1D * sig_a_topPtDown = new TH1D(variable+"_a_"+req+"_topPtDown", variable, nBins, customBins);
   sig_a_topPtDown->Sumw2();
   h_siga_topPtDown.push_back(sig_a_topPtDown);
   
-  TH1D * sig_a_JECup = new TH1D(variable+"_a_"+req+"_JECup", variable, nBins, xlo, xhi);
+  TH1D * sig_a_JECup = new TH1D(variable+"_a_"+req+"_JECup", variable, nBins, customBins);
   sig_a_JECup->Sumw2();
   h_siga_JECup.push_back(sig_a_JECup);
 
-  TH1D * sig_a_JECdown = new TH1D(variable+"_a_"+req+"_JECdown", variable, nBins, xlo, xhi);
+  TH1D * sig_a_JECdown = new TH1D(variable+"_a_"+req+"_JECdown", variable, nBins, customBins);
   sig_a_JECdown->Sumw2();
   h_siga_JECdown.push_back(sig_a_JECdown);
 
-  TH1D * sig_a_leptonSFup = new TH1D(variable+"_a_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
+  TH1D * sig_a_leptonSFup = new TH1D(variable+"_a_"+req+"_leptonSFup", variable, nBins, customBins);
   sig_a_leptonSFup->Sumw2();
   h_siga_leptonSFup.push_back(sig_a_leptonSFup);
 
-  TH1D * sig_a_leptonSFdown = new TH1D(variable+"_a_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
+  TH1D * sig_a_leptonSFdown = new TH1D(variable+"_a_"+req+"_leptonSFdown", variable, nBins, customBins);
   sig_a_leptonSFdown->Sumw2();
   h_siga_leptonSFdown.push_back(sig_a_leptonSFdown);
 
-  TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, xlo, xhi);
+  TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, customBins);
   sig_b->Sumw2();
   h_siga.push_back(sig_b);
 
-  TH1D * sig_b_btagWeightUp = new TH1D(variable+"_b_"+req+"_btagWeightUp", variable, nBins, xlo, xhi);
+  TH1D * sig_b_btagWeightUp = new TH1D(variable+"_b_"+req+"_btagWeightUp", variable, nBins, customBins);
   sig_b_btagWeightUp->Sumw2();
   h_siga_btagWeightUp.push_back(sig_b_btagWeightUp);
 
-  TH1D * sig_b_btagWeightDown = new TH1D(variable+"_b_"+req+"_btagWeightDown", variable, nBins, xlo, xhi);
+  TH1D * sig_b_btagWeightDown = new TH1D(variable+"_b_"+req+"_btagWeightDown", variable, nBins, customBins);
   sig_b_btagWeightDown->Sumw2();
   h_siga_btagWeightDown.push_back(sig_b_btagWeightDown);
 
-  TH1D * sig_b_topPtUp = new TH1D(variable+"_b_"+req+"_topPtUp", variable, nBins, xlo, xhi);
+  TH1D * sig_b_topPtUp = new TH1D(variable+"_b_"+req+"_topPtUp", variable, nBins, customBins);
   sig_b_topPtUp->Sumw2();
   h_siga_topPtUp.push_back(sig_b_topPtUp);
 
-  TH1D * sig_b_topPtDown = new TH1D(variable+"_b_"+req+"_topPtDown", variable, nBins, xlo, xhi);
+  TH1D * sig_b_topPtDown = new TH1D(variable+"_b_"+req+"_topPtDown", variable, nBins, customBins);
   sig_b_topPtDown->Sumw2();
   h_siga_topPtDown.push_back(sig_b_topPtDown);
   
-  TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECup", variable, nBins, xlo, xhi);
+  TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECup", variable, nBins, customBins);
   sig_b_JECup->Sumw2();
   h_siga_JECup.push_back(sig_b_JECup);
 
-  TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECdown", variable, nBins, xlo, xhi);
+  TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECdown", variable, nBins, customBins);
   sig_b_JECdown->Sumw2();
   h_siga_JECdown.push_back(sig_b_JECdown);
 
-  TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
+  TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFup", variable, nBins, customBins);
   sig_b_leptonSFup->Sumw2();
   h_siga_leptonSFup.push_back(sig_b_leptonSFup);
 
-  TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
+  TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFdown", variable, nBins, customBins);
   sig_b_leptonSFdown->Sumw2();
   h_siga_leptonSFdown.push_back(sig_b_leptonSFdown);
   
@@ -2240,7 +2241,7 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
   if(chan < 2) {
     pt = min(vars[15], (float)199.);
     pt = max(pt, (float)15.);
-    eta = min(fabs(vars[16]), (float)2.39);
+    eta = min(fabs(vars[16]), (double)2.39);
 
     central = sf_electron->GetBinContent(sf_electron->FindBin(pt, eta));
     error = sf_electron->GetBinError(sf_electron->FindBin(pt, eta));
@@ -2254,7 +2255,7 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
   else {
     pt = min(vars[17], (float)499.);
     pt = max(pt, (float)10.);
-    eta = min(fabs(vars[18]), (float)2.09);
+    eta = min(fabs(vars[18]), (double)2.09);
 
     central = sf_muon->GetBinContent(sf_muon->FindBin(pt, eta));
     error = sf_muon->GetBinError(sf_muon->FindBin(pt, eta));
