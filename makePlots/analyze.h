@@ -676,39 +676,39 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
 
   TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, xlo, xhi);
   sig_b->Sumw2();
-  h_siga.push_back(sig_b);
+  h_sigb.push_back(sig_b);
 
   TH1D * sig_b_btagWeightUp = new TH1D(variable+"_b_"+req+"_btagWeightUp", variable, nBins, xlo, xhi);
   sig_b_btagWeightUp->Sumw2();
-  h_siga_btagWeightUp.push_back(sig_b_btagWeightUp);
+  h_sigb_btagWeightUp.push_back(sig_b_btagWeightUp);
 
   TH1D * sig_b_btagWeightDown = new TH1D(variable+"_b_"+req+"_btagWeightDown", variable, nBins, xlo, xhi);
   sig_b_btagWeightDown->Sumw2();
-  h_siga_btagWeightDown.push_back(sig_b_btagWeightDown);
+  h_sigb_btagWeightDown.push_back(sig_b_btagWeightDown);
 
   TH1D * sig_b_topPtUp = new TH1D(variable+"_b_"+req+"_topPtUp", variable, nBins, xlo, xhi);
   sig_b_topPtUp->Sumw2();
-  h_siga_topPtUp.push_back(sig_b_topPtUp);
+  h_sigb_topPtUp.push_back(sig_b_topPtUp);
 
   TH1D * sig_b_topPtDown = new TH1D(variable+"_b_"+req+"_topPtDown", variable, nBins, xlo, xhi);
   sig_b_topPtDown->Sumw2();
-  h_siga_topPtDown.push_back(sig_b_topPtDown);
+  h_sigb_topPtDown.push_back(sig_b_topPtDown);
   
   TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECup", variable, nBins, xlo, xhi);
   sig_b_JECup->Sumw2();
-  h_siga_JECup.push_back(sig_b_JECup);
+  h_sigb_JECup.push_back(sig_b_JECup);
 
   TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECdown", variable, nBins, xlo, xhi);
   sig_b_JECdown->Sumw2();
-  h_siga_JECdown.push_back(sig_b_JECdown);
+  h_sigb_JECdown.push_back(sig_b_JECdown);
 
   TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
   sig_b_leptonSFup->Sumw2();
-  h_siga_leptonSFup.push_back(sig_b_leptonSFup);
+  h_sigb_leptonSFup.push_back(sig_b_leptonSFup);
 
   TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
   sig_b_leptonSFdown->Sumw2();
-  h_siga_leptonSFdown.push_back(sig_b_leptonSFdown);
+  h_sigb_leptonSFdown.push_back(sig_b_leptonSFdown);
 
 }
 
@@ -811,39 +811,39 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
 
   TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, customBins);
   sig_b->Sumw2();
-  h_siga.push_back(sig_b);
+  h_sigb.push_back(sig_b);
 
   TH1D * sig_b_btagWeightUp = new TH1D(variable+"_b_"+req+"_btagWeightUp", variable, nBins, customBins);
   sig_b_btagWeightUp->Sumw2();
-  h_siga_btagWeightUp.push_back(sig_b_btagWeightUp);
+  h_sigb_btagWeightUp.push_back(sig_b_btagWeightUp);
 
   TH1D * sig_b_btagWeightDown = new TH1D(variable+"_b_"+req+"_btagWeightDown", variable, nBins, customBins);
   sig_b_btagWeightDown->Sumw2();
-  h_siga_btagWeightDown.push_back(sig_b_btagWeightDown);
+  h_sigb_btagWeightDown.push_back(sig_b_btagWeightDown);
 
   TH1D * sig_b_topPtUp = new TH1D(variable+"_b_"+req+"_topPtUp", variable, nBins, customBins);
   sig_b_topPtUp->Sumw2();
-  h_siga_topPtUp.push_back(sig_b_topPtUp);
+  h_sigb_topPtUp.push_back(sig_b_topPtUp);
 
   TH1D * sig_b_topPtDown = new TH1D(variable+"_b_"+req+"_topPtDown", variable, nBins, customBins);
   sig_b_topPtDown->Sumw2();
-  h_siga_topPtDown.push_back(sig_b_topPtDown);
+  h_sigb_topPtDown.push_back(sig_b_topPtDown);
   
   TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECup", variable, nBins, customBins);
   sig_b_JECup->Sumw2();
-  h_siga_JECup.push_back(sig_b_JECup);
+  h_sigb_JECup.push_back(sig_b_JECup);
 
   TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECdown", variable, nBins, customBins);
   sig_b_JECdown->Sumw2();
-  h_siga_JECdown.push_back(sig_b_JECdown);
+  h_sigb_JECdown.push_back(sig_b_JECdown);
 
   TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFup", variable, nBins, customBins);
   sig_b_leptonSFup->Sumw2();
-  h_siga_leptonSFup.push_back(sig_b_leptonSFup);
+  h_sigb_leptonSFup.push_back(sig_b_leptonSFup);
 
   TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFdown", variable, nBins, customBins);
   sig_b_leptonSFdown->Sumw2();
-  h_siga_leptonSFdown.push_back(sig_b_leptonSFdown);
+  h_sigb_leptonSFdown.push_back(sig_b_leptonSFdown);
   
 }
 
@@ -1472,7 +1472,12 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   for(unsigned int i = 0; i < mcQCDTrees.size(); i++) mcQCDTrees[i]->ResetBranchAddresses();
 
   sigaTree->ResetBranchAddresses();
+  sigaTree_JECup->ResetBranchAddresses();
+  sigaTree_JECdown->ResetBranchAddresses();
+
   sigbTree->ResetBranchAddresses();
+  sigbTree_JECup->ResetBranchAddresses();
+  sigbTree_JECdown->ResetBranchAddresses();
 
 }
 
