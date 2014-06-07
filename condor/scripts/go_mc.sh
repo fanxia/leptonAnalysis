@@ -56,7 +56,10 @@ else
 	mv *.root $WORK_DIR
 fi
 
-rm jan3_pileup.root
+rm pileup_22Jan2013_69400.root
+rm pileup_22Jan2013_72870.root
+rm pileup_22Jan2013_65930.root
+
 cd $WORK_DIR
 rm -rf CMSSW_5_3_8_patch3/
 rm fileLists.tgz

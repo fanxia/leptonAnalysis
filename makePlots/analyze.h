@@ -178,7 +178,8 @@ class PlotMaker : public TObject {
 
   ~PlotMaker();
   
-  void LoadLeptonSFs(int chan);
+  void LoadLeptonSFs(TString fileName);
+  void LoadPhotonSFs(TString fileName);
 
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
@@ -217,6 +218,7 @@ class PlotMaker : public TObject {
   void PlotKolmogorovValues();
 
   void GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down);
+  void GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down);
 
  private:
 
@@ -259,7 +261,12 @@ class PlotMaker : public TObject {
   TTree * qcdTree;
 
   TTree * sigaTree;
+  TTree * sigaTree_JECup;
+  TTree * sigaTree_JECdown;
+
   TTree * sigbTree;
+  TTree * sigbTree_JECup;
+  TTree * sigbTree_JECdown;
 
   vector<TString> variables;
 
@@ -267,12 +274,35 @@ class PlotMaker : public TObject {
   vector<TH1D*> h_qcd;
 
   vector<TH1D*> h_siga;
+  vector<TH1D*> h_siga_btagWeightUp;
+  vector<TH1D*> h_siga_btagWeightDown;
+  vector<TH1D*> h_siga_topPtUp;
+  vector<TH1D*> h_siga_topPtDown;
+  vector<TH1D*> h_siga_JECup;
+  vector<TH1D*> h_siga_JECdown;
+  vector<TH1D*> h_siga_leptonSFup;
+  vector<TH1D*> h_siga_leptonSFdown;
+
   vector<TH1D*> h_sigb;
+  vector<TH1D*> h_sigb_btagWeightUp;
+  vector<TH1D*> h_sigb_btagWeightDown;
+  vector<TH1D*> h_sigb_topPtUp;
+  vector<TH1D*> h_sigb_topPtDown;
+  vector<TH1D*> h_sigb_JECup;
+  vector<TH1D*> h_sigb_JECdown;
+  vector<TH1D*> h_sigb_leptonSFup;
+  vector<TH1D*> h_sigb_leptonSFdown;
 
   vector<pair<TString, double> > KSscores;
 
-  TFile * fSF;
-  TH2D * sf_lepton;
+  TFile * fLeptonSF;
+  TH2D * sf_muon;
+  TH2D * sf_electron;
+  TH2D * sf_SingleElectronTrigger;
+
+  TFile * fPhotonSF;
+  TH2D * sf_photon_id;
+  TH2D * sf_photon_veto;
 
   Int_t intLumi_int;
   TString intLumi;
@@ -305,7 +335,24 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   h_qcd.clear();
 
   h_siga.clear();
+  h_siga_btagWeightUp.clear();
+  h_siga_btagWeightDown.clear();
+  h_siga_topPtUp.clear();
+  h_siga_topPtDown.clear();
+  h_siga_JECup.clear();
+  h_siga_JECdown.clear();
+  h_siga_leptonSFup.clear();
+  h_siga_leptonSFdown.clear();
+
   h_sigb.clear();
+  h_sigb_btagWeightUp.clear();
+  h_sigb_btagWeightDown.clear();
+  h_sigb_topPtUp.clear();
+  h_sigb_topPtDown.clear();
+  h_sigb_JECup.clear();
+  h_sigb_JECdown.clear();
+  h_sigb_leptonSFup.clear();
+  h_sigb_leptonSFdown.clear();
 
   mcFiles.clear();
   mcTrees.clear();
@@ -385,45 +432,76 @@ PlotMaker::~PlotMaker() {
     removeTTAoverlap.clear();
     reweightTopPt.clear();
 
-    fSF->Close();
+    fLeptonSF->Close();
+    fPhotonSF->Close();
 
     delete sigaTree;
+    delete sigaTree_JECup;
+    delete sigaTree_JECdown;
+
     delete sigbTree;
+    delete sigbTree_JECup;
+    delete sigbTree_JECdown;
     
     h_gg.clear();
     h_qcd.clear();
 
     h_siga.clear();
+    h_siga_btagWeightUp.clear();
+    h_siga_btagWeightDown.clear();
+    h_siga_topPtUp.clear();
+    h_siga_topPtDown.clear();
+    h_siga_JECup.clear();
+    h_siga_JECdown.clear();
+    h_siga_leptonSFup.clear();
+    h_siga_leptonSFdown.clear();
+    
     h_sigb.clear();
+    h_sigb_btagWeightUp.clear();
+    h_sigb_btagWeightDown.clear();
+    h_sigb_topPtUp.clear();
+    h_sigb_topPtDown.clear();
+    h_sigb_JECup.clear();
+    h_sigb_JECdown.clear();
+    h_sigb_leptonSFup.clear();
+    h_sigb_leptonSFdown.clear();
 
 }
 
 void PlotMaker::SetTrees(TTree * gg, TTree * qcd,
-			 TTree * sig_a, TTree * sig_b) {
+			 TTree * sig_a, TTree * sig_a_JECup, TTree * sig_a_JECdown,
+			 TTree * sig_b, TTree * sig_b_JECup, TTree * sig_b_JECdown) {
 
   ggTree = gg;
   qcdTree = qcd;
   
   sigaTree = sig_a;
+  sigaTree_JECup = sig_a_JECup;
+  sigaTree_JECdown = sig_a_JECdown;
+
   sigbTree = sig_b;
+  sigbTree_JECup = sig_b_JECup;
+  sigbTree_JECdown = sig_b_JECdown;
 
 }
 
-void PlotMaker::LoadLeptonSFs(int chan) {
-
-  if(chan < 2) {
-    cout << "Using muons for electron SFs for now..." << endl;
-    fSF = new TFile("../data/muon_scaleFactors_8TeV_53x.root", "READ");
-    sf_lepton = (TH2D*)fSF->Get("muTight_SF_full");
-  }
-  else {
-    fSF = new TFile("../data/muon_scaleFactors_8TeV_53x.root", "READ");
-    sf_lepton = (TH2D*)fSF->Get("muTight_SF_full");
-  }
-
-}
-
+void PlotMaker::LoadLeptonSFs(TString fileName) {
   
+  fLeptonSF = new TFile(fileName, "READ");
+  sf_electron = (TH2D*)fLeptonSF->Get("TightEleIdIsoSF");
+  sf_SingleElectronTrigger = (TH2D*)fLeptonSF->Get("TightEleTriggerSF");
+
+  sf_muon = (TH2D*)fLeptonSF->Get("mu_pt_eta_full_id_iso_hlt_8TeV");
+
+}
+
+void PlotMaker::LoadPhotonSFs(TString fileName) {
+  
+  fPhotonSF = new TFile(fileName, "READ");
+  sf_photon_id = (TH2D*)fPhotonSF->Get("PhotonIDSF_LooseWP_Jan22rereco_Full2012_S10_MC_V01");
+  sf_photon_veto = (TH2D*)fPhotonSF->Get("PhotonCSEVSF_LooseWP_Jan22rereco_Full2012_S10_MC_V01");
+
+}
 
 bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
 				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
@@ -562,11 +640,75 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
   TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, xlo, xhi);
   sig_a->Sumw2();
   h_siga.push_back(sig_a);
+
+  TH1D * sig_a_btagWeightUp = new TH1D(variable+"_a_"+req+"_btagWeightUp", variable, nBins, xlo, xhi);
+  sig_a_btagWeightUp->Sumw2();
+  h_siga_btagWeightUp.push_back(sig_a_btagWeightUp);
+
+  TH1D * sig_a_btagWeightDown = new TH1D(variable+"_a_"+req+"_btagWeightDown", variable, nBins, xlo, xhi);
+  sig_a_btagWeightDown->Sumw2();
+  h_siga_btagWeightDown.push_back(sig_a_btagWeightDown);
+
+  TH1D * sig_a_topPtUp = new TH1D(variable+"_a_"+req+"_topPtUp", variable, nBins, xlo, xhi);
+  sig_a_topPtUp->Sumw2();
+  h_siga_topPtUp.push_back(sig_a_topPtUp);
+
+  TH1D * sig_a_topPtDown = new TH1D(variable+"_a_"+req+"_topPtDown", variable, nBins, xlo, xhi);
+  sig_a_topPtDown->Sumw2();
+  h_siga_topPtDown.push_back(sig_a_topPtDown);
   
+  TH1D * sig_a_JECup = new TH1D(variable+"_a_"+req+"_JECup", variable, nBins, xlo, xhi);
+  sig_a_JECup->Sumw2();
+  h_siga_JECup.push_back(sig_a_JECup);
+
+  TH1D * sig_a_JECdown = new TH1D(variable+"_a_"+req+"_JECdown", variable, nBins, xlo, xhi);
+  sig_a_JECdown->Sumw2();
+  h_siga_JECdown.push_back(sig_a_JECdown);
+
+  TH1D * sig_a_leptonSFup = new TH1D(variable+"_a_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
+  sig_a_leptonSFup->Sumw2();
+  h_siga_leptonSFup.push_back(sig_a_leptonSFup);
+
+  TH1D * sig_a_leptonSFdown = new TH1D(variable+"_a_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
+  sig_a_leptonSFdown->Sumw2();
+  h_siga_leptonSFdown.push_back(sig_a_leptonSFdown);
+
   TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, xlo, xhi);
   sig_b->Sumw2();
-  h_sigb.push_back(sig_b);
+  h_siga.push_back(sig_b);
+
+  TH1D * sig_b_btagWeightUp = new TH1D(variable+"_b_"+req+"_btagWeightUp", variable, nBins, xlo, xhi);
+  sig_b_btagWeightUp->Sumw2();
+  h_siga_btagWeightUp.push_back(sig_b_btagWeightUp);
+
+  TH1D * sig_b_btagWeightDown = new TH1D(variable+"_b_"+req+"_btagWeightDown", variable, nBins, xlo, xhi);
+  sig_b_btagWeightDown->Sumw2();
+  h_siga_btagWeightDown.push_back(sig_b_btagWeightDown);
+
+  TH1D * sig_b_topPtUp = new TH1D(variable+"_b_"+req+"_topPtUp", variable, nBins, xlo, xhi);
+  sig_b_topPtUp->Sumw2();
+  h_siga_topPtUp.push_back(sig_b_topPtUp);
+
+  TH1D * sig_b_topPtDown = new TH1D(variable+"_b_"+req+"_topPtDown", variable, nBins, xlo, xhi);
+  sig_b_topPtDown->Sumw2();
+  h_siga_topPtDown.push_back(sig_b_topPtDown);
   
+  TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECup", variable, nBins, xlo, xhi);
+  sig_b_JECup->Sumw2();
+  h_siga_JECup.push_back(sig_b_JECup);
+
+  TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECdown", variable, nBins, xlo, xhi);
+  sig_b_JECdown->Sumw2();
+  h_siga_JECdown.push_back(sig_b_JECdown);
+
+  TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
+  sig_b_leptonSFup->Sumw2();
+  h_siga_leptonSFup.push_back(sig_b_leptonSFup);
+
+  TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
+  sig_b_leptonSFdown->Sumw2();
+  h_siga_leptonSFdown.push_back(sig_b_leptonSFdown);
+
 }
 
 void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBins) {
@@ -630,13 +772,77 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
     mcQCDHistograms[i].push_back(h_bkg);
   }
 
-  TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, customBins);
+  TH1D * sig_a = new TH1D(variable+"_a_"+req, variable, nBins, xlo, xhi);
   sig_a->Sumw2();
   h_siga.push_back(sig_a);
+
+  TH1D * sig_a_btagWeightUp = new TH1D(variable+"_a_"+req+"_btagWeightUp", variable, nBins, xlo, xhi);
+  sig_a_btagWeightUp->Sumw2();
+  h_siga_btagWeightUp.push_back(sig_a_btagWeightUp);
+
+  TH1D * sig_a_btagWeightDown = new TH1D(variable+"_a_"+req+"_btagWeightDown", variable, nBins, xlo, xhi);
+  sig_a_btagWeightDown->Sumw2();
+  h_siga_btagWeightDown.push_back(sig_a_btagWeightDown);
+
+  TH1D * sig_a_topPtUp = new TH1D(variable+"_a_"+req+"_topPtUp", variable, nBins, xlo, xhi);
+  sig_a_topPtUp->Sumw2();
+  h_siga_topPtUp.push_back(sig_a_topPtUp);
+
+  TH1D * sig_a_topPtDown = new TH1D(variable+"_a_"+req+"_topPtDown", variable, nBins, xlo, xhi);
+  sig_a_topPtDown->Sumw2();
+  h_siga_topPtDown.push_back(sig_a_topPtDown);
   
-  TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, customBins);
+  TH1D * sig_a_JECup = new TH1D(variable+"_a_"+req+"_JECup", variable, nBins, xlo, xhi);
+  sig_a_JECup->Sumw2();
+  h_siga_JECup.push_back(sig_a_JECup);
+
+  TH1D * sig_a_JECdown = new TH1D(variable+"_a_"+req+"_JECdown", variable, nBins, xlo, xhi);
+  sig_a_JECdown->Sumw2();
+  h_siga_JECdown.push_back(sig_a_JECdown);
+
+  TH1D * sig_a_leptonSFup = new TH1D(variable+"_a_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
+  sig_a_leptonSFup->Sumw2();
+  h_siga_leptonSFup.push_back(sig_a_leptonSFup);
+
+  TH1D * sig_a_leptonSFdown = new TH1D(variable+"_a_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
+  sig_a_leptonSFdown->Sumw2();
+  h_siga_leptonSFdown.push_back(sig_a_leptonSFdown);
+
+  TH1D * sig_b = new TH1D(variable+"_b_"+req, variable, nBins, xlo, xhi);
   sig_b->Sumw2();
-  h_sigb.push_back(sig_b);
+  h_siga.push_back(sig_b);
+
+  TH1D * sig_b_btagWeightUp = new TH1D(variable+"_b_"+req+"_btagWeightUp", variable, nBins, xlo, xhi);
+  sig_b_btagWeightUp->Sumw2();
+  h_siga_btagWeightUp.push_back(sig_b_btagWeightUp);
+
+  TH1D * sig_b_btagWeightDown = new TH1D(variable+"_b_"+req+"_btagWeightDown", variable, nBins, xlo, xhi);
+  sig_b_btagWeightDown->Sumw2();
+  h_siga_btagWeightDown.push_back(sig_b_btagWeightDown);
+
+  TH1D * sig_b_topPtUp = new TH1D(variable+"_b_"+req+"_topPtUp", variable, nBins, xlo, xhi);
+  sig_b_topPtUp->Sumw2();
+  h_siga_topPtUp.push_back(sig_b_topPtUp);
+
+  TH1D * sig_b_topPtDown = new TH1D(variable+"_b_"+req+"_topPtDown", variable, nBins, xlo, xhi);
+  sig_b_topPtDown->Sumw2();
+  h_siga_topPtDown.push_back(sig_b_topPtDown);
+  
+  TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECup", variable, nBins, xlo, xhi);
+  sig_b_JECup->Sumw2();
+  h_siga_JECup.push_back(sig_b_JECup);
+
+  TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECdown", variable, nBins, xlo, xhi);
+  sig_b_JECdown->Sumw2();
+  h_siga_JECdown.push_back(sig_b_JECdown);
+
+  TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
+  sig_b_leptonSFup->Sumw2();
+  h_siga_leptonSFup.push_back(sig_b_leptonSFup);
+
+  TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
+  sig_b_leptonSFdown->Sumw2();
+  h_siga_leptonSFdown.push_back(sig_b_leptonSFdown);
   
 }
 
@@ -710,6 +916,23 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigaTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
   sigaTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigaTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
+  sigaTree->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+  
+  sigaTree_JECup->SetBranchAddress("pileupWeight", &puWeight);
+  sigaTree_JECup->SetBranchAddress("pileupWeightErr", &puWeightErr);
+  sigaTree_JECup->SetBranchAddress("btagWeight", &btagWeight);
+  sigaTree_JECup->SetBranchAddress("btagWeightErr", &btagWeightErr);
+  sigaTree_JECup->SetBranchAddress("btagWeightUp", &btagWeightUp);
+  sigaTree_JECup->SetBranchAddress("btagWeightDown", &btagWeightDown);
+  sigaTree_JECup->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+
+  sigaTree_JECdown->SetBranchAddress("pileupWeight", &puWeight);
+  sigaTree_JECdown->SetBranchAddress("pileupWeightErr", &puWeightErr);
+  sigaTree_JECdown->SetBranchAddress("btagWeight", &btagWeight);
+  sigaTree_JECdown->SetBranchAddress("btagWeightErr", &btagWeightErr);
+  sigaTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
+  sigaTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
+  sigaTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
   sigbTree->SetBranchAddress("pileupWeight", &puWeight);
   sigbTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
@@ -717,6 +940,23 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigbTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
   sigbTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigbTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
+  sigbTree->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+
+  sigbTree_JECup->SetBranchAddress("pileupWeight", &puWeight);
+  sigbTree_JECup->SetBranchAddress("pileupWeightErr", &puWeightErr);
+  sigbTree_JECup->SetBranchAddress("btagWeight", &btagWeight);
+  sigbTree_JECup->SetBranchAddress("btagWeightErr", &btagWeightErr);
+  sigbTree_JECup->SetBranchAddress("btagWeightUp", &btagWeightUp);
+  sigbTree_JECup->SetBranchAddress("btagWeightDown", &btagWeightDown);
+  sigbTree_JECup->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+
+  sigbTree_JECdown->SetBranchAddress("pileupWeight", &puWeight);
+  sigbTree_JECdown->SetBranchAddress("pileupWeightErr", &puWeightErr);
+  sigbTree_JECdown->SetBranchAddress("btagWeight", &btagWeight);
+  sigbTree_JECdown->SetBranchAddress("btagWeightErr", &btagWeightErr);
+  sigbTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
+  sigbTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
+  sigbTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
   
   for(int i = 0; i < ggTree->GetEntries(); i++) {
     ggTree->GetEntry(i);
@@ -749,6 +989,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   }
 
   Float_t leptonSF, leptonSFup, leptonSFdown;
+  Float_t photonSF, photonSFup, photonSFdown;
 
   for(unsigned int i = 0; i < mcTrees.size(); i++) {
     
@@ -772,6 +1013,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+      GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
 
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t addError2_puOnly = btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -779,7 +1021,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
-	double totalWeight = puWeight * btagWeight * leptonSF;
+	double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 
 	Float_t oldError = mcHistograms[i][k]->GetBinError(mcHistograms[i][k]->FindBin(vars[k]));
@@ -787,42 +1029,42 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	mcHistograms[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
-	totalWeight = puWeight * btagWeightUp * leptonSF;
+	totalWeight = puWeight * btagWeightUp * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_btagWeightUp[i][k]->GetBinError(mcHistograms_btagWeightUp[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_btagWeightUp[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_btagWeightUp[i][k]->SetBinError(mcHistograms_btagWeightUp[i][k]->FindBin(vars[k]), newerror);
 
-	totalWeight = puWeight * btagWeightDown * leptonSF;
+	totalWeight = puWeight * btagWeightDown * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_btagWeightDown[i][k]->GetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_btagWeightDown[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_btagWeightDown[i][k]->SetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]), newerror);
 
-	totalWeight = puWeight * btagWeight * leptonSFup;
+	totalWeight = puWeight * btagWeight * leptonSFup * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_leptonSFup[i][k]->GetBinError(mcHistograms_leptonSFup[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_leptonSFup[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_leptonSFup[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
-	totalWeight = puWeight * btagWeight * leptonSFdown;
+	totalWeight = puWeight * btagWeight * leptonSFdown * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 	oldError = mcHistograms_leptonSFdown[i][k]->GetBinError(mcHistograms_leptonSFdown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_leptonSFdown[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_leptonSFdown[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
-	totalWeight = puWeight * btagWeight * leptonSF;
+	totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting * topPtReweighting;
 	oldError = mcHistograms_topPtUp[i][k]->GetBinError(mcHistograms_topPtUp[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtUp[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_topPtUp[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
-	totalWeight = puWeight * btagWeight * leptonSF;
+	totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	oldError = mcHistograms_topPtDown[i][k]->GetBinError(mcHistograms_topPtDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtDown[i][k]->Fill(vars[k], totalWeight);
@@ -880,8 +1122,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+      GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
 
-      double totalWeight = puWeight * btagWeight * leptonSF;
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
       if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 
       for(unsigned int k = 0; k < vars.size(); k++) {
@@ -910,8 +1153,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+      GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
 
-      double totalWeight = puWeight * btagWeight * leptonSF;
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
       if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 
       for(unsigned int k = 0; k < vars.size(); k++) {
@@ -947,8 +1191,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+      GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
 
-      double totalWeight = puWeight * btagWeight * leptonSF;
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
       if(reweightTopPt[i]) totalWeight *= topPtReweighting;
 
       for(unsigned int k = 0; k < vars.size(); k++) {
@@ -983,21 +1228,113 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
-    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+    if(topPtReweighting < 0) topPtReweighting = 1.;
 
-    double totalWeight = puWeight * btagWeight * leptonSF;
-    //if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
       Float_t olderror = h_siga[j]->GetBinError(h_siga[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_siga[j]->Fill(vars[j], totalWeight);
       h_siga[j]->SetBinError(h_siga[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeightUp * leptonSF * photonSF * topPtReweighting;
+      olderror = h_siga_btagWeightUp[j]->GetBinError(h_siga_btagWeightUp[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_siga_btagWeightUp[j]->Fill(vars[j], totalWeight);
+      h_siga_btagWeightUp[j]->SetBinError(h_siga_btagWeightUp[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeightDown * leptonSF * photonSF * topPtReweighting;
+      olderror = h_siga_btagWeightDown[j]->GetBinError(h_siga_btagWeightDown[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_siga_btagWeightDown[j]->Fill(vars[j], totalWeight);
+      h_siga_btagWeightDown[j]->SetBinError(h_siga_btagWeightDown[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting * topPtReweighting;
+      olderror = h_siga_topPtUp[j]->GetBinError(h_siga_topPtUp[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_siga_topPtUp[j]->Fill(vars[j], totalWeight);
+      h_siga_topPtUp[j]->SetBinError(h_siga_topPtUp[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeight * leptonSF * photonSF;
+      olderror = h_siga_topPtDown[j]->GetBinError(h_siga_topPtDown[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_siga_topPtDown[j]->Fill(vars[j], totalWeight);
+      h_siga_topPtDown[j]->SetBinError(h_siga_topPtDown[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeight * leptonSFup * photonSF * topPtReweighting;
+      olderror = h_siga_leptonSFup[j]->GetBinError(h_siga_leptonSFup[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_siga_leptonSFup[j]->Fill(vars[j], totalWeight);
+      h_siga_leptonSFup[j]->SetBinError(h_siga_btagWeightUp[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeight * leptonSFdown * photonSF * topPtReweighting;
+      olderror = h_siga_leptonSFdown[j]->GetBinError(h_siga_leptonSFdown[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_siga_leptonSFdown[j]->Fill(vars[j], totalWeight);
+      h_siga_leptonSFdown[j]->SetBinError(h_siga_leptonSFdown[j]->FindBin(vars[j]), newerror);
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_siga[j]->Scale(intLumi_int * 0.147492 / 15000.);
+  for(unsigned int j = 0; j < vars.size(); j++) {
+    h_siga[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    h_siga_btagWeightUp[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    h_siga_btagWeightDown[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    h_siga_topPtUp[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    h_siga_topPtDown[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    h_siga_leptonSFup[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    h_siga_leptonSFdown[j]->Scale(intLumi_int * 0.147492 / 15000.);
+  }
+
+  for(int i = 0; i < sigaTree_JECup->GetEntries(); i++) {
+    sigaTree_JECup->GetEntry(i);
+
+    if(nBtagReq == 0) btagWeight = 1.;
+
+    if(btagWeight != btagWeight) continue;
+    if(metCut > 0. && vars[1] >= metCut) continue;
+
+    if(topPtReweighting < 0) topPtReweighting = 1.;
+
+    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+      h_siga_JECup[j]->Fill(vars[j], totalWeight);
+    }
+
+  }
+  for(unsigned int j = 0; j < vars.size(); j++) h_siga_JECup[j]->Scale(intLumi_int * 0.147492 / 15000.);
+
+  for(int i = 0; i < sigaTree_JECdown->GetEntries(); i++) {
+    sigaTree_JECdown->GetEntry(i);
+
+    if(nBtagReq == 0) btagWeight = 1.;
+
+    if(btagWeight != btagWeight) continue;
+    if(metCut > 0. && vars[1] >= metCut) continue;
+
+    if(topPtReweighting < 0) topPtReweighting = 1.;
+
+    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+      h_siga_JECdown[j]->Fill(vars[j], totalWeight);
+    }
+
+  }
+  for(unsigned int j = 0; j < vars.size(); j++) h_siga_JECdown[j]->Scale(intLumi_int * 0.147492 / 15000.);
 
   for(int i = 0; i < sigbTree->GetEntries(); i++) {
     sigbTree->GetEntry(i);
@@ -1017,21 +1354,113 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     Float_t btag_toterr = sqrt(btagWeightErr*btagWeightErr + btagSFsys*btagSFsys);
     Float_t addError2 = puWeight*puWeight*btag_toterr*btag_toterr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
-    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+    if(topPtReweighting < 0) topPtReweighting = 1.;
 
-    double totalWeight = puWeight * btagWeight * leptonSF;
-    //if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
       Float_t olderror = h_sigb[j]->GetBinError(h_sigb[j]->FindBin(vars[j]));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_sigb[j]->Fill(vars[j], totalWeight);
       h_sigb[j]->SetBinError(h_sigb[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeightUp * leptonSF * photonSF * topPtReweighting;
+      olderror = h_sigb_btagWeightUp[j]->GetBinError(h_sigb_btagWeightUp[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_sigb_btagWeightUp[j]->Fill(vars[j], totalWeight);
+      h_sigb_btagWeightUp[j]->SetBinError(h_sigb_btagWeightUp[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeightDown * leptonSF * photonSF * topPtReweighting;
+      olderror = h_sigb_btagWeightDown[j]->GetBinError(h_sigb_btagWeightDown[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_sigb_btagWeightDown[j]->Fill(vars[j], totalWeight);
+      h_sigb_btagWeightDown[j]->SetBinError(h_sigb_btagWeightDown[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting * topPtReweighting;
+      olderror = h_sigb_topPtUp[j]->GetBinError(h_sigb_topPtUp[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_sigb_topPtUp[j]->Fill(vars[j], totalWeight);
+      h_sigb_topPtUp[j]->SetBinError(h_sigb_topPtUp[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeight * leptonSF * photonSF;
+      olderror = h_sigb_topPtDown[j]->GetBinError(h_sigb_topPtDown[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_sigb_topPtDown[j]->Fill(vars[j], totalWeight);
+      h_sigb_topPtDown[j]->SetBinError(h_sigb_topPtDown[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeight * leptonSFup * photonSF * topPtReweighting;
+      olderror = h_sigb_leptonSFup[j]->GetBinError(h_sigb_leptonSFup[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_sigb_leptonSFup[j]->Fill(vars[j], totalWeight);
+      h_sigb_leptonSFup[j]->SetBinError(h_sigb_btagWeightUp[j]->FindBin(vars[j]), newerror);
+
+      totalWeight = puWeight * btagWeight * leptonSFdown * photonSF * topPtReweighting;
+      olderror = h_sigb_leptonSFdown[j]->GetBinError(h_sigb_leptonSFdown[j]->FindBin(vars[j]));
+      newerror = sqrt(olderror*olderror + addError2);
+      h_sigb_leptonSFdown[j]->Fill(vars[j], totalWeight);
+      h_sigb_leptonSFdown[j]->SetBinError(h_sigb_leptonSFdown[j]->FindBin(vars[j]), newerror);
     }
 
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_sigb[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+  for(unsigned int j = 0; j < vars.size(); j++) {
+    h_sigb[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+    h_sigb_btagWeightUp[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+    h_sigb_btagWeightDown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+    h_sigb_topPtUp[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+    h_sigb_topPtDown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+    h_sigb_leptonSFup[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+    h_sigb_leptonSFdown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+  }
+
+  for(int i = 0; i < sigbTree_JECup->GetEntries(); i++) {
+    sigbTree_JECup->GetEntry(i);
+
+    if(nBtagReq == 0) btagWeight = 1.;
+
+    if(btagWeight != btagWeight) continue;
+    if(metCut > 0. && vars[1] >= metCut) continue;
+
+    if(topPtReweighting < 0) topPtReweighting = 1.;
+
+    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+      h_sigb_JECup[j]->Fill(vars[j], totalWeight);
+    }
+
+  }
+  for(unsigned int j = 0; j < vars.size(); j++) h_sigb_JECup[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+
+  for(int i = 0; i < sigbTree_JECdown->GetEntries(); i++) {
+    sigbTree_JECdown->GetEntry(i);
+
+    if(nBtagReq == 0) btagWeight = 1.;
+
+    if(btagWeight != btagWeight) continue;
+    if(metCut > 0. && vars[1] >= metCut) continue;
+
+    if(topPtReweighting < 0) topPtReweighting = 1.;
+
+    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+      h_sigb_JECdown[j]->Fill(vars[j], totalWeight);
+    }
+
+  }
+  for(unsigned int j = 0; j < vars.size(); j++) h_sigb_JECdown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
 
   ggTree->ResetBranchAddresses();
   qcdTree->ResetBranchAddresses();
@@ -1697,6 +2126,71 @@ void PlotMaker::CreateTable() {
     // total background
     fprintf(tableFile, "bkgval%dx:%.1f\nbkgerrorup%dx:%.2f\nbkgerrordown%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgsys2_up + bkgstat2), i+1, sqrt(bkgsys2_down + bkgstat2));
 
+    // Signal yields durp
+    this_val = h_siga[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
+    this_staterr2 = this_err*this_err;
+    
+    Double_t temperr;
+    this_btagUp = h_siga_btagWeightUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_topPtUp = h_siga_topPtUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_JECup = h_siga_JECup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_leptonSFup = h_siga_leptonSFup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    
+    this_btagDown = h_siga_btagWeightDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_topPtDown = h_siga_topPtDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_JECdown = h_siga_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_leptonSFdown = h_siga_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+
+    this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
+      (this_scaleUp - this_val)*(this_scaleUp - this_val) +
+      (this_pdfUp - this_val)*(this_pdfUp - this_val) +
+      (this_topPtUp - this_val)*(this_topPtUp - this_val) +
+      (this_JECup - this_val)*(this_JECup - this_val) +
+      (this_leptonSFup - this_val)*(this_leptonSFup - this_val);
+    
+    this_syserr2_down = (this_btagDown - this_val)*(this_btagDown - this_val) +
+      (this_scaleDown - this_val)*(this_scaleDown - this_val) +
+      (this_pdfDown - this_val)*(this_pdfDown - this_val) +
+      (this_topPtDown - this_val)*(this_topPtDown - this_val) +
+      (this_JECdown - this_val)*(this_JECdown - this_val) +
+      (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val);
+    
+    fprintf(tableFile, "sigaval%dx:%.1f\nsigaerrorup%dx:%.2f\nsigaerrordown%dx:%.2f\n", i+1, this_val, 
+	    i+1, sqrt(this_staterr2 + this_syserr2_up), 
+	    i+1, sqrt(this_staterr2 + this_syserr2_down));
+
+    this_val = h_sigb[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
+    this_staterr2 = this_err*this_err;
+    
+    temperr;
+    this_btagUp = h_sigb_btagWeightUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_topPtUp = h_sigb_topPtUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_JECup = h_sigb_JECup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_leptonSFup = h_sigb_leptonSFup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    
+    this_btagDown = h_sigb_btagWeightDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_topPtDown = h_sigb_topPtDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_JECdown = h_sigb_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_leptonSFdown = h_sigb_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+
+    this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
+      (this_scaleUp - this_val)*(this_scaleUp - this_val) +
+      (this_pdfUp - this_val)*(this_pdfUp - this_val) +
+      (this_topPtUp - this_val)*(this_topPtUp - this_val) +
+      (this_JECup - this_val)*(this_JECup - this_val) +
+      (this_leptonSFup - this_val)*(this_leptonSFup - this_val);
+    
+    this_syserr2_down = (this_btagDown - this_val)*(this_btagDown - this_val) +
+      (this_scaleDown - this_val)*(this_scaleDown - this_val) +
+      (this_pdfDown - this_val)*(this_pdfDown - this_val) +
+      (this_topPtDown - this_val)*(this_topPtDown - this_val) +
+      (this_JECdown - this_val)*(this_JECdown - this_val) +
+      (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val);
+    
+    fprintf(tableFile, "sigbval%dx:%.1f\nsigberrorup%dx:%.2f\nsigberrordown%dx:%.2f\n", i+1, this_val, 
+	    i+1, sqrt(this_staterr2 + this_syserr2_up), 
+	    i+1, sqrt(this_staterr2 + this_syserr2_down));
+
     // Data
     this_val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
     fprintf(tableFile, "dataval%dx:%.0f\n", i+1, this_val);
@@ -1708,7 +2202,7 @@ void PlotMaker::CreateTable() {
       fprintf(tableFile, "bkgpdfup5y:%.1f\nbkgpdfdown5y:%.1f\n", 100. * sqrt(bkg_pdfUp2) / bkgval, 100. * sqrt(bkg_pdfDown2) / bkgval);
       fprintf(tableFile, "bkgjecup5y:%.1f\nbkgjecdown5y:%.1f\n", 100. * sqrt(bkg_JECup2) / bkgval, 100. * sqrt(bkg_JECdown2) / bkgval);
       fprintf(tableFile, "bkgtopptup5y:%.1f\nbkgtopptdown5y:%.1f\n", 100. * sqrt(bkg_topPtUp2) / bkgval, 100. * sqrt(bkg_topPtDown2) / bkgval);
-      fprintf(tableFile, "bkgbtagup5y:%.3f\nbkgbtagdown5y:%.3f\n", 100. * sqrt(bkg_btagUp2) / bkgval, 100. * sqrt(bkg_btagDown2) / bkgval);
+      fprintf(tableFile, "bkgbtagup5y:%.1f\nbkgbtagdown5y:%.1f\n", 100. * sqrt(bkg_btagUp2) / bkgval, 100. * sqrt(bkg_btagDown2) / bkgval);
       fprintf(tableFile, "bkgleptonSFup5y:%.1f\nbkgleptonSFdown5y:%.1f\n", 100. * sqrt(bkg_leptonSFup2) / bkgval, 100. * sqrt(bkg_leptonSFdown2) / bkgval);
     }
 
@@ -1741,23 +2235,88 @@ void PlotMaker::PlotKolmogorovValues() {
 
 void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down) {
 
-  Float_t pt, eta;
+  Float_t pt, eta, error;
 
   if(chan < 2) {
-    pt = min(vars[15], (float)299.);
-    eta = fabs(vars[16]);
-  }
-  else {
-    pt = min(vars[17], (float)299.);
-    eta = fabs(vars[18]);
+    pt = min(vars[15], (float)199.);
+    pt = max(pt, (float)15.);
+    eta = min(fabs(vars[16]), (float)2.39);
+
+    central = sf_electron->GetBinContent(sf_electron->FindBin(pt, eta));
+    error = sf_electron->GetBinError(sf_electron->FindBin(pt, eta));
+
+    central *= sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(pt, eta));
+    Float_t trigger_error = sf_SingleElectronTrigger->GetBinError(sf_SingleElectronTrigger->FindBin(pt, eta));
+
+    error = sqrt(error*error + trigger_error*trigger_error);
   }
 
-  central = sf_lepton->GetBinContent(sf_lepton->FindBin(pt, eta));
-  Float_t error = sf_lepton->GetBinError(sf_lepton->FindBin(pt, eta));
+  else {
+    pt = min(vars[17], (float)499.);
+    pt = max(pt, (float)10.);
+    eta = min(fabs(vars[18]), (float)2.09);
+
+    central = sf_muon->GetBinContent(sf_muon->FindBin(pt, eta));
+    error = sf_muon->GetBinError(sf_muon->FindBin(pt, eta));
+  }
 
   up = central + error;
   down = central - error;
 }
+
+void GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down) {
+
+  if(vars[0] == 0) {
+    central = 1.;
+    up = 1.;
+    down = 1.;
+    return;
+  }
+
+  Float_t et, eta, error2;
+
+  if(vars[0] == 1 && vars.size() >= 21) {
+    et = min(vars[19], 999.);
+    et = min(et, (float)15.);
+    eta = min(fabs(vars[20]), (float)2.49);
+
+    central = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    error2 = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
+    
+    central *= sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    error2 += sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+  }
+
+  else if(vars[0] >= 2 && vars.size() >= 27) {
+    // lead photon
+    et = min(vars[19], 999.);
+    et = min(et, (float)15.);
+    eta = min(fabs(vars[20]), (float)2.49);
+
+    central = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    error2 = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
+    
+    central *= sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    error2 += sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+
+    // trail photon
+    et = min(vars[24], 999.);
+    et = min(et, (float)15.);
+    eta = min(fabs(vars[26]), (float)2.49);
+
+    central *= sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    error2 += sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
+    
+    central *= sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    error2 += sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+  }
+
+  up = central + sqrt(error2);
+  down = central - sqrt(error2);
+
+  return;
+}
+
 
 void prep_signal(TString req, int nPhotons_req) {
 

@@ -114,7 +114,7 @@ void ana_signal(TString scan = "stop-bino", TString discriminant = "CSVM", bool 
   ts.Start();
 
   std::cout << std::endl << "PileupWeights()" << std::endl;
-  sea->PileupWeights("jan3_pileup.root");
+  sea->PileupWeights("pileup_22Jan2013_69400.root", "pileup_22Jan2013_72870.root", "pileup_22Jan2013_65930.root");
   std::cout << std::endl << "CalculateBtagEfficiency()" << std::endl;
   sea->CalculateBtagEfficiency();
   std::cout << std::endl << "Acceptance()" << std::endl;

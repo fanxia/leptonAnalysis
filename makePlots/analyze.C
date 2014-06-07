@@ -47,9 +47,13 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
   TTree * sigaTree = (TTree*)fSigA->Get(channels[channel]+"_signalTree");
+  TTree * sigaTree_JECup = (TTree*)fSigA->Get(channels[channel]+"_signalTree_JECup");
+  TTree * sigaTree_JECdown = (TTree*)fSigA->Get(channels[channel]+"_signalTree_JECdown");
 
   TFile * fSigB = new TFile("../acceptance/signal_contamination_mst_560_m1_325.root", "READ");
   TTree * sigbTree = (TTree*)fSigB->Get(channels[channel]+"_signalTree");
+  TTree * sigbTree_JECup = (TTree*)fSigB->Get(channels[channel]+"_signalTree_JECup");
+  TTree * sigbTree_JECdown = (TTree*)fSigB->Get(channels[channel]+"_signalTree_JECdown");
 
   TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
 
@@ -70,115 +74,126 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   }
 
   PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], blinded);
-  pMaker->LoadLeptonSFs(channel);
+  pMaker->LoadLeptonSFs("../data/lepton_SF_8TeV_53x_baseline.root");
+  pMaker->LoadPhotonSFs("../data/Photon_ID_CSEV_SF_Jan22rereco_Full2012_S10_MC_V01.root");
 
   bool loadSuccess = true;
   
+  int muonQCD_layerAdd = 0;
+
+  if(channel >= 2) {
+    muonQCD_layerAdd = 1;
+
+
+
+  }
+
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
 					  245.8 * 0.457, 2.5, 3.4, 2.6, 2.6,
 					  true, true,
-					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
+					  channel, muonQCD_layerAdd + 0, kGray, "t#bar{t} inclusive", "ttInclusive");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 
 					  245.8 * 0.438, 2.5, 3.4, 2.6, 2.6,
 					  true, true,
-					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
+					  channel, muonQCD_layerAdd + 0, kGray, "t#bar{t} inclusive", "ttInclusive");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 
 					  245.8 * 0.105, 2.5, 3.4, 2.6, 2.6,
 					  true, true,
-					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
+					  channel, muonQCD_layerAdd + 0, kGray, "t#bar{t} inclusive", "ttInclusive");
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 
 					  12234.4 * 3, 79.0, 39.7, 414.7, 414.7,
 					  false, false,
-					  channel, 1, kOrange-3, "W + Jets", "vJets");
+					  channel, muonQCD_layerAdd + 1, kOrange-3, "W + Jets", "vJets");
 
   //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 
   //                                        1177.3 * 3,
   //                                        false, false,
-  //                                        channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+  //                                        channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 
 					  666.7 * 1177.3 * 3 / 3503.71, 5.9, 3.6, 38.8, 38.8,
 					  false, false,
-					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+					  channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy2JetsToLL.root", "dy2JetsToLL", 
 					  215.1 * 1177.3 * 3 / 3503.71, 5.9, 3.6, 38.8, 38.8,
 					  false, false,
-					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+					  channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy3JetsToLL.root", "dy3JetsToLL", 
 					  66.07 * 1177.3 * 3 / 3503.71, 5.9, 3.6, 38.8, 38.8,
 					  false, false,
-					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+					  channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy4JetsToLL.root", "dy4JetsToLL", 
 					  27.38 * 1177.3 * 3 / 3503.71, 5.9, 3.6, 38.8, 38.8,
 					  false, false,
-					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+					  channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TBar_s.root", "TBar_s", 
 					  1.76, 0.01, 0.01, 0.08, 0.08,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, muonQCD_layerAdd + 3, kRed, "Single Top", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TBar_t.root", "TBar_t", 
 					  30.7, 0.7, 0.7, 0.9, 1.1,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, muonQCD_layerAdd + 3, kRed, "Single Top", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TBar_tW.root", "TBar_tW", 
 					  11.1, 0.3, 0.3, 0.7, 0.7,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, muonQCD_layerAdd + 3, kRed, "Single Top", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_T_s.root", "T_s", 
 					  3.79, 0.07, 0.07, 0.13, 0.13,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, muonQCD_layerAdd + 3, kRed, "Single Top", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_T_t.root", "T_t", 
 					  56.4, 2.1, 0.3, 1.1, 1.1,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, muonQCD_layerAdd + 3, kRed, "Single Top", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_T_tW.root", "T_tW", 
 					  11.1, 0.3, 0.3, 0.7, 0.7,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, muonQCD_layerAdd + 3, kRed, "Single Top", "singleTop");
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WW.root", "WW",
 					  57.1097, 2.3, 2.3, 2.0, 2.0,
 					  false, false,
-					  channel, 4, kCyan, "Diboson", "diboson");
+					  channel, muonQCD_layerAdd + 4, kCyan, "Diboson", "diboson");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WZ.root", "WZ",
 					  32.3161, 1.3, 1.3, 1.3, 1.3,
 					  false, false,
-					  channel, 4, kCyan, "Diboson", "diboson");
+					  channel, muonQCD_layerAdd + 4, kCyan, "Diboson", "diboson");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ZZ.root", "ZZ",
 					  8.25561, 0.3, 0.3, 0.3, 0.3,
 					  false, false,
-					  channel, 4, kCyan, "Diboson", "diboson");
+					  channel, muonQCD_layerAdd + 4, kCyan, "Diboson", "diboson");
   
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TTWJets.root", "TTWJets", 
 					  0.232, 0.067, 0.067, 0.03, 0.03,
 					  false, false,
-					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
+					  channel, muonQCD_layerAdd + 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TTZJets.root", "TTZJets", 
 					  0.2057, -1, -1, 0.019, 0.024,
 					  false, false,
-					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
+					  channel, muonQCD_layerAdd + 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
 
   // http://arxiv.org/abs/1102.1967
   //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttgjets.root", "ttgjets", 
   //2.166, 2.166 * .25, 2.166 * .25, 2.166 * 0.076, 2.166 * 0.099,
   //false, true,
-  //channel, 6, 8, "t#bar{t} + #gamma", "ttgamma");
+  //channel, muonQCD_layerAdd + 6, 8, "t#bar{t} + #gamma", "ttgamma");
 
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/WhizardMCTeeTeeGamma#2_to_5_All_ttbar_decay_channels
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttA_2to5.root", "ttA_2to5", 
 					  .9081 * 2, .9081 * .5, .9081 * .5, .9081 * 2 * 0.076, .9081 * 2 * 0.099, 
 					  false, false,
-					  channel, 6, 8, "t#bar{t} + #gamma", "ttgamma");
+					  channel, muonQCD_layerAdd + 6, 8, "t#bar{t} + #gamma", "ttgamma");
   pMaker->SetUseWHIZARD(true);
 
-  //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, 6, kCyan+3, "t#bar{t} + #gamma#gamma");
+  //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttGG.root", "ttGG", 0.146, channel, muonQCD_layerAdd + 6, kCyan+3, "t#bar{t} + #gamma#gamma");
 
   if(!loadSuccess) return;
 
   pMaker->SetTrees(ggTree, qcdTree,
-		   sigaTree, sigbTree);
+		   sigaTree, sigaTree_JECup, sigaTree_JECdown,
+		   sigbTree, sigbTree_JECup, sigbTree_JECdown);
 
   pMaker->SetDisplayKStest(displayKStest);
 
@@ -210,17 +225,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);                  // 18
 
   if(nPhotons_req >= 1) {
-    pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic);
-    pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);
+    pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic); // 19
+    pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);                  // 20
     pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("leadSigmaIetaIeta", 40, 0., 0.02);
     pMaker->BookHistogram("leadChargedHadronIso", 35, 0, 15.0);
   }
 
   if(nPhotons_req >= 2) {
-    pMaker->BookHistogram("trailPhotonEt", nKinematicBins, xbins_kinematic);
-    pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);
-    pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);
+    pMaker->BookHistogram("trailPhotonEt", nKinematicBins, xbins_kinematic); // 24
+    pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);          // 25
+    pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);                  // 26
     pMaker->BookHistogram("trailSigmaIetaIeta", 40, 0, 0.02);
     pMaker->BookHistogram("trailChargedHadronIso", 35, 0, 15.0);
     pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic);

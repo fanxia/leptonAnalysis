@@ -22,16 +22,23 @@ using namespace std;
 
 bool sortTriggers(pair<TString, int> i, pair<TString, int> j) { return (i.second > j.second); }
 
-void SusyEventAnalyzer::PileupWeights(TString puFile) {
+void SusyEventAnalyzer::PileupWeights(TString puFile, TString puFile_up, TString puFile_down) {
 
   TFile * in = new TFile(puFile, "READ");
+  TFile * in_up = new TFile(puFile_up, "READ");
+  TFile * in_down = new TFile(puFile_down, "READ");
+
   TH1F * _data = (TH1F*)in->Get("pileup");
+  TH1F * _data_up = (TH1F*)in_up->Get("pileup");
+  TH1F * _data_down = (TH1F*)in_down->Get("pileup");
   
   TString output_code_t = FormatName(scan);
 
   TH1F * data = (TH1F*)_data->Clone("pu_data"+output_code_t); data->Sumw2();
+  TH1F * data_up = (TH1F*)_data_up->Clone("pu_data_up"+output_code_t); data_up->Sumw2();
+  TH1F * data_down = (TH1F*)_data_down->Clone("pu_data_down"+output_code_t); data_down->Sumw2();
+
   TH1F * mc = new TH1F("pu_mc"+output_code_t, "pu_mc"+output_code_t, 70, 0, 70); mc->Sumw2();
-  TH1F * mc_nPVertex = new TH1F("mc_nPVertex"+output_code_t, "mc_nPVertex"+output_code_t, 70, 0, 70);
 
   Long64_t nEntries = fTree->GetEntries();
   cout << "Total events in files : " << nEntries << endl;
@@ -53,36 +60,57 @@ void SusyEventAnalyzer::PileupWeights(TString puFile) {
     
     if(foundInTimeBX) mc->Fill(nPV);
 
-    // Now find the nPV from reconstruction
-    int nPV_reco = GetNumberPV(event);
-    mc_nPVertex->Fill(nPV_reco);
-
   } // end event loop
 
   TH1D * data_nonorm = (TH1D*)data->Clone("pu_data_nonorm"+output_code_t);
+  TH1D * data_up_nonorm = (TH1D*)data_up->Clone("pu_data_up_nonorm"+output_code_t);
+  TH1D * data_down_nonorm = (TH1D*)data_down->Clone("pu_data_down_nonorm"+output_code_t);
   TH1D * mc_nonorm = (TH1D*)mc->Clone("pu_mc_nonorm"+output_code_t);
 
   Double_t intData = data->Integral();
+  Double_t intData_up = data_up->Integral();
+  Double_t intData_down = data_down->Integral();
   Double_t intMC = mc->Integral();
 
   data->Scale(1./intData);
+  data_up->Scale(1./intData_up);
+  data_down->Scale(1./intData_down);
   mc->Scale(1./intMC);
 
   TH1F * weights = (TH1F*)data->Clone("puWeights"+output_code_t);
   weights->Divide(mc);
+
+  TH1F * weights_up = (TH1F*)data_up->Clone("puWeights_up"+output_code_t);
+  weights_up->Divide(mc);
+
+  TH1F * weights_down = (TH1F*)data_down->Clone("puWeights_down"+output_code_t);
+  weights_down->Divide(mc);
 
   TFile * out = new TFile("pileupReweighting"+output_code_t+".root", "RECREATE");
   out->cd();
 
   data->Write();
   data_nonorm->Write();
+
+  data_up->Write();
+  data_up_nonorm->Write();
+
+  data_down->Write();
+  data_down_nonorm->Write();
+
   mc->Write();
   mc_nonorm->Write();
+
   weights->Write();
+  weights_up->Write();
+  weights_down->Write();
+
   out->Write();
   out->Close();
 
   in->Close();
+  in_up->Close();
+  in_down->Close();
 
   return;
 }
@@ -275,11 +303,16 @@ void SusyEventAnalyzer::Data() {
     h_metFilter->GetYaxis()->SetBinLabel(i+1, metFilterNames[i]);
   }
 
+  TH1D * h_dR_gamma_ele = new TH1D("dR_gamma_ele", "dR between photons and electrons (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_muon", "dR between photons and muons (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_photon = new TH1D("dR_gamma_photon", "dR between photons and other photons (N-1)", 100, 0, 10);
+
   /////////////////////////////////
   // Reweighting trees
   /////////////////////////////////
 
-  const int nTreeVariables = 68;
+  const int nTreeVariables = 71;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
@@ -292,6 +325,7 @@ void SusyEventAnalyzer::Data() {
     "leadPhotonEt", "leadPhotonEta", "leadPhotonPhi", "leadChargedHadronIso", "leadSigmaIetaIeta", "lead_nPixelSeeds", "leadMVAregEnergy", "leadMVAregErr",
     "trailPhotonEt", "trailPhotonEta", "trailPhotonPhi", "trailChargedHadronIso", "trailSigmaIetaIeta", "trail_nPixelSeeds", "trailMVAregEnergy", "trailMVAregErr",
     "photon_invmass", "photon_dR", "photon_dPhi", "diEMpT", "diJetPt",
+    "mLepGammaLead", "mLepGammaTrail", "mLepGammaGamma",
     "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
     "btag1_pt", "btag2_pt",
     "max_csv", "submax_csv", "min_csv",
@@ -447,14 +481,24 @@ void SusyEventAnalyzer::Data() {
 		  pfJets_corrP4,
 		  tightMuons, looseMuons,
 		  tightEles, looseEles,
-		  HT, false);
+		  HT,
+		  h_dR_gamma_ele,
+		  h_dR_gamma_muon,
+		  h_dR_gamma_jet,
+		  h_dR_gamma_photon,
+		  false);
 		
       findPhotons(event, 
 		  fakePhotons,
 		  pfJets_corrP4,
 		  tightMuons, looseMuons,
 		  tightEles, looseEles,
-		  HT, true);
+		  HT, 
+		  h_dR_gamma_ele,
+		  h_dR_gamma_muon,
+		  h_dR_gamma_jet,
+		  h_dR_gamma_photon,
+		  true);
 
       SetTreeValues(treeMap,
 		    event,
@@ -544,7 +588,12 @@ void SusyEventAnalyzer::Acceptance() {
   TH2D * h_ttA_phaseSpace = new TH2D("ttA_phaseSpace"+output_code_t, "ttA_phaseSpace"+output_code_t, 500, 0, 1000, 500, 0, 5);
   TH2D * h_ttbar_phaseSpace = new TH2D("ttbar_phaseSpace"+output_code_t, "ttbar_phaseSpace"+output_code_t, 500, 0, 1000, 500, 0, 5);
 
-  const int nTreeVariables = 74;
+  TH1D * h_dR_gamma_ele = new TH1D("dR_gamma_ele", "dR between photons and electrons (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_muon", "dR between photons and muons (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_photon = new TH1D("dR_gamma_photon", "dR between photons and other photons (N-1)", 100, 0, 10);
+
+  const int nTreeVariables = 79;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
@@ -557,11 +606,12 @@ void SusyEventAnalyzer::Acceptance() {
     "leadPhotonEt", "leadPhotonEta", "leadPhotonPhi", "leadChargedHadronIso", "leadSigmaIetaIeta", "lead_nPixelSeeds", "leadMVAregEnergy", "leadMVAregErr",
     "trailPhotonEt", "trailPhotonEta", "trailPhotonPhi", "trailChargedHadronIso", "trailSigmaIetaIeta", "trail_nPixelSeeds", "trailMVAregEnergy", "trailMVAregErr",
     "photon_invmass", "photon_dR", "photon_dPhi", "diEMpT", "diJetPt",
+    "mLepGammaLead", "mLepGammaTrail", "mLepGammaGamma",
     "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
     "btag1_pt", "btag2_pt",
     "max_csv", "submax_csv", "min_csv",
     "nPV",
-    "pileupWeight", "pileupWeightErr",
+    "pileupWeight", "pileupWeightErr", "pileupWeightUp", "pileupWeightDown",
     "btagWeight", "btagWeightUp", "btagWeightDown", "btagWeightErr",
     "metFilterBit",
     "ttbarDecayMode",
@@ -602,6 +652,8 @@ void SusyEventAnalyzer::Acceptance() {
   // get pileup weights
   TFile * puFile = new TFile("pileupReweighting"+output_code_t+".root", "READ");
   TH1F * puWeights = (TH1F*)puFile->Get("puWeights"+output_code_t);
+  TH1F * puWeights_up = (TH1F*)puFile->Get("puWeights_up"+output_code_t);
+  TH1F * puWeights_down = (TH1F*)puFile->Get("puWeights_down"+output_code_t);
 
   Long64_t nEntries = fTree->GetEntries();
   cout << "Total events in files : " << nEntries << endl;
@@ -639,15 +691,21 @@ void SusyEventAnalyzer::Acceptance() {
 
     float eventWeight = 0.;
     float eventWeightErr = 0.;
+    float eventWeightUp = 0.;
+    float eventWeightDown = 0.;
     if(numTrueInt >= 0.) {
       int binNum = puWeights->GetXaxis()->FindBin(numTrueInt);
       eventWeight = puWeights->GetBinContent(binNum);
       eventWeightErr = puWeights->GetBinError(binNum);
+      eventWeightUp = puWeights_up->GetBinContent(binNum);
+      eventWeightDown = puWeights_down->GetBinContent(binNum);
     }
 
     if(!doPileupReweighting) {
       eventWeight = 1.;
       eventWeightErr = 0.;
+      eventWeightUp = 1.;
+      eventWeightDown = 1.;
     }
 
     int nPVertex = GetNumberPV(event);
@@ -711,14 +769,24 @@ void SusyEventAnalyzer::Acceptance() {
 		    pfJets_corrP4,
 		    tightMuons, looseMuons,
 		    tightEles, looseEles,
-		    HT, false);
+		    HT,
+		    h_dR_gamma_ele,
+		    h_dR_gamma_muon,
+		    h_dR_gamma_jet,
+		    h_dR_gamma_photon,
+		    false);
 
 	findPhotons(event, 
 		    fakePhotons,
 		    pfJets_corrP4,
 		    tightMuons, looseMuons,
 		    tightEles, looseEles,
-		    HT, true);
+		    HT,
+		    h_dR_gamma_ele,
+		    h_dR_gamma_muon,
+		    h_dR_gamma_jet,
+		    h_dR_gamma_photon,
+		    true);
 	
 	float btagWeight[nChannels];
 	float btagWeightUp[nChannels];
@@ -746,7 +814,7 @@ void SusyEventAnalyzer::Acceptance() {
 		      hadronicSystem,
 		      HT, HT_jets,
 		      nPVertex,
-		      eventWeight, eventWeightErr,
+		      eventWeight, eventWeightErr, eventWeightUp, eventWeightDown,
 		      0);
 	
 	////////////////////

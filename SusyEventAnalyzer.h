@@ -68,7 +68,7 @@ class SusyEventAnalyzer {
   virtual void Data();
   virtual void Acceptance();
   virtual void CalculateBtagEfficiency();
-  virtual void PileupWeights(TString puFile);
+  virtual void PileupWeights(TString puFile, TString puFile_up, TString puFile_down);
 
   // utility functions
   float deltaR(TLorentzVector& p1, TLorentzVector& p2);
@@ -136,7 +136,12 @@ class SusyEventAnalyzer {
 		   vector<TLorentzVector> pfJets_corrP4,
 		   vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
 		   vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
-		   float& HT, bool useFakes);
+		   float& HT, 
+		   TH1D*& h_dR_gamma_ele,
+		   TH1D*& h_dR_gamma_muon,
+		   TH1D*& h_dR_gamma_jet,
+		   TH1D*& h_dR_gamma_photon,
+		   bool useFakes);
   // in data
   void findJets(susy::Event& ev, 
 		vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
@@ -176,7 +181,7 @@ class SusyEventAnalyzer {
 		     TLorentzVector hadronicSystem,
 		     float HT, float HT_jets,
 		     int nPVertex,
-		     float eventWeight, float eventWeightErr,
+		     float eventWeight, float eventWeightErr, float eventWeight_up, float eventWeight_down,
 		     Long64_t jentry);
 
   // lazy junk
@@ -451,7 +456,12 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 				    vector<TLorentzVector> pfJets_corrP4,
 				    vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
 				    vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
-				    float& HT, bool useFakes) {
+				    float& HT, 
+				    TH1D*& h_dR_gamma_ele,
+				    TH1D*& h_dR_gamma_muon,
+				    TH1D*& h_dR_gamma_jet,
+				    TH1D*& h_dR_gamma_photon,
+				    bool useFakes) {
   
   map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
   if(phoMap != event.photons.end()) {
@@ -463,52 +473,40 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 
 	bool overlap = false;
 
+	float this_dR;
+
 	for(unsigned int k = 0; k < pfJets_corrP4.size(); k++) {
-	  if(deltaR(pfJets_corrP4[k], it->caloPosition) < 0.5) {
-	    overlap = true;
-	    break;
-	  }
+	  this_dR = deltaR(pfJets_corrP4[k], it->caloPosition);
+	  if(!useFakes) h_dR_gamma_jet->Fill(this_dR);
+	  if(this_dR < 0.5) overlap = true;
 	}
-	if(overlap) continue;
 
 	for(unsigned int i = 0; i < tightMuons.size(); i++) {
-	  if(deltaR(tightMuons[i]->momentum, it->caloPosition) <= 0.5) {
-	    overlap = true;
-	    break;
-	  }
+	  this_dR = deltaR(tightMuons[i]->momentum, it->caloPosition);
+	  if(!useFakes) h_dR_gamma_muon->Fill(this_dR);
+	  if(this_dR < 0.5) overlap = true;
 	}
-	if(overlap) continue;
 
 	for(unsigned int i = 0; i < looseMuons.size(); i++) {
-	  if(deltaR(looseMuons[i]->momentum, it->caloPosition) <= 0.5) {
-	    overlap = true;
-	    break;
-	  }
+	  if(deltaR(looseMuons[i]->momentum, it->caloPosition) <= 0.5) overlap = true;
 	}
-	if(overlap) continue;
 
 	for(unsigned int i = 0; i < tightEles.size(); i++) {
-	  if(deltaR(tightEles[i]->momentum, it->caloPosition) <= 0.5) {
-	    overlap = true;
-	    break;
-	  }
+	  this_dR = deltaR(tightEles[i]->momentum, it->caloPosition);
+	  if(!useFakes) h_dR_gamma_ele->Fill(this_dR);
+	  if(this_dR < 0.5) overlap = true;
 	}
-	if(overlap) continue;
 	
 	for(unsigned int i = 0; i < looseEles.size(); i++) {
-	  if(deltaR(looseEles[i]->momentum, it->caloPosition) <= 0.5) {
-	    overlap = true;
-	    break;
-	  }
+	  if(deltaR(looseEles[i]->momentum, it->caloPosition) <= 0.5) overlap = true;
 	}
-	if(overlap) continue;
 
 	for(unsigned int i = 0; i < photons.size(); i++) {
-	  if(deltaR(photons[i]->caloPosition, it->caloPosition) <= 0.5) {
-	    overlap = true;
-	    break;
-	  }
+	  this_dR = deltaR(photons[i]->caloPosition, it->caloPosition);
+	  if(!useFakes) h_dR_gamma_photon->Fill(this_dR);
+	  if(this_dR < 0.5) overlap = true;
 	}
+
 	if(overlap) continue;
 
 	photons.push_back(&*it);
@@ -1162,7 +1160,6 @@ bool SusyEventAnalyzer::overlaps_ttA(susy::Event& ev) {
   
 }
   
-
 void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 				      susy::Event& event_,
 				      vector<susy::Muon*> tightMuons, vector<susy::Electron*> tightEles, 
@@ -1173,7 +1170,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 				      TLorentzVector hadronicSystem,
 				      float HT, float HT_jets,
 				      int nPVertex,
-				      float eventWeight, float eventWeightErr,
+				      float eventWeight, float eventWeightErr, float eventWeight_up, float eventWeight_down,
 				      Long64_t jentry) {
 
   treeMap["Nmuons"] = tightMuons.size();
@@ -1205,6 +1202,8 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 
   if(isMC) treeMap["pileupWeight"] = eventWeight;
   if(isMC) treeMap["pileupWeightErr"] = eventWeightErr;
+  if(isMC) treeMap["pileupWeightUp"] = eventWeight_up;
+  if(isMC) treeMap["pileupWeightDown"] = eventWeight_down;
         
   susy::MET* pfMet         = &(event_.metMap.find("pfMet")->second);
   susy::MET* pfMetType1    = &(event_.metMap.find("pfType1CorrectedMet")->second);
@@ -1231,6 +1230,25 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["pfNoPUMET"]   = pfNoPileUpMet->met();
   treeMap["pfMVAMET"]    = pfMVAMet->met();
   if(isMC) treeMap["genMET"]      = genMet->met();
+
+  float mLepGammaLead, mLepGammaTrail, mLepGammaGamma;
+  if(photons.size() > 0) {
+    if(tightEles.size() == 1) mLepGammaLead = (tightEles[0]->momentum + photons[0]->momentum).M();
+    else if(tightMuons.size() == 1) mLepGammaLead = (tightMuons[0]->momentum + photons[0]->momentum).M();
+  }
+  if(photons.size() > 1) {
+    if(tightEles.size() == 1) {
+      mLepGammaTrail = (tightEles[0]->momentum + photons[1]->momentum).M();
+      mLepGammaGamma = (tightEles[0]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+    }
+    else if(tightMuons.size() == 1) {
+      mLepGammaTrail = (tightMuons[0]->momentum + photons[1]->momentum).M();
+      mLepGammaGamma = (tightMuons[0]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+    }
+  }
+  treeMap["mLepGammaLead"] = (photons.size() > 0) ? mLepGammaLead : -1;
+  treeMap["mLepGammaTrail"] = (photons.size() > 1) ? mLepGammaTrail : -1;
+  treeMap["mLepGammaGamma"] = (photons.size() > 1) ? mLepGammaGamma : -1;
   
   // Transverse W mass
 

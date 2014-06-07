@@ -83,7 +83,7 @@ void ana_mc(TString scan = "DATASETNAME", TString discriminant = "CSVM", bool is
 
   if(stage == "pileup") {
     std::cout << std::endl << "PileupWeights()" << std::endl;
-    sea->PileupWeights("jan3_pileup.root");
+    sea->PileupWeights("pileup_22Jan2013_69400.root", "pileup_22Jan2013_72870.root", "pileup_22Jan2013_65930.root");
   }
   else if(stage == "btag") {
     std::cout << std::endl << "CalculateBtagEfficiency()" << std::endl;
@@ -95,7 +95,7 @@ void ana_mc(TString scan = "DATASETNAME", TString discriminant = "CSVM", bool is
   }
   else if(stage == "all") {
     std::cout << std::endl << "PileupWeights()" << std::endl;
-    sea->PileupWeights("jan3_pileup.root");
+    sea->PileupWeights("pileup_22Jan2013_69400.root", "pileup_22Jan2013_72870.root", "pileup_22Jan2013_65930.root");
     std::cout << std::endl << "CalculateBtagEfficiency()" << std::endl;
     sea->CalculateBtagEfficiency();
     std::cout << std::endl << "Acceptance()" << std::endl;

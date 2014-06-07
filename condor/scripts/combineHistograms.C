@@ -3,19 +3,34 @@ void combineHistograms(TString datasetname) {
   TFile * puFile = new TFile("pileupReweighting_temp_"+datasetname+".root", "READ");
 
   TH1D * data = (TH1D*)puFile->Get("pu_data_nonorm_"+datasetname);
+  TH1D * data_up = (TH1D*)puFile->Get("pu_data_up_nonorm_"+datasetname);
+  TH1D * data_down = (TH1D*)puFile->Get("pu_data_down_nonorm_"+datasetname);
+
   TH1D * mc = (TH1D*)puFile->Get("pu_mc_nonorm_"+datasetname);
 
   data->Scale(1./data->Integral());
+  data_up->Scale(1./data_up->Integral());
+  data_down->Scale(1./data_down->Integral());
   mc->Scale(1./mc->Integral());
 
   TH1D * weights = (TH1D*)data->Clone("puWeights_"+datasetname);
   weights->Divide(mc);
 
+  TH1D * weights_up = (TH1D*)data_up->Clone("puWeights_up_"+datasetname);
+  weights_up->Divide(mc);
+
+  TH1D * weights_down = (TH1D*)data_down->Clone("puWeights_down_"+datasetname);
+  weights_down->Divide(mc);
+
   TFile * outFile = new TFile("pileupReweighting_"+datasetname+".root", "RECREATE");
   outFile->cd();
 
   weights->Write();
+  weights_up->Write();
+  weights_down->Write();
   data->Write("pu_data_"+datasetname);
+  data_up->Write("pu_data_up_"+datasetname);
+  data_down->Write("pu_data_down_"+datasetname);
   mc->Write("pu_mc_"+datasetname);
   outFile->Close();
 
