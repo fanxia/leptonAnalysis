@@ -219,7 +219,7 @@ class PlotMaker : public TObject {
   void PlotKolmogorovValues();
 
   void GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down);
-  void GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down);
+  void GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up, Float_t& down);
 
  private:
 
@@ -1014,7 +1014,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-      GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
       Float_t addError2_puOnly = btagWeight*btagWeight*puWeightErr*puWeightErr;
@@ -1123,7 +1123,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-      GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
       if(reweightTopPt[i]) totalWeight *= topPtReweighting;
@@ -1154,7 +1154,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(topPtReweighting < 0) topPtReweighting = 1.;
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-      GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
       if(reweightTopPt[i]) totalWeight *= topPtReweighting;
@@ -1192,7 +1192,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-      GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
       if(reweightTopPt[i]) totalWeight *= topPtReweighting;
@@ -1232,7 +1232,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(topPtReweighting < 0) topPtReweighting = 1.;
 
     GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -1302,7 +1302,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(topPtReweighting < 0) topPtReweighting = 1.;
 
     GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -1325,7 +1325,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(topPtReweighting < 0) topPtReweighting = 1.;
 
     GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -1358,7 +1358,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(topPtReweighting < 0) topPtReweighting = 1.;
 
     GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -1428,7 +1428,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(topPtReweighting < 0) topPtReweighting = 1.;
 
     GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -1451,7 +1451,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(topPtReweighting < 0) topPtReweighting = 1.;
 
     GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, chan, photonSF, photonSFup, photonSFdown);
+    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -2163,7 +2163,6 @@ void PlotMaker::CreateTable() {
     this_val = h_sigb[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
     this_staterr2 = this_err*this_err;
     
-    temperr;
     this_btagUp = h_sigb_btagWeightUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_topPtUp = h_sigb_topPtUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_JECup = h_sigb_JECup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
@@ -2265,7 +2264,7 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
   down = central - error;
 }
 
-void PlotMaker::GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down) {
+void PlotMaker::GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up, Float_t& down) {
 
   if(vars[0] == 0) {
     central = 1.;
@@ -2301,9 +2300,9 @@ void PlotMaker::GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
     error2 += sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
 
     // trail photon
-    et = min(vars[24], 999.);
+    et = min(vars[24], (float)999.);
     et = min(et, (float)15.);
-    eta = min(fabs(vars[26]), (float)2.49);
+    eta = min(fabs(vars[26]), (double)2.49);
 
     central *= sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
     error2 += sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
