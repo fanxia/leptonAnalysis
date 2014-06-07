@@ -2265,7 +2265,7 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
   down = central - error;
 }
 
-void GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down) {
+void PlotMaker::GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down) {
 
   if(vars[0] == 0) {
     central = 1.;
@@ -2277,9 +2277,9 @@ void GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, 
   Float_t et, eta, error2;
 
   if(vars[0] == 1 && vars.size() >= 21) {
-    et = min(vars[19], 999.);
+    et = min(vars[19], (float)999.);
     et = min(et, (float)15.);
-    eta = min(fabs(vars[20]), (float)2.49);
+    eta = min(fabs(vars[20]), (double)2.49);
 
     central = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
     error2 = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
@@ -2290,9 +2290,9 @@ void GetPhotonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, 
 
   else if(vars[0] >= 2 && vars.size() >= 27) {
     // lead photon
-    et = min(vars[19], 999.);
+    et = min(vars[19], (float)999.);
     et = min(et, (float)15.);
-    eta = min(fabs(vars[20]), (float)2.49);
+    eta = min(fabs(vars[20]), (double)2.49);
 
     central = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
     error2 = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
