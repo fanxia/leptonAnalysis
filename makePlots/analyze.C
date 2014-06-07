@@ -84,8 +84,50 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   if(channel >= 2) {
     muonQCD_layerAdd = 1;
 
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt30to50.root", "QCD_MuEnriched_pt30to50",
+					    6.609E7 * 0.0122, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
 
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt50to80.root", "QCD_MuEnriched_pt50to80",
+					    8082000.0 * 0.0218, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
 
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt80to120.root", "QCD_MuEnriched_pt80to120",
+					    1024000.0 * 0.0395, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
+
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt120to170.root", "QCD_MuEnriched_pt120to170",
+					    157800.0 * 0.0473, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
+
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt170to300.root", "QCD_MuEnriched_pt170to300",
+					    34020.0 * 0.0676, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
+
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt300to470.root", "QCD_MuEnriched_pt300to470",
+					    1757.0 * 0.0864, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
+
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt470to600.root", "QCD_MuEnriched_pt470to600",
+					    115.2 * 0.1024, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
+
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt600to800.root", "QCD_MuEnriched_pt600to800",
+					    27.01 * 0.0996, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
+
+    loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt800to1000.root", "QCD_MuEnriched_pt800to1000",
+					    3.53 * 0.1033, 0, 0, 0, 0,
+					    false, false,
+					    channel, 0, kSpring-6, "QCD", "qcd");
   }
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
