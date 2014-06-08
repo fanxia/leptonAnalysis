@@ -2423,7 +2423,7 @@ void PlotMaker::CreateTable() {
 
     // Data
     this_val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
-    fprintf(tableFile, "dataval%dx:%.0f\n", i+1, this_val);
+    fprintf(tableFile, "dataval:%.0f\n", this_val);
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) fprintf(datacardFile, "dataval%dx:%.0f\n", i+1, this_val);
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
