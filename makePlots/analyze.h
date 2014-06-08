@@ -2215,8 +2215,8 @@ void PlotMaker::CreateTable() {
 	this_pdfDown += mcHistograms_pdfDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_topPtDown += mcHistograms_topPtDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_JECdown += mcHistograms_JECdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_leptonSFdown += mcHistograms_JECdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_photonSFdown += mcHistograms_JECdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_leptonSFdown += mcHistograms_leptonSFdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	this_photonSFdown += mcHistograms_photonSFdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
       }
 
@@ -2288,8 +2288,8 @@ void PlotMaker::CreateTable() {
     this_btagDown = h_siga_btagWeightDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_topPtDown = h_siga_topPtDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_JECdown = h_siga_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-    this_leptonSFdown = h_siga_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-    this_photonSFdown = h_siga_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_leptonSFdown = h_siga_leptonSFdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_photonSFdown = h_siga_photonSFdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
     this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
       .14499 * .14499 * this_val * this_val +
@@ -2321,8 +2321,8 @@ void PlotMaker::CreateTable() {
     this_btagDown = h_sigb_btagWeightDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_topPtDown = h_sigb_topPtDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_JECdown = h_sigb_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-    this_leptonSFdown = h_sigb_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-    this_photonSFdown = h_sigb_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_leptonSFdown = h_sigb_leptonSFdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    this_photonSFdown = h_sigb_photonSFdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
     this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
       .16065 * .16065 * this_val * this_val +
@@ -2355,7 +2355,7 @@ void PlotMaker::CreateTable() {
       fprintf(tableFile, "bkgtopptup5y:%.1f\nbkgtopptdown5y:%.1f\n", 100. * sqrt(bkg_topPtUp2) / bkgval, 100. * sqrt(bkg_topPtDown2) / bkgval);
       fprintf(tableFile, "bkgbtagup5y:%.1f\nbkgbtagdown5y:%.1f\n", 100. * sqrt(bkg_btagUp2) / bkgval, 100. * sqrt(bkg_btagDown2) / bkgval);
       fprintf(tableFile, "bkgleptonSFup5y:%.1f\nbkgleptonSFdown5y:%.1f\n", 100. * sqrt(bkg_leptonSFup2) / bkgval, 100. * sqrt(bkg_leptonSFdown2) / bkgval);
-      fprintf(tableFile, "bkgphotonSFup5y:%.1f\nbkgphotonSFdown5y:%.1f\n", 100. * sqrt(bkg_photonSFup2) / bkgval, 100. * sqrt(bkg_photonSFdown2) / bkgval);
+      fprintf(tableFile, "bkgphotonSFup5y:%.2f\nbkgphotonSFdown5y:%.2f\n", 100. * sqrt(bkg_photonSFup2) / bkgval, 100. * sqrt(bkg_photonSFdown2) / bkgval);
     }
 
   }
