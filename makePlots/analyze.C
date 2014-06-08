@@ -196,7 +196,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					  false, false,
 					  channel, muonQCD_layerAdd + 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TTZJets.root", "TTZJets", 
-					  0.2057, -1, -1, 0.019, 0.024,
+					  0.2057, 0., 0., 0.019, 0.024,
 					  false, false,
 					  channel, muonQCD_layerAdd + 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
 

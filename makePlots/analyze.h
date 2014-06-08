@@ -2275,7 +2275,7 @@ void PlotMaker::CreateTable() {
 	Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
 	Float_t avg_error_scale = 1. + (this_scaleUp - this_scaleDown) / 2. / this_val;
 	Float_t avg_error_pdf = 1. + (this_pdfUp - this_pdfDown) / 2. / this_val;
-	Float_t avg_error_topPt = 1. + (this_topPtUp - this_topPtDown) / 2. / this_val;
+	Float_t avg_error_topPt = 1. + fabs(this_topPtUp - this_topPtDown) / 2. / this_val;
 	Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
 	Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
 	Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
@@ -2354,7 +2354,7 @@ void PlotMaker::CreateTable() {
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
       Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
       
-      fprintf(datacardFile, "sigaval:%%.2f\nsigastat:%%.2f\nsigabtag:%%.3f\nsigascale:%%.3f\nsigapdf:%%.3f\nsigatopPt:%%.3f\nsigaJEC:%%.3f\nsigaleptonSF:%%.3f\nsigaphotonSF:%%.3f\n\n", 
+      fprintf(datacardFile, "sigaval:%.2f\nsigastat:%.2f\nsigabtag:%.3f\nsigascale:%.3f\nsigapdf:%.3f\nsigatopPt:%.3f\nsigaJEC:%.3f\nsigaleptonSF:%.3f\nsigaphotonSF:%.3f\n\n", 
 	      this_val, 
 	      avg_error_stat,
 	      avg_error_btag,
@@ -2410,7 +2410,7 @@ void PlotMaker::CreateTable() {
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
       Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
       
-      fprintf(datacardFile, "sigbval:%%.2f\nsigbstat:%%.2f\nsigbbtag:%%.3f\nsigbscale:%%.3f\nsigbpdf:%%.3f\nsigbtopPt:%%.3f\nsigbJEC:%%.3f\nsigbleptonSF:%%.3f\nsigbphotonSF:%%.3f\n\n", 
+      fprintf(datacardFile, "sigbval:%.2f\nsigbstat:%.2f\nsigbbtag:%.3f\nsigbscale:%.3f\nsigbpdf:%.3f\nsigbtopPt:%.3f\nsigbJEC:%.3f\nsigbleptonSF:%.3f\nsigbphotonSF:%.3f\n\n", 
 	      this_val, 
 	      avg_error_stat,
 	      avg_error_btag,
