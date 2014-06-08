@@ -26,7 +26,7 @@ u_ttv_scale lnN		-		-		-			-		-			-		ttVscale	-
 u_ttv_pdf lnN		-		-		-			-		-			-		ttVpdf		-
 u_ttgamma_scale lnN	-		-		-			-		-			-		-		ttgammascale
 u_ttgamma_pdf lnN	-		-		-			-		-			-		-		ttgammapdf
-u_topPt lnN   		sigatopPt	-		ttInclusivetopPt	vJetstopPt	singleToptopPt		dibosontopPt	ttVtopPt	ttgammatopPt
+u_topPt lnN   		sigatopPt	-		ttInclusivetopPt	-		-			-		ttVtopPt	ttgammatopPt
 u_JEC lnN		sigaJEC		-		ttInclusiveJEC		vJetsJEC	singleTopJEC		dibosonJEC	ttVJEC		ttgammaJEC
 u_ele_bjjID lnN		sigaele_bjjSF	-		ttInclusiveele_bjjSF	vJetsele_bjjSF	singleTopele_bjjSF	dibosonele_bjjSF	ttVele_bjjSF	ttgammaele_bjjSF
 u_photonID lnN		sigaphotonSF	-		ttInclusivephotonSF	vJetsphotonSF	singleTopphotonSF	dibosonphotonSF	ttVphotonSF	ttgammaphotonSF

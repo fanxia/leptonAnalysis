@@ -2171,7 +2171,7 @@ void PlotMaker::CreateTable() {
       bkgval += this_val;
       bkgstat2 += this_err*this_err;
       fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
-      if(rangeLow[i] == 100 && rangeHigh[i] == -1) fprintf(datacardFile, "eleqcdval%dx:%.1f\neleqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
+      if(rangeLow[i] == 100 && rangeHigh[i] == -1) fprintf(datacardFile, "eleqcdval:%.2f\neleqcdstat:%.3f\n", this_val, 1. + this_err / this_val);
     }
     else fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, 0., i+1, 0.);
     
@@ -2279,10 +2279,10 @@ void PlotMaker::CreateTable() {
 	Float_t avg_error_topPt = 1. + fabs(this_topPtUp - this_topPtDown) / 2. / this_val;
 	Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
 	Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
-	Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
+	Float_t avg_error_photonSF = 1. + (this_photonSFup - this_photonSFdown) / 2. / this_val;
 
 	TString fullDatacardLine = tableNames[j] + "val:%%.2f\n" + 
-	  tableNames[j] + "stat:%%.2f\n" + 
+	  tableNames[j] + "stat:%%.3f\n" + 
 	  tableNames[j] + "btag:%%.3f\n" +
 	  tableNames[j] + "scale:%%.3f\n" +
 	  tableNames[j] + "pdf:%%.3f\n" +
@@ -2353,9 +2353,9 @@ void PlotMaker::CreateTable() {
       Float_t avg_error_topPt = 1. + fabs(this_topPtUp - this_topPtDown) / 2. / this_val;
       Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
-      Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
+      Float_t avg_error_photonSF = 1. + (this_photonSFup - this_photonSFdown) / 2. / this_val;
       
-      TString fullDatacardLine = "sigaval:%%.2f\nsigastat:%%.2f\nsigabtag:%%.3f\nsigaxsec:%%.3f\nsigatopPt:%%.3f\nsigaJEC:%%.3f\nsiga"+req+"SF:%%.3f\nsigaphotonSF:%%.3f\n\n";
+      TString fullDatacardLine = "sigaval:%%.2f\nsigastat:%%.3f\nsigabtag:%%.3f\nsigaxsec:%%.3f\nsigatopPt:%%.3f\nsigaJEC:%%.3f\nsiga"+req+"SF:%%.3f\nsigaphotonSF:%%.3f\n\n";
       char buffer2[200];
       sprintf(buffer2, fullDatacardLine.Data());
 
@@ -2411,9 +2411,9 @@ void PlotMaker::CreateTable() {
       Float_t avg_error_topPt = 1. + fabs(this_topPtUp - this_topPtDown) / 2. / this_val;
       Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
-      Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
+      Float_t avg_error_photonSF = 1. + (this_photonSFup - this_photonSFdown) / 2. / this_val;
       
-      TString fullDatacardLine = "sigbval:%%.2f\nsigbstat:%%.2f\nsigbbtag:%%.3f\nsigbxsec:%%.3f\nsigbtopPt:%%.3f\nsigbJEC:%%.3f\nsigb"+req+"SF:%%.3f\nsigbphotonSF:%%.3f\n\n";
+      TString fullDatacardLine = "sigbval:%%.2f\nsigbstat:%%.3f\nsigbbtag:%%.3f\nsigbxsec:%%.3f\nsigbtopPt:%%.3f\nsigbJEC:%%.3f\nsigb"+req+"SF:%%.3f\nsigbphotonSF:%%.3f\n\n";
       char buffer2[200];
       sprintf(buffer2, fullDatacardLine.Data());
 
