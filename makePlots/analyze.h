@@ -2355,7 +2355,11 @@ void PlotMaker::CreateTable() {
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
       Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
       
-      fprintf(datacardFile, "sigaval:%.2f\nsigastat:%.2f\nsigabtag:%.3f\nsigaxsec:%.3f\nsigatopPt:%.3f\nsigaJEC:%.3f\nsigaleptonSF:%.3f\nsigaphotonSF:%.3f\n\n", 
+      TString fullDatacardLine = "sigaval:%.2f\nsigastat:%.2f\nsigabtag:%.3f\nsigaxsec:%.3f\nsigatopPt:%.3f\nsigaJEC:%.3f\nsiga"+req+"leptonSF:%.3f\nsigaphotonSF:%.3f\n\n";
+      char buffer2[200];
+      sprintf(buffer2, fullDatacardLine.Data());
+
+      fprintf(datacardFile, buffer2, 
 	      this_val, 
 	      avg_error_stat,
 	      avg_error_btag,
@@ -2409,7 +2413,11 @@ void PlotMaker::CreateTable() {
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
       Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
       
-      fprintf(datacardFile, "sigbval:%.2f\nsigbstat:%.2f\nsigbbtag:%.3f\nsigbxsec:%.3f\nsigbtopPt:%.3f\nsigbJEC:%.3f\nsigbleptonSF:%.3f\nsigbphotonSF:%.3f\n\n", 
+      TString fullDatacardLine = "sigbval:%.2f\nsigbstat:%.2f\nsigbbtag:%.3f\nsigbxsec:%.3f\nsigbtopPt:%.3f\nsigbJEC:%.3f\nsigb"+req+"leptonSF:%.3f\nsigbphotonSF:%.3f\n\n";
+      char buffer2[200];
+      sprintf(buffer2, fullDatacardLine.Data());
+
+      fprintf(datacardFile, buffer2, 
 	      this_val, 
 	      avg_error_stat,
 	      avg_error_btag,
@@ -2418,13 +2426,13 @@ void PlotMaker::CreateTable() {
 	      avg_error_JEC,
 	      avg_error_leptonSF,
 	      avg_error_photonSF);
-      
+            
     }
 
     // Data
     this_val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
-    fprintf(tableFile, "dataval:%.0f\n", this_val);
-    if(rangeLow[i] == 100 && rangeHigh[i] == -1) fprintf(datacardFile, "dataval%dx:%.0f\n", i+1, this_val);
+    fprintf(tableFile, "dataval%dx:%.0f\n", i+1, this_val);
+    if(rangeLow[i] == 100 && rangeHigh[i] == -1) fprintf(datacardFile, "dataval:%.0f\n", this_val);
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
       fprintf(tableFile, "bkgstat5y:%.1f\n", 100. * sqrt(bkgstat2) / bkgval);
