@@ -57,22 +57,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
 
-  // Make the correlation plot for MET filters
-  TH2D * metFilter = (TH2D*)in->Get("metFilter");
-  if(channel == 0) {
-    metFilter->GetXaxis()->SetLabelSize(0.035);
-    metFilter->GetYaxis()->SetLabelSize(0.015);
-    metFilter->GetZaxis()->SetLabelSize(0.02);
-
-    metFilter->Draw("colz");
-    metFilter->SetMarkerColor(kWhite);
-    metFilter->Draw("text same");
-    can->SetLogz(true);
-    can->SaveAs("metFilter"+gifOrPdf);
-
-    can->SetLogz(false);
-  }
-
   PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], blinded);
   pMaker->LoadLeptonSFs("../data/lepton_SF_8TeV_53x_baseline.root");
   pMaker->LoadPhotonSFs("../data/Photon_ID_CSEV_SF_Jan22rereco_Full2012_S10_MC_V01.root");
@@ -133,15 +117,15 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
 					  245.8 * 0.457, 2.5, 3.4, 2.6, 2.6,
 					  true, true,
-					  channel, muonQCD_layerAdd + 0, kGray, "t#bar{t} inclusive", "ttInclusive");
+					  channel, muonQCD_layerAdd, kGray, "t#bar{t} inclusive", "ttInclusive");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 
 					  245.8 * 0.438, 2.5, 3.4, 2.6, 2.6,
 					  true, true,
-					  channel, muonQCD_layerAdd + 0, kGray, "t#bar{t} inclusive", "ttInclusive");
+					  channel, muonQCD_layerAdd, kGray, "t#bar{t} inclusive", "ttInclusive");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 
 					  245.8 * 0.105, 2.5, 3.4, 2.6, 2.6,
 					  true, true,
-					  channel, muonQCD_layerAdd + 0, kGray, "t#bar{t} inclusive", "ttInclusive");
+					  channel, muonQCD_layerAdd, kGray, "t#bar{t} inclusive", "ttInclusive");
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 
 					  12234.4 * 3, 79.0, 39.7, 414.7, 414.7,

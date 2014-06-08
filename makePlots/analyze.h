@@ -2247,13 +2247,14 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
     pt = max(pt, (float)15.);
     eta = min(fabs(vars[16]), (double)2.39);
 
-    central = sf_electron->GetBinContent(sf_electron->FindBin(pt, eta));
-    error = sf_electron->GetBinError(sf_electron->FindBin(pt, eta));
+    Float_t id_val = sf_electron->GetBinContent(sf_electron->FindBin(pt, eta));
+    Float_t id_error = sf_electron->GetBinError(sf_electron->FindBin(pt, eta));
 
-    central *= sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(pt, eta));
+    Float_t trigger_val *= sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(pt, eta));
     Float_t trigger_error = sf_SingleElectronTrigger->GetBinError(sf_SingleElectronTrigger->FindBin(pt, eta));
 
-    error = sqrt(error*error + trigger_error*trigger_error);
+    central = id_val * trigger_val;
+    error = central * sqrt(id_error*id_error/(id_val*id_val) + trigger_error*trigger_error/(trigger_val*trigger_val));
   }
 
   else {
@@ -2278,18 +2279,21 @@ void PlotMaker::GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up,
     return;
   }
 
-  Float_t et, eta, error2;
+  Float_t et, eta, error;
 
   if(vars[0] == 1 && vars.size() >= 21) {
     et = min(vars[19], (float)999.);
     et = min(et, (float)15.);
     eta = min(fabs(vars[20]), (double)2.49);
 
-    central = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
-    error2 = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
+    Float_t id_val = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t id_error = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
     
-    central *= sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
-    error2 += sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+    Float_t veto_val = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t veto_error = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+
+    central = id_val * veto_val;
+    error = central * sqrt(id_error*id_error/(id_val*id_val) + veto_error*veto_error/(veto_val*veto_val));
   }
 
   else if(vars[0] >= 2 && vars.size() >= 27) {
@@ -2298,26 +2302,32 @@ void PlotMaker::GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up,
     et = min(et, (float)15.);
     eta = min(fabs(vars[20]), (double)2.49);
 
-    central = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
-    error2 = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
+    Float_t id_val_lead = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t id_error_lead = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
     
-    central *= sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
-    error2 += sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+    Float_t veto_val_lead = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t veto_error_lead = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
 
     // trail photon
     et = min(vars[24], (float)999.);
     et = min(et, (float)15.);
     eta = min(fabs(vars[26]), (double)2.49);
 
-    central *= sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
-    error2 += sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
+    Float_t id_val_trail = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t id_error_trail = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
     
-    central *= sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
-    error2 += sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta)) * sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+    Float_t veto_val_trail = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t veto_error_trail = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+
+    central = id_val_lead * veto_val_lead * id_val_trail * veto_val_trail;
+    error = central * sqrt(id_error_lead*id_error_lead/(id_val_lead*id_val_lead) +
+			   veto_error_lead*veto_error_lead/(veto_val_lead*veto_val_lead) +
+			   id_error_trail*id_error_trail/(id_val_trail*id_val_trail) +
+			   veto_error_trail*veto_error_trail/(veto_val_trail*veto_val_trail));
   }
 
-  up = central + sqrt(error2);
-  down = central - sqrt(error2);
+  up = central + error;
+  down = central - error;
 
   return;
 }

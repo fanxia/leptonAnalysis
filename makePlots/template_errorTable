@@ -86,7 +86,7 @@
         \hline
 	\hline
         
-	GMSB (460_175) &
+	GMSB (460\_175) &
 	\begin{tabular}{@{}c@{}} sigaval1x \vspace{1 mm} \\ $^{+sigaerrorup1x}_{-sigaerrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} sigaval2x \vspace{1 mm} \\ $^{+sigaerrorup2x}_{-sigaerrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} sigaval3x \vspace{1 mm} \\ $^{+sigaerrorup3x}_{-sigaerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
@@ -94,7 +94,7 @@
         \begin{tabular}{@{}c@{}} sigaval5x \vspace{1 mm} \\ $^{+sigaerrorup5x}_{-sigaerrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
-	GMSB (560_325) &
+	GMSB (560\_325) &
 	\begin{tabular}{@{}c@{}} sigbval1x \vspace{1 mm} \\ $^{+sigberrorup1x}_{-sigberrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} sigbval2x \vspace{1 mm} \\ $^{+sigberrorup2x}_{-sigberrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} sigbval3x \vspace{1 mm} \\ $^{+sigberrorup3x}_{-sigberrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
