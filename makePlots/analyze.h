@@ -2463,8 +2463,6 @@ void PlotMaker::CreateDatacard() {
   vector<TString> names;
   vector<float> values;
 
-  float rmin = 0.;
-
   while(1) {
     string line;
     fin >> line;
@@ -2473,12 +2471,15 @@ void PlotMaker::CreateDatacard() {
 
     TString line_t = line;
 
+    if((line_t(line_t.Index(":") + 1, line_t.Length())).Contains("nan")) continue;
+
     names.push_back(line_t(0, line_t.Index(":")));
     values.push_back(atof((line_t(line_t.Index(":") + 1, line_t.Length())).Data()));
   }
 
   fin.close();
 
+  float rmin = 0.;
   float sigval;
 
   for(unsigned int i = 0; i < names.size(); i++) {
