@@ -2171,6 +2171,7 @@ void PlotMaker::CreateTable() {
       bkgval += this_val;
       bkgstat2 += this_err*this_err;
       fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
+      if(rangeLow[i] == 100 && rangeHigh[i] == -1) fprintf(datacardFile, "eleqcdval%dx:%.1f\neleqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
     }
     else fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, 0., i+1, 0.);
     
@@ -2287,8 +2288,9 @@ void PlotMaker::CreateTable() {
 	  tableNames[j] + "pdf:%%.3f\n" +
 	  tableNames[j] + "topPt:%%.3f\n" +
 	  tableNames[j] + "JEC:%%.3f\n" +
-	  tableNames[j] + "leptonSF:%%.3f\n" +
+	  tableNames[j] + req + "SF:%%.3f\n" +
 	  tableNames[j] + "photonSF:%%.3f\n\n";
+
 	sprintf(buffer, fullDatacardLine.Data());
 
 	fprintf(datacardFile, buffer, this_val, 
@@ -2348,7 +2350,7 @@ void PlotMaker::CreateTable() {
       Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
       Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
       Float_t avg_error_xsec = 1.14499;
-      Float_t avg_error_topPt = 1. + (this_topPtUp - this_topPtDown) / 2. / this_val;
+      Float_t avg_error_topPt = 1. + fabs(this_topPtUp - this_topPtDown) / 2. / this_val;
       Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
       Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
@@ -2402,7 +2404,7 @@ void PlotMaker::CreateTable() {
       Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
       Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
       Float_t avg_error_xsec = 1.16065;
-      Float_t avg_error_topPt = 1. + (this_topPtUp - this_topPtDown) / 2. / this_val;
+      Float_t avg_error_topPt = 1. + fabs(this_topPtUp - this_topPtDown) / 2. / this_val;
       Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
       Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
@@ -2422,6 +2424,7 @@ void PlotMaker::CreateTable() {
     // Data
     this_val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
     fprintf(tableFile, "dataval%dx:%.0f\n", i+1, this_val);
+    if(rangeLow[i] == 100 && rangeHigh[i] == -1) fprintf(datacardFile, "dataval%dx:%.0f\n", i+1, this_val);
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
       fprintf(tableFile, "bkgstat5y:%.1f\n", 100. * sqrt(bkgstat2) / bkgval);

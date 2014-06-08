@@ -1,0 +1,39 @@
+# R_firstguess = rfirstguessval
+imax 1 number of channels
+jmax 6 number of backgrounds
+kmax 26 number of nuisance parameters
+--------------
+bin             muon
+observation     dataval
+--------------
+bin			muon		muon			muon		muon			muon		muon		muon
+process			susy		ttbar			vjets		singletop		diboson		ttv		ttgamma
+process			0		1			2		3			4		5		6
+rate			sigaval		ttInclusiveval		vJetsval	singleTopval		dibosonval	ttVval		ttgammaval
+--------------
+u_lumi lnN		1.026		1.026			1.026		1.026			1.026		1.026		1.026
+u_btag lnN		sigabtag	ttInclusivebtag		vJetsbtag	singleTopbtag		dibosonbtag	ttVbtag		ttgammabtag
+u_susy_xsec lnN		sigaxsec	-			-		-			-		-		-
+u_ttbar_scale lnN	-		ttInclusivescale 	-		-			-		-		-
+u_ttbar_pdf lnN		-		ttInclusivepdf	 	-		-			-		-		-
+u_vjets_scale lnN	-		-		 	vJetsscale	-			-		-		-
+u_vjets_pdf lnN		-		-		 	vJetspdf	-			-		-		-
+u_singleTop_scale lnN	-		-			-		singleTopscale		-		-		- 
+u_singleTop_pdf lnN	-		-			-		singleToppdf		-		-		-
+u_diboson_scale lnN	-		-			-		-			dibosonscale	-		-
+u_diboson_pdf lnN	-		-			-		-			dibosonpdf	-		-
+u_ttv_scale lnN		-		-			-		-			-		ttVscale	-
+u_ttv_pdf lnN		-		-			-		-			-		ttVpdf		-
+u_ttgamma_scale lnN	-		-			-		-			-		-		ttgammascale
+u_ttgamma_pdf lnN	-		-			-		-			-		-		ttgammapdf
+u_topPt lnN   		sigatopPt	ttInclusivetopPt	vJetstopPt	singleToptopPt		dibosontopPt	ttVtopPt	ttgammatopPt
+u_JEC lnN		sigaJEC		ttInclusiveJEC		vJetsJEC	singleTopJEC		dibosonJEC	ttVJEC		ttgammaJEC
+u_muonID lnN		sigamuonSF	ttInclusivemuonSF	vJetsmuonSF	singleTopmuonSF		dibosonmuonSF	ttVmuonSF	ttgammamuonSF
+u_photonID lnN		sigaphotonSF	ttInclusivephotonSF	vJetsphotonSF	singleTopphotonSF	dibosonphotonSF	ttVphotonSF	ttgammaphotonSF
+stat_susy lnN		sigastat	-			-		-			-		-		-		
+stat_ttbar lnN		-		ttInclusivestat		-		-			-		-		-
+stat_vjets lnN		-		-			vJetsstat	-			-		-		-
+stat_singleTop lnN	-		-			-		singleTopstat		-		-		-
+stat_diboson lnN	-		-			-		-			dibosonstat	-		-
+stat_ttv lnN 		-		-			-		-			-		ttVstat		-
+stat_ttgamma lnN	-		-			-		-			-		-		ttgammastat
