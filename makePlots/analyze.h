@@ -2347,19 +2347,17 @@ void PlotMaker::CreateTable() {
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
       Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
       Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
-      Float_t avg_error_scale = 1. + (this_scaleUp - this_scaleDown) / 2. / this_val;
-      Float_t avg_error_pdf = 1. + (this_pdfUp - this_pdfDown) / 2. / this_val;
+      Float_t avg_error_xsec = 1.14499;
       Float_t avg_error_topPt = 1. + (this_topPtUp - this_topPtDown) / 2. / this_val;
       Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
       Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
       
-      fprintf(datacardFile, "sigaval:%.2f\nsigastat:%.2f\nsigabtag:%.3f\nsigascale:%.3f\nsigapdf:%.3f\nsigatopPt:%.3f\nsigaJEC:%.3f\nsigaleptonSF:%.3f\nsigaphotonSF:%.3f\n\n", 
+      fprintf(datacardFile, "sigaval:%.2f\nsigastat:%.2f\nsigabtag:%.3f\nsigaxsec:%.3f\nsigatopPt:%.3f\nsigaJEC:%.3f\nsigaleptonSF:%.3f\nsigaphotonSF:%.3f\n\n", 
 	      this_val, 
 	      avg_error_stat,
 	      avg_error_btag,
-	      avg_error_scale,
-	      avg_error_pdf,
+	      avg_error_xsec,
 	      avg_error_topPt,
 	      avg_error_JEC,
 	      avg_error_leptonSF,
@@ -2403,19 +2401,17 @@ void PlotMaker::CreateTable() {
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
       Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
       Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
-      Float_t avg_error_scale = 1. + (this_scaleUp - this_scaleDown) / 2. / this_val;
-      Float_t avg_error_pdf = 1. + (this_pdfUp - this_pdfDown) / 2. / this_val;
+      Float_t avg_error_xsec = 1.16065;
       Float_t avg_error_topPt = 1. + (this_topPtUp - this_topPtDown) / 2. / this_val;
       Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
       Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
       Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
       
-      fprintf(datacardFile, "sigbval:%.2f\nsigbstat:%.2f\nsigbbtag:%.3f\nsigbscale:%.3f\nsigbpdf:%.3f\nsigbtopPt:%.3f\nsigbJEC:%.3f\nsigbleptonSF:%.3f\nsigbphotonSF:%.3f\n\n", 
+      fprintf(datacardFile, "sigbval:%.2f\nsigbstat:%.2f\nsigbbtag:%.3f\nsigbxsec:%.3f\nsigbtopPt:%.3f\nsigbJEC:%.3f\nsigbleptonSF:%.3f\nsigbphotonSF:%.3f\n\n", 
 	      this_val, 
 	      avg_error_stat,
 	      avg_error_btag,
-	      avg_error_scale,
-	      avg_error_pdf,
+	      avg_error_xsec,
 	      avg_error_topPt,
 	      avg_error_JEC,
 	      avg_error_leptonSF,
