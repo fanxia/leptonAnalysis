@@ -2463,7 +2463,7 @@ void PlotMaker::CreateDatacard() {
   vector<TString> names;
   vector<float> values;
 
-  float rmin;
+  float rmin = 0.;
 
   while(1) {
     string line;
@@ -2484,7 +2484,7 @@ void PlotMaker::CreateDatacard() {
   for(unsigned int i = 0; i < names.size(); i++) {
     rmin += pow(1.026 - 1., 2);
     if(names[i].Contains("dataval")) rmin += values[i];
-    else(!names[i].Contains("val")) rmin += pow(values[i] - 1., 2);
+    else if(!(names[i].Contains("val"))) rmin += pow(values[i] - 1., 2);
 
     if(names[i].Contains("sigaval")) sigval = values[i];
   }
