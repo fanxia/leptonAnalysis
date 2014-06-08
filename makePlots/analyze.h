@@ -2131,7 +2131,8 @@ void PlotMaker::CreateTable() {
   Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
   
   FILE * tableFile = fopen("errorTable_"+req+".temp", "w");
-  
+  FILE * datacardFile = fopen("datacard_"+req+".temp", "w");
+
   Double_t binLow[nBins], binHigh[nBins];
   for(int i = 0; i < nBins; i++) {
     binLow[i] = h_gg[variableNumber]->GetXaxis()->FindBin(rangeLow[i]);
@@ -2269,6 +2270,19 @@ void PlotMaker::CreateTable() {
 	      i+1, sqrt(this_syserr2_up + this_staterr2),
 	      i+1, sqrt(this_syserr2_down + this_staterr2));
 
+      if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
+	TString fullDatacardLine = tableNames[j] + "val:%%.1f\n" + tableNames[j] + "error:%%.2f\n";
+	sprintf(buffer, fullDatacardLine.Data());
+	
+	Float_t avg_error = (sqrt(this_syserr2_up + this_staterr2) + sqrt(this_syserr2_down + this_staterr2)) / 2.;
+	avg_error /= this_val;
+	avg_error += 1.;
+
+	fprintf(datacardFile, buffer,
+		this_val, avg_error);
+      }
+	
+
     }
 
     // total background
@@ -2309,6 +2323,14 @@ void PlotMaker::CreateTable() {
 	    i+1, sqrt(this_staterr2 + this_syserr2_up), 
 	    i+1, sqrt(this_staterr2 + this_syserr2_down));
 
+    if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
+      Float_t avg_error = (sqrt(this_staterr2 + this_syserr2_up) + sqrt(this_staterr2 + this_syserr2_down)) / 2.;
+      avg_error /= this_val;
+      avg_error += 1.;
+
+      fprintf(datacardFile, "sigaval:%.1f\nsigaerror:%.2f\n", this_val, avg_error);
+    }
+
     this_val = h_sigb[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
     this_staterr2 = this_err*this_err;
     
@@ -2342,6 +2364,14 @@ void PlotMaker::CreateTable() {
 	    i+1, sqrt(this_staterr2 + this_syserr2_up), 
 	    i+1, sqrt(this_staterr2 + this_syserr2_down));
 
+    if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
+      Float_t avg_error = (sqrt(this_staterr2 + this_syserr2_up) + sqrt(this_staterr2 + this_syserr2_down)) / 2.;
+      avg_error /= this_val;
+      avg_error += 1.;
+
+      fprintf(datacardFile, "sigbval:%.1f\nsigberror:%.2f\n", this_val, avg_error);
+    }
+
     // Data
     this_val = h_gg[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
     fprintf(tableFile, "dataval%dx:%.0f\n", i+1, this_val);
@@ -2361,6 +2391,7 @@ void PlotMaker::CreateTable() {
   }
 
   fclose(tableFile);
+  fclose(datacardFile);
 
 }
 
@@ -2483,7 +2514,6 @@ void PlotMaker::GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up,
 
   return;
 }
-
 
 void prep_signal(TString req, int nPhotons_req) {
 
