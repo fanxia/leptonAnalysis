@@ -2471,7 +2471,8 @@ void PlotMaker::CreateDatacard() {
 
     TString line_t = line;
 
-    if((line_t(line_t.Index(":") + 1, line_t.Length())).Contains("nan")) continue;
+    TString sub_t = line_t(line_t.Index(":") + 1, line_t.Length());
+    if(sub_t.Contains("nan")) continue;
 
     names.push_back(line_t(0, line_t.Index(":")));
     values.push_back(atof((line_t(line_t.Index(":") + 1, line_t.Length())).Data()));
