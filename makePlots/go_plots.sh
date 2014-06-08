@@ -47,7 +47,7 @@ do
     
 done
 
-cp template_datacard_ele_$NUM_PHOTONS_REQUIRED datacard_ele_bjj.dat
+cp template_datacard_ele_$NUM_PHOTONS_REQUIRED\g datacard_ele_bjj.dat
 while read line
 do
     code=`echo $line | cut -d : -f 1`
@@ -56,7 +56,7 @@ do
     sed -i "s/${code}/${value}/g" datacard_ele_bjj.dat
 done < datacard_ele_bjj.temp
 
-cp template_datacard_muon_$NUM_PHOTONS_REQUIRED datacard_muon_bjj.dat
+cp template_datacard_muon_$NUM_PHOTONS_REQUIRED\g datacard_muon_bjj.dat
 while read line
 do
     code=`echo $line | cut -d : -f 1`
