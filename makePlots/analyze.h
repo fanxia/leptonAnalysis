@@ -2250,11 +2250,14 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
     Float_t id_val = sf_electron->GetBinContent(sf_electron->FindBin(pt, eta));
     Float_t id_error = sf_electron->GetBinError(sf_electron->FindBin(pt, eta));
 
-    Float_t trigger_val *= sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(pt, eta));
+    Float_t trigger_val = sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(pt, eta));
     Float_t trigger_error = sf_SingleElectronTrigger->GetBinError(sf_SingleElectronTrigger->FindBin(pt, eta));
 
     central = id_val * trigger_val;
     error = central * sqrt(id_error*id_error/(id_val*id_val) + trigger_error*trigger_error/(trigger_val*trigger_val));
+
+    up = central + error;
+    down = central - error;
   }
 
   else {
@@ -2264,10 +2267,12 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
 
     central = sf_muon->GetBinContent(sf_muon->FindBin(pt, eta));
     error = sf_muon->GetBinError(sf_muon->FindBin(pt, eta));
+
+    up = error;
+    down = 2. * central - error;
   }
 
-  up = central + error;
-  down = central - error;
+  return;  
 }
 
 void PlotMaker::GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up, Float_t& down) {
