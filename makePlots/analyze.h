@@ -2271,15 +2271,36 @@ void PlotMaker::CreateTable() {
 	      i+1, sqrt(this_syserr2_down + this_staterr2));
 
       if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
-	TString fullDatacardLine = tableNames[j] + "val:%%.1f\n" + tableNames[j] + "error:%%.2f\n";
-	sprintf(buffer, fullDatacardLine.Data());
-	
-	Float_t avg_error = (sqrt(this_syserr2_up + this_staterr2) + sqrt(this_syserr2_down + this_staterr2)) / 2.;
-	avg_error /= this_val;
-	avg_error += 1.;
+	Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
+	Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
+	Float_t avg_error_scale = 1. + (this_scaleUp - this_scaleDown) / 2. / this_val;
+	Float_t avg_error_pdf = 1. + (this_pdfUp - this_pdfDown) / 2. / this_val;
+	Float_t avg_error_topPt = 1. + (this_topPtUp - this_topPtDown) / 2. / this_val;
+	Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
+	Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
+	Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
 
-	fprintf(datacardFile, buffer,
-		this_val, avg_error);
+	TString fullDatacardLine = tableNames[j] + "val:%%.2f\n" + 
+	  tableNames[j] + "stat:%%.2f\n" + 
+	  tableNames[j] + "btag:%%.3f\n" +
+	  tableNames[j] + "scale:%%.3f\n" +
+	  tableNames[j] + "pdf:%%.3f\n" +
+	  tableNames[j] + "topPt:%%.3f\n" +
+	  tableNames[j] + "JEC:%%.3f\n" +
+	  tableNames[j] + "leptonSF:%%.3f\n" +
+	  tableNames[j] + "photonSF:%%.3f\n\n";
+	sprintf(buffer, fullDatacardLine.Data());
+
+	fprintf(datacardFile, buffer, this_val, 
+		avg_error_stat,
+		avg_error_btag,
+		avg_error_scale,
+		avg_error_pdf,
+		avg_error_topPt,
+		avg_error_JEC,
+		avg_error_leptonSF,
+		avg_error_photonSF);
+
       }
 	
 
@@ -2324,11 +2345,35 @@ void PlotMaker::CreateTable() {
 	    i+1, sqrt(this_staterr2 + this_syserr2_down));
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
-      Float_t avg_error = (sqrt(this_staterr2 + this_syserr2_up) + sqrt(this_staterr2 + this_syserr2_down)) / 2.;
-      avg_error /= this_val;
-      avg_error += 1.;
-
-      fprintf(datacardFile, "sigaval:%.1f\nsigaerror:%.2f\n", this_val, avg_error);
+      Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
+      Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
+      Float_t avg_error_scale = 1. + (this_scaleUp - this_scaleDown) / 2. / this_val;
+      Float_t avg_error_pdf = 1. + (this_pdfUp - this_pdfDown) / 2. / this_val;
+      Float_t avg_error_topPt = 1. + (this_topPtUp - this_topPtDown) / 2. / this_val;
+      Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
+      Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
+      Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
+      
+      TString fullDatacardLine = "sigaval:%%.2f\n" + 
+	"sigastat:%%.2f\n" +
+	"sigabtag:%%.3f\n" +
+	"sigascale:%%.3f\n" +
+	"sigapdf:%%.3f\n" +
+	"sigatopPt:%%.3f\n" +
+	"sigaJEC:%%.3f\n" +
+	"sigaleptonSF:%%.3f\n" +
+	"sigaphotonSF:%%.3f\n\n";
+      sprintf(buffer, fullDatacardLine.Data());
+      
+      fprintf(datacardFile, buffer, this_val, 
+	      avg_error_btag,
+	      avg_error_scale,
+	      avg_error_pdf,
+	      avg_error_topPt,
+	      avg_error_JEC,
+	      avg_error_leptonSF,
+	      avg_error_photonSF);
+      
     }
 
     this_val = h_sigb[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
@@ -2365,11 +2410,35 @@ void PlotMaker::CreateTable() {
 	    i+1, sqrt(this_staterr2 + this_syserr2_down));
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
-      Float_t avg_error = (sqrt(this_staterr2 + this_syserr2_up) + sqrt(this_staterr2 + this_syserr2_down)) / 2.;
-      avg_error /= this_val;
-      avg_error += 1.;
-
-      fprintf(datacardFile, "sigbval:%.1f\nsigberror:%.2f\n", this_val, avg_error);
+      Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
+      Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
+      Float_t avg_error_scale = 1. + (this_scaleUp - this_scaleDown) / 2. / this_val;
+      Float_t avg_error_pdf = 1. + (this_pdfUp - this_pdfDown) / 2. / this_val;
+      Float_t avg_error_topPt = 1. + (this_topPtUp - this_topPtDown) / 2. / this_val;
+      Float_t avg_error_JEC = 1. + (this_JECup - this_JECdown) / 2. / this_val;
+      Float_t avg_error_leptonSF = 1. + (this_leptonSFup - this_leptonSFdown) / 2. / this_val;
+      Float_t avg_error_photonSF = 1. + (this_photonSFup - this_leptonSFdown) / 2. / this_val;
+      
+      TString fullDatacardLine = "sigbval:%%.2f\n" + 
+	"sigbstat:%%.2f\n" +
+	"sigbbtag:%%.3f\n" +
+	"sigbscale:%%.3f\n" +
+	"sigbpdf:%%.3f\n" +
+	"sigbtopPt:%%.3f\n" +
+	"sigbJEC:%%.3f\n" +
+	"sigbleptonSF:%%.3f\n" +
+	"sigbphotonSF:%%.3f\n\n";
+      sprintf(buffer, fullDatacardLine.Data());
+      
+      fprintf(datacardFile, buffer, this_val, 
+	      avg_error_btag,
+	      avg_error_scale,
+	      avg_error_pdf,
+	      avg_error_topPt,
+	      avg_error_JEC,
+	      avg_error_leptonSF,
+	      avg_error_photonSF);
+      
     }
 
     // Data
