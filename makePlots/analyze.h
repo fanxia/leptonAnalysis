@@ -216,6 +216,8 @@ class PlotMaker : public TObject {
 
   void CreateTable();
 
+  void CreateDatacard();
+
   void PlotKolmogorovValues();
 
   void GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Float_t& up, Float_t& down);
@@ -2171,7 +2173,7 @@ void PlotMaker::CreateTable() {
       bkgval += this_val;
       bkgstat2 += this_err*this_err;
       fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
-      if(rangeLow[i] == 100 && rangeHigh[i] == -1) fprintf(datacardFile, "eleqcdval:%.2f\neleqcdstat:%.3f\n", this_val, 1. + this_err / this_val);
+      if(rangeLow[i] == 100 && rangeHigh[i] == -1 && this_val > 0.) fprintf(datacardFile, "eleqcdval:%.2f\neleqcdstat:%.3f\n", this_val, 1. + this_err / this_val);
     }
     else fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, 0., i+1, 0.);
     
@@ -2271,7 +2273,7 @@ void PlotMaker::CreateTable() {
 	      i+1, sqrt(this_syserr2_up + this_staterr2),
 	      i+1, sqrt(this_syserr2_down + this_staterr2));
 
-      if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
+      if(rangeLow[i] == 100 && rangeHigh[i] == -1 && this_val > 0.) {
 	Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
 	Float_t avg_error_btag = 1. + (this_btagUp - this_btagDown) / 2. / this_val;
 	Float_t avg_error_scale = 1. + (this_scaleUp - this_scaleDown) / 2. / this_val;
@@ -2449,6 +2451,48 @@ void PlotMaker::CreateTable() {
   }
 
   fclose(tableFile);
+  fclose(datacardFile);
+
+}
+
+void PlotMaker::CreateDatacard() {
+
+  fstream fin;
+  fin.open("datacard_"+req+".temp");
+
+  vector<TString> names;
+  vector<float> values;
+
+  float rmin;
+
+  while(1) {
+    string line;
+    fin >> line;
+
+    if(!fin.good()) break;
+
+    TString line_t = line;
+
+    names.push_back(line_t(0, line_t.Index(":")));
+    values.push_back(atof((line_t(line_t.Index(":") + 1, line_t.Length())).Data()));
+  }
+
+  fin.close();
+
+  float sigval;
+
+  for(unsigned int i = 0; i < names.size(); i++) {
+    rmin += pow(1.026 - 1., 2);
+    if(names[i].Contains("dataval")) rmin += values[i];
+    else(!names[i].Contains("val")) rmin += pow(values[i] - 1., 2);
+
+    if(names[i].Contains("sigaval")) sigval = values[i];
+  }
+
+  rmin = 2. * sqrt(rmin) / sigval;
+
+  FILE * datacardFile = fopen("datacard_"+req+".temp", "a");
+  fprintf(datacardFile, "rfirstguessval:%.2f\n", rmin);
   fclose(datacardFile);
 
 }
