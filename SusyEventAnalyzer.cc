@@ -305,7 +305,7 @@ void SusyEventAnalyzer::Data() {
 
   TH1D * h_dR_gamma_ele = new TH1D("dR_gamma_ele", "dR between photons and electrons (N-1)", 100, 0, 10);
   TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_muon", "dR between photons and muons (N-1)", 100, 0, 10);
-  TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_jet = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
   TH1D * h_dR_gamma_photon = new TH1D("dR_gamma_photon", "dR between photons and other photons (N-1)", 100, 0, 10);
 
   /////////////////////////////////
@@ -590,7 +590,7 @@ void SusyEventAnalyzer::Acceptance() {
 
   TH1D * h_dR_gamma_ele = new TH1D("dR_gamma_ele", "dR between photons and electrons (N-1)", 100, 0, 10);
   TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_muon", "dR between photons and muons (N-1)", 100, 0, 10);
-  TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_jet = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
   TH1D * h_dR_gamma_photon = new TH1D("dR_gamma_photon", "dR between photons and other photons (N-1)", 100, 0, 10);
 
   const int nTreeVariables = 79;

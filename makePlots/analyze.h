@@ -2148,15 +2148,13 @@ void PlotMaker::CreateTable() {
     this_leptonSFdown = h_siga_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
     this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
-      (this_scaleUp - this_val)*(this_scaleUp - this_val) +
-      (this_pdfUp - this_val)*(this_pdfUp - this_val) +
+      .14499 * .14499 * this_val * this_val +
       (this_topPtUp - this_val)*(this_topPtUp - this_val) +
       (this_JECup - this_val)*(this_JECup - this_val) +
       (this_leptonSFup - this_val)*(this_leptonSFup - this_val);
     
     this_syserr2_down = (this_btagDown - this_val)*(this_btagDown - this_val) +
-      (this_scaleDown - this_val)*(this_scaleDown - this_val) +
-      (this_pdfDown - this_val)*(this_pdfDown - this_val) +
+      .14499 * .14499 * this_val * this_val +
       (this_topPtDown - this_val)*(this_topPtDown - this_val) +
       (this_JECdown - this_val)*(this_JECdown - this_val) +
       (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val);
@@ -2179,15 +2177,13 @@ void PlotMaker::CreateTable() {
     this_leptonSFdown = h_sigb_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
     this_syserr2_up = (this_btagUp - this_val)*(this_btagUp - this_val) +
-      (this_scaleUp - this_val)*(this_scaleUp - this_val) +
-      (this_pdfUp - this_val)*(this_pdfUp - this_val) +
+      .16065 * .16065 * this_val * this_val +
       (this_topPtUp - this_val)*(this_topPtUp - this_val) +
       (this_JECup - this_val)*(this_JECup - this_val) +
       (this_leptonSFup - this_val)*(this_leptonSFup - this_val);
     
     this_syserr2_down = (this_btagDown - this_val)*(this_btagDown - this_val) +
-      (this_scaleDown - this_val)*(this_scaleDown - this_val) +
-      (this_pdfDown - this_val)*(this_pdfDown - this_val) +
+      .16065 * .16065 * this_val * this_val +
       (this_topPtDown - this_val)*(this_topPtDown - this_val) +
       (this_JECdown - this_val)*(this_JECdown - this_val) +
       (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val);
@@ -2247,11 +2243,11 @@ void PlotMaker::GetLeptonSF(vector<Float_t> vars, int chan, Float_t& central, Fl
     pt = max(pt, (float)15.);
     eta = min(fabs(vars[16]), (double)2.39);
 
-    Float_t id_val = sf_electron->GetBinContent(sf_electron->FindBin(pt, eta));
-    Float_t id_error = sf_electron->GetBinError(sf_electron->FindBin(pt, eta));
+    Float_t id_val = sf_electron->GetBinContent(sf_electron->FindBin(eta, pt));
+    Float_t id_error = sf_electron->GetBinError(sf_electron->FindBin(eta, pt));
 
-    Float_t trigger_val = sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(pt, eta));
-    Float_t trigger_error = sf_SingleElectronTrigger->GetBinError(sf_SingleElectronTrigger->FindBin(pt, eta));
+    Float_t trigger_val = sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(eta, pt));
+    Float_t trigger_error = sf_SingleElectronTrigger->GetBinError(sf_SingleElectronTrigger->FindBin(eta, pt));
 
     central = id_val * trigger_val;
     error = central * sqrt(id_error*id_error/(id_val*id_val) + trigger_error*trigger_error/(trigger_val*trigger_val));

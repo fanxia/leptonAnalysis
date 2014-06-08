@@ -28,7 +28,7 @@ void createStopBinoXsecs() {
   TH1D * h_errors = (TH1D*)h_xsec->Clone("errors");
 
   ifstream fin;
-  fin.open("stop-bino_xsecs.dat");
+  fin.open("crossSections/stop-bino_xsecs.dat");
 
   while(1) {
     int mStop;
@@ -44,7 +44,7 @@ void createStopBinoXsecs() {
   
   fin.close();
 
-  fin.open("realStopMass.dat");
+  fin.open("crossSections/realStopMass.dat");
 
   while(1) {
     int mStop, mBino;
@@ -59,10 +59,10 @@ void createStopBinoXsecs() {
     int bin = h_xsec->FindBin(realMass);
 
     double xsec_left = h_xsec->GetBinContent(bin);
-    double error_left = h_xsec->GetBinError(bin);
+    double error_left = h_errors->GetBinContent(bin);
 
     double xsec_right = h_xsec->GetBinContent(bin + 1);
-    double error_right = h_xsec->GetBinContent(bin + 1);
+    double error_right = h_errors->GetBinContent(bin + 1);
 
     double left = h_xsec->GetBinLowEdge(bin);
     double right = h_xsec->GetBinLowEdge(bin + 1);
@@ -71,7 +71,7 @@ void createStopBinoXsecs() {
     double beta = (right - realMass) / (right - left);
 
     double xsec = alpha * xsec_right + beta * xsec_left;
-    double error = sqrt(alpha*alpha*error_right*error_right + beta*beta*error_left*error_left);
+    double error = alpha * error_right + beta * error_left;
 
     h_real_xsec->SetBinContent(h_real_xsec->FindBin(mStop, mBino), xsec);
     h_real_errors->SetBinContent(h_real_errors->FindBin(mStop, mBino), error);
