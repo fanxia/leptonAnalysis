@@ -1341,8 +1341,8 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   else treeMap["muon_relIso"] = -10.;
   
   treeMap["leadPhotonEt"] = (photons.size() > 0) ? photons[0]->momentum.Et() : -1.;
-  treeMap["leadPhotonEta"] = (photons.size() > 0) ? photons[0]->momentum.Eta() : -100.;
-  treeMap["leadPhotonPhi"] = (photons.size() > 0) ? photons[0]->momentum.Phi() : -100.;
+  treeMap["leadPhotonEta"] = (photons.size() > 0) ? photons[0]->caloPosition.Eta() : -100.;
+  treeMap["leadPhotonPhi"] = (photons.size() > 0) ? photons[0]->caloPosition.Phi() : -100.;
   treeMap["leadChargedHadronIso"] = (photons.size() > 0) ? chargedHadronIso_corrected(*photons[0], event_.rho25) : -100.;
   treeMap["leadSigmaIetaIeta"] = (photons.size() > 0) ? photons[0]->sigmaIetaIeta : -100.;
   treeMap["lead_nPixelSeeds"] = (photons.size() > 0) ? photons[0]->nPixelSeeds : -10.;
@@ -1350,8 +1350,8 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["leadMVAregErr"] = (photons.size() > 0) ? photons[0]->MVAregErr : -10.;
   
   treeMap["trailPhotonEt"] = (photons.size() > 1) ? photons[1]->momentum.Et() : -1.;
-  treeMap["trailPhotonEta"] = (photons.size() > 1) ? photons[1]->momentum.Eta() : -100.;
-  treeMap["trailPhotonPhi"] = (photons.size() > 1) ? photons[1]->momentum.Phi() : -100.;
+  treeMap["trailPhotonEta"] = (photons.size() > 1) ? photons[1]->caloPosition.Eta() : -100.;
+  treeMap["trailPhotonPhi"] = (photons.size() > 1) ? photons[1]->caloPosition.Phi() : -100.;
   treeMap["trail_nPixelSeeds"] = (photons.size() > 1) ? photons[1]->nPixelSeeds : -100.;
   treeMap["trailChargedHadronIso"] = (photons.size() > 1) ? chargedHadronIso_corrected(*photons[1], event_.rho25) : -100.;
   treeMap["trailSigmaIetaIeta"] = (photons.size() > 1) ? photons[1]->sigmaIetaIeta : -100.;

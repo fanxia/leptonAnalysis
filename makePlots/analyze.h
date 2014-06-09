@@ -2570,7 +2570,7 @@ void PlotMaker::GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up,
 
   if(vars[0] == 1 && vars.size() >= 21) {
     et = min(vars[19], (float)999.);
-    et = min(et, (float)15.);
+    et = max(et, (float)15.);
     eta = min(fabs(vars[20]), (double)2.49);
 
     Float_t id_val = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
@@ -2586,7 +2586,7 @@ void PlotMaker::GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up,
   else if(vars[0] >= 2 && vars.size() >= 27) {
     // lead photon
     et = min(vars[19], (float)999.);
-    et = min(et, (float)15.);
+    et = max(et, (float)15.);
     eta = min(fabs(vars[20]), (double)2.49);
 
     Float_t id_val_lead = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
@@ -2597,7 +2597,7 @@ void PlotMaker::GetPhotonSF(vector<Float_t> vars, Float_t& central, Float_t& up,
 
     // trail photon
     et = min(vars[24], (float)999.);
-    et = min(et, (float)15.);
+    et = max(et, (float)15.);
     eta = min(fabs(vars[26]), (double)2.49);
 
     Float_t id_val_trail = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
