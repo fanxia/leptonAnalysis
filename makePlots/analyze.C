@@ -65,6 +65,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   
   int muonQCD_layerAdd = 0;
 
+  /*
   if(channel >= 2) {
     muonQCD_layerAdd = 1;
 
@@ -113,6 +114,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					    false, false,
 					    channel, 0, kSpring-6, "QCD", "qcd");
   }
+  */
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
 					  245.8 * 0.457, 2.5, 3.4, 2.6, 2.6,
