@@ -2286,8 +2286,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
 void PlotMaker::Create2DPlots(bool needsQCD, bool useLogZ, TFile*& out) {
 
   TCanvas * can = new TCanvas("can", "Plot", 10, 10, 2000, 2000);
-  can->SetLogz(useLogZ);
-
+  
   out->cd();
 
   TH2D * bkg;
@@ -2315,12 +2314,14 @@ void PlotMaker::Create2DPlots(bool needsQCD, bool useLogZ, TFile*& out) {
     bkg->GetYaxis()->SetTitle(variables_2d[i].second);
     bkg->GetZaxis()->SetLabelSize(0.02);
     bkg->Draw("colz");
+    can->SetLogz(useLogZ);
     can->SaveAs(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_"+req+".pdf");
 
     ratio->GetXaxis()->SetTitle(variables_2d[i].first);
     ratio->GetYaxis()->SetTitle(variables_2d[i].second);
     ratio->GetZaxis()->SetLabelSize(0.02);
     ratio->Draw("colz");
+    can->SetLogz(false);
     can->SaveAs(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_ratio_"+req+".pdf");
   }
 
