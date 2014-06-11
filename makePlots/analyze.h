@@ -1514,7 +1514,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     h_siga_photonSFdown[j]->Scale(intLumi_int * 0.147492 / 15000.);
   }
 
-  for(unsigned int j = 0; j < variables_2d.size(); j++) h_siga_2d[i][j]->Scale(intLumi_int * 0.147492 / 15000.);
+  for(unsigned int j = 0; j < variables_2d.size(); j++) h_siga_2d[j]->Scale(intLumi_int * 0.147492 / 15000.);
 
   for(int i = 0; i < sigaTree_JECup->GetEntries(); i++) {
     sigaTree_JECup->GetEntry(i);
@@ -1666,7 +1666,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     h_sigb_photonSFdown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
   }
 
-  for(unsigned int j = 0; j < variables_2d.size(); j++) h_sigb_2d[i][j]->Scale(intLumi_int * 0.0399591 / 15000.);
+  for(unsigned int j = 0; j < variables_2d.size(); j++) h_sigb_2d[j]->Scale(intLumi_int * 0.0399591 / 15000.);
 
   for(int i = 0; i < sigbTree_JECup->GetEntries(); i++) {
     sigbTree_JECup->GetEntry(i);
