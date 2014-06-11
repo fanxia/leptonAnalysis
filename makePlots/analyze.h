@@ -952,11 +952,11 @@ void PlotMaker::BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Flo
   gg->Sumw2();
   h_gg_2d.push_back(gg);
 
-  TH1D * qcd = new TH2D(var_y+"_vs_"+var_x+"_qcd_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+  TH2D * qcd = new TH2D(var_y+"_vs_"+var_x+"_qcd_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
   qcd->Sumw2();
   h_qcd_2d.push_back(qcd);
   
-  TH1D * h_bkg;
+  TH2D * h_bkg;
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
     h_bkg = new TH2D(var_y+"_vs_"+var_x+"_"+mcNames[i]+"_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
     h_bkg->Sumw2();
@@ -964,16 +964,16 @@ void PlotMaker::BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Flo
   }
 
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
-    h_bkg = new TH1D(var_y+"_vs_"+var_x+"_qcd_"+mcNames[i]+"_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+    h_bkg = new TH2D(var_y+"_vs_"+var_x+"_qcd_"+mcNames[i]+"_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
     h_bkg->Sumw2();
     mcQCDHistograms_2d[i].push_back(h_bkg);
   }
 
-  TH1D * sig_a = new TH1D(var_y+"_vs_"+var_x+"_a_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+  TH2D * sig_a = new TH2D(var_y+"_vs_"+var_x+"_a_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
   sig_a->Sumw2();
   h_siga_2d.push_back(sig_a);
 
-  TH1D * sig_b = new TH1D(var_y+"_vs_"+var_x+"_b_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+  TH2D * sig_b = new TH2D(var_y+"_vs_"+var_x+"_b_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
   sig_b->Sumw2();
   h_sigb_2d.push_back(sig_b);
 
@@ -1191,7 +1191,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	  if(variables[k] == variables_2d[m].first) {
 	    for(unsigned int n = 0; n < vars.size(); n++) {
 	      if(variables[n] == variables_2d[m].second) {
-		mcHistograms_2d[m]->Fill(vars[k], vars[n], totalWeight);
+		mcHistograms_2d[i][m]->Fill(vars[k], vars[n], totalWeight);
 	      }
 	    }
 	  }
@@ -1393,7 +1393,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	  if(variables[k] == variables_2d[m].first) {
 	    for(unsigned int n = 0; n < vars.size(); n++) {
 	      if(variables[n] == variables_2d[m].second) {
-		mcQCDHistograms_2d[m]->Fill(vars[k], vars[n], totalWeight);
+		mcQCDHistograms_2d[i][m]->Fill(vars[k], vars[n], totalWeight);
 	      }
 	    }
 	  }
@@ -2301,7 +2301,7 @@ void PlotMaker::Create2DPlots(bool needsQCD, bool useLogZ, TFile*& out) {
     }
     else bkg = (TH2D*)mcHistograms_2d[0][i]->Clone(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_bkg_"+req);
 
-    for(unsigned int j = 1; j < mcHistograms_2d.size(); j++) bkg->Add(mcHistorams_2d[j][i]);
+    for(unsigned int j = 1; j < mcHistograms_2d.size(); j++) bkg->Add(mcHistograms_2d[j][i]);
 
     bkg->Write();
 
