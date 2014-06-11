@@ -2306,16 +2306,25 @@ void PlotMaker::Create2DPlots(bool needsQCD, bool useLogZ, TFile*& out) {
 
     for(unsigned int j = 1; j < mcHistograms_2d.size(); j++) bkg->Add(mcHistograms_2d[j][i]);
 
+    TH2D * ratio = (TH2D*)h_gg_2d[i]->Clone(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_ratio_"+req);
+    ratio->Divide(bkg);
+
     bkg->Write();
 
     bkg->GetXaxis()->SetTitle(variables_2d[i].first);
     bkg->GetYaxis()->SetTitle(variables_2d[i].second);
+    bkg->GetZaxis()->SetLabelSize(0.02);
     bkg->Draw("colz");
-    
     can->SaveAs(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_"+req+".pdf");
+
+    ratio->GetXaxis()->SetTitle(variables_2d[i].first);
+    ratio->GetYaxis()->SetTitle(variables_2d[i].second);
+    ratio->GetZaxis()->SetLabelSize(0.02);
+    ratio->Draw("colz");
+    can->SaveAs(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_ratio_"+req+".pdf");
   }
 
-    delete can;
+  delete can;
   
 }
 
