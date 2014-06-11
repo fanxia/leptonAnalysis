@@ -196,6 +196,8 @@ class PlotMaker : public TObject {
   void BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_t xhi);
   void BookHistogram(TString variable, Int_t nBins, Double_t* customBins);
 
+  void BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi);
+
   void FillHistograms(double metCut, int nPhotons_req, int nBtagReq, int chan);
   void SubtractMCFromQCD();
   void NormalizeQCD();
@@ -205,6 +207,8 @@ class PlotMaker : public TObject {
 		  Float_t ratiomin, Float_t ratiomax,
 		  bool drawSignal, bool drawLegend, bool drawPrelim,
 		  TFile*& out);
+
+  void Create2DPlots(bool needsQCD, bool useLogZ, TFile*& out);
 
   void DrawPlot(int variableNumber, TString variable, bool needsQCD,
 		TString xaxisTitle, TString yaxisTitle,
@@ -259,8 +263,10 @@ class PlotMaker : public TObject {
   vector< vector<TH1D*> > mcHistograms_leptonSFdown;
   vector< vector<TH1D*> > mcHistograms_photonSFup;
   vector< vector<TH1D*> > mcHistograms_photonSFdown;
+  vector< vector<TH2D*> > mcHistograms_2d;
 
   vector< vector<TH1D*> > mcQCDHistograms;
+  vector< vector<TH2D*> > mcQCDHistograms_2d;
 
   TTree * ggTree;
   TTree * qcdTree;
@@ -274,9 +280,13 @@ class PlotMaker : public TObject {
   TTree * sigbTree_JECdown;
 
   vector<TString> variables;
+  vector<pair<TString, TString> > variables_2d;
 
   vector<TH1D*> h_gg;
+  vector<TH2D*> h_gg_2d;
+
   vector<TH1D*> h_qcd;
+  vector<TH2D*> h_qcd_2d;
 
   vector<TH1D*> h_siga;
   vector<TH1D*> h_siga_btagWeightUp;
@@ -289,6 +299,7 @@ class PlotMaker : public TObject {
   vector<TH1D*> h_siga_leptonSFdown;
   vector<TH1D*> h_siga_photonSFup;
   vector<TH1D*> h_siga_photonSFdown;
+  vector<TH2D*> h_siga_2d;
 
   vector<TH1D*> h_sigb;
   vector<TH1D*> h_sigb_btagWeightUp;
@@ -301,6 +312,7 @@ class PlotMaker : public TObject {
   vector<TH1D*> h_sigb_leptonSFdown;
   vector<TH1D*> h_sigb_photonSFup;
   vector<TH1D*> h_sigb_photonSFdown;
+  vector<TH2D*> h_sigb_2d;
 
   vector<pair<TString, double> > KSscores;
 
@@ -341,7 +353,10 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   variables.clear();
 
   h_gg.clear();
+  h_gg_2d.clear();
+
   h_qcd.clear();
+  h_qcd_2d.clear();
 
   h_siga.clear();
   h_siga_btagWeightUp.clear();
@@ -354,6 +369,7 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   h_siga_leptonSFdown.clear();
   h_siga_photonSFup.clear();
   h_siga_photonSFdown.clear();
+  h_siga_2d.clear();
 
   h_sigb.clear();
   h_sigb_btagWeightUp.clear();
@@ -366,6 +382,7 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   h_sigb_leptonSFdown.clear();
   h_sigb_photonSFup.clear();
   h_sigb_photonSFdown.clear();
+  h_sigb_2d.clear();
 
   mcFiles.clear();
   mcTrees.clear();
@@ -401,8 +418,10 @@ PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
   mcHistograms_leptonSFdown.clear();
   mcHistograms_photonSFup.clear();
   mcHistograms_photonSFdown.clear();
+  mcHistograms_2d.clear();
 
   mcQCDHistograms.clear();
+  mcQCDHistograms_2d.clear();
 
 }
 
@@ -429,7 +448,11 @@ PlotMaker::~PlotMaker() {
     mcHistograms_leptonSFdown.clear();
     mcHistograms_photonSFup.clear();
     mcHistograms_photonSFdown.clear();
+    mcHistograms_2d.clear();
+
     mcQCDHistograms.clear();
+    mcQCDHistograms_2d.clear();
+
     mcTrees.clear();
     mcTrees_JECup.clear();
     mcTrees_JECdown.clear();
@@ -461,7 +484,10 @@ PlotMaker::~PlotMaker() {
     delete sigbTree_JECdown;
     
     h_gg.clear();
+    h_gg_2d.clear();
+
     h_qcd.clear();
+    h_qcd_2d.clear();
 
     h_siga.clear();
     h_siga_btagWeightUp.clear();
@@ -474,6 +500,7 @@ PlotMaker::~PlotMaker() {
     h_siga_leptonSFdown.clear();
     h_siga_photonSFup.clear();
     h_siga_photonSFdown.clear();
+    h_siga_2d.clear();
     
     h_sigb.clear();
     h_sigb_btagWeightUp.clear();
@@ -486,6 +513,7 @@ PlotMaker::~PlotMaker() {
     h_sigb_leptonSFdown.clear();
     h_sigb_photonSFup.clear();
     h_sigb_photonSFdown.clear();
+    h_sigb_2d.clear();
 
 }
 
@@ -594,7 +622,10 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   mcHistograms_leptonSFdown.resize(mcHistograms_leptonSFdown.size() + 1);
   mcHistograms_photonSFup.resize(mcHistograms_photonSFup.size() + 1);
   mcHistograms_photonSFdown.resize(mcHistograms_photonSFdown.size() + 1);
+  mcHistograms_2d.resize(mcHistograms_2d.size() + 1);
+
   mcQCDHistograms.resize(mcQCDHistograms.size() + 1);
+  mcQCDHistograms_2d.resize(mcQCDHistograms_2d.size() + 1);
   
   return true;
 }
@@ -913,6 +944,41 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
   
 }
 
+void PlotMaker::BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi) {
+  
+  variables_2d.push_back(make_pair(var_x, var_y));
+
+  TH2D * gg = new TH2D(var_y+"_vs_"+var_x+"_gg_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+  gg->Sumw2();
+  h_gg_2d.push_back(gg);
+
+  TH1D * qcd = new TH2D(var_y+"_vs_"+var_x+"_qcd_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+  qcd->Sumw2();
+  h_qcd_2d.push_back(qcd);
+  
+  TH1D * h_bkg;
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    h_bkg = new TH2D(var_y+"_vs_"+var_x+"_"+mcNames[i]+"_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+    h_bkg->Sumw2();
+    mcHistograms_2d[i].push_back(h_bkg);
+  }
+
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    h_bkg = new TH1D(var_y+"_vs_"+var_x+"_qcd_"+mcNames[i]+"_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+    h_bkg->Sumw2();
+    mcQCDHistograms_2d[i].push_back(h_bkg);
+  }
+
+  TH1D * sig_a = new TH1D(var_y+"_vs_"+var_x+"_a_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+  sig_a->Sumw2();
+  h_siga_2d.push_back(sig_a);
+
+  TH1D * sig_b = new TH1D(var_y+"_vs_"+var_x+"_b_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
+  sig_b->Sumw2();
+  h_sigb_2d.push_back(sig_b);
+
+}
+
 // expects BookHistogram on nphotons, then met, then others
 void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, int chan) {
 
@@ -1042,6 +1108,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(blinded && vars[0] == 1 && variables[j] == "pfMET" && vars[1] > 50.) continue;
       if(blinded && vars[0] == 1 && variables[j] == "HT" && vars[2] > 400.) continue;
 
+      for(unsigned int k = 0; k < variables_2d.size(); k++) {
+	if(variables[j] == variables_2d[k].first) {
+	  for(unsigned int m = 0; m < vars.size(); m++) {
+	    if(variables[m] == variables_2d[k].second) {
+	      h_gg_2d[k]->Fill(vars[j], vars[m]);
+	    }
+	  }
+	}
+      }
+
       h_gg[j]->Fill(vars[j]);
     }
 
@@ -1054,6 +1130,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      for(unsigned int k = 0; k < variables_2d.size(); k++) {
+	if(variables[j] == variables_2d[k].first) {
+	  for(unsigned int m = 0; m < vars.size(); m++) {
+	    if(variables[m] == variables_2d[k].second) {
+	      h_qcd_2d[k]->Fill(vars[j], vars[m]);
+	    }
+	  }
+	}
+      }
 
       h_qcd[j]->Fill(vars[j]);
     }
@@ -1100,6 +1186,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	Float_t newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
+
+	for(unsigned int m = 0; m < variables_2d.size(); m++) {
+	  if(variables[k] == variables_2d[m].first) {
+	    for(unsigned int n = 0; n < vars.size(); n++) {
+	      if(variables[n] == variables_2d[m].second) {
+		mcHistograms_2d[m]->Fill(vars[k], vars[n], totalWeight);
+	      }
+	    }
+	  }
+	}
 
 	totalWeight = puWeight * btagWeightUp * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
@@ -1191,6 +1287,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       mcHistograms_leptonSFdown[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
       mcHistograms_photonSFup[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
       mcHistograms_photonSFdown[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+      mcHistograms_2d[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     }
 
   }
@@ -1291,11 +1388,25 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	Float_t newerror = sqrt(oldError*oldError + addError2);
 	mcQCDHistograms[i][k]->Fill(vars[k], totalWeight);
 	mcQCDHistograms[i][k]->SetBinError(mcQCDHistograms[i][k]->FindBin(vars[k]), newerror);
+
+	for(unsigned int m = 0; m < variables_2d.size(); m++) {
+	  if(variables[k] == variables_2d[m].first) {
+	    for(unsigned int n = 0; n < vars.size(); n++) {
+	      if(variables[n] == variables_2d[m].second) {
+		mcQCDHistograms_2d[m]->Fill(vars[k], vars[n], totalWeight);
+	      }
+	    }
+	  }
+	}
+
       }
 
     }
 
-    for(unsigned int j = 0; j < vars.size(); j++) mcQCDHistograms[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      mcQCDHistograms[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+      mcQCDHistograms_2d[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+    }
   }
 
   for(int i = 0; i < sigaTree->GetEntries(); i++) {
@@ -1329,6 +1440,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h_siga[j]->Fill(vars[j], totalWeight);
       h_siga[j]->SetBinError(h_siga[j]->FindBin(vars[j]), newerror);
+
+      for(unsigned int k = 0; k < variables_2d.size(); k++) {
+	if(variables[j] == variables_2d[k].first) {
+	  for(unsigned int m = 0; m < vars.size(); m++) {
+	    if(variables[m] == variables_2d[k].second) {
+	      h_siga_2d[k]->Fill(vars[j], vars[m], totalWeight);
+	    }
+	  }
+	}
+      }
 
       totalWeight = puWeight * btagWeightUp * leptonSF * photonSF * topPtReweighting;
       olderror = h_siga_btagWeightUp[j]->GetBinError(h_siga_btagWeightUp[j]->FindBin(vars[j]));
@@ -1390,6 +1511,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     h_siga_leptonSFdown[j]->Scale(intLumi_int * 0.147492 / 15000.);
     h_siga_photonSFup[j]->Scale(intLumi_int * 0.147492 / 15000.);
     h_siga_photonSFdown[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    h_siga_2d[j]->Scale(intLumi_int * 0.147492 / 15000.);
   }
 
   for(int i = 0; i < sigaTree_JECup->GetEntries(); i++) {
@@ -1470,6 +1592,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       h_sigb[j]->Fill(vars[j], totalWeight);
       h_sigb[j]->SetBinError(h_sigb[j]->FindBin(vars[j]), newerror);
 
+      for(unsigned int k = 0; k < variables_2d.size(); k++) {
+	if(variables[j] == variables_2d[k].first) {
+	  for(unsigned int m = 0; m < vars.size(); m++) {
+	    if(variables[m] == variables_2d[k].second) {
+	      h_sigb_2d[k]->Fill(vars[j], vars[m], totalWeight);
+	    }
+	  }
+	}
+      }
+
       totalWeight = puWeight * btagWeightUp * leptonSF * photonSF * topPtReweighting;
       olderror = h_sigb_btagWeightUp[j]->GetBinError(h_sigb_btagWeightUp[j]->FindBin(vars[j]));
       newerror = sqrt(olderror*olderror + addError2);
@@ -1530,6 +1662,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     h_sigb_leptonSFdown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
     h_sigb_photonSFup[j]->Scale(intLumi_int * 0.0399591 / 15000.);
     h_sigb_photonSFdown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+    h_sigb_2d[j]->Scale(intLumi_int * 0.0399591 / 15000.);
   }
 
   for(int i = 0; i < sigbTree_JECup->GetEntries(); i++) {
@@ -1604,11 +1737,28 @@ void PlotMaker::SubtractMCFromQCD() {
      }
   }
 
+  for(unsigned int i = 0; i < mcQCDHistograms_2d.size(); i++) {
+    for(unsigned int j = 0; j < mcQCDHistograms_2d[i].size(); j++) {
+      h_qcd_2d[j]->Add(mcQCDHistograms_2d[i][j], -1.);
+     }
+  }
+
   for(unsigned int i = 0; i < h_qcd.size(); i++) {
     for(Int_t j = 0; j < h_qcd[i]->GetNbinsX(); j++) {
       if(h_qcd[i]->GetBinContent(j+1) < 0) {
 	h_qcd[i]->SetBinContent(j+1, 0.);
 	h_qcd[i]->SetBinError(j+1, 0.);
+      }
+    }
+  }
+
+  for(unsigned int i = 0; i < h_qcd_2d.size(); i++) {
+    for(Int_t j = 0; j < h_qcd_2d[i]->GetNbinsX(); j++) {
+      for(Int_t k = 0; k < h_qcd_2d[i]->GetNbinsY(); k++) {
+	if(h_qcd[i]->GetBinContent(j+1, k+1) < 0) {
+	  h_qcd[i]->SetBinContent(j+1, k+1, 0.);
+	  h_qcd[i]->SetBinError(j+1, k+1, 0.);
+	}
       }
     }
   }
@@ -1681,6 +1831,8 @@ void PlotMaker::NormalizeQCD() {
     }
 
   }
+
+  for(unsigned int i = 0; i < h_qcd_2d.size(); i++) h_qcd_2d[i]->Scale(scale);
 
   double n_qcd_after = h_qcd[1]->Integral();
 
@@ -2126,6 +2278,42 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
 
   delete can;
 
+}
+
+void PlotMaker::Create2DPlots(bool needsQCD, bool useLogZ, TFile*& out) {
+
+  TCanvas * can = new TCanvas("can", "Plot", 10, 10, 2000, 2000);
+  can->SetLogz(useLogZ);
+
+  out->cd();
+
+  TH2D * bkg;
+
+  for(unsigned int i = 0; i < h_gg_2d.size(); i++) {
+    h_gg_2d[i]->Write();
+    if(needsQCD) h_qcd_2d[i]->Write();
+    for(unsigned int j = 0; j < mcHistograms_2d.size(); j++) mcHistograms_2d[j][i]->Write();
+    for(unsigned int j = 0; j < mcQCDHistograms_2d.size(); j++) mcQCDHistograms_2d[j][i]->Write();
+    
+    if(needsQCD) {
+      bkg = (TH2D*)h_qcd_2d[i]->Clone(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_bkg_"+req);
+      bkg->Add(mcHistograms_2d[0][i]);
+    }
+    else bkg = (TH2D*)mcHistograms_2d[0][i]->Clone(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_bkg_"+req);
+
+    for(unsigned int j = 1; j < mcHistograms_2d.size(); j++) bkg->Add(mcHistorams_2d[j][i]);
+
+    bkg->Write();
+
+    bkg->GetXaxis()->SetTitle(variables_2d[i].first);
+    bkg->GetYaxis()->SetTitle(variables_2d[i].second);
+    bkg->Draw("colz");
+    
+    can->SaveAs(variables_2d[i].first + "_vs_" + variables_2d[i].second +"_"+req+".pdf");
+  }
+
+    delete can;
+  
 }
 
 void PlotMaker::CreateTable() {

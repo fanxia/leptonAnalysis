@@ -252,6 +252,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->BookHistogram("muon_pt", nKinematicBins, xbins_kinematic); // 17
   pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);                  // 18
 
+  pMaker->BookHistogram2D("Njets", "Nbtags", 20, 0., 20., 20, 0., 20.);
+
   if(nPhotons_req >= 1) {
     pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic); // 19
     pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);                  // 20
@@ -284,6 +286,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
   bool needsQCD = (channel < 2);
+
+  pMaker->Create2DPlots(needsQCD, true, out);
 
   pMaker->CreatePlot("Nphotons", false, needsQCD, "Number of #gamma's", "Number of Events",
 		     0, 4, 2.e-2, 3.e6,
