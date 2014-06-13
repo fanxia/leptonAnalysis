@@ -199,8 +199,10 @@ class PlotMaker : public TObject {
   void BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi);
 
   void FillHistograms(double metCut, int nPhotons_req, int nBtagReq, int chan);
-  void SubtractMCFromQCD();
+  void SubtractMCFromQCD(int muonQCD_layerAdd);
   void NormalizeQCD();
+  TH1D * ReweightQCD();
+  void RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int nBtagReq, int chan);
 
   void CreatePlot(TString variable, bool divideByWidth, bool needsQCD, TString xaxisTitle, TString yaxisTitle,
 		  Float_t xmin, Float_t xmax, Float_t ymin, Float_t ymax,
@@ -1732,16 +1734,18 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 }
 
-void PlotMaker::SubtractMCFromQCD() {
+void PlotMaker::SubtractMCFromQCD(int muonQCD_layerAdd) {
 
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
     for(unsigned int j = 0; j < mcQCDHistograms[i].size(); j++) {
+      if(mcLayerNumbers[i] != muonQCD_layerAdd) continue;
       h_qcd[j]->Add(mcQCDHistograms[i][j], -1.);
      }
   }
 
   for(unsigned int i = 0; i < mcQCDHistograms_2d.size(); i++) {
     for(unsigned int j = 0; j < mcQCDHistograms_2d[i].size(); j++) {
+      if(mcLayerNumbers[i] != muonQCD_layerAdd) continue;
       h_qcd_2d[j]->Add(mcQCDHistograms_2d[i][j], -1.);
      }
   }
@@ -1843,6 +1847,62 @@ void PlotMaker::NormalizeQCD() {
 
 }
     
+TH1D * PlotMaker::ReweightQCD() {
+
+  TH1D * weights = (TH1D*)h_gg[13]->Clone("sig_lessQCD");
+  
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) weights->Add(mcHistograms[i][13], -1.);
+
+  weights->Divide(h_qcd[13]);
+
+  return weights;
+
+}
+
+void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int nBtagReq, int chan) {
+
+  vector<Float_t> vars;
+  vars.resize(variables.size());
+
+  for(unsigned int i = 0; i < h_qcd.size(); i++) h_qcd[i]->Reset();
+  for(unsigned int i = 0; i < h_qcd_2d.size(); i++) h_qcd_2d->Reset();
+
+  for(unsigned int i = 0; i < variables.size(); i++) qcdTree->SetBranchAddress(variables[i], &(vars[i]));
+
+  for(int i = 0; i < qcdTree->GetEntries(); i++) {
+    qcdTree->GetEntry(i);
+
+    if(metCut > 0. && vars[1] >= metCut) continue;
+
+    Float_t weight = weights->GetBinContent(weights->FindBin(vars[13]));
+    Float_t weightError = weights->GetBinError(weights->FindBin(vars[13]));
+
+    for(unsigned int j = 0; j < vars.size(); j++) {
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+
+      for(unsigned int k = 0; k < variables_2d.size(); k++) {
+	if(variables[j] == variables_2d[k].first) {
+	  for(unsigned int m = 0; m < vars.size(); m++) {
+	    if(variables[m] == variables_2d[k].second) {
+	      h_qcd_2d[k]->Fill(vars[j], vars[m]);
+	    }
+	  }
+	}
+      }
+
+      Float_t oldError = h_qcd[j]->GetBinError(h_qcd[j]->FindBin(vars[j]));
+      Float_t newerror = sqrt(oldError*oldError + weightError*weightError);
+
+      h_qcd[j]->Fill(vars[j], weight);
+      h_qcd[j]->SetBinError(h_qcd[j]->FindBin(vars[k]), newerror);
+    }
+
+  }
+
+  qcdTree->ResetBranchAddresses();
+
+}
+
 void PlotMaker::CreatePlot(TString variable,
 			   bool divideByWidth, bool needsQCD,
 			   TString xaxisTitle, TString yaxisTitle,

@@ -245,7 +245,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->BookHistogram("jet2_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("jet3_pt", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("btag1_pt", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("w_mT", nKinematicBins, xbins_kinematic);
+  pMaker->BookHistogram("w_mT", nKinematicBins, xbins_kinematic);    // 13
   pMaker->BookHistogram("m3", nKinematicBins, xbins_kinematic);
   pMaker->BookHistogram("ele_pt", nKinematicBins, xbins_kinematic);  // 15
   pMaker->BookHistogram("ele_eta", 60, -2.5, 2.5);                   // 16
@@ -283,7 +283,10 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
   pMaker->SubtractMCFromQCD();
-  pMaker->NormalizeQCD();
+  //pMaker->NormalizeQCD();
+  TH1D * qcdWeights = (TH1D*)pMaker->ReweightQCD();
+  pMaker->RefillQCD(qcdWeights, metCut, nPhotons_req, nBtagReq, channel);
+  pMaker->SubtractMCFromQCD();
 
   pMaker->CreateTable();
   pMaker->CreateDatacard();
