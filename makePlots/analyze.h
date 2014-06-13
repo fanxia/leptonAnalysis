@@ -1865,7 +1865,7 @@ void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int n
   vars.resize(variables.size());
 
   for(unsigned int i = 0; i < h_qcd.size(); i++) h_qcd[i]->Reset();
-  for(unsigned int i = 0; i < h_qcd_2d.size(); i++) h_qcd_2d->Reset();
+  for(unsigned int i = 0; i < h_qcd_2d.size(); i++) h_qcd_2d[i]->Reset();
 
   for(unsigned int i = 0; i < variables.size(); i++) qcdTree->SetBranchAddress(variables[i], &(vars[i]));
 
@@ -1894,7 +1894,7 @@ void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int n
       Float_t newerror = sqrt(oldError*oldError + weightError*weightError);
 
       h_qcd[j]->Fill(vars[j], weight);
-      h_qcd[j]->SetBinError(h_qcd[j]->FindBin(vars[k]), newerror);
+      h_qcd[j]->SetBinError(h_qcd[j]->FindBin(vars[j]), newerror);
     }
 
   }
