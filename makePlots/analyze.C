@@ -110,7 +110,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					    channel, 0, kSpring-6, "QCD", "qcd");
 
     loadSuccess != pMaker->LoadMCBackground("inputs/signal_contamination_QCD_MuEnriched_pt800to1000.root", "QCD_MuEnriched_pt800to1000",
-					    3.53 * 0.1033, 0, 0, 0, 0,
+					    3.57 * 0.1033, 0, 0, 0, 0,
 					    false, false,
 					    channel, 0, kSpring-6, "QCD", "qcd");
   }
@@ -134,10 +134,11 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					  false, false,
 					  channel, muonQCD_layerAdd + 1, kOrange-3, "W + Jets", "vJets");
 
-  //loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 
-  //                                        1177.3 * 3,
-  //                                        false, false,
-  //                                        channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
+  loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 
+                                          1177.3 * 3,
+                                          false, false,
+                                          channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
+  /*
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 
 					  666.7 * 1177.3 * 3 / 3503.71, 5.9, 3.6, 38.8, 38.8,
 					  false, false,
@@ -154,6 +155,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					  27.38 * 1177.3 * 3 / 3503.71, 5.9 * 27.38 / 666.7, 3.6 * 27.38 / 666.7, 38.8 * 27.38 / 666.7, 38.8 * 27.38 / 666.7,
 					  false, false,
 					  channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
+  */
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_TBar_s.root", "TBar_s", 
 					  1.76, 0.01, 0.01, 0.08, 0.08,

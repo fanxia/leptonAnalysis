@@ -9,27 +9,36 @@
 
 using namespace std;
 
-enum searchModes {kSignal, kElectronQCD, kNumSearchModes};
+enum searchModes {kSignal, kElectronQCD, kMuonQCD, kNumSearchModes};
 
 enum jetSystematicMode {kCentral, kJECup, kJECdown, kJERup, kJERdown, kNumJetSytematics};
 
-const int nCategories = 2;
-TString categories[nCategories] = {"signal", "eQCD"};
-const int nChannels = 4;
+const int nCategories = 3;
+TString categories[nCategories] = {"signal", "eQCD", "muQCD"};
+const int nChannels = 6;
 
-TString channels[nChannels] = {"ele_jjj", "muon_jjj",
+TString channels[nChannels] = {"ele_jjj_veto", "muon_jjj_veto",
+			       "ele_jjj", "muon_jjj",
 			       "ele_bjj", "muon_bjj"};
 
 unsigned int nJetReq[nChannels] = {3, 3,
+				   3, 3,
 				   3, 3};
 
-unsigned int nBtagReq[nChannels] = {0, 0, 
+unsigned int nBtagReq[nChannels] = {0, 0,
+				    0, 0, 
 				    1, 1};
 
+bool nBtagInclusive[nChannels] = {false, false,
+				  true, true,
+				  true, true};
+
 int nEleReq[nChannels] = {1, 0,
+			  1, 0,
 			  1, 0};
 
 int nMuonReq[nChannels] = {0, 1,
+			   0, 1,
 			   0, 1};
 
 typedef std::vector<std::vector<TH1F*> > VTH1F;

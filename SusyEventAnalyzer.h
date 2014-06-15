@@ -66,6 +66,7 @@ class SusyEventAnalyzer {
   virtual ~SusyEventAnalyzer();
 
   virtual void Data();
+  virtual void DataDrivenQCD();
   virtual void Acceptance();
   virtual void CalculateBtagEfficiency();
   virtual void PileupWeights(TString puFile, TString puFile_up, TString puFile_down);
@@ -669,15 +670,28 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuo
 				     d0correction(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]), 
 				     dZcorrection(event.vertices[0].position, event.tracks[mu_it->bestTrackIndex()]));
 
-      if(passesTight) {
-	tightMuons.push_back(&*mu_it);
-	HT += mu_it->momentum.Pt();
+      if(mode != kMuonQCD) {
+	if(passesTight && isIsolatedMuon(*mu_it)) {
+	  tightMuons.push_back(&*mu_it);
+	  HT += mu_it->momentum.Pt();
+	}
+	else if(isVetoMuon(*mu_it)) {
+	  looseMuons.push_back(&*mu_it);
+	  HT += mu_it->momentum.Pt();
+	}
       }
-      else if(isVetoMuon(*mu_it)) {
-	looseMuons.push_back(&*mu_it);
-	HT += mu_it->momentum.Pt();
+
+      else {
+	if(passesTight && isAntiIsolatedElectron(*mu_it)) {
+	  tightMuons.push_back(&*mu_it);
+	  HT += mu_it->momentum.Pt();
+	}
+	else if(isVetoMuon(*mu_it)) {
+	  looseMuons.push_back(&*mu_it);
+	  HT += mu_it->momentum.Pt();
+	}
       }
-      
+
     }
 
   }
