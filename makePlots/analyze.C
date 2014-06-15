@@ -266,6 +266,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("leadSigmaIetaIeta", 40, 0., 0.02);
     pMaker->BookHistogram("leadChargedHadronIso", 35, 0, 15.0);
+    pMaker->BookHistogram("mLepGammaLead", nKinematicBins, xbins_kinematic);
   }
 
   if(nPhotons_req >= 2) {
@@ -279,6 +280,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("photon_invmass", nKinematicBins, xbins_kinematic);
     pMaker->BookHistogram("photon_dR", 50, 0., 5.);
     pMaker->BookHistogram("photon_dPhi", 35, 0., 3.14159);
+    pMaker->BookHistogram("mLepGammaTrail", nKinematicBins, xbins_kinematic);
+    pMaker->BookHistogram("mLepGammaGamma", nKinematicBins, xbins_kinematic);
   }
 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);

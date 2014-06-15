@@ -1220,6 +1220,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["pfMET_phi"] = pfMet->mEt.Phi();
   
   TVector2 sysShiftCorr(1.62861e-01 - 2.38517e-02*nPVertex, 3.60860e-01 - 1.30335e-01*nPVertex);
+  if(!isMC) sysShiftCorr = TVector2(4.83642e-02 + 2.48870e-01*nPVertex, -1.50135e-01 - 8.27917e-02*nPVertex);
   treeMap["pfMET_sysShift"]     = (pfMet->mEt - sysShiftCorr).Mod();
   treeMap["pfMET_sysShift_phi"] = (pfMet->mEt - sysShiftCorr).Phi();
   
