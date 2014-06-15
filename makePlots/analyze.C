@@ -575,6 +575,15 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       true, true, false,
 		       out);
 
+    pMaker->CreatePlot("mLepGammaLead",
+		       true, needsQCD,
+		       "m_{#ell#gamma_{lead}}", "Number of Events",
+		       0, 1200, 
+		       2.e-3, 5.e4,
+		       0., 5.1,
+		       true, true, true,
+		       out);
+
   }
 
   if(nPhotons_req >= 2) {
@@ -596,78 +605,97 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       true, false, false,
 		       out);
 
-  pMaker->CreatePlot("trailPhotonEta",
-		     false, needsQCD,
-		     "#eta of trailing #gamma", "Number of Events",
-		     -1.5, 1.5, 
-		     2.e-3, 3.e4,
-		     0., 2.1,
-		     false, false, false,
-		     out);
+    pMaker->CreatePlot("trailPhotonEta",
+		       false, needsQCD,
+		       "#eta of trailing #gamma", "Number of Events",
+		       -1.5, 1.5, 
+		       2.e-3, 3.e4,
+		       0., 2.1,
+		       false, false, false,
+		       out);
+    
+    pMaker->CreatePlot("trailPhotonPhi",
+		       false, needsQCD,
+		       "#phi of trailing #gamma", "Number of Events",
+		       -3.2, 3.2, 
+		       2.e-3, 3.e4,
+		       0., 2.1,
+		       false, false, false,
+		       out);
+    
+    pMaker->CreatePlot("trailSigmaIetaIeta",
+		       false, needsQCD,
+		       "#sigma_{i#etai#eta} of Trail #gamma", "Number of Events",
+		       0, 0.02,
+		       2.3e-3, 5.e4,
+		       0., 5.1,
+		       true, false, false,
+		       out);
+    
+    pMaker->CreatePlot("trailChargedHadronIso",
+		       false, needsQCD,
+		       "Ch. Hadron Iso. of Trail #gamma", "Number of Events",
+		       0, 15,
+		       2.3e-4, 5.e3,
+		       0., 1.8,
+		       true, true, false,
+		       out);
+    
+    pMaker->CreatePlot("photon_invmass",
+		       true, needsQCD,
+		       "m_{#gamma#gamma} (GeV/c^{2})", "Number of Events",
+		       0, 2000, 
+		       2.e-3, 3.e4,
+		       0., 11.5,
+		       true, true, true,
+		       out);
+    
+    pMaker->CreatePlot("trailPhotonEt",
+		       true, needsQCD,
+		       "Et of trailing #gamma", "Number of Events",
+		       0, 1200, 
+		       2.e-3, 5.e4,
+		       0., 5.1,
+		       true, true, true,
+		       out);
+    
+    pMaker->CreatePlot("diEMpT",
+		       true, needsQCD,
+		       "di-EM Pt", "Number of Events",
+		       0, 1200, 
+		       2.e-3, 5.e4,
+		       0., 5.1,
+		       true, true, true,
+		       out);
+    
+    pMaker->CreatePlot("diJetPt",
+		       true, needsQCD,
+		       "di-Jet Pt", "Number of Events",
+		       0, 1400, 
+		       2.e-3, 5.e4,
+		       0., 5.1,
+		       true, true, true,
+		       out);
+   
+    pMaker->CreatePlot("mLepGammaTrail",
+		       true, needsQCD,
+		       "m_{#ell#gamma_{trail}}", "Number of Events",
+		       0, 1200, 
+		       2.e-3, 5.e4,
+		       0., 5.1,
+		       true, true, true,
+		       out);
 
-  pMaker->CreatePlot("trailPhotonPhi",
-		     false, needsQCD,
-		     "#phi of trailing #gamma", "Number of Events",
-		     -3.2, 3.2, 
-		     2.e-3, 3.e4,
-		     0., 2.1,
-		     false, false, false,
-		     out);
-  
-  pMaker->CreatePlot("trailSigmaIetaIeta",
-		     false, needsQCD,
-		     "#sigma_{i#etai#eta} of Trail #gamma", "Number of Events",
-		     0, 0.02,
-		     2.3e-3, 5.e4,
-		     0., 5.1,
-		     true, false, false,
-		     out);
-  
-  pMaker->CreatePlot("trailChargedHadronIso",
-		     false, needsQCD,
-		     "Ch. Hadron Iso. of Trail #gamma", "Number of Events",
-		     0, 15,
-		     2.3e-4, 5.e3,
-		     0., 1.8,
-		     true, true, false,
-		     out);
+    pMaker->CreatePlot("mLepGammaGamma",
+		       true, needsQCD,
+		       "m_{#ell#gamma#gamma}", "Number of Events",
+		       0, 1200, 
+		       2.e-3, 5.e4,
+		       0., 5.1,
+		       true, true, true,
+		       out);
 
-  pMaker->CreatePlot("photon_invmass",
-		     true, needsQCD,
-		     "m_{#gamma#gamma} (GeV/c^{2})", "Number of Events",
-		     0, 2000, 
-		     2.e-3, 3.e4,
-		     0., 11.5,
-		     true, true, true,
-		     out);
-
-  pMaker->CreatePlot("trailPhotonEt",
-		     true, needsQCD,
-		     "Et of trailing #gamma", "Number of Events",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out);
-
-  pMaker->CreatePlot("diEMpT",
-		     true, needsQCD,
-		     "di-EM Pt", "Number of Events",
-		     0, 1200, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out);
-  
-  pMaker->CreatePlot("diJetPt",
-		     true, needsQCD,
-		     "di-Jet Pt", "Number of Events",
-		     0, 1400, 
-		     2.e-3, 5.e4,
-		     0., 5.1,
-		     true, true, true,
-		     out);
-
+ 
   }
 
   pMaker->PlotKolmogorovValues();
