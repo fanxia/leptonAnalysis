@@ -43,7 +43,10 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   TFile * in = new TFile(input, "READ");
   TTree * ggTree = (TTree*)in->Get(channels[channel]+"_signalTree");
-  TTree * qcdTree = (TTree*)in->Get(channels[channel]+"_eQCDTree");
+  TTree * qcdTree;
+  if(channel < 2) qcdTree = (TTree*)in->Get(channels[channel]+"_eQCDTree");
+  else if(channel == 2) qcdTree = (TTree*)in->Get(channels[chanel]+"_muQCDTree");
+  else if(channel == 3) qcdTree = (TTree*)in->Get("muon_jjj_veto_muQCDTree");
 
   TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
   TTree * sigaTree = (TTree*)fSigA->Get(channels[channel]+"_signalTree");
@@ -135,7 +138,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					  channel, muonQCD_layerAdd + 1, kOrange-3, "W + Jets", "vJets");
 
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 
-                                          1177.3 * 3,
+                                          1177.3 * 3, 5.9, 3.6, 38.8, 38.8,
                                           false, false,
                                           channel, muonQCD_layerAdd + 2, kYellow, "Z/#gamma* + Jets", "vJets");
   /*
@@ -287,11 +290,11 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   }
 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
-  pMaker->SubtractMCFromQCD(muonQCD_layerAdd);
-  //pMaker->NormalizeQCD();
-  TH1D * qcdWeights = (TH1D*)pMaker->ReweightQCD();
-  pMaker->RefillQCD(qcdWeights, metCut, nPhotons_req, nBtagReq, channel);
-  pMaker->SubtractMCFromQCD(muonQCD_layerAdd);
+  if(channel < 2) pMaker->SubtractMCFromQCD(muonQCD_layerAdd);
+  pMaker->NormalizeQCD();
+  //TH1D * qcdWeights = (TH1D*)pMaker->ReweightQCD();
+  //pMaker->RefillQCD(qcdWeights, metCut, nPhotons_req, nBtagReq, channel);
+  //pMaker->SubtractMCFromQCD(muonQCD_layerAdd);
 
   pMaker->CreateTable();
   pMaker->CreateDatacard();
@@ -299,7 +302,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
-  bool needsQCD = (channel < 2);
+  bool needsQCD = true;
 
   pMaker->Create2DPlots(needsQCD, true, out);
 
