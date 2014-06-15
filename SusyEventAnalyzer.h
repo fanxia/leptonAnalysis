@@ -66,7 +66,6 @@ class SusyEventAnalyzer {
   virtual ~SusyEventAnalyzer();
 
   virtual void Data();
-  virtual void DataDrivenQCD();
   virtual void Acceptance();
   virtual void CalculateBtagEfficiency();
   virtual void PileupWeights(TString puFile, TString puFile_up, TString puFile_down);
