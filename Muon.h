@@ -17,7 +17,7 @@ bool isIsolatedMuon(susy::Muon mu) {
 bool isAntiIsolatedMuon(susy::Muon mu) {
   float mu_iso = max(0., (mu.sumNeutralHadronEt04 + mu.sumPhotonEt04 - 0.5*(mu.sumPUPt04)));
   mu_iso += mu.sumChargedHadronPt04;
-durp
+
   return (mu_iso / mu.momentum.Pt() > 0.2);
 }
 

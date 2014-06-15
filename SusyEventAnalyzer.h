@@ -681,7 +681,7 @@ void SusyEventAnalyzer::findMuons(susy::Event& ev, vector<susy::Muon*>& tightMuo
       }
 
       else {
-	if(passesTight && isAntiIsolatedElectron(*mu_it)) {
+	if(passesTight && isAntiIsolatedMuon(*mu_it)) {
 	  tightMuons.push_back(&*mu_it);
 	  HT += mu_it->momentum.Pt();
 	}
