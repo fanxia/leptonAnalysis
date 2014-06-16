@@ -1017,11 +1017,11 @@ double SusyEventAnalyzer::ttA_TopPtReweighting(susy::Event& ev) {
 
   for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
 
-    if(it->pdgId == 5 && it->status == 2 && abs(ev.genParticles[it->motherIndex].pdgId) != 5 && !b) b = &*it;
-    if(it->pdgId == -5 && it->status == 2 && abs(ev.genParticles[it->motherIndex].pdgId) != 5 && !bbar) b = &*it;
+    if(it->pdgId == 5 && it->status == 2 && !b) b = &*it;
+    if(it->pdgId == -5 && it->status == 2 && !bbar) bbar = &*it;
       
-    if(it->pdgId == 24 && it->status == 3 && abs(ev.genParticles[it->motherIndex].pdgId) != 24 && !wplus) wplus = &*it;
-    if(it->pdgId == -24 && it->status == 3 && abs(ev.genParticles[it->motherIndex].pdgId) != 24 && !wminus) wminus = &*it;
+    if(it->pdgId == 24 && it->status == 3 && !wplus) wplus = &*it;
+    if(it->pdgId == -24 && it->status == 3 && !wminus) wminus = &*it;
 
   }
 
