@@ -1923,6 +1923,8 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror,
       double olderr = h_qcd[i]->GetBinError(b);
       double oldval = h_qcd[i]->GetBinContent(b);
 
+      if(oldval == 0.) continue;
+
       double_t newerr = oldval * qcdSF * sqrt(olderr*olderr/(oldval*oldval) + qcdSFerror*qcdSFerror/(qcdSF*qcdSF));
 
       h_qcd[i]->SetBinContent(b, oldval * qcdSF);
@@ -1935,6 +1937,8 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror,
       for(Int_t by = 1; by < h_qcd[i]->GetNbinsY(); by++) {
 	double olderr = h_qcd[i]->GetBinError(bx, by);
 	double oldval = h_qcd[i]->GetBinContent(bx, by);
+
+	if(oldval == 0.) continue;
 
 	double_t newerr = oldval * qcdSF * sqrt(olderr*olderr/(oldval*oldval) + qcdSFerror*qcdSFerror/(qcdSF*qcdSF));
 
@@ -1951,6 +1955,8 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror,
 
 	double olderr = mcHistograms[i][j]->GetBinError(b);
 	double oldval = mcHistograms[i][j]->GetBinContent(b);
+
+	if(oldval == 0.) continue;
 
 	double_t newerr, newval;
 	
@@ -1983,6 +1989,8 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror,
 
 	  double olderr = mcHistograms_2d[i][j]->GetBinError(bx, by);
 	  double oldval = mcHistograms_2d[i][j]->GetBinContent(bx, by);
+
+	  if(oldval == 0.) continue;
 
 	  double_t newerr, newval;
 	
