@@ -201,7 +201,7 @@ class PlotMaker : public TObject {
   void FillHistograms(double metCut, int nPhotons_req, int nBtagReq, int chan);
   void SubtractMCFromQCD(int muonQCD_layerAdd);
   void NormalizeQCD();
-  TH1D * ReweightQCD();
+  TH1D * ReweightQCD(int chan);
   void RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int nBtagReq, int chan);
 
   void CreatePlot(TString variable, bool divideByWidth, bool needsQCD, TString xaxisTitle, TString yaxisTitle,
@@ -1847,13 +1847,19 @@ void PlotMaker::NormalizeQCD() {
 
 }
     
-TH1D * PlotMaker::ReweightQCD() {
+TH1D * PlotMaker::ReweightQCD(int chan) {
 
-  TH1D * weights = (TH1D*)h_gg[13]->Clone("sig_lessQCD");
-  
-  for(unsigned int i = 0; i < mcHistograms.size(); i++) weights->Add(mcHistograms[i][13], -1.);
+  TH1D * weights;
+  if(chan < 2) weights = (TH1D*)h_gg[16]->Clone("sig_lessQCD");
+  else weights = (TH1D*)h_gg[18]->Clone("sig_lessQCD");
 
-  weights->Divide(h_qcd[13]);
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    if(chan < 2) weights->Add(mcHistograms[i][16], -1.);
+    else weights->Add(mcHistograms[i][18], -1.);
+  }
+
+  if(chan < 2) weights->Divide(h_qcd[16]);
+  else weights->Divide(h_qcd[18]);
 
   return weights;
 
@@ -1874,8 +1880,8 @@ void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int n
 
     if(metCut > 0. && vars[1] >= metCut) continue;
 
-    Float_t weight = weights->GetBinContent(weights->FindBin(vars[13]));
-    Float_t weightError = weights->GetBinError(weights->FindBin(vars[13]));
+    Float_t weight = (chan < 2) ? weights->GetBinContent(weights->FindBin(vars[16])) : weights->GetBinContent(weights->FindBin(vars[18]));
+    Float_t weightError = (chan < 2) ? weights->GetBinError(weights->FindBin(vars[16])) : weights->GetBinError(weights->FindBin(vars[18]));
 
     for(unsigned int j = 0; j < vars.size(); j++) {
       if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;

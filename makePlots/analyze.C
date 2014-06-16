@@ -293,7 +293,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
   if(channel < 2) pMaker->SubtractMCFromQCD(muonQCD_layerAdd);
   pMaker->NormalizeQCD();
-  //TH1D * qcdWeights = (TH1D*)pMaker->ReweightQCD();
+  //TH1D * qcdWeights = (TH1D*)pMaker->ReweightQCD(channel);
   //pMaker->RefillQCD(qcdWeights, metCut, nPhotons_req, nBtagReq, channel);
   //pMaker->SubtractMCFromQCD(muonQCD_layerAdd);
 
