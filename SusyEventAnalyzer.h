@@ -1047,26 +1047,26 @@ double SusyEventAnalyzer::ttA_TopPtReweighting(susy::Event& ev) {
     }
   }
 
-  TLorentzVector * top = wplus->momentum + b->momentum;
-  TLorentzVector * antitop = wminus->momentum + bbar->momentum;
+  TLorentzVector top = wplus->momentum + b->momentum;
+  TLorentzVector antitop = wminus->momentum + bbar->momentum;
 
   double weight;
 
   if(leptonicWs == 0) {
-    weight = 0.156 - 0.00137*top->momentum.Pt();
-    weight += 0.156 - 0.00137*antitop->momentum.Pt();
+    weight = 0.156 - 0.00137*top.Pt();
+    weight += 0.156 - 0.00137*antitop.Pt();
     weight = exp(weight / 2.);
   }
 
   else if(leptonicWs == 1) {
-    weight = 0.159 - 0.00141*top->momentum.Pt();
-    weight += 0.159 - 0.00141*antitop->momentum.Pt();
+    weight = 0.159 - 0.00141*top.Pt();
+    weight += 0.159 - 0.00141*antitop.Pt();
     weight = exp(weight / 2.);
   }
 
   else if(leptonicWs == 2) {
-    weight = 0.148 - 0.00129*top->momentum.Pt();
-    weight += 0.148 - 0.00129*antitop->momentum.Pt();
+    weight = 0.148 - 0.00129*top.Pt();
+    weight += 0.148 - 0.00129*antitop.Pt();
     weight = exp(weight / 2.);
   }
 
