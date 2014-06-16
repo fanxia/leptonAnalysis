@@ -1338,6 +1338,14 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   // Transverse W mass
 
   float metphi = (pfMet->mEt - sysShiftCorr).Phi();
+  float metphi_t1 = (pfMetType1->mEt - sysShiftCorr).Phi();
+  float metphi_t1p2 = (pfMetType1p2->mEt - sysShiftCorr).Phi();
+  float metphi_t01 = (pfMetType01->mEt - sysShiftCorr).Phi();
+  float metphi_t01p2 = (pfMetType01p2->mEt - sysShiftCorr).Phi();
+  float metphi_nopumet = (pfNoPileUpMet->mEt - sysShiftCorr).Phi();
+  float metphi_mvamet = (pfMVAMet->mEt - sysShiftCorr).Phi();
+  float metphi_genmet = (isMC) ? (genMet->mEt - sysShiftCorr).Phi() : -100.;
+
   float leptonphi, leptonpt;
   if(tightEles.size() == 1) {
     leptonphi = tightEles[0]->momentum.Phi();
@@ -1351,9 +1359,47 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   if(tightMuons.size() + tightEles.size() == 1) {
     float w_mT = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi));
     w_mT *= 2. * leptonpt * treeMap["pfMET_sysShift"];
+
+    float w_mT_t1 = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi_t1));
+    w_mT_t1 *= 2. * leptonpt * treeMap["pfMET_t1"];
+
+    float w_mT_t1p2 = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi_t1p2));
+    w_mT_t1p2 *= 2. * leptonpt * treeMap["pfMET_t1p2"];
+
+    float w_mT_t01 = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi_t01));
+    w_mT_t01 *= 2. * leptonpt * treeMap["pfMET_t01"];
+
+    float w_mT_t01p2 = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi_t01p2));
+    w_mT_t01p2 *= 2. * leptonpt * treeMap["pfMET_t01p2"];
+
+    float w_mT_nopumet = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi_nopumet));
+    w_mT_nopumet *= 2. * leptonpt * treeMap["pfMET_nopumet"];
+
+    float w_mT_mvamet = 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi_mvamet));
+    w_mT_mvamet *= 2. * leptonpt * treeMap["pfMET_mvamet"];
+
+    float w_mT_genmet = (isMC) ? 1. - TMath::Cos(TVector2::Phi_mpi_pi(leptonphi - metphi_genmet)) : -1.;
+    if(isMC) w_mT_genmet *= 2. * leptonpt * treeMap["pfMET_genmet"];
+
     treeMap["w_mT"] = sqrt(w_mT);
+    treeMap["w_mT_t1"] = sqrt(w_mT_t1);
+    treeMap["w_mT_t1p2"] = sqrt(w_mT_t1p2);
+    treeMap["w_mT_t01"] = sqrt(w_mT_t01);
+    treeMap["w_mT_t01p2"] = sqrt(w_mT_t01p2);
+    treeMap["w_mT_nopumet"] = sqrt(w_mT_nopumet);
+    treeMap["w_mT_mvamet"] = sqrt(w_mT_mvamet);
+    treeMap["w_mT_genmet"] = (isMC) ? sqrt(w_mT_genmet) : -1.;
   }
-  else treeMap["w_mT"] = -1.;
+  else {
+    treeMap["w_mT"] = -1.;
+    treeMap["w_mT_t1"] = -1.;
+    treeMap["w_mT_t1p2"] = -1.;
+    treeMap["w_mT_t01"] = -1.;
+    treeMap["w_mT_t01p2"] = -1.;
+    treeMap["w_mT_nopumet"] = -1.;
+    treeMap["w_mT_mvamet"] = -1.;
+    treeMap["w_mT_genmet"] = -1.;
+  }
   
   // M3 calculation
   if(pfJets_corrP4.size() > 2) {

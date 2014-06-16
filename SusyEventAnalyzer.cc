@@ -312,14 +312,16 @@ void SusyEventAnalyzer::Data() {
   // Reweighting trees
   /////////////////////////////////
 
-  const int nTreeVariables = 71;
+  const int nTreeVariables = 77;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
     "pfMET_sysShift", "pfMET_sysShift_phi",
     "pfMET_t1", "pfMET_t1p2", "pfMET_t01", "pfMET_t01p2", "pfNoPUMET", "pfMVAMET",
     "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons", "NfakePhotons",
-    "HT", "HT_jets", "hadronic_pt", "w_mT", "m3",
+    "HT", "HT_jets", "hadronic_pt", 
+    "w_mT", "w_mT_t1", "w_mT_t1p2", "w_mT_t01", "w_mT_t01p2", "w_mT_nopumet", "w_mT_mvamet",
+    "m3",
     "ele_pt", "ele_phi", "ele_eta", "ele_mvaTrigV0", "ele_relIso",
     "muon_pt", "muon_phi", "muon_eta", "muon_relIso",
     "leadPhotonEt", "leadPhotonEta", "leadPhotonPhi", "leadChargedHadronIso", "leadSigmaIetaIeta", "lead_nPixelSeeds", "leadMVAregEnergy", "leadMVAregErr",
@@ -604,14 +606,16 @@ void SusyEventAnalyzer::Acceptance() {
   TH1D * h_dR_gamma_jet = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
   TH1D * h_dR_gamma_photon = new TH1D("dR_gamma_photon", "dR between photons and other photons (N-1)", 100, 0, 10);
 
-  const int nTreeVariables = 79;
+  const int nTreeVariables = 86;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
     "pfMET_sysShift", "pfMET_sysShift_phi",
     "pfMET_t1", "pfMET_t1p2", "pfMET_t01", "pfMET_t01p2", "pfNoPUMET", "pfMVAMET", "genMET",
     "Njets", "Nbtags", "Nphotons", "Nmuons", "Nelectrons", "NfakePhotons",
-    "HT", "HT_jets", "hadronic_pt", "w_mT", "m3",
+    "HT", "HT_jets", "hadronic_pt", 
+    "w_mT", "w_mT_t1", "w_mT_t1p2", "w_mT_t01", "w_mT_t01p2", "w_mT_nopumet", "w_mT_mvamet", "w_mT_genmet",
+    "m3",
     "ele_pt", "ele_phi", "ele_eta", "ele_mvaTrigV0", "ele_relIso",
     "muon_pt", "muon_phi", "muon_eta", "muon_relIso",
     "leadPhotonEt", "leadPhotonEta", "leadPhotonPhi", "leadChargedHadronIso", "leadSigmaIetaIeta", "lead_nPixelSeeds", "leadMVAregEnergy", "leadMVAregErr",
