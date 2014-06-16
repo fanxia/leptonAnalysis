@@ -203,6 +203,10 @@ class PlotMaker : public TObject {
   void NormalizeQCD();
   TH1D * ReweightQCD(int chan);
   void RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int nBtagReq, int chan);
+  void ScaleFromFits(double qcdSF, double qcdSFerror, 
+		     double wjetsSF, double wjetsSFerror, 
+		     double topSF, double topSFerror, 
+		     double mcSF, double mcSFerror);
 
   void CreatePlot(TString variable, bool divideByWidth, bool needsQCD, TString xaxisTitle, TString yaxisTitle,
 		  Float_t xmin, Float_t xmax, Float_t ymin, Float_t ymax,
@@ -1908,6 +1912,104 @@ void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int n
   qcdTree->ResetBranchAddresses();
 
 }
+
+void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, 
+			      double wjetsSF, double wjetsSFerror, 
+			      double topSF, double topSFerror, 
+			      double mcSF, double mcSFerror) {
+
+  for(unsigned int i = 0; i < h_qcd.size(); i++) {
+    for(Int_t b = 1; b < h_qcd[i]->GetNbinsX(); b++) {
+      double olderr = h_qcd[i]->GetBinError(b);
+      double oldval = h_qcd[i]->GetBinContent(b);
+
+      double_t newerr = oldval * qcdSF * sqrt(olderr*olderr/(oldval*oldval) + qcdSFerror*qcdSFerror/(qcdSF*qcdSF));
+
+      h_qcd[i]->SetBinContent(b, oldval * qcdSF);
+      h_qcd[i]->SetBinError(b, newerr);
+    }
+  }
+
+  for(unsigned int i = 0; i < h_qcd_2d.size(); i++) {
+    for(Int_t bx = 1; bx < h_qcd[i]->GetNbinsX(); bx++) {
+      for(Int_t by = 1; by < h_qcd[i]->GetNbinsY(); by++) {
+	double olderr = h_qcd[i]->GetBinError(bx, by);
+	double oldval = h_qcd[i]->GetBinContent(bx, by);
+
+	double_t newerr = oldval * qcdSF * sqrt(olderr*olderr/(oldval*oldval) + qcdSFerror*qcdSFerror/(qcdSF*qcdSF));
+
+	h_qcd[i]->SetBinContent(bx, by, oldval * qcdSF);
+	h_qcd[i]->SetBinError(bx, by, newerr);
+      }
+    }
+  }
+
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    for(unsigned int j = 0; j < mcHistograms[i].size(); j++) {
+
+      for(Int_t b = 1; b < mcHistograms[i][j]->GetNbinsX(); b++) {
+
+	double olderr = mcHistograms[i][j]->GetBinError(b);
+	double oldval = mcHistograms[i][j]->GetBinContent(b);
+
+	double_t newerr, newval;
+	
+	if(mcLayerNumbers[i] == 0 || mcLayerNumbers[i] == 5 || mcLayerNumbers[i] == 6) {
+	  newval = oldval * topSF;
+	  newerr = oldval * topSF * sqrt(olderr*olderr/(oldval*oldval) + topSFerror*topSFerror/(topSF*topSF));
+	}
+	else if(mcLayerNumbers[i] == 1) {
+	  newval = oldval * wjetsSF;
+	  newerr = oldval * wjetsSF * sqrt(olderr*olderr/(oldval*oldval) + wjetsSFerror*wjetsSFerror/(wjetsSF*wjetsSF));
+	}
+	else {
+	  newval = oldval * mcSF;
+	  newerr = oldval * mcSF * sqrt(olderr*olderr/(oldval*oldval) + mcSFerror*mcSFerror/(mcSF*mcSF));
+	}
+
+	mcHistograms[i][j]->SetBinContent(b, newval);
+	mcHistograms[i][j]->SetBinError(b, newerr);
+
+      }
+
+    }
+  }
+
+  for(unsigned int i = 0; i < mcHistograms_2d.size(); i++) {
+    for(unsigned int j = 0; j < mcHistograms_2d[i].size(); j++) {
+
+      for(Int_t bx = 1; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
+	for(Int_t by = 1; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
+
+	  double olderr = mcHistograms_2d[i][j]->GetBinError(bx, by);
+	  double oldval = mcHistograms_2d[i][j]->GetBinContent(bx, by);
+
+	  double_t newerr, newval;
+	
+	  if(mcLayerNumbers[i] == 0 || mcLayerNumbers[i] == 5 || mcLayerNumbers[i] == 6) {
+	    newval = oldval * topSF;
+	    newerr = oldval * topSF * sqrt(olderr*olderr/(oldval*oldval) + topSFerror*topSFerror/(topSF*topSF));
+	  }
+	  else if(mcLayerNumbers[i] == 1) {
+	    newval = oldval * wjetsSF;
+	    newerr = oldval * wjetsSF * sqrt(olderr*olderr/(oldval*oldval) + wjetsSFerror*wjetsSFerror/(wjetsSF*wjetsSF));
+	  }
+	  else {
+	    newval = oldval * mcSF;
+	    newerr = oldval * mcSF * sqrt(olderr*olderr/(oldval*oldval) + mcSFerror*mcSFerror/(mcSF*mcSF));
+	  }
+	  
+	  mcHistograms_2d[i][j]->SetBinContent(bx, by, newval);
+	  mcHistograms_2d[i][j]->SetBinError(bx, by, newerr);
+	  
+	}
+      }
+
+    }
+  }
+
+}
+  
 
 void PlotMaker::CreatePlot(TString variable,
 			   bool divideByWidth, bool needsQCD,
