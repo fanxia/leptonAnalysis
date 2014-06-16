@@ -166,6 +166,7 @@ class SusyEventAnalyzer {
   bool PhotonMatchesElectron(susy::Event& ev, vector<susy::Photon*> candidates, int& bothMatchCounter);
   int FigureTTbarDecayMode(susy::Event& ev);
   double TopPtReweighting(susy::Event& ev);
+  double ttA_TopPtReweighting(susy::Event& ev);
 
   void ttA_phaseSpace(susy::Event& ev, TH2D*& h);
   void ttbar_phaseSpace(susy::Event& ev, TH2D*& h);
@@ -1007,6 +1008,73 @@ double SusyEventAnalyzer::TopPtReweighting(susy::Event& ev) {
   return weight;
 }
 
+double SusyEventAnalyzer::ttA_TopPtReweighting(susy::Event& ev) {
+
+  susy::Particle * b      = 0;
+  susy::Particle * bbar   = 0;
+  susy::Particle * wplus  = 0;
+  susy::Particle * wminus = 0;
+
+  for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+
+    if(it->pdgId == 5 && it->status == 2 && abs(ev.genParticles[it->motherIndex].pdgId) != 5 && !b) b = &*it;
+    if(it->pdgId == -5 && it->status == 2 && abs(ev.genParticles[it->motherIndex].pdgId) != 5 && !bbar) b = &*it;
+      
+    if(it->pdgId == 24 && it->status == 3 && abs(ev.genParticles[it->motherIndex].pdgId) != 24 && !wplus) wplus = &*it;
+    if(it->pdgId == -24 && it->status == 3 && abs(ev.genParticles[it->motherIndex].pdgId) != 24 && !wminus) wminus = &*it;
+
+  }
+
+  if(!b || !bbar || !wplus || !wminus) return -1;
+
+  int leptonicWs = 0;
+
+  for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+    if(it->mother == wplus) {
+      if(abs(it->pdgId) >= 11 && abs(it->pdgId) <= 16) {
+	leptonicWs++;
+	break;
+      }
+    }
+  }
+
+  for(vector<susy::Particle>::iterator it = ev.genParticles.begin(); it != ev.genParticles.end(); it++) {
+    if(it->mother == wminus) {
+      if(abs(it->pdgId) >= 11 && abs(it->pdgId) <= 16) {
+	leptonicWs++;
+	break;
+      }
+    }
+  }
+
+  TLorentzVector * top = wplus->momentum + b->momentum;
+  TLorentzVector * antitop = wminus->momentum + bbar->momentum;
+
+  double weight;
+
+  if(leptonicWs == 0) {
+    weight = 0.156 - 0.00137*top->momentum.Pt();
+    weight += 0.156 - 0.00137*antitop->momentum.Pt();
+    weight = exp(weight / 2.);
+  }
+
+  else if(leptonicWs == 1) {
+    weight = 0.159 - 0.00141*top->momentum.Pt();
+    weight += 0.159 - 0.00141*antitop->momentum.Pt();
+    weight = exp(weight / 2.);
+  }
+
+  else if(leptonicWs == 2) {
+    weight = 0.148 - 0.00129*top->momentum.Pt();
+    weight += 0.148 - 0.00129*antitop->momentum.Pt();
+    weight = exp(weight / 2.);
+  }
+
+  else weight = -1;
+
+  return weight;
+}
+
 void SusyEventAnalyzer::ttA_phaseSpace(susy::Event& ev, TH2D*& h) {
 
   susy::Particle * gamma = 0;
@@ -1192,7 +1260,10 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["metFilterBit"] = event_.metFilterBit;
   if(isMC && scan == "stop-bino") treeMap["ttbarDecayMode"] = FigureTTbarDecayMode(event_);
   if(isMC) treeMap["overlaps_ttA"] = overlaps_ttA(event_);
-  if(isMC) treeMap["TopPtReweighting"] = TopPtReweighting(event_);
+  if(isMC) {
+    if(scan == "ttA_2to5") treeMap["TopPtReweighting"] = ttA_TopPtReweighting(event_);
+    else treeMap["TopPtReweighting"] = TopPtReweighting(event_);
+  }
   treeMap["Nphotons"] = photons.size();
   treeMap["NfakePhotons"] = fakePhotons.size();
   treeMap["Njets"] = pfJets.size();

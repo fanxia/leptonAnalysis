@@ -526,6 +526,15 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out);
 
+  pMaker->CreatePlot("ele_eta",
+		     false, needsQCD,
+		     "#Eta of electron", "Number of Events",
+		     -2.4, 2.4, 
+		     2.e-4, 8.e3,
+		     0., 2.3,
+		     false, false, false,
+		     out);
+
   pMaker->CreatePlot("muon_pt",
 		     true, needsQCD,
 		     "Pt of #mu", "Number of Events",
@@ -533,6 +542,15 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     2.e-4, 8.e3,
 		     0., 2.3,
 		     true, true, true,
+		     out);
+
+  pMaker->CreatePlot("muon_eta",
+		     false, needsQCD,
+		     "#Eta of #mu", "Number of Events",
+		     -2.4, 2.4, 
+		     2.e-4, 8.e3,
+		     0., 2.3,
+		     false, false, false,
 		     out);
 
   if(nPhotons_req >= 1) {
