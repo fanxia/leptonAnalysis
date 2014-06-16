@@ -44,8 +44,9 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   TFile * in = new TFile(input, "READ");
   TTree * ggTree = (TTree*)in->Get(channels[channel]+"_signalTree");
   TTree * qcdTree;
-  if(channel < 2) qcdTree = (TTree*)in->Get(channels[channel]+"_eQCDTree");
-  else if(channel == 2) qcdTree = (TTree*)in->Get(channels[chanel]+"_muQCDTree");
+  if(channel == 0) qcdTree = (TTree*)in->Get(channels[channel]+"_eQCDTree");
+  else if(channel == 1) qcdTree = (TTree*)in->Get("ele_jjj_veto_eQCDTree");
+  else if(channel == 2) qcdTree = (TTree*)in->Get(channels[channel]+"_muQCDTree");
   else if(channel == 3) qcdTree = (TTree*)in->Get("muon_jjj_veto_muQCDTree");
 
   TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
