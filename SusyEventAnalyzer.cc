@@ -922,6 +922,8 @@ void SusyEventAnalyzer::Acceptance() {
     cout << "Signal " << channels[i] << " events : " << nCnt[2][i] << endl;
     if(nEleReq[i] == 1) cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
     if(nMuonReq[i] == 1) cout << "muQCD   " << channels[i] << " events : " << nCnt[4][i] << endl;
+    cout << "noSigmaIetaIeta " << channels[i] << " events : " << nCnt[5][i] << endl;
+    cout << "noChHadIso      " << channels[i] << " events : " << nCnt[6][i] << endl;
   }
   cout << endl;
   cout << "----------------Continues, info----------------" << endl;
