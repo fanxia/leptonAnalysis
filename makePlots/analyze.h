@@ -2037,22 +2037,26 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
     h_bkg_dR[i]->Sumw2();
     h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
-    for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
-      h_bkg_dR[j]->Add(h_bkg_dR.back());
+  }
+
+  for(unsigned int i = 0; i < h_bkg_dR.size(); i++) {
+    for(unsigned int j = i + 1; j < h_bkg_dR.size(); j++) {
+      h_bkg_dR[i]->Add(h_bkg_dR[j]);
     }
   }
 
   TCanvas * can = new TCanvas("dR_can", "Plot", 10, 10, 2000, 2000);
   can->SetLogy(true);
 
+  h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
   }
 
-  h_siga_dR->Draw("hist same");
-  h_sigb_dR->Draw("hist same");
+  h_siga_dR->Draw("same");
+  h_sigb_dR->Draw("same");
 
   can->SaveAs("dR_gamma_ele_"+req+".pdf");
 
@@ -2071,19 +2075,23 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
     h_bkg_dR[i]->Sumw2();
     h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
-    for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
-      h_bkg_dR[j]->Add(h_bkg_dR.back());
+  }
+  
+  for(unsigned int i = 0; i < h_bkg_dR.size(); i++) {
+    for(unsigned int j = i + 1; j < h_bkg_dR.size(); j++) {
+      h_bkg_dR[i]->Add(h_bkg_dR[j]);
     }
   }
 
+  h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
   }
 
-  h_siga_dR->Draw("hist same");
-  h_sigb_dR->Draw("hist same");
+  h_siga_dR->Draw("same");
+  h_sigb_dR->Draw("same");
 
   can->SaveAs("dR_gamma_muon_"+req+".pdf");
 
@@ -2102,19 +2110,23 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
     h_bkg_dR[i]->Sumw2();
     h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
-    for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
-      h_bkg_dR[j]->Add(h_bkg_dR.back());
+  }
+
+  for(unsigned int i = 0; i < h_bkg_dR.size(); i++) {
+    for(unsigned int j = i + 1; j < h_bkg_dR.size(); j++) {
+      h_bkg_dR[i]->Add(h_bkg_dR[j]);
     }
   }
 
+  h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
   }
 
-  h_siga_dR->Draw("hist same");
-  h_sigb_dR->Draw("hist same");
+  h_siga_dR->Draw("same");
+  h_sigb_dR->Draw("same");
 
   can->SaveAs("dR_gamma_jet_"+req+".pdf");
 	
@@ -2133,19 +2145,23 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
     h_bkg_dR[i]->Sumw2();
     h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
-    for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
-      h_bkg_dR[j]->Add(h_bkg_dR.back());
+  }
+
+  for(unsigned int i = 0; i < h_bkg_dR.size(); i++) {
+    for(unsigned int j = i + 1; j < h_bkg_dR.size(); j++) {
+      h_bkg_dR[i]->Add(h_bkg_dR[j]);
     }
   }
 
+  h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
   }
 
-  h_siga_dR->Draw("hist same");
-  h_sigb_dR->Draw("hist same");
+  h_siga_dR->Draw("same");
+  h_sigb_dR->Draw("same");
 
   can->SaveAs("dR_gamma_photon_"+req+".pdf");
 
