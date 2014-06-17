@@ -2024,17 +2024,16 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   TH1D * h_siga_dR = (TH1D*)siga->Get("dR_gamma_ele");
   h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
-  h_siga_dR->SetFillColor(kMagenta);
+  h_siga_dR->SetLineColor(kMagenta);
 
   TH1D * h_sigb_dR = (TH1D*)sigb->Get("dR_gamma_ele");
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
-  h_sigb_dR->SetFillColor(kBlue);
+  h_sigb_dR->SetLineColor(kBlue);
 
   vector<TH1D*> h_bkg_dR;
 
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
     h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_ele"));
-    h_bkg_dR[i]->Sumw2();
     h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
   }
@@ -2058,21 +2057,22 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_siga_dR->Draw("same");
   h_sigb_dR->Draw("same");
 
+  h_sigb_dR->Draw("axis same");
+
   can->SaveAs("dR_gamma_ele_"+req+".pdf");
 
   h_bkg_dR.clear();
 
   h_siga_dR = (TH1D*)siga->Get("dR_gamma_muon");
   h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
-  h_siga_dR->SetFillColor(kMagenta);
+  h_siga_dR->SetLineColor(kMagenta);
 
   h_sigb_dR = (TH1D*)sigb->Get("dR_gamma_muon");
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
-  h_sigb_dR->SetFillColor(kBlue);
+  h_sigb_dR->SetLineColor(kBlue);
 
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
     h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_muon"));
-    h_bkg_dR[i]->Sumw2();
     h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
   }
@@ -2093,21 +2093,22 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_siga_dR->Draw("same");
   h_sigb_dR->Draw("same");
 
+  h_sigb_dR->Draw("axis same");
+
   can->SaveAs("dR_gamma_muon_"+req+".pdf");
 
   h_bkg_dR.clear();
 
   h_siga_dR = (TH1D*)siga->Get("dR_gamma_jet");
   h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
-  h_siga_dR->SetFillColor(kMagenta);
+  h_siga_dR->SetLineColor(kMagenta);
 
   h_sigb_dR = (TH1D*)sigb->Get("dR_gamma_jet");
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
-  h_sigb_dR->SetFillColor(kBlue);
+  h_sigb_dR->SetLineColor(kBlue);
 
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
     h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_jet"));
-    h_bkg_dR[i]->Sumw2();
     h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
   }
@@ -2127,6 +2128,8 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_siga_dR->Draw("same");
   h_sigb_dR->Draw("same");
+
+  h_sigb_dR->Draw("axis same");
 
   can->SaveAs("dR_gamma_jet_"+req+".pdf");
 	
@@ -2134,15 +2137,14 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_siga_dR = (TH1D*)siga->Get("dR_gamma_photon");
   h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
-  h_siga_dR->SetFillColor(kMagenta);
+  h_siga_dR->SetLineColor(kMagenta);
 
   h_sigb_dR = (TH1D*)sigb->Get("dR_gamma_photon");
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
-  h_sigb_dR->SetFillColor(kBlue);
+  h_sigb_dR->SetLineColor(kBlue);
 
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
     h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_photon"));
-    h_bkg_dR[i]->Sumw2();
     h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
   }
@@ -2162,6 +2164,8 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_siga_dR->Draw("same");
   h_sigb_dR->Draw("same");
+
+  h_sigb_dR->Draw("axis same");
 
   can->SaveAs("dR_gamma_photon_"+req+".pdf");
 
