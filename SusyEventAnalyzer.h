@@ -141,7 +141,7 @@ class SusyEventAnalyzer {
 		   TH1D*& h_dR_gamma_muon,
 		   TH1D*& h_dR_gamma_jet,
 		   TH1D*& h_dR_gamma_photon,
-		   bool useFakes);
+		   bool requireSigmaIetaIeta, bool requireChHadIso);
   // in data
   void findJets(susy::Event& ev, 
 		vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
@@ -462,15 +462,16 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 				    TH1D*& h_dR_gamma_muon,
 				    TH1D*& h_dR_gamma_jet,
 				    TH1D*& h_dR_gamma_photon,
-				    bool useFakes) {
+				    bool requireSigmaIetaIeta, bool requireChHadIso) {
   
   map<TString, vector<susy::Photon> >::iterator phoMap = ev.photons.find("photons");
   if(phoMap != event.photons.end()) {
     for(vector<susy::Photon>::iterator it = phoMap->second.begin();
 	it != phoMap->second.end(); it++) {
       
-      if((is_eg(*it, event.rho25) && it->passelectronveto && !useFakes) ||
-	 (is_f(*it, event.rho25) && it->passelectronveto && useFakes)) {
+      if((requireSigmaIetaIeta && requireChHadIso && is_loosePhoton(*it, event.rho25)) ||
+	 (!requireSigmaIetaIeta && requireChHadIso && is_loosePhoton_noSigmaIetaIeta(*it, event.rho25)) ||
+	 (requireSigmaIetaIeta && !requireChHadIso && is_loosePhoton_noChHadIso(*it, event.rho25))) {
 
 	bool overlap = false;
 
@@ -478,13 +479,13 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 
 	for(unsigned int k = 0; k < pfJets_corrP4.size(); k++) {
 	  this_dR = deltaR(pfJets_corrP4[k], it->caloPosition);
-	  if(!useFakes) h_dR_gamma_jet->Fill(this_dR);
+	  if(!allowFakes) h_dR_gamma_jet->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
 
 	for(unsigned int i = 0; i < tightMuons.size(); i++) {
 	  this_dR = deltaR(tightMuons[i]->momentum, it->caloPosition);
-	  if(!useFakes) h_dR_gamma_muon->Fill(this_dR);
+	  if(!allowFakes) h_dR_gamma_muon->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
 
@@ -494,7 +495,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 
 	for(unsigned int i = 0; i < tightEles.size(); i++) {
 	  this_dR = deltaR(tightEles[i]->momentum, it->caloPosition);
-	  if(!useFakes) h_dR_gamma_ele->Fill(this_dR);
+	  if(!allowFakes) h_dR_gamma_ele->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
 	
@@ -504,7 +505,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 
 	for(unsigned int i = 0; i < photons.size(); i++) {
 	  this_dR = deltaR(photons[i]->caloPosition, it->caloPosition);
-	  if(!useFakes) h_dR_gamma_photon->Fill(this_dR);
+	  if(!allowFakes) h_dR_gamma_photon->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
 

@@ -208,6 +208,8 @@ class PlotMaker : public TObject {
 		     double topSF, double topSFerror, 
 		     double mcSF, double mcSFerror);
 
+  void CreateFSRPlot(TFile * siga, TFile * sigb);
+
   void CreatePlot(TString variable, bool divideByWidth, bool needsQCD, TString xaxisTitle, TString yaxisTitle,
 		  Float_t xmin, Float_t xmax, Float_t ymin, Float_t ymax,
 		  Float_t ratiomin, Float_t ratiomax,
@@ -2018,6 +2020,133 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror,
 
 }
   
+void CreateFSRPlot(TFile * siga, TFile * sigb) {
+
+  TH1D * h_siga_dR = (TH1D*)siga->Get("dR_gamma_ele");
+  h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
+  h_siga_dR->SetFillColor(kMagenta);
+
+  TH1D * h_sigb_dR = (TH1D*)sigb->Get("dR_gamma_ele");
+  h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
+  h_sigb_dR->SetFillColor(kBlue);
+
+  vector<TH1D*> h_bkg_dR;
+
+  for(unsigned int i = 0; i < mcFiles.size(); i++) {
+    h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_ele"));
+    h_bkg_dR[i]->Sumw2();
+    h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
+    for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
+      h_bkg_dR[j]->Add(h_bkg_dR.back());
+    }
+  }
+
+  TCanvas * can = new TCanvas("dR_can", "Plot", 10, 10, 2000, 2000);
+  can->SetLogy(true);
+
+  h_bkg_dR[0]->Draw("hist");
+
+  for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
+  }
+
+  h_siga_dR->Draw("hist same");
+  h_sigb_dR->Draw("hist same");
+
+  can->SaveAs("dR_gamma_ele_"+req+".pdf");
+
+  h_bkg_dR.clear();
+
+  h_siga_dR = (TH1D*)siga->Get("dR_gamma_muon");
+  h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
+  h_siga_dR->SetFillColor(kMagenta);
+
+  h_sigb_dR = (TH1D*)sigb->Get("dR_gamma_muon");
+  h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
+  h_sigb_dR->SetFillColor(kBlue);
+
+  for(unsigned int i = 0; i < mcFiles.size(); i++) {
+    h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_muon"));
+    h_bkg_dR[i]->Sumw2();
+    h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
+    for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
+      h_bkg_dR[j]->Add(h_bkg_dR.back());
+    }
+  }
+
+  h_bkg_dR[0]->Draw("hist");
+
+  for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
+  }
+
+  h_siga_dR->Draw("hist same");
+  h_sigb_dR->Draw("hist same");
+
+  can->SaveAs("dR_gamma_muon_"+req+".pdf");
+
+  h_bkg_dR.clear();
+
+  h_siga_dR = (TH1D*)siga->Get("dR_gamma_jet");
+  h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
+  h_siga_dR->SetFillColor(kMagenta);
+
+  h_sigb_dR = (TH1D*)sigb->Get("dR_gamma_jet");
+  h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
+  h_sigb_dR->SetFillColor(kBlue);
+
+  for(unsigned int i = 0; i < mcFiles.size(); i++) {
+    h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_jet"));
+    h_bkg_dR[i]->Sumw2();
+    h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
+    for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
+      h_bkg_dR[j]->Add(h_bkg_dR.back());
+    }
+  }
+
+  h_bkg_dR[0]->Draw("hist");
+
+  for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
+  }
+
+  h_siga_dR->Draw("hist same");
+  h_sigb_dR->Draw("hist same");
+
+  can->SaveAs("dR_gamma_jet_"+req+".pdf");
+	
+  h_bkg_dR.clear();
+
+  h_siga_dR = (TH1D*)siga->Get("dR_gamma_photon");
+  h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
+  h_siga_dR->SetFillColor(kMagenta);
+
+  h_sigb_dR = (TH1D*)sigb->Get("dR_gamma_photon");
+  h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
+  h_sigb_dR->SetFillColor(kBlue);
+
+  for(unsigned int i = 0; i < mcFiles.size(); i++) {
+    h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_photon"));
+    h_bkg_dR[i]->Sumw2();
+    h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
+    for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
+      h_bkg_dR[j]->Add(h_bkg_dR.back());
+    }
+  }
+
+  h_bkg_dR[0]->Draw("hist");
+
+  for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
+  }
+
+  h_siga_dR->Draw("hist same");
+  h_sigb_dR->Draw("hist same");
+
+  can->SaveAs("dR_gamma_photon_"+req+".pdf");
+
+  delete can;
+}
 
 void PlotMaker::CreatePlot(TString variable,
 			   bool divideByWidth, bool needsQCD,

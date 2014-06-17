@@ -88,10 +88,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					  channel, muonQCD_layerAdd + 1, kOrange-3, "W + Jets", "vJets");
 
   
-  
-
-
-
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 
                                           1177.3 * 3, 5.9, 3.6, 38.8, 38.8,
                                           false, false,
@@ -171,7 +167,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/WhizardMCTeeTeeGamma#2_to_5_All_ttbar_decay_channels
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttA_2to5.root", "ttA_2to5", 
 					  .9081 * 2, .9081 * .5, .9081 * .5, .9081 * 2 * 0.076, .9081 * 2 * 0.099, 
-					  false, false,
+					  false, true,
 					  channel, muonQCD_layerAdd + 6, 8, "t#bar{t} + #gamma", "ttgamma");
   pMaker->SetUseWHIZARD(true);
 
@@ -256,6 +252,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     topSF, topSFerror, 
     mcSF, mcSFerror);
   */
+
+  pMaker->CreateFSRPlot(fSigA, fSigB);
 
   pMaker->CreateTable();
   pMaker->CreateDatacard();
