@@ -2020,7 +2020,7 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror,
 
 }
   
-void CreateFSRPlot(TFile * siga, TFile * sigb) {
+void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   TH1D * h_siga_dR = (TH1D*)siga->Get("dR_gamma_ele");
   h_siga_dR->Scale(intLumi_int * 0.147492 / 15000.);
@@ -2035,6 +2035,7 @@ void CreateFSRPlot(TFile * siga, TFile * sigb) {
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
     h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_ele"));
     h_bkg_dR[i]->Sumw2();
+    h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
     for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
       h_bkg_dR[j]->Add(h_bkg_dR.back());
@@ -2068,6 +2069,7 @@ void CreateFSRPlot(TFile * siga, TFile * sigb) {
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
     h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_muon"));
     h_bkg_dR[i]->Sumw2();
+    h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
     for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
       h_bkg_dR[j]->Add(h_bkg_dR.back());
@@ -2098,6 +2100,7 @@ void CreateFSRPlot(TFile * siga, TFile * sigb) {
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
     h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_jet"));
     h_bkg_dR[i]->Sumw2();
+    h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
     for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
       h_bkg_dR[j]->Add(h_bkg_dR.back());
@@ -2128,6 +2131,7 @@ void CreateFSRPlot(TFile * siga, TFile * sigb) {
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
     h_bkg_dR.push_back((TH1D*)mcFiles[i]->Get("dR_gamma_photon"));
     h_bkg_dR[i]->Sumw2();
+    h_bkg_dR[i]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
     h_bkg_dR[i]->SetFillColor(mcLayerColors[i]);
     for(unsigned int j = 0; j < h_bkg_dR.size() - 1; j++) {
       h_bkg_dR[j]->Add(h_bkg_dR.back());
