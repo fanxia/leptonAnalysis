@@ -176,7 +176,7 @@ class SusyEventAnalyzer {
 		     susy::Event& event_,
 		     vector<susy::Muon*> tightMuons, vector<susy::Electron*> tightEles, 
 		     vector<susy::PFJet*> pfJets, vector<susy::PFJet*> btags,
-		     vector<susy::Photon*> photons, vector<susy::Photon*> fakePhotons,
+		     vector<susy::Photon*> photons,
 		     vector<TLorentzVector> pfJets_corrP4, vector<TLorentzVector> btags_corrP4,
 		     vector<float> csvValues,
 		     TLorentzVector hadronicSystem,
@@ -479,13 +479,13 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 
 	for(unsigned int k = 0; k < pfJets_corrP4.size(); k++) {
 	  this_dR = deltaR(pfJets_corrP4[k], it->caloPosition);
-	  if(!allowFakes) h_dR_gamma_jet->Fill(this_dR);
+	  if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_jet->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
 
 	for(unsigned int i = 0; i < tightMuons.size(); i++) {
 	  this_dR = deltaR(tightMuons[i]->momentum, it->caloPosition);
-	  if(!allowFakes) h_dR_gamma_muon->Fill(this_dR);
+	  if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_muon->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
 
@@ -495,7 +495,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 
 	for(unsigned int i = 0; i < tightEles.size(); i++) {
 	  this_dR = deltaR(tightEles[i]->momentum, it->caloPosition);
-	  if(!allowFakes) h_dR_gamma_ele->Fill(this_dR);
+	  if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_ele->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
 	
@@ -505,7 +505,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 
 	for(unsigned int i = 0; i < photons.size(); i++) {
 	  this_dR = deltaR(photons[i]->caloPosition, it->caloPosition);
-	  if(!allowFakes) h_dR_gamma_photon->Fill(this_dR);
+	  if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_photon->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
 
@@ -1246,7 +1246,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
 				      susy::Event& event_,
 				      vector<susy::Muon*> tightMuons, vector<susy::Electron*> tightEles, 
 				      vector<susy::PFJet*> pfJets, vector<susy::PFJet*> btags,
-				      vector<susy::Photon*> photons, vector<susy::Photon*> fakePhotons,
+				      vector<susy::Photon*> photons,
 				      vector<TLorentzVector> pfJets_corrP4, vector<TLorentzVector> btags_corrP4,
 				      vector<float> csvValues,
 				      TLorentzVector hadronicSystem,
@@ -1266,7 +1266,6 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     else treeMap["TopPtReweighting"] = TopPtReweighting(event_);
   }
   treeMap["Nphotons"] = photons.size();
-  treeMap["NfakePhotons"] = fakePhotons.size();
   treeMap["Njets"] = pfJets.size();
   treeMap["Nbtags"] = btags.size();
   treeMap["HT_jets"] = HT_jets;
