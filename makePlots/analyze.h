@@ -15,6 +15,13 @@
 #include "TGraphAsymmErrors.h"
 #include "TGraphErrors.h"
 
+#include "RooRealVar.h"
+#include "RooArgList.h"
+#include "RooArgSet.h"
+#include "RooDataHist.h"
+#include "RooHistPdf.h"
+#include "RooAddPdf.h"
+
 #include <vector>
 #include <iostream>
 #include <map>
@@ -30,6 +37,7 @@
 #include "rootRoutines.h"
 
 using namespace std;
+using namespace RooFit;
 
 const TString gifOrPdf = ".pdf";
 
@@ -206,6 +214,12 @@ class PlotMaker : public TObject {
   void NormalizeQCD();
   TH1D * ReweightQCD(int chan);
   void RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int nBtagReq, int chan);
+
+  void FitQCD();
+  void FitM3();
+  void FitSigmaIetaIeta();
+  void FitChHadIso();
+
   void ScaleFromFits(double qcdSF, double qcdSFerror, 
 		     double wjetsSF, double wjetsSFerror, 
 		     double topSF, double topSFerror, 
@@ -1916,6 +1930,46 @@ void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int n
 
 }
 
+void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, TH1D * backgroundHist, TH1D * dataHist, TString plotName, double& value, double error) {
+
+  //RooFit variables
+  RooRealVar var(varname, varname, varmin, varmax);
+  RooArgList argList();
+  argList.add(var);
+  RooArgSet argSet();
+  argSet.add(var);
+
+  // create PDFs
+  RooDataHist signalDataHist("signalDataHist", "signal RooDataHist", argList, signalHist);
+  RooHistPdf signalPdf("signalPdf", varname+" of signal", argSet, signalDataHist);
+
+  RooDataHist backgroundDataHist("backgroundDataHist", "background RooDataHist", argList, backgroundHist);
+  RooHistPdf backgroundPdf("backgroundPdf", varname+" of background", argSet, backgroundDataHist);
+
+  // data
+  RooDataHist dataDataHist("data "+varname, varname+"in Data", argList, dataHist);
+
+  // signal fraction parameter
+  RooRealVar signalFractionVar("signal fraction", "signal fraction", 0.5, 0.0, 1.0);
+  RooAddPdf sumPdf("totalPdf", "signal and background", signalPdf, backgroundPdf, signalFractionVar);
+
+  // fit
+  sumPdf.fitTo(dataDataHist, RooFit::SumW2Error(kFalse), RooFit::PrintLevel(-1));
+  
+  value = signalFractionVar.getVal();
+  error = signalFractionVar.getError();
+
+  cout << "Fit returned value " << value << " +/- " << error << endl;
+
+  return;
+}
+
+void PlotMaker::FitQCD();
+void PlotMaker::FitM3();
+void PlotMaker::FitSigmaIetaIeta();
+void PlotMaker::FitChHadIso();
+
+
 void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, 
 			      double wjetsSF, double wjetsSFerror, 
 			      double topSF, double topSFerror, 
@@ -3315,3 +3369,4 @@ void plotReducedChi2(vector<TH1D*> gg, vector<TH1D*> gf, vector<TH1D*> ff,
   ff_chi2->SetBinContent(ff_chi2->FindBin(binx, 10), chi2_all);
 
 }
+
