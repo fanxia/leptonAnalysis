@@ -215,10 +215,10 @@ class PlotMaker : public TObject {
   TH1D * ReweightQCD(int chan);
   void RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int nBtagReq, int chan);
 
-  void FitQCD();
-  void FitM3();
-  void FitSigmaIetaIeta();
-  void FitChHadIso();
+  void FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror);
+  void FitM3(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror);
+  void FitSigmaIetaIeta(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror);
+  void FitChHadIso(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror);
 
   void ScaleFromFits(double qcdSF, double qcdSFerror, 
 		     double wjetsSF, double wjetsSFerror, 
@@ -1951,20 +1951,52 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
   RooAddPdf sumPdf("totalPdf", "signal and background", signalPdf, backgroundPdf, signalFractionVar);
 
   // fit
-  sumPdf.fitTo(dataDataHist, RooFit::SumW2Error(kFalse), RooFit::PrintLevel(-1));
+  sumPdf.fitTo(dataDataHist, RooFit::SumW2Error(kFALSE), RooFit::PrintLevel(-1));
   
   value = signalFractionVar.getVal();
   error = signalFractionVar.getError();
 
-  cout << "Fit returned value " << value << " +/- " << error << endl;
-
   return;
 }
 
-void PlotMaker::FitQCD();
-void PlotMaker::FitM3();
-void PlotMaker::FitSigmaIetaIeta();
-void PlotMaker::FitChHadIso();
+void PlotMaker::FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror) {
+
+  unsigned int variableNumber = 1; // for MET
+
+  TH1D * qcd = (TH1D*)h_qcd[variableNumber]->Clone("qcdForQCDFit");
+  TH1D * data = (TH1D*)h_gg[variableNumber]->Clone("dataForQCDFit");
+  TH1D * mc = (TH1D*)mcHistograms[0][variableNumber]->Clone("mcForQCDFit");
+
+  for(unsigned int i = 1; i < mcHistograms.size(); i++) mc->Add(mcHistograms[i][variableNumber]);
+
+  double fitVal, fitError;
+
+  makeFit("pfMET", xlo, xhi, qcd, mc, data, "pfMET_QCD_fit.pdf");
+
+  cout << endl << "QCD Fit returned QCD fraction = " << fitVal << " +/- " << fitError << endl;
+
+  double dataInt = data->Integral();
+  double qcdInt = qcd->Integral();
+  double mcInt = mc->Integral();
+    
+  qcdSF = fitVal * dataInt / qcdInt;
+  qcdSFerror = fitValError * dataInt / qcdInt;
+
+  mcSF = (1. - fitVal) * dataInt / mcInt;
+  mcSFerror = fitValError * dataInt / mcInt;
+
+  cout << "-------------------------------------------------------------" << endl;
+  cout << "qcdSF = " << qcdSF << " +/- " << qcdSFerror << endl;
+  cout << "mcSF = " << mcSF << " +/- " << mcSFerror << endl;
+  cout << "-------------------------------------------------------------" << endl << endl;
+
+  return;
+
+}
+
+void PlotMaker::FitM3(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror) {;}
+void PlotMaker::FitSigmaIetaIeta(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror) {;}
+void PlotMaker::FitChHadIso(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror) {;}
 
 
 void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, 
