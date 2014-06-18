@@ -216,7 +216,9 @@ class PlotMaker : public TObject {
   void RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int nBtagReq, int chan);
 
   void FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror);
-  void FitM3(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror);
+  void FitM3(double xlo, double xhi, 
+	     double qcdSF, double qcdSFerror, double mcSF, double mcSFerror,
+	     double& ttbarSF, double& ttbarSFerror, double& wjetsSF, double& wjetsSFerror);
   void FitSigmaIetaIeta(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror);
   void FitChHadIso(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror);
 
@@ -1994,7 +1996,52 @@ void PlotMaker::FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror
 
 }
 
-void PlotMaker::FitM3(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror) {;}
+void PlotMaker::FitM3(double xlo, double xhi, 
+		      double qcdSF, double qcdSFerror, double mcSF, double mcSFerror,
+		      double& ttbarSF, double& ttbarSFerror, double& wjetsSF, double& wjetsSFerror) {
+
+  unsigned int variableNumber = 14; // for M3
+
+  TH1D * ttbar = (TH1D*)mcHistograms[0][variableNumber]->Clone("ttbarForM3Fit");
+  ttbar->Reset();
+
+  TH1D * data = (TH1D*)h_gg[variableNumber]->Clone("dataForM3Fit");
+  data->Add(h_qcd[variableNumber], -1. * qcdSF);
+
+  TH1D * wjets = (TH1D*)mcHistograms[3][variableNumber]->Clone("wjetsForM3Fit");
+  wjets->Reset();
+
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+    if(tableNames[i] == "ttInclusive" || tableNames[i] == "ttgamma") ttbar->Add(mcHistograms[i][variableNumber], mcSF);
+    else if(tableNames[i] == "vJets" && !(mcNames[i].Contains("JetsToLL"))) wjets->Add(mcHistograms[i][variableNumber], mcSF);
+    else data->Add(mcHistograms[i][variableNumber], -1. * mcSF);
+  }
+
+  double fitVal, fitError;
+
+  makeFit("M3", xlo, xhi, ttbar, wjets, data, "M3_fit.pdf", fitVal, fitError);
+
+  cout << endl << "M3 Fit returned ttbar fraction = " << fitVal << " +/- " << fitError << endl;
+
+  double dataInt = data->Integral();
+  double ttbarInt = ttbar->Integral();
+  double wjetsInt = wjets->Integral();
+    
+  ttbarSF = fitVal * dataInt / ttbarInt;
+  ttbarSFerror = fitError * dataInt / ttbarInt;
+
+  wjetsSF = (1. - fitVal) * dataInt / wjetsInt;
+  wjetsSFerror = fitError * dataInt / wjetsInt;
+
+  cout << "-------------------------------------------------------------" << endl;
+  cout << "ttbarSF = " << ttbarSF << " +/- " << ttbarSFerror << endl;
+  cout << "wjetsSF = " << wjetsSF << " +/- " << wjetsSFerror << endl;
+  cout << "-------------------------------------------------------------" << endl << endl;
+
+  return;
+
+}
+
 void PlotMaker::FitSigmaIetaIeta(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror) {;}
 void PlotMaker::FitChHadIso(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror) {;}
 

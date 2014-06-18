@@ -269,9 +269,14 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   double qcdSF, qcdSFerror;
   double mcSF, mcSFerror;
+  double ttbarSF, ttbarSFerror;
+  double wjetsSF, wjetsSFerror;
 
-  pMaker->FitQCD(0., 50., double& qcdSF, qcdSFerror, mcSF, mcSFerror)
-
+  pMaker->FitQCD(0., 50., qcdSF, qcdSFerror, mcSF, mcSFerror);
+  pMaker->FitM3(70., 500., 
+		qcdSF, qcdSFerror, mcSF, mcSFerror,
+		ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror)
+    
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
   pMaker->CreateTable();
