@@ -256,7 +256,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
   pMaker->SubtractMCFromQCD();
-  pMaker->NormalizeQCD();
+  //pMaker->NormalizeQCD();
   //TH1D * qcdWeights = (TH1D*)pMaker->ReweightQCD(channel);
   //pMaker->RefillQCD(qcdWeights, metCut, nPhotons_req, nBtagReq, channel);
   //pMaker->SubtractMCFromQCD();
@@ -266,6 +266,11 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     topSF, topSFerror, 
     mcSF, mcSFerror);
   */
+
+  double qcdSF, qcdSFerror;
+  double mcSF, mcSFerror;
+
+  pMaker->FitQCD(0., 50., double& qcdSF, qcdSFerror, mcSF, mcSFerror)
 
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
