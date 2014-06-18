@@ -37,6 +37,9 @@ const int nChannels = 4;
 TString channels[nChannels] = {"ele_jjj", "ele_bjj",
 			       "muon_jjj", "muon_bjj"};
 
+TString qcdChannels[nChannels] = {"ele_jjj_eQCDTree", "ele_jjj_veto_eQCDTree",
+				  "muon_jjj_muQCDTree", "muon_jjj_veto_muQCDTree"};
+
 TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut, int nPhotons_req) {
   TH1D * h = new TH1D(name, title, nBins, xlo, xhi);
   h->Sumw2();
@@ -199,7 +202,7 @@ class PlotMaker : public TObject {
   void BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi);
 
   void FillHistograms(double metCut, int nPhotons_req, int nBtagReq, int chan);
-  void SubtractMCFromQCD(int muonQCD_layerAdd);
+  void SubtractMCFromQCD();
   void NormalizeQCD();
   TH1D * ReweightQCD(int chan);
   void RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int nBtagReq, int chan);
@@ -589,9 +592,9 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
     return false;
   }
 
-  mcQCDTrees.push_back((TTree*)mcFiles.back()->Get(channels[channel]+"_eQCDTree"));
+  mcQCDTrees.push_back((TTree*)mcFiles.back()->Get(qcdChannels[channel]));
   if(!mcQCDTrees.back()) {
-    cout << "Could not load TTree " << channels[channel] << "_eQCDTree from TFile " << fileName << endl;
+    cout << "Could not load TTree " << qcdChannels[channel] << " from TFile " << fileName << endl;
     return false;
   }
 
@@ -1740,18 +1743,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 }
 
-void PlotMaker::SubtractMCFromQCD(int muonQCD_layerAdd) {
+void PlotMaker::SubtractMCFromQCD() {
 
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
     for(unsigned int j = 0; j < mcQCDHistograms[i].size(); j++) {
-      if(mcLayerNumbers[i] != muonQCD_layerAdd) continue;
       h_qcd[j]->Add(mcQCDHistograms[i][j], -1.);
      }
   }
 
   for(unsigned int i = 0; i < mcQCDHistograms_2d.size(); i++) {
     for(unsigned int j = 0; j < mcQCDHistograms_2d[i].size(); j++) {
-      if(mcLayerNumbers[i] != muonQCD_layerAdd) continue;
       h_qcd_2d[j]->Add(mcQCDHistograms_2d[i][j], -1.);
      }
   }
