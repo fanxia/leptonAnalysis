@@ -1934,20 +1934,17 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
 
   //RooFit variables
   RooRealVar var(varname, varname, varmin, varmax);
-  RooArgList argList();
-  argList.add(var);
-  RooArgSet argSet();
-  argSet.add(var);
 
   // create PDFs
-  RooDataHist signalDataHist("signalDataHist", "signal RooDataHist", argList, signalHist);
-  RooHistPdf signalPdf("signalPdf", varname+" of signal", argSet, signalDataHist);
+  RooDataHist signalDataHist("signalDataHist", "signal RooDataHist", RooArgList(var), *signalHist);
+  RooHistPdf signalPdf("signalPdf", varname+" of signal", RooArgSet(var), *signalDataHist);
 
-  RooDataHist backgroundDataHist("backgroundDataHist", "background RooDataHist", argList, backgroundHist);
-  RooHistPdf backgroundPdf("backgroundPdf", varname+" of background", argSet, backgroundDataHist);
+
+  RooDataHist backgroundDataHist("backgroundDataHist", "background RooDataHist", RooArgList(var), *backgroundHist);
+  RooHistPdf backgroundPdf("backgroundPdf", varname+" of background", RooArgSet(var), *backgroundDataHist);
 
   // data
-  RooDataHist dataDataHist("data "+varname, varname+"in Data", argList, dataHist);
+  RooDataHist dataDataHist("data "+varname, varname+"in Data", RooArgList(var), *dataHist);
 
   // signal fraction parameter
   RooRealVar signalFractionVar("signal fraction", "signal fraction", 0.5, 0.0, 1.0);

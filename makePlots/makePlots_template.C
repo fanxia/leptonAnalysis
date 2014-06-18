@@ -1,7 +1,6 @@
 void makePlots() {
 
   gSystem->AddIncludePath("-I$ROOFITSYS/include"); 
-  gROOT->Load("libRooFit");
   gROOT->LoadMacro("analyze.C+");
 
   TStopwatch ts;
