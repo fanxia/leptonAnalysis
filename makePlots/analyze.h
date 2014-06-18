@@ -1930,7 +1930,7 @@ void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int n
 
 }
 
-void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, TH1D * backgroundHist, TH1D * dataHist, TString plotName, double& value, double error) {
+void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, TH1D * backgroundHist, TH1D * dataHist, TString plotName, double& value, double& error) {
 
   //RooFit variables
   RooRealVar var(varname, varname, varmin, varmax);
@@ -1971,7 +1971,7 @@ void PlotMaker::FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror
 
   double fitVal, fitError;
 
-  makeFit("pfMET", xlo, xhi, qcd, mc, data, "pfMET_QCD_fit.pdf");
+  makeFit("pfMET", xlo, xhi, qcd, mc, data, "pfMET_QCD_fit.pdf", fitVal, fitError);
 
   cout << endl << "QCD Fit returned QCD fraction = " << fitVal << " +/- " << fitError << endl;
 
@@ -1980,10 +1980,10 @@ void PlotMaker::FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror
   double mcInt = mc->Integral();
     
   qcdSF = fitVal * dataInt / qcdInt;
-  qcdSFerror = fitValError * dataInt / qcdInt;
+  qcdSFerror = fitError * dataInt / qcdInt;
 
   mcSF = (1. - fitVal) * dataInt / mcInt;
-  mcSFerror = fitValError * dataInt / mcInt;
+  mcSFerror = fitError * dataInt / mcInt;
 
   cout << "-------------------------------------------------------------" << endl;
   cout << "qcdSF = " << qcdSF << " +/- " << qcdSFerror << endl;
