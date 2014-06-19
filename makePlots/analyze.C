@@ -271,11 +271,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   double mcSF, mcSFerror;
   double ttbarSF, ttbarSFerror;
   double wjetsSF, wjetsSFerror;
+  double ttjetsSF, ttjetsSFerror;
+  double ttgammaSF, ttgammaSFerror;
 
   pMaker->FitQCD(0., 50., qcdSF, qcdSFerror, mcSF, mcSFerror);
   pMaker->FitM3(70., 500., 
 		qcdSF, qcdSFerror, mcSF, mcSFerror,
-		ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror)
+		ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror);
+  pMaker->FitSigmaIetaIeta(0., 0.012, nPhotons_req,
+			   qcdSF, qcdSFerror, mcSF, mcSFerror,
+			   ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror,
+			   ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
     
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
