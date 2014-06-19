@@ -266,15 +266,15 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   if(nPhotons_req == 0) {
     pMaker->FitQCD(0., 50., qcdSF, qcdSFerror, mcSF, mcSFerror);
-    ScaleFromFits(qcdSF, qcdSFerror, mcSF, mcSFerror,
-		  -1., -1., -1., -1.,
-		  -1., -1., -1., -1.);
+    pMaker->ScaleFromFits(qcdSF, qcdSFerror, mcSF, mcSFerror,
+			  -1., -1., -1., -1.,
+			  -1., -1., -1., -1.);
  
     pMaker->FitM3(70., 500., 
 		  ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror);
-    ScaleFromFits(-1., -1., -1., -1.,
-		  wjetsSF, wjetsSFerror, topSF, topSFerror,
-		  -1., -1., -1., -1.);
+    pMaker->ScaleFromFits(-1., -1., -1., -1.,
+			  wjetsSF, wjetsSFerror, topSF, topSFerror,
+			  -1., -1., -1., -1.);
   }
 
   /*
