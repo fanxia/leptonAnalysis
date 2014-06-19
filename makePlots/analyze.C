@@ -277,12 +277,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 			  -1., -1., -1., -1.);
   }
 
-  /*
+  if(nPhotons_req == 1) {
+    
+    pMaker->NormalizeQCD();
 
     pMaker->FitSigmaIetaIeta(0., 0.012, nPhotons_req,
-			   qcdSF, qcdSFerror, mcSF, mcSFerror,
-			   ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror,
-			   ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
+			     1., 0., 1., 0.,
+			     1., 0., 1., 0.,
+			     ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
+  }
+
+  /*
   pMaker->FitSigmaIetaIeta(0., 2.6, nPhotons_req,
 			   qcdSF, qcdSFerror, mcSF, mcSFerror,
 			   ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror,

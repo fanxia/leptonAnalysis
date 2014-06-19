@@ -1996,6 +1996,27 @@ void PlotMaker::FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror
   cout << "mcSF = " << mcSF << " +/- " << mcSFerror << endl;
   cout << "-------------------------------------------------------------" << endl << endl;
 
+  TCanvas * can = new TCanvas("fitQCD_can", "Plot", 10, 10, 2000, 2000);
+  can->SetLogy(true);
+
+  mc->Scale(mcSF);
+  qcd->Scale(qcdSF);
+
+  TH1D * h_sum = (TH1D*)mc->Clone("h_sum");
+  h_sum->Add(qcd);
+
+  mc->SetLineColor(kRed);
+  h_sum->SetLineColor(kBlue);
+
+  h_sum->Draw("hist");
+  mc->Draw("hist same");
+  qcd->Draw("hist same");
+  data->Draw("e1 same");
+
+  can->SaveAs("fitQCD_"+req+".pdf");
+
+  delete can;
+
   return;
   
 }
