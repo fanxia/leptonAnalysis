@@ -271,7 +271,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 			  -1., -1., -1., -1.);
  
     pMaker->FitM3(70., 500., 
-		  ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror);
+		  topSF, topSFerror, wjetsSF, wjetsSFerror);
     pMaker->ScaleFromFits(-1., -1., -1., -1.,
 			  wjetsSF, wjetsSFerror, topSF, topSFerror,
 			  -1., -1., -1., -1.);
