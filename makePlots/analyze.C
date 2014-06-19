@@ -256,32 +256,38 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
   pMaker->SubtractMCFromQCD();
-  //pMaker->NormalizeQCD();
-  //TH1D * qcdWeights = (TH1D*)pMaker->ReweightQCD(channel);
-  //pMaker->RefillQCD(qcdWeights, metCut, nPhotons_req, nBtagReq, channel);
-  //pMaker->SubtractMCFromQCD();
-  /*
-    pMaker->ScaleFromFits(qcdSF, qcdSFerror, 
-    wjetsSF, wjetsSFerror, 
-    topSF, topSFerror, 
-    mcSF, mcSFerror);
-  */
 
   double qcdSF, qcdSFerror;
   double mcSF, mcSFerror;
-  double ttbarSF, ttbarSFerror;
+  double topSF, topSFerror;
   double wjetsSF, wjetsSFerror;
   double ttjetsSF, ttjetsSFerror;
   double ttgammaSF, ttgammaSFerror;
 
-  pMaker->FitQCD(0., 50., qcdSF, qcdSFerror, mcSF, mcSFerror);
-  pMaker->FitM3(70., 500., 
-		qcdSF, qcdSFerror, mcSF, mcSFerror,
-		ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror);
-  pMaker->FitSigmaIetaIeta(0., 0.012, nPhotons_req,
+  if(nPhotons_req == 0) {
+    pMaker->FitQCD(0., 50., qcdSF, qcdSFerror, mcSF, mcSFerror);
+    ScaleFromFits(qcdSF, qcdSFerror, mcSF, mcSFerror,
+		  -1., -1., -1., -1.,
+		  -1., -1., -1., -1.);
+ 
+    pMaker->FitM3(70., 500., 
+		  ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror);
+    ScaleFromFits(-1., -1., -1., -1.,
+		  wjetsSF, wjetsSFerror, topSF, topSFerror,
+		  -1., -1., -1., -1.);
+  }
+
+  /*
+
+    pMaker->FitSigmaIetaIeta(0., 0.012, nPhotons_req,
 			   qcdSF, qcdSFerror, mcSF, mcSFerror,
 			   ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror,
 			   ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
+  pMaker->FitSigmaIetaIeta(0., 2.6, nPhotons_req,
+			   qcdSF, qcdSFerror, mcSF, mcSFerror,
+			   ttbarSF, ttbarSFerror, wjetsSF, wjetsSFerror,
+			   ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
+  */
     
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
