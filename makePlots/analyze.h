@@ -201,7 +201,7 @@ class PlotMaker : public TObject {
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 			bool removeTTA, bool reweightTop,
-			int channel, int layer, int color, TString legendEntry, TString tableEntry);
+			int channel, int layer, int color, TString legendEntry, TString tableEntry, int photonMode);
   
   void SetTrees(TTree * gg, TTree * qcd,
 		TTree * sig_a, TTree * sig_a_JECup, TTree * sig_a_JECdown,
