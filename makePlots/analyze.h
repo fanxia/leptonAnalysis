@@ -48,6 +48,12 @@ TString channels[nChannels] = {"ele_jjj", "ele_bjj",
 TString qcdChannels[nChannels] = {"ele_jjj_eQCDTree", "ele_jjj_veto_eQCDTree",
 				  "muon_jjj_muQCDTree", "muon_jjj_veto_muQCDTree"};
 
+TString qcdChannels_noSigmaIetaIeta[nChannels] = {"ele_jjj_eQCDnoSigmaIetaIetaTree", "ele_jjj_veto_eQCDnoSigmaIetaIetaTree",
+						  "muon_jjj_muQCDnoSigmaIetaIetaTree", "muon_jjj_veto_muQCDnoSigmaIetaIetaTree"};
+
+TString qcdChannels_noChHadIso[nChannels] = {"ele_jjj_eQCDnoChHadIsoTree", "ele_jjj_veto_eQCDnoChHadIsoTree",
+					     "muon_jjj_muQCDnoChHadIsoTree", "muon_jjj_veto_muQCDnoChHadIsoTree"};
+
 TH1D * HistoFromTree(TString variable, TTree * tree, TString name, TString title, Int_t nBins, Double_t xlo, Double_t xhi, double metCut, int nPhotons_req) {
   TH1D * h = new TH1D(name, title, nBins, xlo, xhi);
   h->Sumw2();
@@ -595,27 +601,39 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
     return false;
   }
 
-  mcTrees.push_back((TTree*)mcFiles.back()->Get(channels[channel]+"_signalTree"));
+  TString signalString = channels[channel]+"_signalTree";
+  if(photonMode == 1) {
+    signalString = channels[channel]+"_noSigmaIetaIetaTree";
+  }
+  if(photonMode == 2) {
+    signalString = channels[channel]+"_noChHadIsoTree";
+  }
+
+  TString qcdString = qcdChannels[channel];
+  if(photonMode == 1) qcdString = qcdChannels_noSigmaIetaIeta[channel];
+  if(photonMode == 2) qcdString = qcdChannels_noChHadIso[channel];
+
+  mcTrees.push_back((TTree*)mcFiles.back()->Get(signalString));
   if(!mcTrees.back()) {
-    cout << "Could not load TTree " << channels[channel] << "_signalTree from TFile " << fileName << endl;
+    cout << "Could not load TTree " << signalString << " from TFile " << fileName << endl;
     return false;
   }
 
-  mcTrees_JECup.push_back((TTree*)mcFiles.back()->Get(channels[channel]+"_signalTree_JECup"));
+  mcTrees_JECup.push_back((TTree*)mcFiles.back()->Get(signalString+"_JECup"));
   if(!mcTrees_JECup.back()) {
-    cout << "Could not load TTree " << channels[channel] << "_signalTree_JECup from TFile " << fileName << endl;
+    cout << "Could not load TTree " << signalString << "_JECup from TFile " << fileName << endl;
     return false;
   }
 
-  mcTrees_JECdown.push_back((TTree*)mcFiles.back()->Get(channels[channel]+"_signalTree_JECdown"));
+  mcTrees_JECdown.push_back((TTree*)mcFiles.back()->Get(signalString+"_JECdown"));
   if(!mcTrees_JECdown.back()) {
-    cout << "Could not load TTree " << channels[channel] << "_signalTree_JECdown from TFile " << fileName << endl;
+    cout << "Could not load TTree " << signalString << "_JECdown from TFile " << fileName << endl;
     return false;
   }
-
-  mcQCDTrees.push_back((TTree*)mcFiles.back()->Get(qcdChannels[channel]));
+durp
+  mcQCDTrees.push_back((TTree*)mcFiles.back()->Get(qcdString));
   if(!mcQCDTrees.back()) {
-    cout << "Could not load TTree " << qcdChannels[channel] << " from TFile " << fileName << endl;
+    cout << "Could not load TTree " << qcdString << " from TFile " << fileName << endl;
     return false;
   }
 
