@@ -13,6 +13,7 @@ rate			sigaval		eleqcdval	ttInclusiveval		vJetsval	singleTopval		dibosonval	ttVv
 --------------
 u_lumi lnN		1.026		-		1.026			1.026		1.026			1.026		1.026		1.026
 u_btag lnN		sigabtag	-		ttInclusivebtag		vJetsbtag	singleTopbtag		dibosonbtag	ttVbtag		ttgammabtag
+u_pileup lnN		sigapu		-		ttInclusivepu		vJetspu		singleToppu		dibosonpu	ttVpu		ttgammapu
 u_susy_xsec lnN		sigaxsec	-		-			-		-			-		-		-
 u_ttbar_scale lnN	-		-		ttInclusivescale 	-		-			-		-		-
 u_ttbar_pdf lnN		-		-		ttInclusivepdf	 	-		-			-		-		-

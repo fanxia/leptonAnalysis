@@ -13,6 +13,7 @@ rate			sigaval		ttInclusiveval		ttgammaval
 --------------
 u_lumi lnN		1.026		1.026			1.026
 u_btag lnN		sigabtag	ttInclusivebtag		ttgammabtag
+u_pileup lnN		sigapu		ttInclusivepu		ttgammapu
 u_susy_xsec lnN		sigaxsec	-			-
 u_ttbar_scale lnN	-		ttInclusivescale 	-
 u_ttbar_pdf lnN		-		ttInclusivepdf	 	-
