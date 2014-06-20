@@ -1149,8 +1149,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     mcQCDTrees[i]->SetBranchAddress("btagWeightErr", &btagWeightErr);
     mcQCDTrees[i]->SetBranchAddress("btagWeightUp", &btagWeightUp);
     mcQCDTrees[i]->SetBranchAddress("btagWeightDown", &btagWeightDown);
-    mcQCDTrees[i]->SetBranchAddress("puWeightUp", &puWeightUp);
-    mcQCDTrees[i]->SetBranchAddress("puWeightDown", &puWeightDown);
+    mcQCDTrees[i]->SetBranchAddress("pileupWeightUp", &puWeightUp);
+    mcQCDTrees[i]->SetBranchAddress("pileupWeightDown", &puWeightDown);
 
     if(removeTTAoverlap[i]) {
       mcTrees[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
@@ -1174,8 +1174,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigaTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
   sigaTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigaTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigaTree->SetBranchAddress("puWeightUp", &puWeightUp);
-  sigaTree->SetBranchAddress("puWeightDown", &puWeightDown);
+  sigaTree->SetBranchAddress("pileupWeightUp", &puWeightUp);
+  sigaTree->SetBranchAddress("pileupWeightDown", &puWeightDown);
   sigaTree->SetBranchAddress("TopPtReweighting", &topPtReweighting);
   
   sigaTree_JECup->SetBranchAddress("pileupWeight", &puWeight);
@@ -1184,8 +1184,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigaTree_JECup->SetBranchAddress("btagWeightErr", &btagWeightErr);
   sigaTree_JECup->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigaTree_JECup->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigaTree_JECup->SetBranchAddress("puWeightUp", &puWeightUp);
-  sigaTree_JECup->SetBranchAddress("puWeightDown", &puWeightDown);
+  sigaTree_JECup->SetBranchAddress("pileupWeightUp", &puWeightUp);
+  sigaTree_JECup->SetBranchAddress("pileupWeightDown", &puWeightDown);
   sigaTree_JECup->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
   sigaTree_JECdown->SetBranchAddress("pileupWeight", &puWeight);
@@ -1194,8 +1194,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigaTree_JECdown->SetBranchAddress("btagWeightErr", &btagWeightErr);
   sigaTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigaTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigaTree_JECdown->SetBranchAddress("puWeightUp", &puWeightUp);
-  sigaTree_JECdown->SetBranchAddress("puWeightDown", &puWeightDown);
+  sigaTree_JECdown->SetBranchAddress("pileupWeightUp", &puWeightUp);
+  sigaTree_JECdown->SetBranchAddress("pileupWeightDown", &puWeightDown);
   sigaTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
   sigbTree->SetBranchAddress("pileupWeight", &puWeight);
@@ -1204,8 +1204,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigbTree->SetBranchAddress("btagWeightErr", &btagWeightErr);
   sigbTree->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigbTree->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigbTree->SetBranchAddress("puWeightUp", &puWeightUp);
-  sigbTree->SetBranchAddress("puWeightDown", &puWeightDown);
+  sigbTree->SetBranchAddress("pileupWeightUp", &puWeightUp);
+  sigbTree->SetBranchAddress("pileupWeightDown", &puWeightDown);
   sigbTree->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
   sigbTree_JECup->SetBranchAddress("pileupWeight", &puWeight);
@@ -1214,8 +1214,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigbTree_JECup->SetBranchAddress("btagWeightErr", &btagWeightErr);
   sigbTree_JECup->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigbTree_JECup->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigbTree_JECup->SetBranchAddress("puWeightUp", &puWeightUp);
-  sigbTree_JECup->SetBranchAddress("puWeightDown", &puWeightDown);
+  sigbTree_JECup->SetBranchAddress("pileupWeightUp", &puWeightUp);
+  sigbTree_JECup->SetBranchAddress("pileupWeightDown", &puWeightDown);
   sigbTree_JECup->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
   sigbTree_JECdown->SetBranchAddress("pileupWeight", &puWeight);
@@ -1224,8 +1224,8 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigbTree_JECdown->SetBranchAddress("btagWeightErr", &btagWeightErr);
   sigbTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigbTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigbTree_JECdown->SetBranchAddress("puWeightUp", &puWeightUp);
-  sigbTree_JECdown->SetBranchAddress("puWeightDown", &puWeightDown);
+  sigbTree_JECdown->SetBranchAddress("pileupWeightUp", &puWeightUp);
+  sigbTree_JECdown->SetBranchAddress("pileupWeightDown", &puWeightDown);
   sigbTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
   for(int i = 0; i < ggTree->GetEntries(); i++) {
