@@ -338,21 +338,17 @@ void SusyEventAnalyzer::Data() {
   map<TString, float> treeMap;
   for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;
 
-  vector<TTree*> signalTrees, eQCDTrees, muQCDTrees, noSigmaIetaIetaTrees, noChHadIsoTrees;
+  vector<TTree*> signalTrees, 
+    noSigmaIetaIetaTrees, noChHadIsoTrees,
+    eQCDTrees,
+    eQCDnoSigmaIetaIetaTrees, eQCDnoChHadIsoTrees,
+    muQCDTrees,
+    muQCDnoSigmaIetaIetaTrees, muQCDnoChHadIsoTrees;
+
   for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree(channels[i]+"_signalTree", "An event tree for final analysis");
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
     signalTrees.push_back(tree);
-  }
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree(channels[i]+"_eQCDTree", "An event tree for final analysis");
-    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
-    eQCDTrees.push_back(tree);
-  }
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree(channels[i]+"_muQCDTree", "An event tree for final analysis");
-    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
-    muQCDTrees.push_back(tree);
   }
   for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree(channels[i]+"_noSigmaIetaIetaTree", "An event tree for final analysis");
@@ -364,7 +360,39 @@ void SusyEventAnalyzer::Data() {
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
     noChHadIsoTrees.push_back(tree);
   }
-    
+
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_eQCDTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    eQCDTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_eQCDnoSigmaIetaIetaTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    eQCDnoSigmaIetaIetaTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_eQCDnoChHadIsoTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    eQCDnoChHadIsoTrees.push_back(tree);
+  }
+
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_muQCDTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    muQCDTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_muQCDnoSigmaIetaIetaTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    muQCDnoSigmaIetaIetaTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_muQCDnoChHadIsoTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    muQCDnoChHadIsoTrees.push_back(tree);
+  }
+      
   ScaleFactorInfo sf(btagger);
 
   bool quitAfterProcessing = false;
@@ -436,8 +464,6 @@ void SusyEventAnalyzer::Data() {
     for(int qcdMode = kSignal; qcdMode < kNumSearchModes; qcdMode++) {
 
       for(int photonMode = kSignalPhotons; photonMode < kNumPhotonModes; photonMode++) {
-
-	if(qcdMode != kSignal && photonMode != kSignalPhotons) continue;
 
 	float HT = 0.;
 	
@@ -546,14 +572,34 @@ void SusyEventAnalyzer::Data() {
 	    }
 	  }
 	  
-	  if(photonMode == kNoSigmaIetaIeta && qcdMode == kSignal) {
-	    nCnt[5][chan]++;
-	    noSigmaIetaIetaTrees[chan]->Fill();
+	  if(photonMode == kNoSigmaIetaIeta) {
+	    if(qcdMode == kSignal) {
+	      nCnt[5][chan]++;
+	      noSigmaIetaIetaTrees[chan]->Fill();
+	    }
+	    else if(qcdMode == kElectronQCD) {
+	      nCnt[6][chan]++;
+	      eQCDnoSigmaIetaIetaTrees[chan]->Fill();
+	    }
+	    else if(qcdMode == kMuonQCD) {
+	      nCnt[7][chan]++;
+	      muQCDnoSigmaIetaIetaTrees[chan]->Fill();
+	    }
 	  }
 
-	  if(photonMode == kNoChHadIso && qcdMode == kSignal) {
-	    nCnt[6][chan]++;
-	    noChHadIsoTrees[chan]->Fill();
+	  if(photonMode == kNoChHadIso) {
+	    if(qcdMode == kSignal) {
+	      nCnt[8][chan]++;
+	      noChHadIsoTrees[chan]->Fill();
+	    }
+	    else if(qcdMode == kElectronQCD) {
+	      nCnt[9][chan]++;
+	      eQCDnoChHadIsoTrees[chan]->Fill();
+	    }
+	    else if(qcdMode == kMuonQCD) {
+	      nCnt[10][chan]++;
+	      muQCDnoChHadIsoTrees[chan]->Fill();
+	    }
 	  }
 
 	} // loop over jet/btag req channels
@@ -574,11 +620,15 @@ void SusyEventAnalyzer::Data() {
   cout << endl;
   for(int i = 0; i < nChannels; i++) {
     cout << "--------------- " << channels[i] << " Requirement ----------------" << endl;
-    cout << "Signal          " << channels[i] << " events : " << nCnt[2][i] << endl;
-    cout << "eQCD            " << channels[i] << " events : " << nCnt[3][i] << endl;
-    cout << "muQCD           " << channels[i] << " events : " << nCnt[4][i] << endl;
-    cout << "noSigmaIetaIeta " << channels[i] << " events : " << nCnt[5][i] << endl;
-    cout << "noChHadIso      " << channels[i] << " events : " << nCnt[6][i] << endl;
+    cout << "Signal               " << channels[i] << " events : " << nCnt[2][i] << endl;
+    cout << "eQCD                 " << channels[i] << " events : " << nCnt[3][i] << endl;
+    cout << "muQCD                " << channels[i] << " events : " << nCnt[4][i] << endl;
+    cout << "noSigmaIetaIeta      " << channels[i] << " events : " << nCnt[5][i] << endl;
+    cout << "eQCDnoSigmaIetaIeta  " << channels[i] << " events : " << nCnt[6][i] << endl;
+    cout << "muQCDnoSigmaIetaIeta " << channels[i] << " events : " << nCnt[7][i] << endl;
+    cout << "noChHadIso           " << channels[i] << " events : " << nCnt[8][i] << endl;
+    cout << "eQCDnoChHadIso       " << channels[i] << " events : " << nCnt[9][i] << endl;
+    cout << "muQCDnoChHadIso      " << channels[i] << " events : " << nCnt[10][i] << endl;
   }
   cout << "-----------------------------------------------" << endl;
   cout << endl;
@@ -654,9 +704,12 @@ void SusyEventAnalyzer::Acceptance() {
   for(int i = 0; i < nTreeVariables; i++) treeMap[varNames[i]] = 0.;
 
   vector<TTree*> signalTrees, signalTrees_JECup, signalTrees_JECdown;
-  vector<TTree*> eQCDTrees, muQCDTrees;
-  vector<TTree*> noSigmaIetaIetaTrees, noChHadIsoTrees;
-
+  vector<TTree*> noSigmaIetaIetaTrees, noChHadIsoTrees,
+    eQCDTrees,
+    eQCDnoSigmaIetaIetaTrees, eQCDnoChHadIsoTrees,
+    muQCDTrees,
+    muQCDnoSigmaIetaIetaTrees, muQCDnoChHadIsoTrees;
+  
   for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree(channels[i]+"_signalTree", "An event tree for final analysis");
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
@@ -672,16 +725,7 @@ void SusyEventAnalyzer::Acceptance() {
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
     signalTrees_JECdown.push_back(tree);
   }
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree(channels[i]+"_eQCDTree", "An event tree for final analysis");
-    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
-    eQCDTrees.push_back(tree);
-  }
-  for(int i = 0; i < nChannels; i++) {
-    TTree * tree = new TTree(channels[i]+"_muQCDTree", "An event tree for final analysis");
-    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
-    muQCDTrees.push_back(tree);
-  }
+
   for(int i = 0; i < nChannels; i++) {
     TTree * tree = new TTree(channels[i]+"_noSigmaIetaIetaTree", "An event tree for final analysis");
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
@@ -692,7 +736,39 @@ void SusyEventAnalyzer::Acceptance() {
     for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
     noChHadIsoTrees.push_back(tree);
   }
-  
+
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_eQCDTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    eQCDTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_eQCDnoSigmaIetaIetaTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    eQCDnoSigmaIetaIetaTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_eQCDnoChHadIsoTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    eQCDnoChHadIsoTrees.push_back(tree);
+  }
+
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_muQCDTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    muQCDTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_muQCDnoSigmaIetaIetaTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    muQCDnoSigmaIetaIetaTrees.push_back(tree);
+  }
+  for(int i = 0; i < nChannels; i++) {
+    TTree * tree = new TTree(channels[i]+"_muQCDnoChHadIsoTree", "An event tree for final analysis");
+    for(int j = 0; j < nTreeVariables; j++) tree->Branch(varNames[j], &treeMap[varNames[j]], varNames[j]+"/F");
+    muQCDnoChHadIsoTrees.push_back(tree);
+  }
+
   ScaleFactorInfo sf(btagger);
   TFile * btagEfficiency = new TFile("btagEfficiency"+output_code_t+".root", "READ");
   sf.SetTaggingEfficiencies((TH1F*)btagEfficiency->Get("lEff"+output_code_t), (TH1F*)btagEfficiency->Get("cEff"+output_code_t), (TH1F*)btagEfficiency->Get("bEff"+output_code_t));
@@ -766,7 +842,6 @@ void SusyEventAnalyzer::Acceptance() {
       for(int jetSyst = kCentral; jetSyst < kNumJetSytematics; jetSyst++) {
 	for(int photonMode = kSignalPhotons; photonMode < kNumPhotonModes; photonMode++) {
 
-	  if(qcdMode != kSignal && photonMode != kSignalPhotons) continue;
 	  if(jetSyst != kCentral && photonMode != kSignalPhotons) continue;
 	  if(qcdMode != kSignal && jetSyst != kCentral) continue;
 
@@ -873,34 +948,57 @@ void SusyEventAnalyzer::Acceptance() {
 
 	    if(photonMode == kSignalPhotons) {
 	      if(qcdMode == kSignal) {
+		
 		if(jetSyst == kCentral) {
 		  nCnt[2][chan]++;
 		  signalTrees[chan]->Fill();
 		}
 		else if(jetSyst == kJECup) signalTrees_JECup[chan]->Fill();
 		else if(jetSyst == kJECdown) signalTrees_JECdown[chan]->Fill();
+
 	      }
-	      
 	      else if(qcdMode == kElectronQCD) {
 		nCnt[3][chan]++;
 		eQCDTrees[chan]->Fill();
 	      }
-	      
 	      else if(qcdMode == kMuonQCD) {
 		nCnt[4][chan]++;
 		muQCDTrees[chan]->Fill();
 	      }
+	    }
+	    
+	    if(jetSyst == kCentral) {
+
+	      if(photonMode == kNoSigmaIetaIeta) {
+		if(qcdMode == kSignal) {
+		  nCnt[5][chan]++;
+		  noSigmaIetaIetaTrees[chan]->Fill();
+		}
+		else if(qcdMode == kElectronQCD) {
+		  nCnt[6][chan]++;
+		  eQCDnoSigmaIetaIetaTrees[chan]->Fill();
+		}
+		else if(qcdMode == kMuonQCD) {
+		  nCnt[7][chan]++;
+		  muQCDnoSigmaIetaIetaTrees[chan]->Fill();
+		}
+	      }
 	      
-	    }
-
-	    if(photonMode == kNoSigmaIetaIeta && qcdMode == kSignal && jetSyst == kCentral) {
-	      nCnt[5][chan]++;
-	      noSigmaIetaIetaTrees[chan]->Fill();
-	    }
-
-	    if(photonMode == kNoChHadIso && qcdMode == kSignal && jetSyst == kCentral) {
-	      nCnt[6][chan]++;
-	      noChHadIsoTrees[chan]->Fill();
+	      if(photonMode == kNoChHadIso) {
+		if(qcdMode == kSignal) {
+		  nCnt[8][chan]++;
+		  noChHadIsoTrees[chan]->Fill();
+		}
+		else if(qcdMode == kElectronQCD) {
+		  nCnt[9][chan]++;
+		  eQCDnoChHadIsoTrees[chan]->Fill();
+		}
+		else if(qcdMode == kMuonQCD) {
+		  nCnt[10][chan]++;
+		  muQCDnoChHadIsoTrees[chan]->Fill();
+		}
+	      }
+	      
 	    }
 
 	  } // for channels
@@ -919,11 +1017,15 @@ void SusyEventAnalyzer::Acceptance() {
   cout << endl;
   for(int i = 0; i < nChannels; i++) {
     cout << "---------------- " << channels[i] << " Requirement ----------------" << endl;
-    cout << "Signal " << channels[i] << " events : " << nCnt[2][i] << endl;
-    if(nEleReq[i] == 1) cout << "eQCD   " << channels[i] << " events : " << nCnt[3][i] << endl;
-    if(nMuonReq[i] == 1) cout << "muQCD   " << channels[i] << " events : " << nCnt[4][i] << endl;
-    cout << "noSigmaIetaIeta " << channels[i] << " events : " << nCnt[5][i] << endl;
-    cout << "noChHadIso      " << channels[i] << " events : " << nCnt[6][i] << endl;
+    cout << "Signal               " << channels[i] << " events : " << nCnt[2][i] << endl;
+    cout << "eQCD                 " << channels[i] << " events : " << nCnt[3][i] << endl;
+    cout << "muQCD                " << channels[i] << " events : " << nCnt[4][i] << endl;
+    cout << "noSigmaIetaIeta      " << channels[i] << " events : " << nCnt[5][i] << endl;
+    cout << "eQCDnoSigmaIetaIeta  " << channels[i] << " events : " << nCnt[6][i] << endl;
+    cout << "muQCDnoSigmaIetaIeta " << channels[i] << " events : " << nCnt[7][i] << endl;
+    cout << "noChHadIso           " << channels[i] << " events : " << nCnt[8][i] << endl;
+    cout << "eQCDnoChHadIso       " << channels[i] << " events : " << nCnt[9][i] << endl;
+    cout << "muQCDnoChHadIso      " << channels[i] << " events : " << nCnt[10][i] << endl;
   }
   cout << endl;
   cout << "----------------Continues, info----------------" << endl;
