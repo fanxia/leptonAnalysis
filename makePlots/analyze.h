@@ -300,8 +300,9 @@ class PlotMaker : public TObject {
   vector< vector<TH2D*> > mcQCDHistograms_2d;
 
   TTree * ggTree;
-  TTree * qcdTree;
 
+  TTree * qcdTree;
+  
   TTree * sigaTree;
   TTree * sigaTree_JECup;
   TTree * sigaTree_JECdown;
@@ -1050,7 +1051,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     mcTrees[i]->SetBranchAddress("btagWeightErr", &btagWeightErr);
     mcTrees[i]->SetBranchAddress("btagWeightUp", &btagWeightUp);
     mcTrees[i]->SetBranchAddress("btagWeightDown", &btagWeightDown);
-    
+
     mcTrees_JECup[i]->SetBranchAddress("pileupWeight", &puWeight);
     mcTrees_JECup[i]->SetBranchAddress("btagWeight", &btagWeight);
     mcTrees_JECdown[i]->SetBranchAddress("pileupWeight", &puWeight);
@@ -1126,7 +1127,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigbTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
   sigbTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
   sigbTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
-  
+
   for(int i = 0; i < ggTree->GetEntries(); i++) {
     ggTree->GetEntry(i);
 
@@ -1961,6 +1962,31 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
   
   value = signalFractionVar.getVal();
   error = signalFractionVar.getError();
+  
+  TCanvas * can = new TCanvas("fitQCD_can", "Plot", 10, 10, 2000, 2000);
+  can->SetLogy(true);
+
+  signalHist->Scale(value * dataHist->Integral() / signalHist->Integral());
+  backgroundHist->Scale((1.-value) * dataHist->Integral() / backgroundHist->Integral());
+
+  TH1D * h_sum = (TH1D*)signalHist->Clone("h_sum");
+  h_sum->Add(backgroundHist);
+  h_sum->SetLineColor(3);
+
+  signalHist->SetLineColor(kRed);
+  signalHist->SetLineWidth(3);
+
+  backgroundHist->SetLineColor(kBlue);
+  backgroundHist->SetLineWidth(3);
+  
+  h_sum->Draw("hist");
+  signalHist->Draw("hist same");
+  backgroundHist->Draw("hist same");
+  dataHist->Draw("e1 same");
+
+  can->SaveAs(plotName);
+
+  delete can;
 
   return;
 }
@@ -1977,7 +2003,7 @@ void PlotMaker::FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror
 
   double fitVal, fitError;
 
-  makeFit("pfMET", xlo, xhi, qcd, mc, data, "pfMET_QCD_fit.pdf", fitVal, fitError);
+  makeFit("pfMET", xlo, xhi, qcd, mc, data, "pfMET_QCD_fit_"+req+".pdf", fitVal, fitError);
 
   cout << endl << "QCD Fit returned QCD fraction = " << fitVal << " +/- " << fitError << endl;
 
@@ -1995,27 +2021,6 @@ void PlotMaker::FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror
   cout << "qcdSF = " << qcdSF << " +/- " << qcdSFerror << endl;
   cout << "mcSF = " << mcSF << " +/- " << mcSFerror << endl;
   cout << "-------------------------------------------------------------" << endl << endl;
-
-  TCanvas * can = new TCanvas("fitQCD_can", "Plot", 10, 10, 2000, 2000);
-  can->SetLogy(true);
-
-  mc->Scale(mcSF);
-  qcd->Scale(qcdSF);
-
-  TH1D * h_sum = (TH1D*)mc->Clone("h_sum");
-  h_sum->Add(qcd);
-
-  mc->SetLineColor(kRed);
-  h_sum->SetLineColor(kBlue);
-
-  h_sum->Draw("hist");
-  mc->Draw("hist same");
-  qcd->Draw("hist same");
-  data->Draw("e1 same");
-
-  can->SaveAs("fitQCD_"+req+".pdf");
-
-  delete can;
 
   return;
   
@@ -2043,7 +2048,7 @@ void PlotMaker::FitM3(double xlo, double xhi,
 
   double fitVal, fitError;
 
-  makeFit("M3", xlo, xhi, ttbar, wjets, data, "M3_fit.pdf", fitVal, fitError);
+  makeFit("M3", xlo, xhi, ttbar, wjets, data, "M3_fit_"+req+".pdf", fitVal, fitError);
 
   cout << endl << "M3 Fit returned ttbar fraction = " << fitVal << " +/- " << fitError << endl;
 
@@ -2100,7 +2105,7 @@ void PlotMaker::FitSigmaIetaIeta(double xlo, double xhi, int nPhotons_req,
 
   double fitVal, fitError;
 
-  makeFit("sigmaIetaIeta", xlo, xhi, ttbar, ttgamma, data, "sIetaIeta_fit.pdf", fitVal, fitError);
+  makeFit("sigmaIetaIeta", xlo, xhi, ttbar, ttgamma, data, "sIetaIeta_fit_"+req+".pdf", fitVal, fitError);
 
   cout << endl << "sIetaIeta Fit returned ttjets fraction = " << fitVal << " +/- " << fitError << endl;
 
@@ -2157,7 +2162,7 @@ void PlotMaker::FitChHadIso(double xlo, double xhi, int nPhotons_req,
 
   double fitVal, fitError;
 
-  makeFit("sigmaIetaIeta", xlo, xhi, ttbar, ttgamma, data, "chHadIso_fit.pdf", fitVal, fitError);
+  makeFit("sigmaIetaIeta", xlo, xhi, ttbar, ttgamma, data, "chHadIso_fit_"+req+".pdf", fitVal, fitError);
 
   cout << endl << "chHadIso Fit returned ttjets fraction = " << fitVal << " +/- " << fitError << endl;
 
