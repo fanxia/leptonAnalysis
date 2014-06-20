@@ -593,7 +593,7 @@ void PlotMaker::LoadPhotonSFs(TString fileName) {
 bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
 				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 				 bool removeTTA, bool reweightTop,
-				 int channel, int layer, int color, TString legendEntry, TString tableEntry) {
+				 int channel, int layer, int color, TString legendEntry, TString tableEntry, int photonMode) {
 
   mcFiles.push_back(new TFile(fileName, "READ"));
   if(!mcFiles.back()) {
@@ -630,7 +630,7 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
     cout << "Could not load TTree " << signalString << "_JECdown from TFile " << fileName << endl;
     return false;
   }
-durp
+
   mcQCDTrees.push_back((TTree*)mcFiles.back()->Get(qcdString));
   if(!mcQCDTrees.back()) {
     cout << "Could not load TTree " << qcdString << " from TFile " << fileName << endl;
