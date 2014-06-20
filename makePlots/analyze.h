@@ -1963,25 +1963,28 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
   value = signalFractionVar.getVal();
   error = signalFractionVar.getError();
   
-  TCanvas * can = new TCanvas("fitQCD_can", "Plot", 10, 10, 2000, 2000);
+  TCanvas * can = new TCanvas("fit_can", "Plot", 10, 10, 2000, 2000);
   can->SetLogy(true);
 
-  signalHist->Scale(value * dataHist->Integral() / signalHist->Integral());
-  backgroundHist->Scale((1.-value) * dataHist->Integral() / backgroundHist->Integral());
+  TH1D * h_sig = (TH1D*)signalHist->Clone("h_sig_"+varname);
+  TH1D * h_bkg = (TH1D*)backgroundHist->Clone("h_bkg_"+varname);
 
-  TH1D * h_sum = (TH1D*)signalHist->Clone("h_sum");
-  h_sum->Add(backgroundHist);
-  h_sum->SetLineColor(3);
+  h_sig->Scale(value * dataHist->Integral() / signalHist->Integral());
+  h_bkg->Scale((1.-value) * dataHist->Integral() / backgroundHist->Integral());
 
-  signalHist->SetLineColor(kRed);
-  signalHist->SetLineWidth(3);
+  TH1D * h_sum = (TH1D*)h_sig->Clone("h_sum");
+  h_sum->Add(h_bkg);
+  h_sum->SetLineWidth(3);
 
-  backgroundHist->SetLineColor(kBlue);
-  backgroundHist->SetLineWidth(3);
+  h_sig->SetLineColor(kRed);
+  h_sig->SetLineWidth(3);
+
+  h_bkg->SetLineColor(kBlue);
+  h_bkg->SetLineWidth(3);
   
   h_sum->Draw("hist");
-  signalHist->Draw("hist same");
-  backgroundHist->Draw("hist same");
+  h_sig->Draw("hist same");
+  h_bkg->Draw("hist same");
   dataHist->Draw("e1 same");
 
   can->SaveAs(plotName);
