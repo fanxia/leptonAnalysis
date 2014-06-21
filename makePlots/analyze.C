@@ -924,20 +924,17 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   double ttjetsSF, ttjetsSFerror;
   double ttgammaSF, ttgammaSFerror;
 
-  if(nPhotons_req == 1) {
-    
-    pMaker->NormalizeQCD();
+  pMaker->NormalizeQCD();
 
-    pMaker->FitSigmaIetaIeta(0.005, 0.025, nPhotons_req,
-			     1., 0., 1., 0.,
-			     1., 0., 1., 0.,
-			     ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
-
-    pMaker->FitChHadIso(0., 2.6, nPhotons_req,
-			1., 0., 1., 0.,
-			1., 0., 1., 0.,
-			ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
-  }
+  pMaker->FitSigmaIetaIeta(0.005, 0.025, nPhotons_req,
+			   1., 0., 1., 0.,
+			   1., 0., 1., 0.,
+			   ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
+  
+  pMaker->FitChHadIso(0., 2.6, nPhotons_req,
+		      1., 0., 1., 0.,
+		      1., 0., 1., 0.,
+		      ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
 
   delete pMaker;
   

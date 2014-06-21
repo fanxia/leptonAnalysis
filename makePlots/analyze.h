@@ -2286,7 +2286,12 @@ void PlotMaker::FitSigmaIetaIeta(double xlo, double xhi, int nPhotons_req,
 
   double fitVal, fitError;
 
-  makeFit("sigmaIetaIeta", xlo, xhi, ttbar, ttgamma, data, "sIetaIeta_fit_"+req+".pdf", fitVal, fitError);
+  TString plotName = "sIetaIeta_fit_"+req;
+  if(photonMode == 0) plotName += "_normal.pdf";
+  if(photonMode == 1) plotName += "_noSigmaIetaIeta.pdf";
+  if(photonMode == 2) plotName += "_noChHadIso.pdf";
+
+  makeFit("sigmaIetaIeta", xlo, xhi, ttbar, ttgamma, data, plotName, fitVal, fitError);
 
   cout << endl << "sIetaIeta Fit returned ttjets fraction = " << fitVal << " +/- " << fitError << endl;
 
@@ -2343,7 +2348,12 @@ void PlotMaker::FitChHadIso(double xlo, double xhi, int nPhotons_req,
 
   double fitVal, fitError;
 
-  makeFit("sigmaIetaIeta", xlo, xhi, ttbar, ttgamma, data, "chHadIso_fit_"+req+".pdf", fitVal, fitError);
+  TString plotName = "chHadIso_fit_"+req;
+  if(photonMode == 0) plotName += "_normal.pdf";
+  if(photonMode == 1) plotName += "_noSigmaIetaIeta.pdf";
+  if(photonMode == 2) plotName += "_noChHadIso.pdf";
+
+  makeFit("sigmaIetaIeta", xlo, xhi, ttbar, ttgamma, data, plotName, fitVal, fitError);
 
   cout << endl << "chHadIso Fit returned ttjets fraction = " << fitVal << " +/- " << fitError << endl;
 
