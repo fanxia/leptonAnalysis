@@ -203,6 +203,8 @@ class PlotMaker : public TObject {
 			bool removeTTA, bool reweightTop,
 			int channel, int layer, int color, TString legendEntry, TString tableEntry, int photonMode);
   
+  void SetPhotonMode(int pMode) { photonMode = pMode; }
+
   void SetTrees(TTree * gg, TTree * qcd,
 		TTree * sig_a, TTree * sig_a_JECup, TTree * sig_a_JECdown,
 		TTree * sig_b, TTree * sig_b_JECup, TTree * sig_b_JECdown);
@@ -378,6 +380,7 @@ class PlotMaker : public TObject {
 
   bool useWHIZARD;
 
+  int photonMode;
 };
 
 PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
@@ -637,16 +640,18 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
     return false;
   }
 
-  mcTrees_JECup.push_back((TTree*)mcFiles.back()->Get(signalString+"_JECup"));
-  if(!mcTrees_JECup.back()) {
-    cout << "Could not load TTree " << signalString << "_JECup from TFile " << fileName << endl;
-    return false;
-  }
-
-  mcTrees_JECdown.push_back((TTree*)mcFiles.back()->Get(signalString+"_JECdown"));
-  if(!mcTrees_JECdown.back()) {
-    cout << "Could not load TTree " << signalString << "_JECdown from TFile " << fileName << endl;
-    return false;
+  if(photonMode == 0) {
+    mcTrees_JECup.push_back((TTree*)mcFiles.back()->Get(signalString+"_JECup"));
+    if(!mcTrees_JECup.back()) {
+      cout << "Could not load TTree " << signalString << "_JECup from TFile " << fileName << endl;
+      return false;
+    }
+    
+    mcTrees_JECdown.push_back((TTree*)mcFiles.back()->Get(signalString+"_JECdown"));
+    if(!mcTrees_JECdown.back()) {
+      cout << "Could not load TTree " << signalString << "_JECdown from TFile " << fileName << endl;
+      return false;
+    }
   }
 
   mcQCDTrees.push_back((TTree*)mcFiles.back()->Get(qcdString));
@@ -1113,18 +1118,24 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
     for(unsigned int j = 0; j < mcTrees.size(); j++) {
       mcTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
-      mcTrees_JECup[j]->SetBranchAddress(variables[i], &(vars[i]));
-      mcTrees_JECdown[j]->SetBranchAddress(variables[i], &(vars[i]));
+      if(photonMode == 0) {
+	mcTrees_JECup[j]->SetBranchAddress(variables[i], &(vars[i]));
+	mcTrees_JECdown[j]->SetBranchAddress(variables[i], &(vars[i]));
+      }
       mcQCDTrees[j]->SetBranchAddress(variables[i], &(vars[i]));
     }
 
     sigaTree->SetBranchAddress(variables[i], &(vars[i]));
-    sigaTree_JECup->SetBranchAddress(variables[i], &(vars[i]));
-    sigaTree_JECdown->SetBranchAddress(variables[i], &(vars[i]));
+    if(photonMode == 0) {
+      sigaTree_JECup->SetBranchAddress(variables[i], &(vars[i]));
+      sigaTree_JECdown->SetBranchAddress(variables[i], &(vars[i]));
+    }
 
     sigbTree->SetBranchAddress(variables[i], &(vars[i]));
-    sigbTree_JECup->SetBranchAddress(variables[i], &(vars[i]));
-    sigbTree_JECdown->SetBranchAddress(variables[i], &(vars[i]));
+    if(photonMode == 0) {
+      sigbTree_JECup->SetBranchAddress(variables[i], &(vars[i]));
+      sigbTree_JECdown->SetBranchAddress(variables[i], &(vars[i]));
+    }
 
   }
 
@@ -1138,10 +1149,12 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     mcTrees[i]->SetBranchAddress("pileupWeightUp", &puWeightUp);
     mcTrees[i]->SetBranchAddress("pileupWeightDown", &puWeightDown);
 
-    mcTrees_JECup[i]->SetBranchAddress("pileupWeight", &puWeight);
-    mcTrees_JECup[i]->SetBranchAddress("btagWeight", &btagWeight);
-    mcTrees_JECdown[i]->SetBranchAddress("pileupWeight", &puWeight);
-    mcTrees_JECdown[i]->SetBranchAddress("btagWeight", &btagWeight);
+    if(photonMode == 0) {
+      mcTrees_JECup[i]->SetBranchAddress("pileupWeight", &puWeight);
+      mcTrees_JECup[i]->SetBranchAddress("btagWeight", &btagWeight);
+      mcTrees_JECdown[i]->SetBranchAddress("pileupWeight", &puWeight);
+      mcTrees_JECdown[i]->SetBranchAddress("btagWeight", &btagWeight);
+    }
 
     mcQCDTrees[i]->SetBranchAddress("pileupWeight", &puWeight);
     mcQCDTrees[i]->SetBranchAddress("pileupWeightErr", &puWeightErr);
@@ -1154,15 +1167,19 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
     if(removeTTAoverlap[i]) {
       mcTrees[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
-      mcTrees_JECup[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
-      mcTrees_JECdown[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
+      if(photonMode == 0) {
+	mcTrees_JECup[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
+	mcTrees_JECdown[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
+      }
       mcQCDTrees[i]->SetBranchAddress("overlaps_ttA", &overlaps_ttA);
     }
 
     if(reweightTopPt[i]) {
       mcTrees[i]->SetBranchAddress("TopPtReweighting", &topPtReweighting);
-      mcTrees_JECup[i]->SetBranchAddress("TopPtReweighting", &topPtReweighting);
-      mcTrees_JECdown[i]->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+      if(photonMode == 0) {
+	mcTrees_JECup[i]->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+	mcTrees_JECdown[i]->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+      }
       mcQCDTrees[i]->SetBranchAddress("TopPtReweighting", &topPtReweighting);
     }
 
@@ -1178,26 +1195,27 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigaTree->SetBranchAddress("pileupWeightDown", &puWeightDown);
   sigaTree->SetBranchAddress("TopPtReweighting", &topPtReweighting);
   
-  sigaTree_JECup->SetBranchAddress("pileupWeight", &puWeight);
-  sigaTree_JECup->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  sigaTree_JECup->SetBranchAddress("btagWeight", &btagWeight);
-  sigaTree_JECup->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  sigaTree_JECup->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  sigaTree_JECup->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigaTree_JECup->SetBranchAddress("pileupWeightUp", &puWeightUp);
-  sigaTree_JECup->SetBranchAddress("pileupWeightDown", &puWeightDown);
-  sigaTree_JECup->SetBranchAddress("TopPtReweighting", &topPtReweighting);
-
-  sigaTree_JECdown->SetBranchAddress("pileupWeight", &puWeight);
-  sigaTree_JECdown->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  sigaTree_JECdown->SetBranchAddress("btagWeight", &btagWeight);
-  sigaTree_JECdown->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  sigaTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  sigaTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigaTree_JECdown->SetBranchAddress("pileupWeightUp", &puWeightUp);
-  sigaTree_JECdown->SetBranchAddress("pileupWeightDown", &puWeightDown);
-  sigaTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
-
+  if(photonMode == 0) {
+    sigaTree_JECup->SetBranchAddress("pileupWeight", &puWeight);
+    sigaTree_JECup->SetBranchAddress("pileupWeightErr", &puWeightErr);
+    sigaTree_JECup->SetBranchAddress("btagWeight", &btagWeight);
+    sigaTree_JECup->SetBranchAddress("btagWeightErr", &btagWeightErr);
+    sigaTree_JECup->SetBranchAddress("btagWeightUp", &btagWeightUp);
+    sigaTree_JECup->SetBranchAddress("btagWeightDown", &btagWeightDown);
+    sigaTree_JECup->SetBranchAddress("pileupWeightUp", &puWeightUp);
+    sigaTree_JECup->SetBranchAddress("pileupWeightDown", &puWeightDown);
+    sigaTree_JECup->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+    
+    sigaTree_JECdown->SetBranchAddress("pileupWeight", &puWeight);
+    sigaTree_JECdown->SetBranchAddress("pileupWeightErr", &puWeightErr);
+    sigaTree_JECdown->SetBranchAddress("btagWeight", &btagWeight);
+    sigaTree_JECdown->SetBranchAddress("btagWeightErr", &btagWeightErr);
+    sigaTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
+    sigaTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
+    sigaTree_JECdown->SetBranchAddress("pileupWeightUp", &puWeightUp);
+    sigaTree_JECdown->SetBranchAddress("pileupWeightDown", &puWeightDown);
+    sigaTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+  }
   sigbTree->SetBranchAddress("pileupWeight", &puWeight);
   sigbTree->SetBranchAddress("pileupWeightErr", &puWeightErr);
   sigbTree->SetBranchAddress("btagWeight", &btagWeight);
@@ -1208,25 +1226,27 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
   sigbTree->SetBranchAddress("pileupWeightDown", &puWeightDown);
   sigbTree->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
-  sigbTree_JECup->SetBranchAddress("pileupWeight", &puWeight);
-  sigbTree_JECup->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  sigbTree_JECup->SetBranchAddress("btagWeight", &btagWeight);
-  sigbTree_JECup->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  sigbTree_JECup->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  sigbTree_JECup->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigbTree_JECup->SetBranchAddress("pileupWeightUp", &puWeightUp);
-  sigbTree_JECup->SetBranchAddress("pileupWeightDown", &puWeightDown);
-  sigbTree_JECup->SetBranchAddress("TopPtReweighting", &topPtReweighting);
-
-  sigbTree_JECdown->SetBranchAddress("pileupWeight", &puWeight);
-  sigbTree_JECdown->SetBranchAddress("pileupWeightErr", &puWeightErr);
-  sigbTree_JECdown->SetBranchAddress("btagWeight", &btagWeight);
-  sigbTree_JECdown->SetBranchAddress("btagWeightErr", &btagWeightErr);
-  sigbTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
-  sigbTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
-  sigbTree_JECdown->SetBranchAddress("pileupWeightUp", &puWeightUp);
-  sigbTree_JECdown->SetBranchAddress("pileupWeightDown", &puWeightDown);
-  sigbTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+  if(photonMode == 0) {
+    sigbTree_JECup->SetBranchAddress("pileupWeight", &puWeight);
+    sigbTree_JECup->SetBranchAddress("pileupWeightErr", &puWeightErr);
+    sigbTree_JECup->SetBranchAddress("btagWeight", &btagWeight);
+    sigbTree_JECup->SetBranchAddress("btagWeightErr", &btagWeightErr);
+    sigbTree_JECup->SetBranchAddress("btagWeightUp", &btagWeightUp);
+    sigbTree_JECup->SetBranchAddress("btagWeightDown", &btagWeightDown);
+    sigbTree_JECup->SetBranchAddress("pileupWeightUp", &puWeightUp);
+    sigbTree_JECup->SetBranchAddress("pileupWeightDown", &puWeightDown);
+    sigbTree_JECup->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+    
+    sigbTree_JECdown->SetBranchAddress("pileupWeight", &puWeight);
+    sigbTree_JECdown->SetBranchAddress("pileupWeightErr", &puWeightErr);
+    sigbTree_JECdown->SetBranchAddress("btagWeight", &btagWeight);
+    sigbTree_JECdown->SetBranchAddress("btagWeightErr", &btagWeightErr);
+    sigbTree_JECdown->SetBranchAddress("btagWeightUp", &btagWeightUp);
+    sigbTree_JECdown->SetBranchAddress("btagWeightDown", &btagWeightDown);
+    sigbTree_JECdown->SetBranchAddress("pileupWeightUp", &puWeightUp);
+    sigbTree_JECdown->SetBranchAddress("pileupWeightDown", &puWeightDown);
+    sigbTree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
+  }
 
   for(int i = 0; i < ggTree->GetEntries(); i++) {
     ggTree->GetEntry(i);
@@ -1441,65 +1461,68 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
   }
 
-  for(unsigned int i = 0; i < mcTrees_JECup.size(); i++) {
-    
-    for(int j = 0; j < mcTrees_JECup[i]->GetEntries(); j++) {
-      mcTrees_JECup[i]->GetEntry(j);
-
-      if(nBtagReq == 0) btagWeight = 1.;
-
-      if(useWHIZARD && removeTTAoverlap[i] && overlaps_ttA > 0.001) continue;
-
-      if(btagWeight != btagWeight) continue;
-      if(metCut > 0. && vars[1] >= metCut) continue;
-
-      if(topPtReweighting < 0) topPtReweighting = 1.;
-
-      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
-
-      double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
-      if(reweightTopPt[i]) totalWeight *= topPtReweighting;
-
-      for(unsigned int k = 0; k < vars.size(); k++) {
-	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-	mcHistograms_JECup[i][k]->Fill(vars[k], totalWeight);
+  if(photonMode == 0) {
+    for(unsigned int i = 0; i < mcTrees_JECup.size(); i++) {
+      
+      for(int j = 0; j < mcTrees_JECup[i]->GetEntries(); j++) {
+	mcTrees_JECup[i]->GetEntry(j);
+	
+	if(nBtagReq == 0) btagWeight = 1.;
+	
+	if(useWHIZARD && removeTTAoverlap[i] && overlaps_ttA > 0.001) continue;
+	
+	if(btagWeight != btagWeight) continue;
+	if(metCut > 0. && vars[1] >= metCut) continue;
+	
+	if(topPtReweighting < 0) topPtReweighting = 1.;
+	
+	GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+	GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
+	
+	double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
+	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	
+	for(unsigned int k = 0; k < vars.size(); k++) {
+	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	  mcHistograms_JECup[i][k]->Fill(vars[k], totalWeight);
+	}
+	
       }
+      
+      for(unsigned int j = 0; j < vars.size(); j++) mcHistograms_JECup[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
+      
+    }
+    
+    for(unsigned int i = 0; i < mcTrees_JECdown.size(); i++) {
+      
+      for(int j = 0; j < mcTrees_JECdown[i]->GetEntries(); j++) {
+	mcTrees_JECdown[i]->GetEntry(j);
+	
+	if(nBtagReq == 0) btagWeight = 1.;
+	
+	if(useWHIZARD && removeTTAoverlap[i] && overlaps_ttA > 0.001) continue;
+	
+	if(btagWeight != btagWeight) continue;
+	if(metCut > 0. && vars[1] >= metCut) continue;
+	
+	if(topPtReweighting < 0) topPtReweighting = 1.;
+	
+	GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+	GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
+	
+	double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
+	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	
+	for(unsigned int k = 0; k < vars.size(); k++) {
+	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	  mcHistograms_JECdown[i][k]->Fill(vars[k], totalWeight);
+	}
+	
+      }
+      
+      for(unsigned int j = 0; j < vars.size(); j++) mcHistograms_JECdown[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
 
     }
-
-    for(unsigned int j = 0; j < vars.size(); j++) mcHistograms_JECup[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
-
-  }
-
-  for(unsigned int i = 0; i < mcTrees_JECdown.size(); i++) {
-    
-    for(int j = 0; j < mcTrees_JECdown[i]->GetEntries(); j++) {
-      mcTrees_JECdown[i]->GetEntry(j);
-
-      if(nBtagReq == 0) btagWeight = 1.;
-
-      if(useWHIZARD && removeTTAoverlap[i] && overlaps_ttA > 0.001) continue;
-
-      if(btagWeight != btagWeight) continue;
-      if(metCut > 0. && vars[1] >= metCut) continue;
-
-      if(topPtReweighting < 0) topPtReweighting = 1.;
-
-      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
-
-      double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
-      if(reweightTopPt[i]) totalWeight *= topPtReweighting;
-
-      for(unsigned int k = 0; k < vars.size(); k++) {
-	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-	mcHistograms_JECdown[i][k]->Fill(vars[k], totalWeight);
-      }
-
-    }
-
-    for(unsigned int j = 0; j < vars.size(); j++) mcHistograms_JECdown[i][j]->Scale(intLumi_int * crossSections[i] / mcNGen[i]);
 
   }
 
@@ -1677,51 +1700,55 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
   for(unsigned int j = 0; j < variables_2d.size(); j++) h_siga_2d[j]->Scale(intLumi_int * 0.147492 / 15000.);
 
-  for(int i = 0; i < sigaTree_JECup->GetEntries(); i++) {
-    sigaTree_JECup->GetEntry(i);
-
-    if(nBtagReq == 0) btagWeight = 1.;
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(topPtReweighting < 0) topPtReweighting = 1.;
-
-    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-
-      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
-      h_siga_JECup[j]->Fill(vars[j], totalWeight);
+  if(photonMode == 0) {
+    
+    for(int i = 0; i < sigaTree_JECup->GetEntries(); i++) {
+      sigaTree_JECup->GetEntry(i);
+      
+      if(nBtagReq == 0) btagWeight = 1.;
+      
+      if(btagWeight != btagWeight) continue;
+      if(metCut > 0. && vars[1] >= metCut) continue;
+      
+      if(topPtReweighting < 0) topPtReweighting = 1.;
+      
+      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
+      
+      for(unsigned int j = 0; j < vars.size(); j++) {
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	
+	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+	h_siga_JECup[j]->Fill(vars[j], totalWeight);
+      }
+      
     }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_siga_JECup[j]->Scale(intLumi_int * 0.147492 / 15000.);
-
-  for(int i = 0; i < sigaTree_JECdown->GetEntries(); i++) {
-    sigaTree_JECdown->GetEntry(i);
-
-    if(nBtagReq == 0) btagWeight = 1.;
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(topPtReweighting < 0) topPtReweighting = 1.;
-
-    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-
-      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
-      h_siga_JECdown[j]->Fill(vars[j], totalWeight);
+    for(unsigned int j = 0; j < vars.size(); j++) h_siga_JECup[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    
+    for(int i = 0; i < sigaTree_JECdown->GetEntries(); i++) {
+      sigaTree_JECdown->GetEntry(i);
+      
+      if(nBtagReq == 0) btagWeight = 1.;
+      
+      if(btagWeight != btagWeight) continue;
+      if(metCut > 0. && vars[1] >= metCut) continue;
+      
+      if(topPtReweighting < 0) topPtReweighting = 1.;
+      
+      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
+      
+      for(unsigned int j = 0; j < vars.size(); j++) {
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	
+	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+	h_siga_JECdown[j]->Fill(vars[j], totalWeight);
+      }
+      
     }
-
+    for(unsigned int j = 0; j < vars.size(); j++) h_siga_JECdown[j]->Scale(intLumi_int * 0.147492 / 15000.);
+    
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_siga_JECdown[j]->Scale(intLumi_int * 0.147492 / 15000.);
 
   for(int i = 0; i < sigbTree->GetEntries(); i++) {
     sigbTree->GetEntry(i);
@@ -1842,67 +1869,76 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
   for(unsigned int j = 0; j < variables_2d.size(); j++) h_sigb_2d[j]->Scale(intLumi_int * 0.0399591 / 15000.);
 
-  for(int i = 0; i < sigbTree_JECup->GetEntries(); i++) {
-    sigbTree_JECup->GetEntry(i);
+  if(photonMode == 0) {
 
-    if(nBtagReq == 0) btagWeight = 1.;
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(topPtReweighting < 0) topPtReweighting = 1.;
-
-    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-
-      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
-      h_sigb_JECup[j]->Fill(vars[j], totalWeight);
+    for(int i = 0; i < sigbTree_JECup->GetEntries(); i++) {
+      sigbTree_JECup->GetEntry(i);
+      
+      if(nBtagReq == 0) btagWeight = 1.;
+      
+      if(btagWeight != btagWeight) continue;
+      if(metCut > 0. && vars[1] >= metCut) continue;
+      
+      if(topPtReweighting < 0) topPtReweighting = 1.;
+      
+      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
+      
+      for(unsigned int j = 0; j < vars.size(); j++) {
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	
+	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+	h_sigb_JECup[j]->Fill(vars[j], totalWeight);
+      }
+      
     }
-
-  }
-  for(unsigned int j = 0; j < vars.size(); j++) h_sigb_JECup[j]->Scale(intLumi_int * 0.0399591 / 15000.);
-
-  for(int i = 0; i < sigbTree_JECdown->GetEntries(); i++) {
-    sigbTree_JECdown->GetEntry(i);
-
-    if(nBtagReq == 0) btagWeight = 1.;
-
-    if(btagWeight != btagWeight) continue;
-    if(metCut > 0. && vars[1] >= metCut) continue;
-
-    if(topPtReweighting < 0) topPtReweighting = 1.;
-
-    GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
-    GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
-
-    for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
-
-      double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
-      h_sigb_JECdown[j]->Fill(vars[j], totalWeight);
+    for(unsigned int j = 0; j < vars.size(); j++) h_sigb_JECup[j]->Scale(intLumi_int * 0.0399591 / 15000.);
+    
+    for(int i = 0; i < sigbTree_JECdown->GetEntries(); i++) {
+      sigbTree_JECdown->GetEntry(i);
+      
+      if(nBtagReq == 0) btagWeight = 1.;
+      
+      if(btagWeight != btagWeight) continue;
+      if(metCut > 0. && vars[1] >= metCut) continue;
+      
+      if(topPtReweighting < 0) topPtReweighting = 1.;
+      
+      GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
+      GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
+      
+      for(unsigned int j = 0; j < vars.size(); j++) {
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	
+	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+	h_sigb_JECdown[j]->Fill(vars[j], totalWeight);
+      }
+      
     }
-
+    for(unsigned int j = 0; j < vars.size(); j++) h_sigb_JECdown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
   }
-  for(unsigned int j = 0; j < vars.size(); j++) h_sigb_JECdown[j]->Scale(intLumi_int * 0.0399591 / 15000.);
 
   ggTree->ResetBranchAddresses();
   qcdTree->ResetBranchAddresses();
-
+  
   for(unsigned int i = 0; i < mcTrees.size(); i++) mcTrees[i]->ResetBranchAddresses();
-  for(unsigned int i = 0; i < mcTrees_JECup.size(); i++) mcTrees_JECup[i]->ResetBranchAddresses();
-  for(unsigned int i = 0; i < mcTrees_JECdown.size(); i++) mcTrees_JECdown[i]->ResetBranchAddresses();
+  if(photonMode == 0) {
+    for(unsigned int i = 0; i < mcTrees_JECup.size(); i++) mcTrees_JECup[i]->ResetBranchAddresses();
+    for(unsigned int i = 0; i < mcTrees_JECdown.size(); i++) mcTrees_JECdown[i]->ResetBranchAddresses();
+  }
   for(unsigned int i = 0; i < mcQCDTrees.size(); i++) mcQCDTrees[i]->ResetBranchAddresses();
 
   sigaTree->ResetBranchAddresses();
-  sigaTree_JECup->ResetBranchAddresses();
-  sigaTree_JECdown->ResetBranchAddresses();
+  if(photonMode == 0) {
+    sigaTree_JECup->ResetBranchAddresses();
+    sigaTree_JECdown->ResetBranchAddresses();
+  }
 
   sigbTree->ResetBranchAddresses();
-  sigbTree_JECup->ResetBranchAddresses();
-  sigbTree_JECdown->ResetBranchAddresses();
+  if(photonMode == 0) {
+    sigbTree_JECup->ResetBranchAddresses();
+    sigbTree_JECdown->ResetBranchAddresses();
+  }
 
 }
 
@@ -2821,8 +2857,10 @@ void PlotMaker::CreatePlot(TString variable,
     for(unsigned int i = 0; i < mcHistograms_pdfDown.size(); i++) mcHistograms_pdfDown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_pdfDown[i][var_num]);
     for(unsigned int i = 0; i < mcHistograms_topPtUp.size(); i++) mcHistograms_topPtUp[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_topPtUp[i][var_num]);
     for(unsigned int i = 0; i < mcHistograms_topPtDown.size(); i++) mcHistograms_topPtDown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_topPtDown[i][var_num]);
-    for(unsigned int i = 0; i < mcHistograms_JECup.size(); i++) mcHistograms_JECup[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_JECup[i][var_num]);
-    for(unsigned int i = 0; i < mcHistograms_JECdown.size(); i++) mcHistograms_JECdown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_JECdown[i][var_num]);
+    if(photonMode == 0) {
+      for(unsigned int i = 0; i < mcHistograms_JECup.size(); i++) mcHistograms_JECup[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_JECup[i][var_num]);
+      for(unsigned int i = 0; i < mcHistograms_JECdown.size(); i++) mcHistograms_JECdown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_JECdown[i][var_num]);
+    }
     for(unsigned int i = 0; i < mcHistograms_leptonSFup.size(); i++) mcHistograms_leptonSFup[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_leptonSFup[i][var_num]);
     for(unsigned int i = 0; i < mcHistograms_leptonSFdown.size(); i++) mcHistograms_leptonSFdown[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_leptonSFdown[i][var_num]);
     for(unsigned int i = 0; i < mcHistograms_photonSFup.size(); i++) mcHistograms_photonSFup[i][var_num] = (TH1D*)DivideByBinWidth(mcHistograms_photonSFup[i][var_num]);
@@ -2899,8 +2937,10 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     bkg_pdfDown->Add(mcHistograms_pdfDown[i][variableNumber]);
     bkg_topPtUp->Add(mcHistograms_topPtUp[i][variableNumber]);
     bkg_topPtDown->Add(mcHistograms_topPtDown[i][variableNumber]);
-    bkg_JECup->Add(mcHistograms_JECup[i][variableNumber]);
-    bkg_JECdown->Add(mcHistograms_JECdown[i][variableNumber]);
+    if(photonMode == 0) {
+      bkg_JECup->Add(mcHistograms_JECup[i][variableNumber]);
+      bkg_JECdown->Add(mcHistograms_JECdown[i][variableNumber]);
+    }
     bkg_leptonSFup->Add(mcHistograms_leptonSFup[i][variableNumber]);
     bkg_leptonSFdown->Add(mcHistograms_leptonSFdown[i][variableNumber]);
     bkg_photonSFup->Add(mcHistograms_photonSFup[i][variableNumber]);
@@ -3343,7 +3383,7 @@ void PlotMaker::CreateTable() {
 	this_scaleUp += mcHistograms_scaleUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_pdfUp += mcHistograms_pdfUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_topPtUp += mcHistograms_topPtUp[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_JECup += mcHistograms_JECup[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	if(photonMode == 0) this_JECup += mcHistograms_JECup[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_leptonSFup += mcHistograms_leptonSFup[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_photonSFup += mcHistograms_photonSFup[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
@@ -3352,7 +3392,7 @@ void PlotMaker::CreateTable() {
 	this_scaleDown += mcHistograms_scaleDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_pdfDown += mcHistograms_pdfDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_topPtDown += mcHistograms_topPtDown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-	this_JECdown += mcHistograms_JECdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+	if(photonMode == 0) this_JECdown += mcHistograms_JECdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_leptonSFdown += mcHistograms_leptonSFdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 	this_photonSFdown += mcHistograms_photonSFdown[k][variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
@@ -3462,14 +3502,14 @@ void PlotMaker::CreateTable() {
     this_btagUp = h_siga_btagWeightUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_puUp = h_siga_puWeightUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_topPtUp = h_siga_topPtUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-    this_JECup = h_siga_JECup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    if(photonMode == 0) this_JECup = h_siga_JECup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_leptonSFup = h_siga_leptonSFup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_photonSFup = h_siga_photonSFup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     
     this_btagDown = h_siga_btagWeightDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_puDown = h_siga_puWeightDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_topPtDown = h_siga_topPtDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-    this_JECdown = h_siga_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    if(photonMode == 0) this_JECdown = h_siga_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_leptonSFdown = h_siga_leptonSFdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_photonSFdown = h_siga_photonSFdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
@@ -3526,14 +3566,14 @@ void PlotMaker::CreateTable() {
     this_btagUp = h_sigb_btagWeightUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_puUp = h_sigb_puWeightUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_topPtUp = h_sigb_topPtUp[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-    this_JECup = h_sigb_JECup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    if(photonMode == 0) this_JECup = h_sigb_JECup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_leptonSFup = h_sigb_leptonSFup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_photonSFup = h_sigb_photonSFup[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     
     this_btagDown = h_sigb_btagWeightDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_puDown = h_sigb_puWeightDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_topPtDown = h_sigb_topPtDown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
-    this_JECdown = h_sigb_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
+    if(photonMode == 0) this_JECdown = h_sigb_JECdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_leptonSFdown = h_sigb_leptonSFdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
     this_photonSFdown = h_sigb_photonSFdown[variableNumber]->IntegralAndError(binLow[i], binHigh[i], temperr);
 
