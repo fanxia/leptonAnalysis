@@ -2009,6 +2009,8 @@ void PlotMaker::NormalizeQCD() {
 
   double scale = (n_sig - n_mc) / n_qcd;
   
+  if(scale < 0) return;
+
   for(unsigned int i = 0; i < h_qcd.size(); i++) {
     double newError_lowBins[endBin];
 

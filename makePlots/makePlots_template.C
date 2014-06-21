@@ -11,7 +11,7 @@ void makePlots() {
   bool addMC = true;
   int intLumi = 19712; // quote to 19.7
 
-  double metCut = -1.;
+  double metCut = 50.;
 
   bool displayKStest = true;
   bool blinded = true;
