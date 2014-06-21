@@ -201,7 +201,7 @@ class PlotMaker : public TObject {
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 			bool removeTTA, bool reweightTop,
-			int channel, int layer, int color, TString legendEntry, TString tableEntry, int photonMode);
+			int channel, int layer, int color, TString legendEntry, TString tableEntry);
   
   void SetPhotonMode(int pMode) { photonMode = pMode; }
 
@@ -614,7 +614,7 @@ void PlotMaker::LoadPhotonSFs(TString fileName) {
 bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
 				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 				 bool removeTTA, bool reweightTop,
-				 int channel, int layer, int color, TString legendEntry, TString tableEntry, int photonMode) {
+				 int channel, int layer, int color, TString legendEntry, TString tableEntry) {
 
   mcFiles.push_back(new TFile(fileName, "READ"));
   if(!mcFiles.back()) {
