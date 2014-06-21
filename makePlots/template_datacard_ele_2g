@@ -23,6 +23,6 @@ u_topPt lnN   		sigatopPt	ttInclusivetopPt	ttgammatopPt
 u_JEC lnN		sigaJEC		ttInclusiveJEC		ttgammaJEC
 u_ele_bjjID lnN		sigaele_bjjSF	ttInclusiveele_bjjSF	ttgammaele_bjjSF
 u_photonID lnN		sigaphotonSF	ttInclusivephotonSF	ttgammaphotonSF
-stat_susy lnN		sigastat	-		-
-stat_ttbar lnN		-		ttInclusivestat		-
-stat_ttgamma lnN	-		-			ttgammastat
+stat_ele_susy lnN	sigastat	-			-
+stat_ele_ttbar lnN	-		ttInclusivestat		-
+stat_ele_ttgamma lnN	-		-			ttgammastat

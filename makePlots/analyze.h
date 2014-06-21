@@ -3294,14 +3294,18 @@ void PlotMaker::CreateTable() {
     Double_t bkg_leptonSFdown2 = 0;
     Double_t bkg_photonSFdown2 = 0;
 
+    this_val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
+    bkgval += this_val;
+    bkgstat2 += this_err*this_err;
+
     if(req.Contains("ele")) {
-      this_val = h_qcd[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
-      bkgval += this_val;
-      bkgstat2 += this_err*this_err;
       fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
       if(rangeLow[i] == 100 && rangeHigh[i] == -1 && this_val > 0.) fprintf(datacardFile, "eleqcdval:%.2f\neleqcdstat:%.3f\n", this_val, 1. + this_err / this_val);
     }
-    else fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, 0., i+1, 0.);
+    else {
+      fprintf(tableFile, "qcdval%dx:%.1f\nqcdstat%dx:%.2f\n", i+1, this_val, i+1, this_err);
+      if(rangeLow[i] == 100 && rangeHigh[i] == -1 && this_val > 0.) fprintf(datacardFile, "muonqcdval:%.2f\nmuonqcdstat:%.3f\n", this_val, 1. + this_err / this_val);
+    }
     
     for(unsigned int j = 0; j < mcHistograms.size(); j++) {
 
