@@ -2176,7 +2176,7 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
 
 void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * ttjets, TH1D * ttgamma, TH1D * dataHist, TString plotName, double& value, double& error) {
 
-  TH1D * h_chi = new TH1D("chi_"+varname, "chi_"+varname, 200, 0, 2);
+  TH1D * h_chi = new TH1D("chi_"+varname, "chi_"+varname, 200, 0, 5);
 
   TH1D * h_data = (TH1D*)dataHist->Clone("h_data");
   h_data->Add(ttjets, -1.0);
@@ -2186,14 +2186,18 @@ void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * ttjets,
   double val_ttgamma, val_data;
   double err_ttgamma, err_data;
 
-  double chi;
+  double chi, n;
 
   for(int i = 0; i < 200; i++) {
 
     double x = i * 0.01;
     chi = 0;
+    n = 0;
 
     for(int bin = 0; bin < h_ttgamma->GetNbinsX(); bin++) {
+
+      if(h_ttgamma->GetBinLowEdge(bin+1) < 0.005) continue;
+      if(h_ttgamma->GetBinLowEdge(bin+1) > 0.025) continue;
 
       val_ttgamma = x * h_ttgamma->GetBinContent(bin+1);
       err_ttgamma = x * h_ttgamma->GetBinError(bin+1);
@@ -2201,15 +2205,17 @@ void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * ttjets,
       val_data = h_data->GetBinContent(bin+1);
       err_data = h_data->GetBinError(bin+1);
 
-      if(val_data == 0. || val_ttgamma == 0.) continue;
-
       double numerator = (val_ttgamma - val_data)*(val_ttgamma - val_data);
       double denominator = err_ttgamma*err_ttgamma + err_data*err_data;
+
+      if(denominator < 1.e-6) continue;
       
       chi += numerator / denominator;
+      n += 1.;
+
     }
 
-    chi /= (double)(h_ttgamma->GetNbinsX() - 1.);
+    chi /= n;
       
     h_chi->SetBinContent(i+1, chi);
   }
