@@ -2174,6 +2174,63 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
   return;
 }
 
+void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * signalHist, TH1D * backgroundHist, TH1D * dataHist, TString plotName, double& value, double& error) {
+
+  //RooFit variables
+  RooRealVar var(varname, varname, varmin, varmax);
+
+  // create PDFs
+  RooDataHist signalDataHist("signalDataHist", "signal RooDataHist", RooArgList(var), signalHist);
+  RooHistPdf signalPdf("signalPdf", varname+" of signal", RooArgSet(var), signalDataHist);
+
+
+  RooDataHist backgroundDataHist("backgroundDataHist", "background RooDataHist", RooArgList(var), backgroundHist);
+  RooHistPdf backgroundPdf("backgroundPdf", varname+" of background", RooArgSet(var), backgroundDataHist);
+
+  // data
+  RooDataHist dataDataHist("data "+varname, varname+"in Data", RooArgList(var), dataHist);
+
+  // signal fraction parameter
+  RooRealVar signalFractionVar("signal fraction", "signal fraction", 0.5, 0.0, 1.0);
+  RooAddPdf sumPdf("totalPdf", "signal and background", signalPdf, backgroundPdf, signalFractionVar, 1.0);
+
+  // fit
+  sumPdf.fitTo(dataDataHist, RooFit::SumW2Error(kFALSE), RooFit::PrintLevel(-1));
+  
+  value = signalFractionVar.getVal();
+  error = signalFractionVar.getError();
+  
+  TCanvas * can = new TCanvas("fit_can", "Plot", 10, 10, 2000, 2000);
+  can->SetLogy(true);
+
+  TH1D * h_sig = (TH1D*)signalHist->Clone("h_sig_"+varname);
+  TH1D * h_bkg = (TH1D*)backgroundHist->Clone("h_bkg_"+varname);
+
+  h_sig->Scale(value * dataHist->Integral() / signalHist->Integral());
+  h_bkg->Scale((1.-value) * dataHist->Integral() / backgroundHist->Integral());
+
+  TH1D * h_sum = (TH1D*)h_sig->Clone("h_sum");
+  h_sum->Add(h_bkg);
+  h_sum->SetLineWidth(3);
+
+  h_sig->SetLineColor(kRed);
+  h_sig->SetLineWidth(3);
+
+  h_bkg->SetLineColor(kBlue);
+  h_bkg->SetLineWidth(3);
+  
+  h_sum->Draw("hist");
+  h_sig->Draw("hist same");
+  h_bkg->Draw("hist same");
+  dataHist->Draw("e1 same");
+
+  can->SaveAs(plotName);
+
+  delete can;
+
+  return;
+}
+
 void PlotMaker::FitQCD(double xlo, double xhi, double& qcdSF, double& qcdSFerror, double& mcSF, double& mcSFerror) {
 
   unsigned int variableNumber = 1; // for MET

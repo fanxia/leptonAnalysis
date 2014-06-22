@@ -261,8 +261,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
   pMaker->SubtractMCFromQCD();
 
-  pMaker->NormalizeQCD();
-  
   if(channel < 2) pMaker->ScaleFromFits(-1., -1., -1., -1.,
 					-1., -1., -1., -1.,
 					1.15829, 0.0862952, 0.994598, 0.0994705);
@@ -270,6 +268,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   else pMaker->ScaleFromFits(-1., -1., -1., -1.,
 			     -1., -1., -1., -1.,
 			     1.32064, 0.0874485, 0.84487, 0.104048);
+
+  pMaker->NormalizeQCD();
 
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
