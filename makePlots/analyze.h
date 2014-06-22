@@ -2176,7 +2176,7 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
 
 void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * signalHist, TH1D * backgroundHist, TH1D * dataHist, TString plotName, double& value, double& error) {
 
-  TH1D * h_chi = new TH1D("chi_"+varname+"_"+req, "chi_"+varname+"_"+req, 200, 0, 2);
+  TH1D * h_chi = new TH1D("chi_"+varname, "chi_"+varname, 200, 0, 2);
 
   TH1D * h_data = (TH1D*)signalHist->Clone("h_data");
   h_data->Add(backgroundHist, -1.0);
@@ -2212,10 +2212,13 @@ void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * signalH
     h_chi->SetBinContent(i+1, chi);
   }
     
-  value = 999.;
+  double minValue = 999.;
   
   for(int i = 0; i < h_chi->GetNbinsX(); i++) {
-    if(h_chi->GetBinContent(i+1) < value) value = h_chi->GetBinContent(i+1);
+    if(h_chi->GetBinContent(i+1) < minValue) {
+      minValue = h_chi->GetBinContent(i+1);
+      value = (i+1) * 0.01;
+    }
   }
 
   TCanvas * can = new TCanvas("fit_can", "Plot", 10, 10, 2000, 2000);
