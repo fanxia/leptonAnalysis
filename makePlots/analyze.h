@@ -2216,17 +2216,23 @@ void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * ttjets,
     
   double minValue = 999.;
   
-  for(int i = 0; i < h_chi->GetNbinsX(); i++) {
+  for(int i = 1; i < h_chi->GetNbinsX(); i++) {
+
     if(h_chi->GetBinContent(i+1) < minValue) {
       minValue = h_chi->GetBinContent(i+1);
-      value = (i+1) * 0.01;
+      value = i * 0.01;
     }
   }
+
+  h_ttgamma->Scale(value);
 
   TCanvas * can = new TCanvas("fit_can", "Plot", 10, 10, 2000, 2000);
 
   h_chi->Draw("hist");
+  can->SaveAs("chi2_"+plotName);
 
+  h_ttgamma->Draw("hist");
+  h_data->Draw("e1 same");
   can->SaveAs(plotName);
 
   delete can;
