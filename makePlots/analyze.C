@@ -266,7 +266,11 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   double ttgammaSF, ttgammaSFerror;
 
   pMaker->NormalizeQCD();
-
+  /*
+  pMaker->ScaleFromFits(qcdSF, qcdSFerror, mcSF, mcSFerror,
+			wjetsSF, wjetsSFerror, topSF, topSFerror,
+			ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
+  */
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
   pMaker->CreateTable();
@@ -914,7 +918,8 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic); // 19
   pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);                  // 20
   pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
-  pMaker->BookHistogram("leadSigmaIetaIeta", 80, 0., 0.04);
+  if(channel == 3 && metCut < 0.) pMaker->BookHistogram("leadSigmaIetaIeta", 70, 0., 0.04);
+  else pMaker->BookHistogram("leadSigmaIetaIeta", 80, 0., 0.04);
   pMaker->BookHistogram("leadChargedHadronIso", 70, 0, 15.0);
   pMaker->BookHistogram("mLepGammaLead", nKinematicBins, xbins_kinematic);
 
@@ -930,12 +935,12 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
 			   1., 0., 1., 0.,
 			   1., 0., 1., 0.,
 			   ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
-  
+  /*
   pMaker->FitChHadIso(0., 15.0, nPhotons_req,
 		      1., 0., 1., 0.,
 		      1., 0., 1., 0.,
 		      ttjetsSF, ttjetsSFerror, ttgammaSF, ttgammaSFerror);
-
+  */
   delete pMaker;
   
   in->Close();
