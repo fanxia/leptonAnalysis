@@ -2176,53 +2176,51 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
 
 void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * signalHist, TH1D * backgroundHist, TH1D * dataHist, TString plotName, double& value, double& error) {
 
-  //RooFit variables
-  RooRealVar var(varname, varname, varmin, varmax);
+  TH1D * h_chi = new TH1D("chi_"+varname+"_"+req, "chi_"+varname+"_"+req, 200, 0, 2);
 
-  // create PDFs
-  RooDataHist signalDataHist("signalDataHist", "signal RooDataHist", RooArgList(var), signalHist);
-  RooHistPdf signalPdf("signalPdf", varname+" of signal", RooArgSet(var), signalDataHist);
+  TH1D * h_data = (TH1D*)signalHist->Clone("h_data");
+  h_data->Add(backgroundHist, -1.0);
 
+  TH1D * h_sig = (TH1D*)signalHist->Clone("h_sig");
 
-  RooDataHist backgroundDataHist("backgroundDataHist", "background RooDataHist", RooArgList(var), backgroundHist);
-  RooHistPdf backgroundPdf("backgroundPdf", varname+" of background", RooArgSet(var), backgroundDataHist);
+  double val_sig, val_data;
+  double err_sig, err_data;
 
-  // data
-  RooDataHist dataDataHist("data "+varname, varname+"in Data", RooArgList(var), dataHist);
+  double chi;
 
-  // signal fraction parameter
-  RooRealVar signalFractionVar("signal fraction", "signal fraction", 0.5, 0.0, 1.0);
-  RooAddPdf sumPdf("totalPdf", "signal and background", signalPdf, backgroundPdf, signalFractionVar, 1.0);
+  for(int i = 0; i < 200; i++) {
 
-  // fit
-  sumPdf.fitTo(dataDataHist, RooFit::SumW2Error(kFALSE), RooFit::PrintLevel(-1));
+    double x = i * 0.01;
+    chi = 0;
+
+    for(int bin = 1; bin < h_sig->FindBin(50.); bin++) {
+
+      val_sig = x * h_sig->GetBinContent(bin);
+      err_sig = x * h_sig->GetBinError(bin);
+      
+      val_data = h_data->GetBinContent(bin);
+      err_data = h_data->GetBinError(bin);
+
+      double numerator = (val_sig - val_data)*(val_sig - val_data);
+      double denominator = err_sig*err_sig + err_data*err_data;
+      
+      chi += numerator / denominator;
+    }
+
+    chi /= (double)(h_sig->FindBin(50.) - 1.);
+      
+    h_chi->SetBinContent(i+1, chi);
+  }
+    
+  value = 999.;
   
-  value = signalFractionVar.getVal();
-  error = signalFractionVar.getError();
-  
+  for(int i = 0; i < h_chi->GetNbinsX(); i++) {
+    if(h_chi->GetBinContent(i+1) < value) value = h_chi->GetBinContent(i+1);
+  }
+
   TCanvas * can = new TCanvas("fit_can", "Plot", 10, 10, 2000, 2000);
-  can->SetLogy(true);
 
-  TH1D * h_sig = (TH1D*)signalHist->Clone("h_sig_"+varname);
-  TH1D * h_bkg = (TH1D*)backgroundHist->Clone("h_bkg_"+varname);
-
-  h_sig->Scale(value * dataHist->Integral() / signalHist->Integral());
-  h_bkg->Scale((1.-value) * dataHist->Integral() / backgroundHist->Integral());
-
-  TH1D * h_sum = (TH1D*)h_sig->Clone("h_sum");
-  h_sum->Add(h_bkg);
-  h_sum->SetLineWidth(3);
-
-  h_sig->SetLineColor(kRed);
-  h_sig->SetLineWidth(3);
-
-  h_bkg->SetLineColor(kBlue);
-  h_bkg->SetLineWidth(3);
-  
-  h_sum->Draw("hist");
-  h_sig->Draw("hist same");
-  h_bkg->Draw("hist same");
-  dataHist->Draw("e1 same");
+  h_chi->Draw("hist");
 
   can->SaveAs(plotName);
 
