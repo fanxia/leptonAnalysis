@@ -2176,7 +2176,7 @@ void makeFit(TString varname, double varmin, double varmax, TH1D * signalHist, T
 
 void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * ttjets, TH1D * ttgamma, TH1D * dataHist, TString plotName, double& value, double& error) {
 
-  TH1D * h_chi = new TH1D("chi_"+varname, "chi_"+varname, 200, 0, 5);
+  TH1D * h_chi = new TH1D("chi_"+varname, "chi_"+varname, 200, 0, 2);
 
   TH1D * h_data = (TH1D*)dataHist->Clone("h_data");
   h_data->Add(ttjets, -1.0);
@@ -2188,7 +2188,7 @@ void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * ttjets,
 
   double chi, n;
 
-  for(int i = 0; i < 200; i++) {
+  for(int i = 1; i < 200; i++) {
 
     double x = i * 0.01;
     chi = 0;
@@ -2204,6 +2204,8 @@ void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * ttjets,
       
       val_data = h_data->GetBinContent(bin+1);
       err_data = h_data->GetBinError(bin+1);
+
+      if(val_data == 0.) continue;
 
       double numerator = (val_ttgamma - val_data)*(val_ttgamma - val_data);
       double denominator = err_ttgamma*err_ttgamma + err_data*err_data;
@@ -2232,16 +2234,13 @@ void makeSimpleFit(TString varname, double varmin, double varmax, TH1D * ttjets,
 
   h_ttgamma->Scale(value);
 
-  TCanvas * can = new TCanvas("fit_can", "Plot", 10, 10, 2000, 2000);
+  TFile * fChi = new TFile(plotName.ReplaceAll(".pdf", ".root"), "RECREATE");
+  h_chi->Write();
+  h_ttgamma->Write();
+  h_data->Write();
 
-  h_chi->Draw("hist");
-  can->SaveAs("chi2_"+plotName);
-
-  h_ttgamma->Draw("hist");
-  h_data->Draw("e1 same");
-  can->SaveAs(plotName);
-
-  delete can;
+  fChi->Write();
+  fChi->Close();
 
   return;
 }
