@@ -361,19 +361,19 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, false,
 		     out);
 
-  // pfMET
+  // pfMET durp
   if(nPhotons_req == 0) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
-					   xbins_met[0], xbins_met[nMetBins], 7.e-3, 2.5e4,
+					   0., 300., 7.e-3, 2.5e4,
 					   0.7, 1.3,
 					   true, true, true,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
-						xbins_met[0], xbins_met[nMetBins], 7.e-4, 2.5e2,
+						0., 300., 7.e-4, 2.5e2,
 						0.5, 1.5,
 						true, true, true,
 						out);
   else if(nPhotons_req == 2) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
-						xbins_met[0], xbins_met[nMetBins], 7.e-6, 9.,
+						0., 300., 7.e-6, 9.,
 						0., 2.1,
 						true, true, true,
 						out);
