@@ -42,8 +42,14 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   prep_signal(channels[channel], nPhotons_req);
 
   TFile * in = new TFile(input, "READ");
+
   TTree * ggTree = (TTree*)in->Get(channels[channel]+"_signalTree");
+  if(photonMode == 1) ggTree = (TTree*)in->Get(channels[channel]+"_noSigmaIetaIetaTree");
+  if(photonMode == 2) ggTree = (TTree*)in->Get(channels[channel]+"_noChHadIsoTree");
+
   TTree * qcdTree = (TTree*)in->Get(qcdChannels[channel]);
+  if(photonMode == 1) qcdTree = (TTree*)in->Get(qcdChannels_noSigmaIetaIeta[channel]);
+  if(photonMode == 2) qcdTree = (TTree*)in->Get(qcdChannels_noChHadIso[channel]);
 
   TFile * fSigA = new TFile("../acceptance/signal_contamination_mst_460_m1_175.root", "READ");
   TTree * sigaTree = (TTree*)fSigA->Get(channels[channel]+"_signalTree");
@@ -65,18 +71,23 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   
   pMaker->SetPhotonMode(photonMode);
 
+  Double_t ttbar_hadronic_xsec = 245.8 * 0.457;
+  Double_t ttbar_semiLep_xsec  = 245.8 * 0.438;
+  Double_t ttbar_fullLep_xsec  = 245.8 * 0.105;
+
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
-					  245.8 * 0.457, 2.5, 3.4, 2.6, 2.6,
+					  ttbar_hadronic_xsec, ttbar_hadronic_xsec * 0.025, ttbar_hadronic_xsec * 0.034, ttbar_hadronic_xsec * 0.026, ttbar_hadronic_xsec * 0.026,
 					  true, true,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 
-					  245.8 * 0.438, 2.5, 3.4, 2.6, 2.6,
+					  ttbar_semiLep_xsec, ttbar_semiLep_xsec * 0.025, ttbar_semiLep_xsec * 0.034, ttbar_semiLep_xsec * 0.026, ttbar_semiLep_xsec * 0.026,
 					  true, true,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 
-					  245.8 * 0.105, 2.5, 3.4, 2.6, 2.6,
+					  ttbar_fullLep_xsec, ttbar_fullLep_xsec * 0.025, ttbar_fullLep_xsec * 0.034, ttbar_fullLep_xsec * 0.026, ttbar_fullLep_xsec * 0.026,
 					  true, true,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
+
   /*
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 
 					  12234.4 * 3, 79.0, 39.7, 414.7, 414.7,
@@ -196,66 +207,127 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   pMaker->SetDisplayKStest(displayKStest);
 
-  const int nMetBins = 17;
-  Double_t xbins_met[nMetBins+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 100, 150, 300, 650};
+  const int nMetBins_0g = 17;
+  Double_t xbins_met_0g[nMetBins_0g+1] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 100, 150, 300, 650};
+  const int nKinematicBins_0g = 28;
+  Double_t xbins_kinematic_0g[nKinematicBins_0g+1] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
 
-  const int nKinematicBins = 28;
-  Double_t xbins_kinematic[nKinematicBins+1] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
-  
+  const int nMetBins_1g = 10;
+  Double_t xbins_met_1g[nMetBins_1g+1] = {0, 10, 20, 30, 40, 50, 75, 100, 150, 300, 600};
+  const int nKinematicBins_1g = 20;
+  Double_t xbins_kinematic_1g[nKinematicBins_1g+1] = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 800, 1000, 1250, 1500, 2000};
+
+  const int nMetBins_2g = 6;
+  Double_t xbins_met_2g[nMetBins_2g+1] = {0, 25, 50, 75, 100, 150, 300};
+  const int nKinematicBins_2g = 15;
+  Double_t xbins_kinematic_2g[nKinematicBins_2g+1] = {0, 25, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000};
+
   // has to start with nphotons then met, then HT
-  pMaker->BookHistogram("Nphotons", 4, 0., 4.);
-  pMaker->BookHistogram("pfMET", nMetBins, xbins_met);
-  pMaker->BookHistogram("HT", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("Njets", 20, 0., 20.);
-  pMaker->BookHistogram("Nbtags", 20, 0., 20.);
-  pMaker->BookHistogram("max_csv", 20, 0., 1.);
-  pMaker->BookHistogram("submax_csv", 20, 0., 1.);
-  pMaker->BookHistogram("HT_jets", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("hadronic_pt", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("jet1_pt", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("jet2_pt", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("jet3_pt", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("btag1_pt", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("w_mT", nKinematicBins, xbins_kinematic);    // 13
-  pMaker->BookHistogram("m3", nKinematicBins, xbins_kinematic);
-  pMaker->BookHistogram("ele_pt", nKinematicBins, xbins_kinematic);  // 15
-  pMaker->BookHistogram("ele_eta", 60, -2.5, 2.5);                   // 16
-  pMaker->BookHistogram("muon_pt", nKinematicBins, xbins_kinematic); // 17
-  pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);                  // 18
 
-  pMaker->BookHistogram2D("Njets", "Nbtags", 15, 0., 15., 7, 0., 7.);
-  pMaker->BookHistogram2D("HT", "pfMET", 20, 0., 1200., 20, 0., 350.);
+  if(nPhotons_req == 0) {
+    pMaker->BookHistogram("Nphotons", 4, 0., 4.);
+    pMaker->BookHistogram("pfMET", nMetBins_0g, xbins_met_0g);
+    pMaker->BookHistogram("HT", nKinematicBins_0g, xbins_kinematic_0g);
+    pMaker->BookHistogram("Njets", 20, 0., 20.);
+    pMaker->BookHistogram("Nbtags", 20, 0., 20.);
+    pMaker->BookHistogram("max_csv", 20, 0., 1.);
+    pMaker->BookHistogram("submax_csv", 20, 0., 1.);
+    pMaker->BookHistogram("HT_jets", nKinematicBins_0g, xbins_kinematic_0g);
+    pMaker->BookHistogram("hadronic_pt", nKinematicBins_0g, xbins_kinematic_0g);
+    pMaker->BookHistogram("jet1_pt", nKinematicBins_0g, xbins_kinematic_0g);
+    pMaker->BookHistogram("jet2_pt", nKinematicBins_0g, xbins_kinematic_0g);
+    pMaker->BookHistogram("jet3_pt", nKinematicBins_0g, xbins_kinematic_0g);
+    pMaker->BookHistogram("btag1_pt", nKinematicBins_0g, xbins_kinematic_0g);
+    pMaker->BookHistogram("w_mT", nKinematicBins_0g, xbins_kinematic_0g);    // 13
+    pMaker->BookHistogram("m3", nKinematicBins_0g, xbins_kinematic_0g);
+    pMaker->BookHistogram("ele_pt", nKinematicBins_0g, xbins_kinematic_0g);  // 15
+    pMaker->BookHistogram("ele_eta", 60, -2.5, 2.5);                   // 16
+    pMaker->BookHistogram("muon_pt", nKinematicBins_0g, xbins_kinematic_0g); // 17
+    pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);                  // 18
 
-  pMaker->BookHistogram2D("w_mT", "Njets", 60, 0., 600., 15, 0., 15.);
-  pMaker->BookHistogram2D("w_mT", "Nbtags", 60, 0., 600., 7, 0., 7.);
-  pMaker->BookHistogram2D("w_mT", "pfMET", 60, 0., 600., 20, 0., 350.);
-  pMaker->BookHistogram2D("w_mT", "HT", 60, 0., 600., 20, 0., 1200.);  
-
-  if(nPhotons_req >= 1) {
-    pMaker->BookHistogram("leadPhotonEt", nKinematicBins, xbins_kinematic); // 19
+    /*
+    pMaker->BookHistogram2D("Njets", "Nbtags", 15, 0., 15., 7, 0., 7.);
+    pMaker->BookHistogram2D("HT", "pfMET", 20, 0., 1200., 20, 0., 350.);
+    pMaker->BookHistogram2D("w_mT", "Njets", 60, 0., 600., 15, 0., 15.);
+    pMaker->BookHistogram2D("w_mT", "Nbtags", 60, 0., 600., 7, 0., 7.);
+    pMaker->BookHistogram2D("w_mT", "pfMET", 60, 0., 600., 20, 0., 350.);
+    pMaker->BookHistogram2D("w_mT", "HT", 60, 0., 600., 20, 0., 1200.);
+    */
+  }
+    
+  if(nPhotons_req == 1) {
+    pMaker->BookHistogram("Nphotons", 4, 0., 4.);
+    pMaker->BookHistogram("pfMET", nMetBins_1g, xbins_met_1g);
+    pMaker->BookHistogram("HT", nKinematicBins_1g, xbins_kinematic_1g);
+    pMaker->BookHistogram("Njets", 20, 0., 20.);
+    pMaker->BookHistogram("Nbtags", 20, 0., 20.);
+    pMaker->BookHistogram("max_csv", 20, 0., 1.);
+    pMaker->BookHistogram("submax_csv", 20, 0., 1.);
+    pMaker->BookHistogram("HT_jets", nKinematicBins_1g, xbins_kinematic_1g);
+    pMaker->BookHistogram("hadronic_pt", nKinematicBins_1g, xbins_kinematic_1g);
+    pMaker->BookHistogram("jet1_pt", nKinematicBins_1g, xbins_kinematic_1g);
+    pMaker->BookHistogram("jet2_pt", nKinematicBins_1g, xbins_kinematic_1g);
+    pMaker->BookHistogram("jet3_pt", nKinematicBins_1g, xbins_kinematic_1g);
+    pMaker->BookHistogram("btag1_pt", nKinematicBins_1g, xbins_kinematic_1g);
+    pMaker->BookHistogram("w_mT", nKinematicBins_1g, xbins_kinematic_1g);    // 13
+    pMaker->BookHistogram("m3", nKinematicBins_1g, xbins_kinematic_1g);
+    pMaker->BookHistogram("ele_pt", nKinematicBins_1g, xbins_kinematic_1g);  // 15
+    pMaker->BookHistogram("ele_eta", 60, -2.5, 2.5);                   // 16
+    pMaker->BookHistogram("muon_pt", nKinematicBins_1g, xbins_kinematic_1g); // 17
+    pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);
+    pMaker->BookHistogram("leadPhotonEt", nKinematicBins_1g, xbins_kinematic_1g); // 19
     pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);                  // 20
     pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
     pMaker->BookHistogram("leadSigmaIetaIeta", 40, 0., 0.02);
     pMaker->BookHistogram("leadChargedHadronIso", 35, 0, 15.0);
-    pMaker->BookHistogram("mLepGammaLead", nKinematicBins, xbins_kinematic);
-
+    pMaker->BookHistogram("mLepGammaLead", nKinematicBins_1g, xbins_kinematic_1g);
+    
     pMaker->BookHistogram2D("leadSigmaIetaIeta", "pfMET", 80, 0., 0.04, 20, 0., 350.);
     pMaker->BookHistogram2D("leadChargedHadronIso", "pfMET", 70, 0., 15., 20, 0., 350.);
   }
+  
+  if(nPhotons_req == 2) {
+    pMaker->BookHistogram("Nphotons", 4, 0., 4.);
+    pMaker->BookHistogram("pfMET", nMetBins_2g, xbins_met_2g);
+    pMaker->BookHistogram("HT", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("Njets", 20, 0., 20.);
+    pMaker->BookHistogram("Nbtags", 20, 0., 20.);
+    pMaker->BookHistogram("max_csv", 20, 0., 1.);
+    pMaker->BookHistogram("submax_csv", 20, 0., 1.);
+    pMaker->BookHistogram("HT_jets", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("hadronic_pt", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("jet1_pt", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("jet2_pt", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("jet3_pt", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("btag1_pt", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("w_mT", nKinematicBins_2g, xbins_kinematic_2g);    // 13
+    pMaker->BookHistogram("m3", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("ele_pt", nKinematicBins_2g, xbins_kinematic_2g);  // 15
+    pMaker->BookHistogram("ele_eta", 60, -2.5, 2.5);                   // 16
+    pMaker->BookHistogram("muon_pt", nKinematicBins_2g, xbins_kinematic_2g); // 17
+    pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);
+    pMaker->BookHistogram("leadPhotonEt", nKinematicBins_2g, xbins_kinematic_2g); // 19
+    pMaker->BookHistogram("leadPhotonEta", 40, -1.5, 1.5);                  // 20
+    pMaker->BookHistogram("leadPhotonPhi", 63, -3.14159, 3.14159);
+    pMaker->BookHistogram("leadSigmaIetaIeta", 40, 0., 0.02);
+    pMaker->BookHistogram("leadChargedHadronIso", 35, 0, 15.0);
+    pMaker->BookHistogram("mLepGammaLead", nKinematicBins_2g, xbins_kinematic_2g);
+    
+    pMaker->BookHistogram2D("leadSigmaIetaIeta", "pfMET", 80, 0., 0.04, 20, 0., 350.);
+    pMaker->BookHistogram2D("leadChargedHadronIso", "pfMET", 70, 0., 15., 20, 0., 350.);
 
-  if(nPhotons_req >= 2) {
-    pMaker->BookHistogram("trailPhotonEt", nKinematicBins, xbins_kinematic); // 24
+    pMaker->BookHistogram("trailPhotonEt", nKinematicBins_2g, xbins_kinematic_2g); // 24
     pMaker->BookHistogram("trailPhotonPhi", 63, -3.14159, 3.14159);          // 25
     pMaker->BookHistogram("trailPhotonEta", 40, -1.5, 1.5);                  // 26
     pMaker->BookHistogram("trailSigmaIetaIeta", 40, 0, 0.02);
     pMaker->BookHistogram("trailChargedHadronIso", 35, 0, 15.0);
-    pMaker->BookHistogram("diEMpT", nKinematicBins, xbins_kinematic);
-    pMaker->BookHistogram("diJetPt", nKinematicBins, xbins_kinematic);
-    pMaker->BookHistogram("photon_invmass", nKinematicBins, xbins_kinematic);
+    pMaker->BookHistogram("diEMpT", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("diJetPt", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("photon_invmass", nKinematicBins_2g, xbins_kinematic_2g);
     pMaker->BookHistogram("photon_dR", 50, 0., 5.);
     pMaker->BookHistogram("photon_dPhi", 35, 0., 3.14159);
-    pMaker->BookHistogram("mLepGammaTrail", nKinematicBins, xbins_kinematic);
-    pMaker->BookHistogram("mLepGammaGamma", nKinematicBins, xbins_kinematic);
+    pMaker->BookHistogram("mLepGammaTrail", nKinematicBins_2g, xbins_kinematic_2g);
+    pMaker->BookHistogram("mLepGammaGamma", nKinematicBins_2g, xbins_kinematic_2g);
   }
 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
@@ -749,18 +821,23 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   
   pMaker->SetPhotonMode(photonMode);
 
+  Double_t ttbar_hadronic_xsec = 245.8 * 0.457;
+  Double_t ttbar_semiLep_xsec  = 245.8 * 0.438;
+  Double_t ttbar_fullLep_xsec  = 245.8 * 0.105;
+
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
-					  245.8 * 0.457, 2.5, 3.4, 2.6, 2.6,
+					  ttbar_hadronic_xsec, ttbar_hadronic_xsec * 0.025, ttbar_hadronic_xsec * 0.034, ttbar_hadronic_xsec * 0.026, ttbar_hadronic_xsec * 0.026,
 					  true, true,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 
-					  245.8 * 0.438, 2.5, 3.4, 2.6, 2.6,
+					  ttbar_semiLep_xsec, ttbar_semiLep_xsec * 0.025, ttbar_semiLep_xsec * 0.034, ttbar_semiLep_xsec * 0.026, ttbar_semiLep_xsec * 0.026,
 					  true, true,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 
-					  245.8 * 0.105, 2.5, 3.4, 2.6, 2.6,
+					  ttbar_fullLep_xsec, ttbar_fullLep_xsec * 0.025, ttbar_fullLep_xsec * 0.034, ttbar_fullLep_xsec * 0.026, ttbar_fullLep_xsec * 0.026,
 					  true, true,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive");
+
   /*
   loadSuccess |= pMaker->LoadMCBackground("inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 
 					  12234.4 * 3, 79.0, 39.7, 414.7, 414.7,
