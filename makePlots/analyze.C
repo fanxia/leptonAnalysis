@@ -351,7 +351,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
-  bool needsQCD = true;
+  bool needsQCD = (channel < 2);
 
   pMaker->Create2DPlots(needsQCD, true, out);
 
@@ -361,7 +361,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, false,
 		     out);
 
-  // pfMET durp
+  // pfMET
   if(nPhotons_req == 0) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
 					   0., 300., 7.e-3, 2.5e4,
 					   0.7, 1.3,
