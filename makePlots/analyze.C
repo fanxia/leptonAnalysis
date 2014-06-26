@@ -39,8 +39,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   gStyle->SetOptStat(0000);
   gStyle->SetOptTitle(0);
 
-  prep_signal(channels[channel], nPhotons_req);
-
   TFile * in = new TFile(input, "READ");
 
   TTree * ggTree = (TTree*)in->Get(channels[channel]+"_signalTree");
@@ -346,7 +344,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
   pMaker->CreateTable();
-  pMaker->CreateDatacard();
+  pMaker->CreateAllDatacards(chan, nPhotons_req, nBtagReq);
 
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");

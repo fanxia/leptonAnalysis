@@ -259,7 +259,7 @@ class PlotMaker : public TObject {
 
   void CreateTable();
 
-  void CreateAllDatacards();
+  void CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq);
   void CreateDatacard();
 
   void PlotKolmogorovValues();
@@ -4075,280 +4075,251 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
   
 }
 
+void PlotMaker::CreateDatacard() {
 
+  fstream fin;
+  fin.open("datacard_"+req+".temp");
 
+  vector<TString> names;
+  vector<float> values;
 
+  while(1) {
+    string line;
+    fin >> line;
 
+    if(!fin.good()) break;
 
-  void PlotMaker::CreateDatacard() {
+    TString line_t = line;
 
-    fstream fin;
-    fin.open("datacard_"+req+".temp");
+    TString sub_t = line_t(line_t.Index(":") + 1, line_t.Length());
+    if(sub_t.Contains("nan")) continue;
 
-    vector<TString> names;
-    vector<float> values;
-
-    while(1) {
-      string line;
-      fin >> line;
-
-      if(!fin.good()) break;
-
-      TString line_t = line;
-
-      TString sub_t = line_t(line_t.Index(":") + 1, line_t.Length());
-      if(sub_t.Contains("nan")) continue;
-
-      names.push_back(line_t(0, line_t.Index(":")));
-      values.push_back(atof((line_t(line_t.Index(":") + 1, line_t.Length())).Data()));
-    }
-
-    fin.close();
-
-    float rmin = 0.;
-    float sigval;
-
-    for(unsigned int i = 0; i < names.size(); i++) {
-      rmin += pow(1.026 - 1., 2);
-      if(names[i].Contains("dataval")) rmin += values[i];
-      else if(!(names[i].Contains("val"))) rmin += pow(values[i] - 1., 2);
-
-      if(names[i].Contains("sigaval")) sigval = values[i];
-    }
-
-    rmin = 2. * sqrt(rmin) / sigval;
-
-    FILE * datacardFile = fopen("datacard_"+req+".temp", "a");
-    fprintf(datacardFile, "rfirstguessval:%.2f\n", rmin);
-    fclose(datacardFile);
-
+    names.push_back(line_t(0, line_t.Index(":")));
+    values.push_back(atof((line_t(line_t.Index(":") + 1, line_t.Length())).Data()));
   }
 
-  void PlotMaker::PlotKolmogorovValues() {
+  fin.close();
 
-    if(!displayKStest) return;
+  float rmin = 0.;
+  float sigval;
 
-    TH1D * h_ks = new TH1D("h_ks_"+req, "h_ks_"+req, (int)KSscores.size(), 0, (int)KSscores.size());
+  for(unsigned int i = 0; i < names.size(); i++) {
+    rmin += pow(1.026 - 1., 2);
+    if(names[i].Contains("dataval")) rmin += values[i];
+    else if(!(names[i].Contains("val"))) rmin += pow(values[i] - 1., 2);
 
-    for(unsigned int i = 0; i < KSscores.size(); i++) {
-      h_ks->SetBinContent(i+1, KSscores[i].second);
-      h_ks->GetXaxis()->SetBinLabel(i+1, KSscores[i].first);
-    }
-
-    TCanvas * can = new TCanvas("ks_can_"+req, "Plot", 10, 10, 2000, 2000);
-    can->SetLogy(true);
-
-    h_ks->Draw("hist");
-    can->SaveAs("ksScores_"+req+".pdf");
-
-    delete can;
-
+    if(names[i].Contains("sigaval")) sigval = values[i];
   }
 
-  void PlotMaker::GetLeptonSF(Float_t lepton_pt, Float_t lepton_eta, int chan, Float_t& central, Float_t& up, Float_t& down) {
+  rmin = 2. * sqrt(rmin) / sigval;
 
-    Float_t pt, eta, error;
+  FILE * datacardFile = fopen("datacard_"+req+".temp", "a");
+  fprintf(datacardFile, "rfirstguessval:%.2f\n", rmin);
+  fclose(datacardFile);
 
-    if(chan < 2) {
-      pt = min(lepton_pt, (float)199.);
-      pt = max(pt, (float)15.);
-      eta = min(fabs(lepton_eta), (double)2.39);
+}
 
-      Float_t id_val = sf_electron->GetBinContent(sf_electron->FindBin(eta, pt));
-      Float_t id_error = sf_electron->GetBinError(sf_electron->FindBin(eta, pt));
+void PlotMaker::PlotKolmogorovValues() {
 
-      Float_t trigger_val = sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(eta, pt));
-      Float_t trigger_error = sf_SingleElectronTrigger->GetBinError(sf_SingleElectronTrigger->FindBin(eta, pt));
+  if(!displayKStest) return;
 
-      central = id_val * trigger_val;
-      error = central * sqrt(id_error*id_error/(id_val*id_val) + trigger_error*trigger_error/(trigger_val*trigger_val));
+  TH1D * h_ks = new TH1D("h_ks_"+req, "h_ks_"+req, (int)KSscores.size(), 0, (int)KSscores.size());
 
-      up = central + error;
-      down = central - error;
-    }
-
-    else {
-      pt = min(lepton_pt, (float)499.);
-      pt = max(pt, (float)10.);
-      eta = min(fabs(lepton_eta), (double)2.09);
-
-      central = sf_muon->GetBinContent(sf_muon->FindBin(pt, eta));
-      error = sf_muon->GetBinError(sf_muon->FindBin(pt, eta));
-
-      up = error;
-      down = 2. * central - error;
-    }
-
-    return;  
+  for(unsigned int i = 0; i < KSscores.size(); i++) {
+    h_ks->SetBinContent(i+1, KSscores[i].second);
+    h_ks->GetXaxis()->SetBinLabel(i+1, KSscores[i].first);
   }
 
-  void GetPhotonSF(Float_t lead_photon_et, Float_t lead_photon_eta, Float_t trail_photon_et, Float_t trail_photon_eta, Float_t nphotons, 
-		   Float_t& central, Float_t& up, Float_t& down) {
+  TCanvas * can = new TCanvas("ks_can_"+req, "Plot", 10, 10, 2000, 2000);
+  can->SetLogy(true);
 
-    if(nphotons == 0) {
-      central = 1.;
-      up = 1.;
-      down = 1.;
-      return;
-    }
+  h_ks->Draw("hist");
+  can->SaveAs("ksScores_"+req+".pdf");
 
-    Float_t et, eta, error;
+  delete can;
 
-    if(nphotons == 1) {
-      et = min(lead_photon_et, (float)999.);
-      et = max(et, (float)15.);
-      eta = min(fabs(lead_photon_eta), (double)1.44441);
+}
 
-      Float_t id_val = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
-      Float_t id_error = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
-    
-      Float_t veto_val = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
-      Float_t veto_error = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+void PlotMaker::GetLeptonSF(Float_t lepton_pt, Float_t lepton_eta, int chan, Float_t& central, Float_t& up, Float_t& down) {
 
-      central = id_val * veto_val;
-      error = central * sqrt(id_error*id_error/(id_val*id_val) + veto_error*veto_error/(veto_val*veto_val));
-    }
+  Float_t pt, eta, error;
 
-    else if(nphotons >= 2) {
-      // lead photon
-      et = min(lead_photon_et, (float)999.);
-      et = max(et, (float)15.);
-      eta = min(fabs(lead_photon_eta), (double)1.44441);
+  if(chan < 2) {
+    pt = min(lepton_pt, (float)199.);
+    pt = max(pt, (float)15.);
+    eta = min(fabs(lepton_eta), (double)2.39);
 
-      Float_t id_val_lead = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
-      Float_t id_error_lead = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
-    
-      Float_t veto_val_lead = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
-      Float_t veto_error_lead = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
+    Float_t id_val = sf_electron->GetBinContent(sf_electron->FindBin(eta, pt));
+    Float_t id_error = sf_electron->GetBinError(sf_electron->FindBin(eta, pt));
 
-      // trail photon
-      et = min(trail_photon_et, (float)999.);
-      et = max(et, (float)15.);
-      eta = min(fabs(trail_photon_eta), (double)1.44441);
+    Float_t trigger_val = sf_SingleElectronTrigger->GetBinContent(sf_SingleElectronTrigger->FindBin(eta, pt));
+    Float_t trigger_error = sf_SingleElectronTrigger->GetBinError(sf_SingleElectronTrigger->FindBin(eta, pt));
 
-      Float_t id_val_trail = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
-      Float_t id_error_trail = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
-    
-      Float_t veto_val_trail = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
-      Float_t veto_error_trail = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
-
-      central = id_val_lead * veto_val_lead * id_val_trail * veto_val_trail;
-      error = central * sqrt(id_error_lead*id_error_lead/(id_val_lead*id_val_lead) +
-			     veto_error_lead*veto_error_lead/(veto_val_lead*veto_val_lead) +
-			     id_error_trail*id_error_trail/(id_val_trail*id_val_trail) +
-			     veto_error_trail*veto_error_trail/(veto_val_trail*veto_val_trail));
-    }
+    central = id_val * trigger_val;
+    error = central * sqrt(id_error*id_error/(id_val*id_val) + trigger_error*trigger_error/(trigger_val*trigger_val));
 
     up = central + error;
     down = central - error;
+  }
 
+  else {
+    pt = min(lepton_pt, (float)499.);
+    pt = max(pt, (float)10.);
+    eta = min(fabs(lepton_eta), (double)2.09);
+
+    central = sf_muon->GetBinContent(sf_muon->FindBin(pt, eta));
+    error = sf_muon->GetBinError(sf_muon->FindBin(pt, eta));
+
+    up = error;
+    down = 2. * central - error;
+  }
+
+  return;  
+}
+
+void PlotMaker::GetPhotonSF(Float_t lead_photon_et, Float_t lead_photon_eta, Float_t trail_photon_et, Float_t trail_photon_eta, Float_t nphotons, 
+			    Float_t& central, Float_t& up, Float_t& down) {
+
+  if(nphotons == 0) {
+    central = 1.;
+    up = 1.;
+    down = 1.;
     return;
   }
 
-  void prep_signal(TString req, int nPhotons_req) {
+  Float_t et, eta, error;
 
-    durp
-  
-  
+  if(nphotons == 1) {
+    et = min(lead_photon_et, (float)999.);
+    et = max(et, (float)15.);
+    eta = min(fabs(lead_photon_eta), (double)1.44441);
 
-      TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
+    Float_t id_val = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t id_error = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
+    
+    Float_t veto_val = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t veto_error = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
 
-    h_acc->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
-    h_acc->GetXaxis()->SetRangeUser(0, 1600);
-    h_acc->GetXaxis()->SetLabelSize(0.03);
-    h_acc->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
-    h_acc->GetYaxis()->SetTitleOffset(1.3);
-    h_acc->GetYaxis()->SetLabelSize(0.03);
-    h_acc->GetYaxis()->SetRangeUser(0, 1600);
-    h_acc->GetZaxis()->SetLabelSize(0.02);
-    h_acc->Draw("colz");
-    can->SaveAs("acceptance_"+req+".pdf");
-  
-    out->Write();
-    out->Close();
-
+    central = id_val * veto_val;
+    error = central * sqrt(id_error*id_error/(id_val*id_val) + veto_error*veto_error/(veto_val*veto_val));
   }
 
-  void plotReducedChi2(vector<TH1D*> gg, vector<TH1D*> gf, vector<TH1D*> ff,
-		       TH2D*& gf_chi2,
-		       TH2D*& ff_chi2,
-		       Int_t binx) {
+  else if(nphotons >= 2) {
+    // lead photon
+    et = min(lead_photon_et, (float)999.);
+    et = max(et, (float)15.);
+    eta = min(fabs(lead_photon_eta), (double)1.44441);
 
-    for(unsigned int i = 0; i < gg.size(); i++) {
-      if(gg[i]->Integral() >= 1.) gg[i]->Scale(1./gg[i]->Integral());
-    }
-    for(unsigned int i = 0; i < gf.size(); i++) {
-      if(gf[i]->Integral() >= 1.) gf[i]->Scale(1./gf[i]->Integral());
-    }
-    for(unsigned int i = 0; i < ff.size(); i++) {
-      if(ff[i]->Integral() >= 1.) ff[i]->Scale(1./ff[i]->Integral());
-    }
-
-    for(int i = 0; i < 10; i++) {
-
-      Float_t chi2 = 0.;
-      Int_t nBins = 0;
+    Float_t id_val_lead = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t id_error_lead = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
     
-      for(int j = 0; j < gg[i]->GetNbinsX(); j++) {
-	Float_t val_num = gg[i]->GetBinContent(j+1) - gf[i]->GetBinContent(j+1);
-	Float_t val_den = gg[i]->GetBinError(j+1)*gg[i]->GetBinError(j+1) + gf[i]->GetBinError(j+1)*gf[i]->GetBinError(j+1);
+    Float_t veto_val_lead = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t veto_error_lead = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
 
-	if(val_den == 0.) continue;
+    // trail photon
+    et = min(trail_photon_et, (float)999.);
+    et = max(et, (float)15.);
+    eta = min(fabs(trail_photon_eta), (double)1.44441);
 
-	chi2 += val_num * val_num / val_den;
-	nBins++;
-      }
-      chi2 /= nBins;
-      gf_chi2->SetBinContent(gf_chi2->FindBin(binx, i), chi2);
-
-      chi2 = 0.;
-      nBins = 0;
+    Float_t id_val_trail = sf_photon_id->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t id_error_trail = sf_photon_id->GetBinError(sf_photon_id->FindBin(et, eta));
     
-      for(int j = 0; j < gg[i]->GetNbinsX(); j++) {
-	Float_t val_num = gg[i]->GetBinContent(j+1) - ff[i]->GetBinContent(j+1);
-	Float_t val_den = gg[i]->GetBinError(j+1)*gg[i]->GetBinError(j+1) + ff[i]->GetBinError(j+1)*ff[i]->GetBinError(j+1);
+    Float_t veto_val_trail = sf_photon_veto->GetBinContent(sf_photon_id->FindBin(et, eta));
+    Float_t veto_error_trail = sf_photon_veto->GetBinError(sf_photon_id->FindBin(et, eta));
 
-	if(val_den == 0.) continue;
-
-	chi2 += val_num * val_num / val_den;
-	nBins++;
-      }
-      chi2 /= nBins;
-      ff_chi2->SetBinContent(gf_chi2->FindBin(binx, i), chi2);
-    }
-
-    // now fill bin 10, chi2 across all variables
-    Float_t chi2_all = 0.;
-    Float_t nBins_all = 0;
-    for(unsigned int i = 0; i < gg.size(); i++) {
-      for(int j = 0; j < gg[i]->GetNbinsX(); j++) {
-	Float_t val_num = gg[i]->GetBinContent(j+1) - gf[i]->GetBinContent(j+1);
-	Float_t val_den = gg[i]->GetBinError(j+1)*gg[i]->GetBinError(j+1) + gf[i]->GetBinError(j+1)*gf[i]->GetBinError(j+1);
-
-	if(val_den == 0.) continue;
-
-	chi2_all += val_num * val_num / val_den;
-	nBins_all++;
-      }
-    }
-    chi2_all /= nBins_all;
-    gf_chi2->SetBinContent(gf_chi2->FindBin(binx, 10), chi2_all);
-
-    chi2_all = 0.;
-    nBins_all = 0;
-    for(unsigned int i = 0; i < gg.size(); i++) {
-      for(int j = 0; j < gg[i]->GetNbinsX(); j++) {
-	Float_t val_num = gg[i]->GetBinContent(j+1) - ff[i]->GetBinContent(j+1);
-	Float_t val_den = gg[i]->GetBinError(j+1)*gg[i]->GetBinError(j+1) + ff[i]->GetBinError(j+1)*ff[i]->GetBinError(j+1);
-    
-	if(val_den == 0.) continue;
-  
-	chi2_all += val_num * val_num / val_den;
-	nBins_all++;
-      }
-    }
-    chi2_all /= nBins_all;
-    ff_chi2->SetBinContent(ff_chi2->FindBin(binx, 10), chi2_all);
-
+    central = id_val_lead * veto_val_lead * id_val_trail * veto_val_trail;
+    error = central * sqrt(id_error_lead*id_error_lead/(id_val_lead*id_val_lead) +
+			   veto_error_lead*veto_error_lead/(veto_val_lead*veto_val_lead) +
+			   id_error_trail*id_error_trail/(id_val_trail*id_val_trail) +
+			   veto_error_trail*veto_error_trail/(veto_val_trail*veto_val_trail));
   }
+
+  up = central + error;
+  down = central - error;
+
+  return;
+}
+
+void plotReducedChi2(vector<TH1D*> gg, vector<TH1D*> gf, vector<TH1D*> ff,
+		     TH2D*& gf_chi2,
+		     TH2D*& ff_chi2,
+		     Int_t binx) {
+
+  for(unsigned int i = 0; i < gg.size(); i++) {
+    if(gg[i]->Integral() >= 1.) gg[i]->Scale(1./gg[i]->Integral());
+  }
+  for(unsigned int i = 0; i < gf.size(); i++) {
+    if(gf[i]->Integral() >= 1.) gf[i]->Scale(1./gf[i]->Integral());
+  }
+  for(unsigned int i = 0; i < ff.size(); i++) {
+    if(ff[i]->Integral() >= 1.) ff[i]->Scale(1./ff[i]->Integral());
+  }
+
+  for(int i = 0; i < 10; i++) {
+
+    Float_t chi2 = 0.;
+    Int_t nBins = 0;
+    
+    for(int j = 0; j < gg[i]->GetNbinsX(); j++) {
+      Float_t val_num = gg[i]->GetBinContent(j+1) - gf[i]->GetBinContent(j+1);
+      Float_t val_den = gg[i]->GetBinError(j+1)*gg[i]->GetBinError(j+1) + gf[i]->GetBinError(j+1)*gf[i]->GetBinError(j+1);
+
+      if(val_den == 0.) continue;
+
+      chi2 += val_num * val_num / val_den;
+      nBins++;
+    }
+    chi2 /= nBins;
+    gf_chi2->SetBinContent(gf_chi2->FindBin(binx, i), chi2);
+
+    chi2 = 0.;
+    nBins = 0;
+    
+    for(int j = 0; j < gg[i]->GetNbinsX(); j++) {
+      Float_t val_num = gg[i]->GetBinContent(j+1) - ff[i]->GetBinContent(j+1);
+      Float_t val_den = gg[i]->GetBinError(j+1)*gg[i]->GetBinError(j+1) + ff[i]->GetBinError(j+1)*ff[i]->GetBinError(j+1);
+
+      if(val_den == 0.) continue;
+
+      chi2 += val_num * val_num / val_den;
+      nBins++;
+    }
+    chi2 /= nBins;
+    ff_chi2->SetBinContent(gf_chi2->FindBin(binx, i), chi2);
+  }
+
+  // now fill bin 10, chi2 across all variables
+  Float_t chi2_all = 0.;
+  Float_t nBins_all = 0;
+  for(unsigned int i = 0; i < gg.size(); i++) {
+    for(int j = 0; j < gg[i]->GetNbinsX(); j++) {
+      Float_t val_num = gg[i]->GetBinContent(j+1) - gf[i]->GetBinContent(j+1);
+      Float_t val_den = gg[i]->GetBinError(j+1)*gg[i]->GetBinError(j+1) + gf[i]->GetBinError(j+1)*gf[i]->GetBinError(j+1);
+
+      if(val_den == 0.) continue;
+
+      chi2_all += val_num * val_num / val_den;
+      nBins_all++;
+    }
+  }
+  chi2_all /= nBins_all;
+  gf_chi2->SetBinContent(gf_chi2->FindBin(binx, 10), chi2_all);
+
+  chi2_all = 0.;
+  nBins_all = 0;
+  for(unsigned int i = 0; i < gg.size(); i++) {
+    for(int j = 0; j < gg[i]->GetNbinsX(); j++) {
+      Float_t val_num = gg[i]->GetBinContent(j+1) - ff[i]->GetBinContent(j+1);
+      Float_t val_den = gg[i]->GetBinError(j+1)*gg[i]->GetBinError(j+1) + ff[i]->GetBinError(j+1)*ff[i]->GetBinError(j+1);
+    
+      if(val_den == 0.) continue;
+  
+      chi2_all += val_num * val_num / val_den;
+      nBins_all++;
+    }
+  }
+  chi2_all /= nBins_all;
+  ff_chi2->SetBinContent(ff_chi2->FindBin(binx, 10), chi2_all);
+
+}
 
