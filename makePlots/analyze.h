@@ -4034,19 +4034,19 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 
     double xsec = h_xsec->GetBinContent(h_xsec->FindBin(index1, index2));
     
-    h->Scale(xsec);
-    h_btagWeightUp->Scale(xsec);
-    h_btagWeightDown->Scale(xsec);
-    h_puWeightUp->Scale(xsec);
-    h_puWeightDown->Scale(xsec);
-    h_topPtUp->Scale(xsec);
-    h_topPtDown->Scale(xsec);
-    h_JECup->Scale(xsec);
-    h_JECdown->Scale(xsec);
-    h_leptonSFup->Scale(xsec);
-    h_leptonSFdown->Scale(xsec);
-    h_photonSFup->Scale(xsec);
-    h_photonSFdown->Scale(xsec);
+    h->Scale(xsec * 19712. / 15000.);
+    h_btagWeightUp->Scale(xsec * 19712. / 15000.);
+    h_btagWeightDown->Scale(xsec * 19712. / 15000.);
+    h_puWeightUp->Scale(xsec * 19712. / 15000.);
+    h_puWeightDown->Scale(xsec * 19712. / 15000.);
+    h_topPtUp->Scale(xsec * 19712. / 15000.);
+    h_topPtDown->Scale(xsec * 19712. / 15000.);
+    h_JECup->Scale(xsec * 19712. / 15000.);
+    h_JECdown->Scale(xsec * 19712. / 15000.);
+    h_leptonSFup->Scale(xsec * 19712. / 15000.);
+    h_leptonSFdown->Scale(xsec * 19712. / 15000.);
+    h_photonSFup->Scale(xsec * 19712. / 15000.);
+    h_photonSFdown->Scale(xsec * 19712. / 15000.);
 
     fSignalOut->cd();
     h->Write();
