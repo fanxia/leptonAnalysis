@@ -3080,6 +3080,8 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     }
   }
   
+  out->cd();
+
   bkg->Write();
   bkg_btagWeightUp->Write();
   bkg_btagWeightDown->Write();
@@ -3912,6 +3914,8 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     tree_JECdown->SetBranchAddress("pileupWeightDown", &puWeightDown);
     tree_JECdown->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
+    fSignalOut->cd();
+
     TH1D * h = new TH1D("pfMET_gg_"+req+code_t, "pfMET_gg_"+req+code_t, 400, 0, 2000); h->Sumw2();
 
     TH1D * h_btagWeightUp = new TH1D("pfMET_gg_"+req+code_t+"_btagWeightUp", "pfMET_gg_"+req+code_t+"_btagWeightUp", 400, 0, 2000); h_btagWeightUp->Sumw2();
@@ -4026,7 +4030,6 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     }
 
     double acceptance = h->Integral();
-    h_acc->Fill(index1, index2, acceptance / (0.438/3.) / n);
     h_acc->Fill(index1, index2, h->Integral() / (0.438/3.) / 15000.);
 
     double xsec = h_xsec->GetBinContent(h_xsec->FindBin(index1, index2));
