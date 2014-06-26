@@ -336,7 +336,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
   pMaker->CreateTable();
-  pMaker->CreateAllDatacards(chan, nPhotons_req, nBtagReq);
+  pMaker->CreateAllDatacards(channel, nPhotons_req, nBtagReq);
   pMaker->SaveBackgroundOutput();
 
   // Now save the met plots out to file -- use these later for the limit-setting
