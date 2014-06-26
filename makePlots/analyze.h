@@ -260,7 +260,7 @@ class PlotMaker : public TObject {
   void CreateTable();
 
   void CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq);
-  void CreateDatacard();
+  void SaveBackgroundOutput();
 
   void PlotKolmogorovValues();
 
@@ -2995,36 +2995,6 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) mcQCDHistograms[i][variableNumber]->Write();
 
-  // if pfMET, make the limit input file
-  if(variableNumber == 1) {
-    TFile * fLimits = new TFile("limitInputs_"+req+".root", "RECREATE");
-    fLimits->cd();
-
-    h_gg[variableNumber]->Write();
-    h_qcd[variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_btagWeightUp.size(); i++) mcHistograms_btagWeightUp[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_btagWeightDown.size(); i++) mcHistograms_btagWeightDown[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_puWeightUp.size(); i++) mcHistograms_puWeightUp[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_puWeightDown.size(); i++) mcHistograms_puWeightDown[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_topPtUp.size(); i++) mcHistograms_topPtUp[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_topPtDown.size(); i++) mcHistograms_topPtDown[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_JECup.size(); i++) mcHistograms_JECup[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_JECdown.size(); i++) mcHistograms_JECdown[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_leptonSFup.size(); i++) mcHistograms_leptonSFup[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_leptonSFdown.size(); i++) mcHistograms_leptonSFdown[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_photonSFup.size(); i++) mcHistograms_photonSFup[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_photonSFdown.size(); i++) mcHistograms_photonSFdown[i][variableNumber]->Write();
-
-    for(unsigned int i = 0; i < mcHistograms_scaleUp.size(); i++) mcHistograms_scaleUp[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_scaleDown.size(); i++) mcHistograms_scaleDown[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_pdfUp.size(); i++) mcHistograms_pdfUp[i][variableNumber]->Write();
-    for(unsigned int i = 0; i < mcHistograms_pdfDown.size(); i++) mcHistograms_pdfDown[i][variableNumber]->Write();
-    
-    fLimits->Write();
-    fLimits->Close();
-  }
-
   TH1D *bkg, 
     *bkg_btagWeightUp, *bkg_btagWeightDown, 
     *bkg_puWeightUp, *bkg_puWeightDown, 
@@ -4078,47 +4048,37 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
   
 }
 
-void PlotMaker::CreateDatacard() {
+void PlotMaker::SaveBackgroundOutput() {
 
-  fstream fin;
-  fin.open("datacard_"+req+".temp");
+  // save pfMET
+  int variableNumber = 1;
 
-  vector<TString> names;
-  vector<float> values;
-
-  while(1) {
-    string line;
-    fin >> line;
-
-    if(!fin.good()) break;
-
-    TString line_t = line;
-
-    TString sub_t = line_t(line_t.Index(":") + 1, line_t.Length());
-    if(sub_t.Contains("nan")) continue;
-
-    names.push_back(line_t(0, line_t.Index(":")));
-    values.push_back(atof((line_t(line_t.Index(":") + 1, line_t.Length())).Data()));
-  }
-
-  fin.close();
-
-  float rmin = 0.;
-  float sigval;
-
-  for(unsigned int i = 0; i < names.size(); i++) {
-    rmin += pow(1.026 - 1., 2);
-    if(names[i].Contains("dataval")) rmin += values[i];
-    else if(!(names[i].Contains("val"))) rmin += pow(values[i] - 1., 2);
-
-    if(names[i].Contains("sigaval")) sigval = values[i];
-  }
-
-  rmin = 2. * sqrt(rmin) / sigval;
-
-  FILE * datacardFile = fopen("datacard_"+req+".temp", "a");
-  fprintf(datacardFile, "rfirstguessval:%.2f\n", rmin);
-  fclose(datacardFile);
+  TFile * fLimits = new TFile("limitInputs_"+req+".root", "RECREATE");
+  fLimits->cd();
+  
+  h_gg[variableNumber]->Write();
+  h_qcd[variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_btagWeightUp.size(); i++) mcHistograms_btagWeightUp[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_btagWeightDown.size(); i++) mcHistograms_btagWeightDown[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_puWeightUp.size(); i++) mcHistograms_puWeightUp[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_puWeightDown.size(); i++) mcHistograms_puWeightDown[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_topPtUp.size(); i++) mcHistograms_topPtUp[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_topPtDown.size(); i++) mcHistograms_topPtDown[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_JECup.size(); i++) mcHistograms_JECup[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_JECdown.size(); i++) mcHistograms_JECdown[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_leptonSFup.size(); i++) mcHistograms_leptonSFup[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_leptonSFdown.size(); i++) mcHistograms_leptonSFdown[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_photonSFup.size(); i++) mcHistograms_photonSFup[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_photonSFdown.size(); i++) mcHistograms_photonSFdown[i][variableNumber]->Write();
+  
+  for(unsigned int i = 0; i < mcHistograms_scaleUp.size(); i++) mcHistograms_scaleUp[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_scaleDown.size(); i++) mcHistograms_scaleDown[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_pdfUp.size(); i++) mcHistograms_pdfUp[i][variableNumber]->Write();
+  for(unsigned int i = 0; i < mcHistograms_pdfDown.size(); i++) mcHistograms_pdfDown[i][variableNumber]->Write();
+  
+  fLimits->Write();
+  fLimits->Close();
 
 }
 
