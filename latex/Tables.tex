@@ -1,12 +1,32 @@
 \documentclass[landscape]{article}
 \usepackage[english]{babel}
 \usepackage{graphicx}
+\usepackage[top=2in, bottom=2in, left=1in, right=1in]{geometry}
 
 \begin{document}
 
 \begin{small}
   
   \begin{center}
+
+    \begin{tabular}{ | l | c | c | }
+      \hline \hline
+      Dataset & Trigger \\ \hline
+      \textbf{SingleElectron} & HLT\_Ele27\_WP80\_v* \\
+      /SingleElectron/Run2012A-22Jan2013-v1/AOD & \\
+      /SingleElectron/Run2012B-22Jan2013-v1/AOD & \\
+      /SingleElectron/Run2012C-22Jan2013-v1/AOD & \\
+      /SingleElectron/Run2012D-22Jan2013-v1/AOD & \\ \hline
+      \textbf{SingleMu} & HLT\_IsoMu24\_eta2p1\_v* \\
+      /SingleMu/Run2012A-22Jan2013-v1/AOD & \\
+      /SingleMu/Run2012B-22Jan2013-v1/AOD & \\
+      /SingleMu/Run2012C-22Jan2013-v1/AOD & \\
+      /SingleMu/Run2012D-22Jan2013-v1/AOD & \\ 
+      \hline
+      \hline
+    \end{tabular}
+
+    \vspace{10 mm}
 
     \begin{tabular}{ | l | c | c | }
       \hline \hline
@@ -97,17 +117,23 @@
     \begin{tabular}{ | l | c | c | }
       \hline \hline
       Sample & Dataset & $\sigma$ (pb) \\ \hline
-      $t\bar{t} \rightarrow jets$ & /TTJets\_HadronicMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 112.33 \\
-      $t\bar{t} \rightarrow \ell\nu + 4 jets$ & /TTJets\_SemiLeptMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A\_ext-v1/AODSIM & 107.66 \\
-      $t\bar{t} \rightarrow \ell\nu\ell\nu + 2 jets$ & /TTJets\_FullLeptMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v2/AODSIM & 25.81 \\
+      $t\bar{t} \rightarrow$ jets & /TTJets\_HadronicMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 112.33 \\
+      $t\bar{t} \rightarrow \ell\nu + $4 jets & /TTJets\_SemiLeptMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A\_ext-v1/AODSIM & 107.66 \\
+      $t\bar{t} \rightarrow \ell\nu\ell\nu + $2 jets & /TTJets\_FullLeptMGDecays\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v2/AODSIM & 25.81 \\
       \hline
       $t\bar{t} + W$ & /TTWJets\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 0.232 \\
       \hline
       $t\bar{t} + Z$ & /TTZJets\_8TeV-madgraph\_v2/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 0.2057 \\
       \hline
-      $W + jets$ & /WJetsToLNu\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 36257.2 \\
+      % $W + $ jets & /WJetsToLNu\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 36257.2 \\
+      $W + $ jets & & \\
+       & /W1JetsToLNu\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 6518.9 \\
+       & /W2JetsToLNu\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 2112.6 \\
+       & /W3JetsToLNu\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 626.3 \\
+       & /W4JetsToLNu\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 258.3 \\
       \hline
-      $Z/\gamma* + jets$ & /DYJetsToLL\_M-50\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 3503.71 \\
+      %$Z/\gamma* + $ jets & /DYJetsToLL\_M-50\_TuneZ2Star\_8TeV-madgraph-tarball/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 3503.71 \\
+      $Z/\gamma* + $ jets & & \\
       \-10 $GeV/c^{2} < M_{\ell\ell} <$ 50 $GeV/c^{2}$ & & \\
       $Z/\gamma* +$ 1 jet & /DY1JetsToLL\_M-50\_TuneZ2Star\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 666.7 \\
       $Z/\gamma* +$ 2 jet & /DY2JetsToLL\_M-50\_TuneZ2Star\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 215.1 \\
@@ -130,11 +156,10 @@
       \hline
       $ZZ$ & /ZZ\_TuneZ2star\_8TeV\_pythia6\_tauola/Summer12\_DR53X-PU\_S10\_START53\_V7A-v1/AODSIM & 8.26 \\
       \hline
-%      $t\bar{t} + \gamma + jets$ & /TTGJets\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V19-v1/AODSIM & 14.0 \\
-      $t\bar{t} + \gamma + jets$ & /LHE2EDM\_WHIZARD\_2to5\_ttA/htholen-FULLSIM\_STEP2\_WHIZARD\_2to5\_ttA-da43ae45efb6a7c35e17aad82de2e2cd/USER  & 1.82 \\
+      % $t\bar{t} + \gamma + $ jets & /TTGJets\_8TeV-madgraph/Summer12\_DR53X-PU\_S10\_START53\_V19-v1/AODSIM & 14.0 \\
+       $t\bar{t} + \gamma + $ jets & /LHE2EDM\_WHIZARD\_2to5\_ttA/htholen-FULLSIM\_STEP2\_WHIZARD\_2to5\_ttA-da43ae45efb6a7c35e17aad82de2e2cd/USER  & 1.82 \\
       \hline \hline
     \end{tabular}
-
 
   \end{center}
   

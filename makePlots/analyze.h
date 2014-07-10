@@ -3006,25 +3006,50 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     *bkg_photonSFup, *bkg_photonSFdown;
 
   // Stack histograms; qcd is on top
-  bkg = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req);
-  bkg_btagWeightUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightUp");
-  bkg_btagWeightDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightDown");
-  bkg_puWeightUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_puWeightUp");
-  bkg_puWeightDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_puWeightDown");
-  bkg_scaleUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_scaleUp");
-  bkg_scaleDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_scaleDown");
-  bkg_pdfUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfUp");
-  bkg_pdfDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
-  bkg_topPtUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_topPtUp");
-  bkg_topPtDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_topPtDown");
-  bkg_JECup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECup");
-  bkg_JECdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECdown");
-  bkg_leptonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFup");
-  bkg_leptonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFdown");
-  bkg_photonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFup");
-  bkg_photonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFdown");
-  
+  if(needsQCD) {
+    bkg = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req);
+    bkg_btagWeightUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightUp");
+    bkg_btagWeightDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightDown");
+    bkg_puWeightUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_puWeightUp");
+    bkg_puWeightDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_puWeightDown");
+    bkg_scaleUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_scaleUp");
+    bkg_scaleDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_scaleDown");
+    bkg_pdfUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfUp");
+    bkg_pdfDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
+    bkg_topPtUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_topPtUp");
+    bkg_topPtDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_topPtDown");
+    bkg_JECup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECup");
+    bkg_JECdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECdown");
+    bkg_leptonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFup");
+    bkg_leptonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFdown");
+    bkg_photonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFup");
+    bkg_photonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFdown");
+  }
+
+  else { // durp
+    bkg = (TH1D*)mcHistograms[0][variableNumber]->Clone(variable+"_bkg_"+req);
+    bkg_btagWeightUp = (TH1D*)mcHistograms_btagWeightUp[0][variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightUp");
+    bkg_btagWeightDown = (TH1D*)mcHistograms_btagWeightDown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_btagWeightDown");
+    bkg_puWeightUp = (TH1D*)mcHistograms_puWeightUp[0][variableNumber]->Clone(variable+"_bkg_"+req+"_puWeightUp");
+    bkg_puWeightDown = (TH1D*)mcHistograms_puWeightDown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_puWeightDown");
+    bkg_scaleUp = (TH1D*)mcHistograms_scaleUp[0][variableNumber]->Clone(variable+"_bkg_"+req+"_scaleUp");
+    bkg_scaleDown = (TH1D*)mcHistograms_scaleDown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_scaleDown");
+    bkg_pdfUp = (TH1D*)mcHistograms_pdfUp[0][variableNumber]->Clone(variable+"_bkg_"+req+"_pdfUp");
+    bkg_pdfDown = (TH1D*)mcHistograms_pdfDown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
+    bkg_topPtUp = (TH1D*)mcHistograms_topPtUp[0][variableNumber]->Clone(variable+"_bkg_"+req+"_topPtUp");
+    bkg_topPtDown = (TH1D*)mcHistograms_topPtDown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_topPtDown");
+    bkg_JECup = (TH1D*)mcHistograms_JECup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_JECup");
+    bkg_JECdown = (TH1D*)mcHistograms_JECdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_JECdown");
+    bkg_leptonSFup = (TH1D*)mcHistograms_leptonSFup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFup");
+    bkg_leptonSFdown = (TH1D*)mcHistograms_leptonSFdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFdown");
+    bkg_photonSFup = (TH1D*)mcHistograms_photonSFup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFup");
+    bkg_photonSFdown = (TH1D*)mcHistograms_photonSFdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFdown");
+  }
+
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
+
+    if(!needsQCD && i == 0) continue;
+
     bkg->Add(mcHistograms[i][variableNumber]);
     bkg_btagWeightUp->Add(mcHistograms_btagWeightUp[i][variableNumber]);
     bkg_btagWeightDown->Add(mcHistograms_btagWeightDown[i][variableNumber]);
