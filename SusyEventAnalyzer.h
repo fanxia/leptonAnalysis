@@ -761,7 +761,7 @@ void SusyEventAnalyzer::findElectrons(susy::Event& ev, vector<susy::Muon*> tight
       }
 
       else {
-	if(passesTight && isAntiIsolatedElectron(*ele_it, event.superClusters, event.rho25)) {
+	if(passesTight && isAntiIsolatedElectron(*ele_it, event.superClusters, event.rho25) && ele_it->mvaTrig < 0.) {
 	  tightEles.push_back(&*ele_it);
 	  HT += ele_it->momentum.Pt();
 	}

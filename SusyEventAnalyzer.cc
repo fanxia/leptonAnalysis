@@ -189,7 +189,11 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
     bool passHLT = true;
     if(useTrigger) {
       if(tightEles.size() == 1) passHLT = PassTriggers(1);
-      else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
+
+      else if(tightMuons.size() == 1) {
+	if(qcdMode == kSignal) passHLT = PassTriggers(2);
+	if(kSignal == kMuonQCD) passHLT = PassTriggers(3);
+      }
     }
     if(!passHLT) continue;
 
@@ -503,7 +507,11 @@ void SusyEventAnalyzer::Data() {
 	bool passHLT = true;
 	if(useTrigger) {
 	  if(tightEles.size() == 1) passHLT = PassTriggers(1);
-	  else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
+
+	  else if(tightMuons.size() == 1) {
+	    if(qcdMode == kSignal) passHLT = PassTriggers(2);
+	    if(kSignal == kMuonQCD) passHLT = PassTriggers(3);
+	  }
 	}
 	if(!passHLT) {
 	  nCnt[25][qcdMode]++;
@@ -873,7 +881,11 @@ void SusyEventAnalyzer::Acceptance() {
 	  bool passHLT = true;
 	  if(useTrigger) {
 	    if(tightEles.size() == 1) passHLT = PassTriggers(1);
-	    else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
+
+	    else if(tightMuons.size() == 1) {
+	      if(qcdMode == kSignal) passHLT = PassTriggers(2);
+	      if(kSignal == kMuonQCD) passHLT = PassTriggers(3);
+	    }
 	  }
 	  if(!passHLT) continue;
 	  
