@@ -243,6 +243,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("muon_pt", nKinematicBins_0g, xbins_kinematic_0g); // 17
     pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);                  // 18
 
+    pMaker->BookHistogram2D("Nphotons", "pfMET", 3, 0., 3., 20, 0., 350.);
+
     /*
     pMaker->BookHistogram2D("Njets", "Nbtags", 15, 0., 15., 7, 0., 7.);
     pMaker->BookHistogram2D("HT", "pfMET", 20, 0., 1200., 20, 0., 350.);

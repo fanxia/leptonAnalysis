@@ -2470,31 +2470,31 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
   
   if(qcdSF > 0) {
     for(unsigned int i = 0; i < h_qcd.size(); i++) {
-      for(Int_t b = 1; b < h_qcd[i]->GetNbinsX(); b++) {
-	double olderr = h_qcd[i]->GetBinError(b);
-	double oldval = h_qcd[i]->GetBinContent(b);
+      for(Int_t b = 0; b < h_qcd[i]->GetNbinsX(); b++) {
+	double olderr = h_qcd[i]->GetBinError(b+1);
+	double oldval = h_qcd[i]->GetBinContent(b+1);
 	
 	if(oldval == 0.) continue;
 	
 	double_t newerr = oldval * qcdSF * sqrt(olderr*olderr/(oldval*oldval) + qcdSFerror*qcdSFerror/(qcdSF*qcdSF));
 	
-	h_qcd[i]->SetBinContent(b, oldval * qcdSF);
-	h_qcd[i]->SetBinError(b, newerr);
+	h_qcd[i]->SetBinContent(b+1, oldval * qcdSF);
+	h_qcd[i]->SetBinError(b+1, newerr);
       }
     }
     
     for(unsigned int i = 0; i < h_qcd_2d.size(); i++) {
-      for(Int_t bx = 1; bx < h_qcd[i]->GetNbinsX(); bx++) {
-	for(Int_t by = 1; by < h_qcd[i]->GetNbinsY(); by++) {
-	  double olderr = h_qcd[i]->GetBinError(bx, by);
-	  double oldval = h_qcd[i]->GetBinContent(bx, by);
+      for(Int_t bx = 0; bx < h_qcd[i]->GetNbinsX(); bx++) {
+	for(Int_t by = 0; by < h_qcd[i]->GetNbinsY(); by++) {
+	  double olderr = h_qcd[i]->GetBinError(bx+1, by+1);
+	  double oldval = h_qcd[i]->GetBinContent(bx+1, by+1);
 	  
 	  if(oldval == 0.) continue;
 	  
 	  double_t newerr = oldval * qcdSF * sqrt(olderr*olderr/(oldval*oldval) + qcdSFerror*qcdSFerror/(qcdSF*qcdSF));
 	  
-	  h_qcd[i]->SetBinContent(bx, by, oldval * qcdSF);
-	  h_qcd[i]->SetBinError(bx, by, newerr);
+	  h_qcd[i]->SetBinContent(bx+1, by+1, oldval * qcdSF);
+	  h_qcd[i]->SetBinError(bx+1, by+1, newerr);
 	}
       }
     }
@@ -2506,18 +2506,18 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
     for(unsigned int i = 0; i < mcHistograms.size(); i++) {
       for(unsigned int j = 0; j < mcHistograms[i].size(); j++) {
 	
-	for(Int_t b = 1; b < mcHistograms[i][j]->GetNbinsX(); b++) {
+	for(Int_t b = 0; b < mcHistograms[i][j]->GetNbinsX(); b++) {
 	  
-	  double olderr = mcHistograms[i][j]->GetBinError(b);
-	  double oldval = mcHistograms[i][j]->GetBinContent(b);
+	  double olderr = mcHistograms[i][j]->GetBinError(b+1);
+	  double oldval = mcHistograms[i][j]->GetBinContent(b+1);
 	  
 	  if(oldval == 0.) continue;
 	  
 	  double newval = oldval * mcSF;
 	  double newerr = oldval * mcSF * sqrt(olderr*olderr/(oldval*oldval) + mcSFerror*mcSFerror/(mcSF*mcSF));
 	  
-	  mcHistograms[i][j]->SetBinContent(b, newval);
-	  mcHistograms[i][j]->SetBinError(b, newerr);
+	  mcHistograms[i][j]->SetBinContent(b+1, newval);
+	  mcHistograms[i][j]->SetBinError(b+1, newerr);
 	  
 	}
 	
@@ -2527,19 +2527,19 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
     for(unsigned int i = 0; i < mcHistograms_2d.size(); i++) {
       for(unsigned int j = 0; j < mcHistograms_2d[i].size(); j++) {
 	
-	for(Int_t bx = 1; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
-	  for(Int_t by = 1; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
+	for(Int_t bx = 0; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
+	  for(Int_t by = 0; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
 	    
-	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx, by);
-	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx, by);
+	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx+1, by+1);
+	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx+1, by+1);
 	    
 	    if(oldval == 0.) continue;
 	    
 	    double newval = oldval * mcSF;
 	    double newerr = oldval * mcSF * sqrt(olderr*olderr/(oldval*oldval) + mcSFerror*mcSFerror/(mcSF*mcSF));
 	    
-	    mcHistograms_2d[i][j]->SetBinContent(bx, by, newval);
-	    mcHistograms_2d[i][j]->SetBinError(bx, by, newerr);
+	    mcHistograms_2d[i][j]->SetBinContent(bx+1, by+1, newval);
+	    mcHistograms_2d[i][j]->SetBinError(bx+1, by+1, newerr);
 	    
 	  }
 	}
@@ -2557,18 +2557,18 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
 
       for(unsigned int j = 0; j < mcHistograms[i].size(); j++) {
 
-	for(Int_t b = 1; b < mcHistograms[i][j]->GetNbinsX(); b++) {
+	for(Int_t b = 0; b < mcHistograms[i][j]->GetNbinsX(); b++) {
 	  
-	  double olderr = mcHistograms[i][j]->GetBinError(b);
-	  double oldval = mcHistograms[i][j]->GetBinContent(b);
+	  double olderr = mcHistograms[i][j]->GetBinError(b+1);
+	  double oldval = mcHistograms[i][j]->GetBinContent(b+1);
 	  
 	  if(oldval == 0.) continue;
 	  
 	  double newval = oldval * wjetsSF;
 	  double newerr = oldval * wjetsSF * sqrt(olderr*olderr/(oldval*oldval) + wjetsSFerror*wjetsSFerror/(wjetsSF*wjetsSF));
 
-	  mcHistograms[i][j]->SetBinContent(b, newval);
-	  mcHistograms[i][j]->SetBinError(b, newerr);
+	  mcHistograms[i][j]->SetBinContent(b+1, newval);
+	  mcHistograms[i][j]->SetBinError(b+1, newerr);
 	  
 	}
 	
@@ -2581,19 +2581,19 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
       
       for(unsigned int j = 0; j < mcHistograms_2d[i].size(); j++) {
 	
-	for(Int_t bx = 1; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
-	  for(Int_t by = 1; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
+	for(Int_t bx = 0; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
+	  for(Int_t by = 0; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
 	    
-	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx, by);
-	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx, by);
+	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx+1, by+1);
+	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx+1, by+1);
 	    
 	    if(oldval == 0.) continue;
 	    
 	    double newval = oldval * wjetsSF;
 	    double newerr = oldval * wjetsSF * sqrt(olderr*olderr/(oldval*oldval) + wjetsSFerror*wjetsSFerror/(wjetsSF*wjetsSF));
 	    
-	    mcHistograms_2d[i][j]->SetBinContent(bx, by, newval);
-	    mcHistograms_2d[i][j]->SetBinError(bx, by, newerr);
+	    mcHistograms_2d[i][j]->SetBinContent(bx+1, by+1, newval);
+	    mcHistograms_2d[i][j]->SetBinError(bx+1, by+1, newerr);
 	    
 	  }
 	}
@@ -2611,18 +2611,18 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
 
       for(unsigned int j = 0; j < mcHistograms[i].size(); j++) {
 
-	for(Int_t b = 1; b < mcHistograms[i][j]->GetNbinsX(); b++) {
+	for(Int_t b = 0; b < mcHistograms[i][j]->GetNbinsX(); b++) {
 	  
-	  double olderr = mcHistograms[i][j]->GetBinError(b);
-	  double oldval = mcHistograms[i][j]->GetBinContent(b);
+	  double olderr = mcHistograms[i][j]->GetBinError(b+1);
+	  double oldval = mcHistograms[i][j]->GetBinContent(b+1);
 	  
 	  if(oldval == 0.) continue;
 	  
 	  double newval = oldval * topSF;
 	  double newerr = oldval * topSF * sqrt(olderr*olderr/(oldval*oldval) + topSFerror*topSFerror/(topSF*topSF));
 
-	  mcHistograms[i][j]->SetBinContent(b, newval);
-	  mcHistograms[i][j]->SetBinError(b, newerr);
+	  mcHistograms[i][j]->SetBinContent(b+1, newval);
+	  mcHistograms[i][j]->SetBinError(b+1, newerr);
 	  
 	}
 	
@@ -2635,19 +2635,19 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
       
       for(unsigned int j = 0; j < mcHistograms_2d[i].size(); j++) {
 	
-	for(Int_t bx = 1; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
-	  for(Int_t by = 1; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
+	for(Int_t bx = 0; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
+	  for(Int_t by = 0; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
 	    
-	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx, by);
-	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx, by);
+	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx+1, by+1);
+	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx+1, by+1);
 	    
 	    if(oldval == 0.) continue;
 	    
 	    double newval = oldval * topSF;
 	    double newerr = oldval * topSF * sqrt(olderr*olderr/(oldval*oldval) + topSFerror*topSFerror/(topSF*topSF));
 	    
-	    mcHistograms_2d[i][j]->SetBinContent(bx, by, newval);
-	    mcHistograms_2d[i][j]->SetBinError(bx, by, newerr);
+	    mcHistograms_2d[i][j]->SetBinContent(bx+1, by+1, newval);
+	    mcHistograms_2d[i][j]->SetBinError(bx+1, by+1, newerr);
 	    
 	  }
 	}
@@ -2665,18 +2665,18 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
 
       for(unsigned int j = 0; j < mcHistograms[i].size(); j++) {
 
-	for(Int_t b = 1; b < mcHistograms[i][j]->GetNbinsX(); b++) {
+	for(Int_t b = 0; b < mcHistograms[i][j]->GetNbinsX(); b++) {
 	  
-	  double olderr = mcHistograms[i][j]->GetBinError(b);
-	  double oldval = mcHistograms[i][j]->GetBinContent(b);
+	  double olderr = mcHistograms[i][j]->GetBinError(b+1);
+	  double oldval = mcHistograms[i][j]->GetBinContent(b+1);
 	  
 	  if(oldval == 0.) continue;
 	  
 	  double newval = oldval * ttjetsSF;
 	  double newerr = oldval * ttjetsSF * sqrt(olderr*olderr/(oldval*oldval) + ttjetsSFerror*ttjetsSFerror/(ttjetsSF*ttjetsSF));
 
-	  mcHistograms[i][j]->SetBinContent(b, newval);
-	  mcHistograms[i][j]->SetBinError(b, newerr);
+	  mcHistograms[i][j]->SetBinContent(b+1, newval);
+	  mcHistograms[i][j]->SetBinError(b+1, newerr);
 	  
 	}
 	
@@ -2689,19 +2689,19 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
       
       for(unsigned int j = 0; j < mcHistograms_2d[i].size(); j++) {
 	
-	for(Int_t bx = 1; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
-	  for(Int_t by = 1; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
+	for(Int_t bx = 0; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
+	  for(Int_t by = 0; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
 	    
-	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx, by);
-	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx, by);
+	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx+1, by+1);
+	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx+1, by+1);
 	    
 	    if(oldval == 0.) continue;
 	    
 	    double newval = oldval * ttjetsSF;
 	    double newerr = oldval * ttjetsSF * sqrt(olderr*olderr/(oldval*oldval) + ttjetsSFerror*ttjetsSFerror/(ttjetsSF*ttjetsSF));
 	    
-	    mcHistograms_2d[i][j]->SetBinContent(bx, by, newval);
-	    mcHistograms_2d[i][j]->SetBinError(bx, by, newerr);
+	    mcHistograms_2d[i][j]->SetBinContent(bx+1, by+1, newval);
+	    mcHistograms_2d[i][j]->SetBinError(bx+1, by+1, newerr);
 	    
 	  }
 	}
@@ -2719,18 +2719,18 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
 
       for(unsigned int j = 0; j < mcHistograms[i].size(); j++) {
 
-	for(Int_t b = 1; b < mcHistograms[i][j]->GetNbinsX(); b++) {
+	for(Int_t b = 0; b < mcHistograms[i][j]->GetNbinsX(); b++) {
 	  
-	  double olderr = mcHistograms[i][j]->GetBinError(b);
-	  double oldval = mcHistograms[i][j]->GetBinContent(b);
+	  double olderr = mcHistograms[i][j]->GetBinError(b+1);
+	  double oldval = mcHistograms[i][j]->GetBinContent(b+1);
 	  
 	  if(oldval == 0.) continue;
 	  
 	  double newval = oldval * ttgammaSF;
 	  double newerr = oldval * ttgammaSF * sqrt(olderr*olderr/(oldval*oldval) + ttgammaSFerror*ttgammaSFerror/(ttgammaSF*ttgammaSF));
 
-	  mcHistograms[i][j]->SetBinContent(b, newval);
-	  mcHistograms[i][j]->SetBinError(b, newerr);
+	  mcHistograms[i][j]->SetBinContent(b+1, newval);
+	  mcHistograms[i][j]->SetBinError(b+1, newerr);
 	  
 	}
 	
@@ -2743,19 +2743,19 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
       
       for(unsigned int j = 0; j < mcHistograms_2d[i].size(); j++) {
 	
-	for(Int_t bx = 1; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
-	  for(Int_t by = 1; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
+	for(Int_t bx = 0; bx < mcHistograms_2d[i][j]->GetNbinsX(); bx++) {
+	  for(Int_t by = 0; by < mcHistograms_2d[i][j]->GetNbinsY(); by++) {
 	    
-	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx, by);
-	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx, by);
+	    double olderr = mcHistograms_2d[i][j]->GetBinError(bx+1, by+1);
+	    double oldval = mcHistograms_2d[i][j]->GetBinContent(bx+1, by+1);
 	    
 	    if(oldval == 0.) continue;
 	    
 	    double newval = oldval * ttgammaSF;
 	    double newerr = oldval * ttgammaSF * sqrt(olderr*olderr/(oldval*oldval) + ttgammaSFerror*ttgammaSFerror/(ttgammaSF*ttgammaSF));
 	    
-	    mcHistograms_2d[i][j]->SetBinContent(bx, by, newval);
-	    mcHistograms_2d[i][j]->SetBinError(bx, by, newerr);
+	    mcHistograms_2d[i][j]->SetBinContent(bx+1, by+1, newval);
+	    mcHistograms_2d[i][j]->SetBinError(bx+1, by+1, newerr);
 	    
 	  }
 	}
