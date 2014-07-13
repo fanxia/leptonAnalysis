@@ -1985,6 +1985,18 @@ void PlotMaker::SubtractMCFromQCD() {
   h_qcd[1]->Draw("e1 same");
   h_qcd[1]->Draw("axis same");
 
+  TLegend * leg = new TLegend(0.45, 0.6, 0.85, 0.85, NULL, "brNDC");
+  leg->AddEntry(h_qcd[1], "QCD Data", "LP");
+  leg->AddEntry((TObject*)0, "QCD Selection on MC", "");
+  leg->AddEntry(mcHistograms[0][variableNumber], legendNames[0], "F");
+  for(unsigned int i = 1; i < mcHistograms.size(); i++) {
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
+  }
+  leg->SetFillColor(0);
+  leg->SetTextSize(0.028);
+
+  leg->Draw("same");
+
   can->SaveAs("qcdSubtraction_"+req+".pdf");
 
   delete can;
