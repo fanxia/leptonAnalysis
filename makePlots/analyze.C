@@ -216,7 +216,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   Double_t xbins_kinematic_1g[nKinematicBins_1g+1] = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 800, 1000, 1250, 1500, 2000};
 
   const int nMetBins_2g = 6;
-  Double_t xbins_met_2g[nMetBins_2g+1] = {0, 25, 50, 75, 100, 150, 300};
+  Double_t xbins_met_2g[nMetBins_2g+1] = {0, 20, 50, 75, 100, 150, 300};
   const int nKinematicBins_2g = 15;
   Double_t xbins_kinematic_2g[nKinematicBins_2g+1] = {0, 25, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000};
 
@@ -333,8 +333,49 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
   pMaker->SubtractMCFromQCD();
 
-  pMaker->NormalizeQCD();
+  if(nPhotons_req == 0) {
+    if(channel < 2) {
+      pMaker->ScaleFromFits( 0.273450764707 ,  0.0133104387363 , -1., 0.,
+			     1.63683502938 ,  0.0542032853545 , -1., 0.,
+			     -1., 0., -1., 0.);
+    }
+    else {
+      pMaker->ScaleFromFits( 0.00938379592183 ,  0.00176136939402 , -1., 0.,
+			     1.55940554984 ,  0.0605550676693 , -1., 0.,
+			     -1., 0., -1., 0.);
+    }
+  }
 
+  else if(nPhotons_req == 1) {
+    pMaker->NormalizeQCD();
+    
+    if(channel < 2) {
+      pMaker->ScaleFromFits(-1., 0. , -1., 0.,
+			    1.63683502938 ,  0.0542032853545 , -1., 0.,
+			    -1., 0., -1., 0.);
+    }
+    else {
+      pMaker->ScaleFromFits(-1., 0. , -1., 0.,
+			    1.55940554984 ,  0.0605550676693 , -1., 0.,
+			    -1., 0., -1., 0.);
+    }
+  }
+  
+  else {
+    pMaker->NormalizeQCD();
+    
+    if(channel < 2) {
+      pMaker->ScaleFromFits(-1., 0. , -1., 0.,
+			    1.63683502938 ,  0.0542032853545 , -1., 0.,
+			    -1., 0., -1., 0.);
+    }
+    else {
+      pMaker->ScaleFromFits(-1., 0. , -1., 0.,
+			    1.55940554984 ,  0.0605550676693 , -1., 0., 
+			    -1., 0., -1., 0.);
+    }
+  }
+  
   pMaker->CreateFSRPlot(fSigA, fSigB);
 
   pMaker->CreateTable();

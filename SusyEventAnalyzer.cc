@@ -190,7 +190,6 @@ void SusyEventAnalyzer::CalculateBtagEfficiency() {
     if(useTrigger) {
       if(tightEles.size() == 1) passHLT = PassTriggers(1);
       else if(tightMuons.size() == 1) passHLT = PassTriggers(2);
-      }
     }
     if(!passHLT) continue;
 
