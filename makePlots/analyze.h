@@ -1963,13 +1963,19 @@ void PlotMaker::SubtractMCFromQCD() {
   TCanvas * can = new TCanvas("mcSubtraction_can", "Plot", 10, 10, 2000, 2000);
 
   vector<TH1D*> h_clones;
-  h_clones.push_back((TH1D*)mcHistograms[1][0]->Clone(mcHistograms[1][0]->GetName() + "_clone"));
+  h_clones.push_back((TH1D*)mcHistograms[1][0]->Clone(TString(mcHistograms[1][0]->GetName()) + "_clone"));
   h_clones.back()->SetFillColor(mcLayerColors[0]);
   for(unsigned int i = 1; i < mcHistograms[1].size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_clones.back()->Add(mcHistograms[1][i]);
     else {
-      h_clones.push_back((TH1D*)mcHistograms[1][i]->Clone(mcHistograms[1][i]->GetName() + "_clone"));
+      h_clones.push_back((TH1D*)mcHistograms[1][i]->Clone(TString(mcHistograms[1][i]->GetName()) + "_clone"));
       h_clones.back()->SetFillColor(mcLayerColors[i]);
+    }
+  }
+
+  for(unsigned int i = 0; i < h_clones.size(); i++) {
+    for(unsigned int j = i + 1; j < h_clones.size(); j++) {
+      h_clones[i]->Add(h_clones[j]);
     }
   }
 
@@ -1977,6 +1983,8 @@ void PlotMaker::SubtractMCFromQCD() {
   for(unsigned int i = 0; i < h_clones.size(); i++) h_clones[i]->Draw("hist same");
 
   can->SaveAs("qcdSubtraction_"+req+".pdf");
+
+  delete can;
     
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
     for(unsigned int j = 0; j < mcQCDHistograms[i].size(); j++) {
@@ -3829,6 +3837,9 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 
     index1 = mst[int(i)/31];
     index2 = mBino[int(i)%31];
+
+    if(index1 < index2) continue;
+
     sprintf(code, "_mst_%d_m1_%d", index1, index2);
     TString code_t = code;
 
