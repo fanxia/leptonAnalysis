@@ -1960,11 +1960,14 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 void PlotMaker::SubtractMCFromQCD() {
 
+  unsigned int variableNumber = 1; // for MET
+
   TCanvas * can = new TCanvas("mcSubtraction_can", "Plot", 10, 10, 2000, 2000);
+  can->SetLogy(true);
 
   vector<TH1D*> h_clones;
-  for(unsigned int i = 0; i < mcQCDHistograms[1].size(); i++) {
-    h_clones.push_back((TH1D*)mcQCDHistograms[1][i]->Clone(TString(mcQCDHistograms[1][i]->GetName()) + "_clone"));
+  for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
+    h_clones.push_back((TH1D*)mcQCDHistograms[i][variableNumber]->Clone(TString(mcQCDHistograms[i][variableNumber]->GetName()) + "_clone"));
     h_clones.back()->SetFillColor(mcLayerColors[i]);
   }
 
