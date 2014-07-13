@@ -1963,12 +1963,12 @@ void PlotMaker::SubtractMCFromQCD() {
   TCanvas * can = new TCanvas("mcSubtraction_can", "Plot", 10, 10, 2000, 2000);
 
   vector<TH1D*> h_clones;
-  h_clones.push_back((TH1D*)mcHistograms[1][0]->Clone(TString(mcHistograms[1][0]->GetName()) + "_clone"));
+  h_clones.push_back((TH1D*)mcQCDHistograms[1][0]->Clone(TString(mcQCDHistograms[1][0]->GetName()) + "_clone"));
   h_clones.back()->SetFillColor(mcLayerColors[0]);
-  for(unsigned int i = 1; i < mcHistograms[1].size(); i++) {
-    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_clones.back()->Add(mcHistograms[1][i]);
+  for(unsigned int i = 1; i < mcQCDHistograms[1].size(); i++) {
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_clones.back()->Add(mcQCDHistograms[1][i]);
     else {
-      h_clones.push_back((TH1D*)mcHistograms[1][i]->Clone(TString(mcHistograms[1][i]->GetName()) + "_clone"));
+      h_clones.push_back((TH1D*)mcQCDHistograms[1][i]->Clone(TString(mcQCDHistograms[1][i]->GetName()) + "_clone"));
       h_clones.back()->SetFillColor(mcLayerColors[i]);
     }
   }
