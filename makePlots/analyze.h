@@ -1080,7 +1080,7 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
   
 }
 
-void PlotMaker::BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi, Float_t zlo = 0.0, Float_t zhi = -1.0) {
+void PlotMaker::BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi, Float_t zlo, Float_t zhi) {
   
   variables_2d.push_back(make_pair(var_x, var_y));
 

@@ -11,11 +11,13 @@ void makePlots() {
   bool addMC = true;
   int intLumi = 19712; // quote to 19.7
 
-  double metCut = 50.;
+  double metCut = -1.;
 
   bool displayKStest = true;
   bool blinded = true;
   int nPhotons_req = NUM_PHOTONS_REQUIRED;
+
+  if(nPhotons_req > 0) metCut = 50.;
 
   const int nChannels = 4;
   TString channels[nChannels] = {"ele_jjj", "ele_bjj",
@@ -26,15 +28,15 @@ void makePlots() {
   for(int i = 0; i < nChannels; i++) {
     if(i != 1 && i != 3) continue;
     if(i < 2) {
-      fitPhotons(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 0);
-      fitPhotons(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 1);
-      fitPhotons(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 2);
+      //fitPhotons(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 0);
+      //fitPhotons(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 1);
+      //fitPhotons(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 2);
       analyze(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 0);
     }
     else {
-      fitPhotons(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 0);
-      fitPhotons(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 1);
-      fitPhotons(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 2);      
+      //fitPhotons(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 0);
+      //fitPhotons(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 1);
+      //fitPhotons(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 2);      
       analyze(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 0);
     }
   }  
