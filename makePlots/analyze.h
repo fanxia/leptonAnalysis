@@ -215,7 +215,7 @@ class PlotMaker : public TObject {
   void BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_t xhi);
   void BookHistogram(TString variable, Int_t nBins, Double_t* customBins);
 
-  void BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi);
+  void BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi, Float_t zlo = 0.0, Float_t zhi = -1.0);
 
   void FillHistograms(double metCut, int nPhotons_req, int nBtagReq, int chan);
   void SubtractMCFromQCD();
@@ -1080,37 +1080,43 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
   
 }
 
-void PlotMaker::BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi) {
+void PlotMaker::BookHistogram2D(TString var_x, TString var_y, Int_t nBins_x, Float_t xlo, Float_t xhi, Int_t nBins_y, Float_t ylo, Float_t yhi, Float_t zlo = 0.0, Float_t zhi = -1.0) {
   
   variables_2d.push_back(make_pair(var_x, var_y));
 
   TH2D * gg = new TH2D(var_y+"_vs_"+var_x+"_gg_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
   gg->Sumw2();
+  if(zhi > zlo) gg->GetZaxis()->SetRangeUser(zlo, zhi);
   h_gg_2d.push_back(gg);
 
   TH2D * qcd = new TH2D(var_y+"_vs_"+var_x+"_qcd_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
   qcd->Sumw2();
+  if(zhi > zlo) qcd->GetZaxis()->SetRangeUser(zlo, zhi);
   h_qcd_2d.push_back(qcd);
   
   TH2D * h_bkg;
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
     h_bkg = new TH2D(var_y+"_vs_"+var_x+"_"+mcNames[i]+"_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
     h_bkg->Sumw2();
+    if(zhi > zlo) h_bkg->GetZaxis()->SetRangeUser(zlo, zhi);
     mcHistograms_2d[i].push_back(h_bkg);
   }
 
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
     h_bkg = new TH2D(var_y+"_vs_"+var_x+"_qcd_"+mcNames[i]+"_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
     h_bkg->Sumw2();
+    if(zhi > zlo) h_bkg->GetZaxis()->SetRangeUser(zlo, zhi);
     mcQCDHistograms_2d[i].push_back(h_bkg);
   }
 
   TH2D * sig_a = new TH2D(var_y+"_vs_"+var_x+"_a_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
   sig_a->Sumw2();
+  if(zhi > zlo) sig_a->GetZaxis()->SetRangeUser(zlo, zhi);
   h_siga_2d.push_back(sig_a);
 
   TH2D * sig_b = new TH2D(var_y+"_vs_"+var_x+"_b_"+req, var_y+"_vs_"+var_x, nBins_x, xlo, xhi, nBins_y, ylo, yhi);
   sig_b->Sumw2();
+  if(zhi > zlo) sig_b->GetZaxis()->SetRangeUser(zlo, zhi);
   h_sigb_2d.push_back(sig_b);
 
 }
