@@ -385,7 +385,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
-  bool needsQCD = (channel < 2);
+  bool needsQCD = true; // (channel < 2)
 
   pMaker->Create2DPlots(needsQCD, true, out);
 
@@ -480,17 +480,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 						true, false, false,
 						out);
   // HT_jets
-  if(nPhotons_req == 0) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (jets only) (GeV/c^{2})", "Number of Events",
+  if(nPhotons_req == 0) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (GeV/c^{2})", "Number of Events",
 					   0, 2000, 2.e-4, 4.e3,
 					   0.5, 1.6,
 					   true, true, false,
 					   out);
-  else if(nPhotons_req == 1) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (jets only) (GeV/c^{2})", "Number of Events",
+  else if(nPhotons_req == 1) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (GeV/c^{2})", "Number of Events",
 						0, 2000, 2.e-5, 4.e1,
 						0., 2.5,
 						true, true, false,
 						out);
-  else if(nPhotons_req == 2) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (jets only) (GeV/c^{2})", "Number of Events",
+  else if(nPhotons_req == 2) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (GeV/c^{2})", "Number of Events",
 						0, 2000, 2.e-6, 4.e-1,
 						0., 2.5,
 						true, true, false,
@@ -499,7 +499,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // MHT
   if(nPhotons_req == 0) pMaker->CreatePlot("hadronic_pt", true, needsQCD, "MHT (GeV/c)", "Number of Events",
 					   0, 1500, 2.e-5, 8.e3,
-					   0., 8.5,
+					   0., 1.5,
 					   true, true, true,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("hadronic_pt", true, needsQCD, "MHT (GeV/c)", "Number of Events",
@@ -514,17 +514,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 						out);
   
   // HT
-  if(nPhotons_req == 0) pMaker->CreatePlot("HT", true, needsQCD, "HT (GeV)", "Number of Events",
+  if(nPhotons_req == 0) pMaker->CreatePlot("HT", true, needsQCD, "S_{T} (GeV/c^{2})", "Number of Events",
 					   0, 2000, 2.e-4, 2.8e3,
 					   0.5, 1.5,
 					   true, true, false,
 					   out);
-  else if(nPhotons_req == 1) pMaker->CreatePlot("HT", true, needsQCD, "HT (GeV)", "Number of Events",
+  else if(nPhotons_req == 1) pMaker->CreatePlot("HT", true, needsQCD, "S_{T} (GeV/c^{2})", "Number of Events",
 						0, 2000, 2.e-4, 4.8e1,
 						0., 1.8,
 						true, true, false,
 						out);
-  else if(nPhotons_req == 2) pMaker->CreatePlot("HT", true, needsQCD, "HT (GeV)", "Number of Events",
+  else if(nPhotons_req == 2) pMaker->CreatePlot("HT", true, needsQCD, "S_{T} (GeV/c^{2})", "Number of Events",
 						0, 2000, 2.e-6, 2.8e-1,
 						0., 2.5,
 						true, true, false,
@@ -590,14 +590,31 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, true,
 		     out);
 
-  pMaker->CreatePlot("m3",
-		     true, needsQCD,
-		     "M3 (GeV/c^{2})", "Number of Events",
-		     0, 2000, 
-		     2.e-4, 2.8e3,
-		     0., 3.8,
-		     true, true, false,
-		     out);
+  if(nPhotons_req == 0) pMaker->CreatePlot("m3",
+					   true, needsQCD,
+					   "M3 (GeV/c^{2})", "Number of Events",
+					   0, 2000, 
+					   2.e-4, 5.e3,
+					   0., 1.4,
+					   true, true, false,
+					   out);
+  else if(nPhotons_req == 1) pMaker->CreatePlot("m3",
+						true, needsQCD,
+						"M3 (GeV/c^{2})", "Number of Events",
+						0, 2000, 
+						7.e-5, 2.e2,
+						0., 1.9,
+						true, true, false,
+						out);
+  else if(nPhotons_req == 2) pMaker->CreatePlot("m3",
+						true, needsQCD,
+						"M3 (GeV/c^{2})", "Number of Events",
+						0, 2000, 
+						2.e-5, 1.1e1,
+						0., 1.9,
+						true, true, false,
+						out);
+  
 
   pMaker->CreatePlot("ele_pt",
 		     true, needsQCD,

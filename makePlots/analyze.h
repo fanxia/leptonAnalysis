@@ -1983,6 +1983,9 @@ void PlotMaker::SubtractMCFromQCD() {
     }
   }
 
+  h_qcd[1]->GetXaxis()->SetTitle("#slash{E}_{T} (GeV)");
+  h_qcd[1]->GetYaxis()->SetTitle("Events");
+
   h_qcd[1]->Draw("e1");
   h_clones[0]->Draw("hist same");
   for(unsigned int i = 1; i < h_clones.size(); i++) {
@@ -1993,7 +1996,7 @@ void PlotMaker::SubtractMCFromQCD() {
 
   TLegend * leg = new TLegend(0.45, 0.6, 0.85, 0.85, NULL, "brNDC");
   leg->AddEntry(h_qcd[1], "QCD Data", "LP");
-  leg->AddEntry((TObject*)0, "QCD Selection on MC", "");
+  leg->AddEntry((TObject*)0, "QCD Selection on MC:", "");
   leg->AddEntry(h_clones[0], legendNames[0], "F");
   for(unsigned int i = 1; i < h_clones.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(h_clones[i], legendNames[i], "F");
@@ -2129,8 +2132,14 @@ TH1D * PlotMaker::ReweightQCD(int chan) {
     else weights->Add(mcHistograms[i][18], -1.);
   }
 
-  if(chan < 2) weights->Divide(h_qcd[16]);
-  else weights->Divide(h_qcd[18]);
+  if(chan < 2) {
+    weights->Divide(h_qcd[16]);
+    weights->Scale(h_qcd[16]->Integral() / h_gg[16]->Integral());
+  }
+  else {
+    weights->Divide(h_qcd[18]);
+    weights->Scale(h_qcd[18]->Integral() / h_gg[18]->Integral());
+  }
 
   return weights;
 
