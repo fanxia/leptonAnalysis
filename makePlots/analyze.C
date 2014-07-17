@@ -347,8 +347,6 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   }
 
   else if(nPhotons_req == 1) {
-    pMaker->NormalizeQCD();
-    
     if(channel < 2) {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.63683502938 ,  0.0542032853545 , -1., 0.,
@@ -359,11 +357,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 			    1.55940554984 ,  0.0605550676693 , -1., 0.,
 			    1.174, 0.120499, 0.897304, 0.136081);
     }
+
+    pMaker->NormalizeQCD();
+
   }
   
   else {
-    pMaker->NormalizeQCD();
-    
     if(channel < 2) {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.63683502938 ,  0.0542032853545 , -1., 0.,
@@ -374,6 +373,9 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 			    1.55940554984 ,  0.0605550676693 , -1., 0., 
 			    1.174, 0.120499, 0.897304, 0.136081);
     }
+
+    pMaker->NormalizeQCD();
+
   }
   
   pMaker->CreateFSRPlot(fSigA, fSigB);
@@ -1068,33 +1070,35 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   }
 
   else if(nPhotons_req == 1) {
-    pMaker->NormalizeQCD();
-    
     if(channel < 2) {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.63683502938 ,  0.0542032853545 , -1., 0.,
-			    -1., 0., -1., 0.);
+			    0.970391, 0.111691, 1.11805, 0.128502);
     }
     else {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.55940554984 ,  0.0605550676693 , -1., 0.,
-			    -1., 0., -1., 0.);
+			    1.174, 0.120499, 0.897304, 0.136081);
     }
+
+    pMaker->NormalizeQCD();
+
   }
   
   else {
-    pMaker->NormalizeQCD();
-    
     if(channel < 2) {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.63683502938 ,  0.0542032853545 , -1., 0.,
-			    -1., 0., -1., 0.);
+			    0.970391, 0.111691, 1.11805, 0.128502);
     }
     else {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.55940554984 ,  0.0605550676693 , -1., 0., 
-			    -1., 0., -1., 0.);
+			    1.174, 0.120499, 0.897304, 0.136081);
     }
+
+    pMaker->NormalizeQCD();
+
   }
 
   double ttjetsSF, ttjetsSFerror;

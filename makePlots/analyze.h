@@ -2717,7 +2717,7 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
 
     for(unsigned int i = 0; i < mcHistograms.size(); i++) {
 
-      if(mcLayerNumbers[i] != 0 && mcLayerNumbers[i] != 6) continue;
+      if(mcLayerNumbers[i] != 0) continue;
 
       for(unsigned int j = 0; j < mcHistograms[i].size(); j++) {
 
@@ -2741,7 +2741,7 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
     
     for(unsigned int i = 0; i < mcHistograms_2d.size(); i++) {
 
-      if(mcLayerNumbers[i] != 0 && mcLayerNumbers[i] != 6) continue;
+      if(mcLayerNumbers[i] != 0) continue;
       
       for(unsigned int j = 0; j < mcHistograms_2d[i].size(); j++) {
 	
@@ -2771,7 +2771,7 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
 
     for(unsigned int i = 0; i < mcHistograms.size(); i++) {
 
-      if(mcLayerNumbers[i] != 0 && mcLayerNumbers[i] != 6) continue;
+      if(mcLayerNumbers[i] != 6) continue;
 
       for(unsigned int j = 0; j < mcHistograms[i].size(); j++) {
 
@@ -2795,7 +2795,7 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
     
     for(unsigned int i = 0; i < mcHistograms_2d.size(); i++) {
 
-      if(mcLayerNumbers[i] != 0 && mcLayerNumbers[i] != 6) continue;
+      if(mcLayerNumbers[i] != 6) continue;
       
       for(unsigned int j = 0; j < mcHistograms_2d[i].size(); j++) {
 	
