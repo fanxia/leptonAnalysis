@@ -352,12 +352,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     if(channel < 2) {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.63683502938 ,  0.0542032853545 , -1., 0.,
-			    -1., 0., -1., 0.);
+			    0.970391, 0.111691, 1.11805, 0.128502);
     }
     else {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.55940554984 ,  0.0605550676693 , -1., 0.,
-			    -1., 0., -1., 0.);
+			    1.174, 0.120499, 0.897304, 0.136081);
     }
   }
   
@@ -367,12 +367,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     if(channel < 2) {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.63683502938 ,  0.0542032853545 , -1., 0.,
-			    -1., 0., -1., 0.);
+			    0.970391, 0.111691, 1.11805, 0.128502);
     }
     else {
       pMaker->ScaleFromFits(-1., 0. , -1., 0.,
 			    1.55940554984 ,  0.0605550676693 , -1., 0., 
-			    -1., 0., -1., 0.);
+			    1.174, 0.120499, 0.897304, 0.136081);
     }
   }
   
@@ -499,7 +499,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // MHT
   if(nPhotons_req == 0) pMaker->CreatePlot("hadronic_pt", true, needsQCD, "MHT (GeV/c)", "Number of Events",
 					   0, 1500, 2.e-5, 8.e3,
-					   0., 1.5,
+					   0., 2.1,
 					   true, true, true,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("hadronic_pt", true, needsQCD, "MHT (GeV/c)", "Number of Events",
@@ -595,7 +595,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					   "M3 (GeV/c^{2})", "Number of Events",
 					   0, 2000, 
 					   2.e-4, 5.e3,
-					   0., 1.4,
+					   0., 2.1,
 					   true, true, false,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("m3",
@@ -603,7 +603,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 						"M3 (GeV/c^{2})", "Number of Events",
 						0, 2000, 
 						7.e-5, 2.e2,
-						0., 1.9,
+						0., 2.1,
 						true, true, false,
 						out);
   else if(nPhotons_req == 2) pMaker->CreatePlot("m3",
@@ -611,7 +611,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 						"M3 (GeV/c^{2})", "Number of Events",
 						0, 2000, 
 						2.e-5, 1.1e1,
-						0., 1.9,
+						0., 2.1,
 						true, true, false,
 						out);
   
@@ -1054,10 +1054,51 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   pMaker->FillHistograms(metCut, nPhotons_req, nBtagReq, channel);
   pMaker->SubtractMCFromQCD();
 
+  if(nPhotons_req == 0) {
+    if(channel < 2) {
+      pMaker->ScaleFromFits( 0.273450764707 ,  0.0133104387363 , -1., 0.,
+			     1.63683502938 ,  0.0542032853545 , -1., 0.,
+			     -1., 0., -1., 0.);
+    }
+    else {
+      pMaker->ScaleFromFits( 0.00938379592183 ,  0.00176136939402 , -1., 0.,
+			     1.55940554984 ,  0.0605550676693 , -1., 0.,
+			     -1., 0., -1., 0.);
+    }
+  }
+
+  else if(nPhotons_req == 1) {
+    pMaker->NormalizeQCD();
+    
+    if(channel < 2) {
+      pMaker->ScaleFromFits(-1., 0. , -1., 0.,
+			    1.63683502938 ,  0.0542032853545 , -1., 0.,
+			    -1., 0., -1., 0.);
+    }
+    else {
+      pMaker->ScaleFromFits(-1., 0. , -1., 0.,
+			    1.55940554984 ,  0.0605550676693 , -1., 0.,
+			    -1., 0., -1., 0.);
+    }
+  }
+  
+  else {
+    pMaker->NormalizeQCD();
+    
+    if(channel < 2) {
+      pMaker->ScaleFromFits(-1., 0. , -1., 0.,
+			    1.63683502938 ,  0.0542032853545 , -1., 0.,
+			    -1., 0., -1., 0.);
+    }
+    else {
+      pMaker->ScaleFromFits(-1., 0. , -1., 0.,
+			    1.55940554984 ,  0.0605550676693 , -1., 0., 
+			    -1., 0., -1., 0.);
+    }
+  }
+
   double ttjetsSF, ttjetsSFerror;
   double ttgammaSF, ttgammaSFerror;
-
-  pMaker->NormalizeQCD();
 
   pMaker->FitSigmaIetaIeta(0.005, 0.025, nPhotons_req,
 			   1., 0., 1., 0.,
