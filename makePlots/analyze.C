@@ -217,8 +217,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   const int nMetBins_2g = 6;
   Double_t xbins_met_2g[nMetBins_2g+1] = {0, 20, 50, 75, 100, 150, 300};
-  const int nKinematicBins_2g = 15;
-  Double_t xbins_kinematic_2g[nKinematicBins_2g+1] = {0, 25, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000};
+  const int nKinematicBins_2g = 10;
+  Double_t xbins_kinematic_2g[nKinematicBins_2g+1] = {0, 25, 50, 100, 150, 200, 400, 600, 1000, 1500, 2000};
 
   // has to start with nphotons then met, then HT
 
@@ -698,7 +698,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					     true, true, true,
 					     out);
 
-    else if(nPhotons_req == 1) pMaker->CreatePlot("leadPhotonEt",
+    else if(nPhotons_req == 2) pMaker->CreatePlot("leadPhotonEt",
 						  true, needsQCD,
 						  "Et of leading #gamma", "Number of Events",
 						  0, 1200, 
