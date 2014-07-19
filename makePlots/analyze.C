@@ -583,14 +583,30 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     true, true, false,
 		     out);
   
-  pMaker->CreatePlot("w_mT",
-		     true, needsQCD,
-		     "Transverse Mass", "Number of Events",
-		     0, 1000, 
-		     2.e-4, 8.e3,
-		     0., 3.5,
-		     true, true, true,
-		     out);
+  if(nPhotons_req == 0) pMaker->CreatePlot("w_mT",
+					   true, needsQCD,
+					   "Transverse Mass", "Number of Events",
+					   0, 1000, 
+					   2.e-4, 8.e3,
+					   0., 3.5,
+					   true, true, true,
+					   out);
+  else if(nPhotons_req == 1) pMaker->CreatePlot("w_mT",
+						true, needsQCD,
+						"Transverse Mass", "Number of Events",
+						0, 1000, 
+						2.e-5, 1.2e2,
+						0., 2.8,
+						true, true, true,
+						out);
+  else if(nPhotons_req == 2) pMaker->CreatePlot("w_mT",
+						true, needsQCD,
+						"Transverse Mass", "Number of Events",
+						0, 1000, 
+						2.e-6, 8.e-1,
+						0., 2.8,
+						true, true, true,
+						out);
 
   if(nPhotons_req == 0) pMaker->CreatePlot("m3",
 					   true, needsQCD,
@@ -673,14 +689,23 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       false, false, false,
 		       out);
 
-    pMaker->CreatePlot("leadPhotonEt",
-		       true, needsQCD,
-		       "Et of leading #gamma", "Number of Events",
-		       0, 1200, 
-		       2.e-3, 5.e4,
-		       0., 5.1,
-		       true, true, true,
-		       out);
+    if(nPhotons_req == 1) pMaker->CreatePlot("leadPhotonEt",
+					     true, needsQCD,
+					     "Et of leading #gamma", "Number of Events",
+					     0, 1200, 
+					     2.e-4, 5.e2,
+					     0., 5.1,
+					     true, true, true,
+					     out);
+
+    else if(nPhotons_req == 1) pMaker->CreatePlot("leadPhotonEt",
+						  true, needsQCD,
+						  "Et of leading #gamma", "Number of Events",
+						  0, 1200, 
+						  2.e-5, 2.,
+						  0., 5.1,
+						  true, true, true,
+						  out);
 
     pMaker->CreatePlot("leadSigmaIetaIeta",
 		       false, needsQCD,
@@ -779,7 +804,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		       true, needsQCD,
 		       "Et of trailing #gamma", "Number of Events",
 		       0, 1200, 
-		       2.e-3, 5.e4,
+		       2.e-5, .9,
 		       0., 5.1,
 		       true, true, true,
 		       out);
