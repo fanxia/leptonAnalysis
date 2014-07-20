@@ -1046,3 +1046,133 @@ void SusyEventAnalyzer::Acceptance() {
 
 }
 
+void SusyEventAnalyzer::GeneratorInfo() {
+
+  TString output_code_t = FormatName(scan);
+
+  // open histogram file and define histograms
+  TFile * out = new TFile("generator_info"+output_code_t+".root", "RECREATE");
+  out->cd();
+
+  TH1D * h_stop_pt = new TH1D("stop_pt", "stop_pt", 400, 0, 2000);
+  TH1D * h_top_pt = new TH1D("top_pt", "top_pt", 400, 0, 2000);
+  TH1D * h_bottom_pt = new TH1D("bottom_pt", "bottom_pt", 400, 0, 2000);
+  TH1D * h_w_pt = new TH1D("w_pt", "w_pt", 400, 0, 2000);
+  TH1D * h_bino_pt = new TH1D("bino_pt", "bino_pt", 400, 0, 2000);
+  TH1D * h_photon_pt = new TH1D("photon_pt", "photon_pt", 400, 0, 2000);
+  TH1D * h_muon_pt = new TH1D("muon_pt", "muon_pt", 400, 0, 2000);
+  TH1D * h_ele_pt = new TH1D("ele_pt", "ele_pt", 400, 0, 2000);
+  TH1D * h_genMET = new TH1D("genMET", "genMET", 400, 0, 2000);
+  TH1D * h_top_invmass = new TH1D("top_invmass", "top_invmass", 400, 0, 2000);
+
+  TH2D * h_stop_dalitz = new TH2D("stop_dalitz", "m(bW) vs m(Wbino)", 400, 0, 2000, 400, 0, 2000);
+
+  TH1D * h_nPhotons = new TH1D("nPhotons", "nPhotons", 4, 0, 4);
+
+  Long64_t nEntries = fTree->GetEntries();
+  cout << "Total events in files : " << nEntries << endl;
+  cout << "Events to be processed : " << processNEvents << endl;
+
+  // start event looping
+  Long64_t jentry = 0;
+  while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
+
+    if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
+      cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
+    }
+
+    susy::Particle * stop = 0;
+    susy::Particle * antistop = 0;
+
+    susy::Particle * top = 0;
+    susy::Particle * antitop = 0;
+
+    for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
+      if(abs(it->pdgId) == 1000006) {
+	h_stop_pt->Fill(it->momentum.Pt());
+	if(it->pdgId == 1000006 && !stop) stop = &*it;
+	else if(it->pdgId == -1000006 && !antistop) antistop = &*it;
+      }
+      if(stop && antistop) break;
+    }
+    if(!stop || !antistop) continue;
+
+    for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
+      if(abs(it->pdgId) == 6) {
+	h_top_pt->Fill(it->momentum.Pt());
+	h_top_invmass->Fill(it->momentum.M());
+	if(it->pdgId == 6 && !top) top = &*it;
+	else if(it->pdgId == -6 && !antitop) antitop = &*it;
+      }
+      if(top && antitop) break;
+    }
+
+    if(!top) {
+      TLorentzVector bW_pair(0, 0, 0, 0);
+      TLorentzVector Wbino_pair(0, 0, 0, 0);
+
+      int n_bW = 0;
+      int n_Wbino = 0;
+
+      for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
+	if(it->mother == top && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
+	  bW_pair += it->momentum;
+	  n_bW++;
+	}
+	if(it->mother == top && (abs(it->pdgId) == 24 || abs(it->pdgId) == 1000022)) {
+	  Wbino_pair += it->momentum;
+	  n_Wbino++;
+	}
+      }
+
+      if(n_bW == 2 && n_Wbino == 2) h_stop_dalitz->Fill(bW_pair.M(), Wbino_pair.M());
+    }
+
+    if(!antitop) {
+      TLorentzVector bW_pair(0, 0, 0, 0);
+      TLorentzVector Wbino_pair(0, 0, 0, 0);
+
+      int n_bW = 0;
+      int n_Wbino = 0;
+
+      for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
+	if(it->mother == antitop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
+	  bW_pair += it->momentum;
+	  n_bW++;
+	}
+	if(it->mother == antitop && (abs(it->pdgId) == 24 || abs(it->pdgId) == 1000022)) {
+	  Wbino_pair += it->momentum;
+	  n_Wbino++;
+	}
+      }
+
+      if(n_bW == 2 && n_Wbino == 2) h_stop_dalitz->Fill(bW_pair.M(), Wbino_pair.M());
+    }
+
+    int nPhotons = 0;
+
+    for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
+
+      if(abs(it->pdgId) == 5 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_bottom_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 24 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_w_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 1000022 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_bino_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 22 && abs(it->mother->pdgId) == 1000022) {
+	nPhotons++;
+	h_photon_pt->Fill(it->momentum.Pt());
+      }
+      if(abs(it->pdgId) == 11 && abs(it->mother->pdgId) == 24) h_ele_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 13 && abs(it->mother->pdgId) == 24) h_muon_pt->Fill(it->momentum.Pt());
+
+    }
+
+    susy::MET* genMet = &(event_.metMap.find("genMetTrue")->second);
+
+    h_genMET->Fill(genMet->met());
+    h_nPhotons->Fill(nPhotons);
+
+  } // for entries
+
+  out->Write();
+  out->Close();
+
+}
