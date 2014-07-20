@@ -1125,7 +1125,7 @@ void SusyEventAnalyzer::GeneratorInfo() {
 	}
       }
 
-      if(n_bW == 2 && n_Wbino == 2) h_stop_dalitz->Fill(bW_pair.M(), Wbino_pair.M());
+      if(n_bW == 2 && n_Wbino == 2) h_stop_dalitz->Fill(bW_pair.M() * bW_pair.M(), Wbino_pair.M() * Wbino_pair.M());
     }
 
     if(!antitop) {
@@ -1146,7 +1146,7 @@ void SusyEventAnalyzer::GeneratorInfo() {
 	}
       }
 
-      if(n_bW == 2 && n_Wbino == 2) h_stop_dalitz->Fill(bW_pair.M(), Wbino_pair.M());
+      if(n_bW == 2 && n_Wbino == 2) h_stop_dalitz->Fill(bW_pair.M() * bW_pair.M(), Wbino_pair.M() * Wbino_pair.M());
     }
 
     int nPhotons = 0;
