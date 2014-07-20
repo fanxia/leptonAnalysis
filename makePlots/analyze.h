@@ -3905,54 +3905,54 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 
     tree->SetBranchAddress("pfMET", &met);
     tree_JECup->SetBranchAddress("pfMET", &met);
-    tree_JECup->SetBranchAddress("pfMET", &met);
+    tree_JECdown->SetBranchAddress("pfMET", &met);
     tree_contam->SetBranchAddress("pfMET", &met);
 
     tree->SetBranchAddress("Nphotons", &nphotons);
     tree_JECup->SetBranchAddress("Nphotons", &nphotons);
-    tree_JECup->SetBranchAddress("Nphotons", &nphotons);
+    tree_JECdown->SetBranchAddress("Nphotons", &nphotons);
     tree_contam->SetBranchAddress("Nphotons", &nphotons);
 
     tree->SetBranchAddress("leadPhotonEt", &lead_photon_et);
     tree_JECup->SetBranchAddress("leadPhotonEt", &lead_photon_et);
-    tree_JECup->SetBranchAddress("leadPhotonEt", &lead_photon_et);
+    tree_JECdown->SetBranchAddress("leadPhotonEt", &lead_photon_et);
     tree_contam->SetBranchAddress("leadPhotonEt", &lead_photon_et);
 
     tree->SetBranchAddress("leadPhotonEta", &lead_photon_eta);
     tree_JECup->SetBranchAddress("leadPhotonEta", &lead_photon_eta);
-    tree_JECup->SetBranchAddress("leadPhotonEta", &lead_photon_eta);
+    tree_JECdown->SetBranchAddress("leadPhotonEta", &lead_photon_eta);
     tree_contam->SetBranchAddress("leadPhotonEta", &lead_photon_eta);
 
     tree->SetBranchAddress("trailPhotonEta", &trail_photon_eta);
     tree_JECup->SetBranchAddress("trailPhotonEta", &trail_photon_eta);
-    tree_JECup->SetBranchAddress("trailPhotonEta", &trail_photon_eta);
+    tree_JECdown->SetBranchAddress("trailPhotonEta", &trail_photon_eta);
     tree_contam->SetBranchAddress("trailPhotonEta", &trail_photon_eta);
 
     tree->SetBranchAddress("trailPhotonEt", &trail_photon_et);
     tree_JECup->SetBranchAddress("trailPhotonEt", &trail_photon_et);
-    tree_JECup->SetBranchAddress("trailPhotonEt", &trail_photon_et);
+    tree_JECdown->SetBranchAddress("trailPhotonEt", &trail_photon_et);
     tree_contam->SetBranchAddress("trailPhotonEt", &trail_photon_et);
 
     if(req.Contains("ele")) {
       tree->SetBranchAddress("ele_pt", &lepton_pt);
       tree_JECup->SetBranchAddress("ele_pt", &lepton_pt);
-      tree_JECup->SetBranchAddress("ele_pt", &lepton_pt);
+      tree_JECdown->SetBranchAddress("ele_pt", &lepton_pt);
       tree_contam->SetBranchAddress("ele_pt", &lepton_pt);
 
       tree->SetBranchAddress("ele_eta", &lepton_eta);
       tree_JECup->SetBranchAddress("ele_eta", &lepton_eta);
-      tree_JECup->SetBranchAddress("ele_eta", &lepton_eta);
+      tree_JECdown->SetBranchAddress("ele_eta", &lepton_eta);
       tree_contam->SetBranchAddress("ele_eta", &lepton_eta);
     }
     else if(req.Contains("muon")) {
       tree->SetBranchAddress("muon_pt", &lepton_pt);
       tree_JECup->SetBranchAddress("muon_pt", &lepton_pt);
-      tree_JECup->SetBranchAddress("muon_pt", &lepton_pt);
+      tree_JECdown->SetBranchAddress("muon_pt", &lepton_pt);
       tree_contam->SetBranchAddress("muon_pt", &lepton_pt);
 
       tree->SetBranchAddress("muon_eta", &lepton_eta);
       tree_JECup->SetBranchAddress("muon_eta", &lepton_eta);
-      tree_JECup->SetBranchAddress("muon_eta", &lepton_eta);
+      tree_JECdown->SetBranchAddress("muon_eta", &lepton_eta);
       tree_contam->SetBranchAddress("muon_eta", &lepton_eta);
     }
 

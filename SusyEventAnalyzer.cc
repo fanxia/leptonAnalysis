@@ -1115,11 +1115,11 @@ void SusyEventAnalyzer::GeneratorInfo() {
       int n_Wbino = 0;
 
       for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-	if(it->mother == top && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
+	if(it->mother == stop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
 	  bW_pair += it->momentum;
 	  n_bW++;
 	}
-	if(it->mother == top && (abs(it->pdgId) == 24 || abs(it->pdgId) == 1000022)) {
+	if(it->mother == stop && (abs(it->pdgId) == 24 || abs(it->pdgId) == 1000022)) {
 	  Wbino_pair += it->momentum;
 	  n_Wbino++;
 	}
@@ -1136,11 +1136,11 @@ void SusyEventAnalyzer::GeneratorInfo() {
       int n_Wbino = 0;
 
       for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-	if(it->mother == antitop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
+	if(it->mother == antistop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
 	  bW_pair += it->momentum;
 	  n_bW++;
 	}
-	if(it->mother == antitop && (abs(it->pdgId) == 24 || abs(it->pdgId) == 1000022)) {
+	if(it->mother == antistop && (abs(it->pdgId) == 24 || abs(it->pdgId) == 1000022)) {
 	  Wbino_pair += it->momentum;
 	  n_Wbino++;
 	}
@@ -1165,7 +1165,7 @@ void SusyEventAnalyzer::GeneratorInfo() {
 
     }
 
-    susy::MET* genMet = &(event_.metMap.find("genMetTrue")->second);
+    susy::MET* genMet = &(event.metMap.find("genMetTrue")->second);
 
     h_genMET->Fill(genMet->met());
     h_nPhotons->Fill(nPhotons);
