@@ -1346,6 +1346,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	btagWeightDown = 1.;
       }
 
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
+
       if(useWHIZARD && removeTTAoverlap[i] && overlaps_ttA > 0.001) continue;
 
       if(btagWeight != btagWeight) continue;
@@ -1526,6 +1529,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	
 	if(nBtagReq == 0) btagWeight = 1.;
 	
+	if(btagWeightUp < 0) btagWeightUp = 0.;
+	if(btagWeightDown < 0) btagWeightDown = 0;
+
 	if(useWHIZARD && removeTTAoverlap[i] && overlaps_ttA > 0.001) continue;
 	
 	if(btagWeight != btagWeight) continue;
@@ -1558,6 +1564,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	
 	if(nBtagReq == 0) btagWeight = 1.;
 	
+	if(btagWeightUp < 0) btagWeightUp = 0.;
+	if(btagWeightDown < 0) btagWeightDown = 0;
+
 	if(useWHIZARD && removeTTAoverlap[i] && overlaps_ttA > 0.001) continue;
 	
 	if(btagWeight != btagWeight) continue;
@@ -1596,6 +1605,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	btagWeightUp = 1.;
 	btagWeightDown = 1.;
       }
+
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
 
       if(btagWeight != btagWeight) continue;
       if(metCut > 0. && vars[1] >= metCut) continue;
@@ -1653,6 +1665,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       btagWeightUp = 1.;
       btagWeightDown = 1.;
     }
+
+    if(btagWeightUp < 0) btagWeightUp = 0.;
+    if(btagWeightDown < 0) btagWeightDown = 0;
 
     if(btagWeight != btagWeight) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -1770,6 +1785,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       
       if(nBtagReq == 0) btagWeight = 1.;
       
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
+
       if(btagWeight != btagWeight) continue;
       if(metCut > 0. && vars[1] >= metCut) continue;
       
@@ -1793,6 +1811,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       
       if(nBtagReq == 0) btagWeight = 1.;
       
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
+
       if(btagWeight != btagWeight) continue;
       if(metCut > 0. && vars[1] >= metCut) continue;
       
@@ -1822,6 +1843,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       btagWeightUp = 1.;
       btagWeightDown = 1.;
     }
+
+    if(btagWeightUp < 0) btagWeightUp = 0.;
+    if(btagWeightDown < 0) btagWeightDown = 0;
 
     if(btagWeight != btagWeight) continue;
     if(metCut > 0. && vars[1] >= metCut) continue;
@@ -1939,6 +1963,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       
       if(nBtagReq == 0) btagWeight = 1.;
       
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
+
       if(btagWeight != btagWeight) continue;
       if(metCut > 0. && vars[1] >= metCut) continue;
       
@@ -1962,6 +1989,9 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       
       if(nBtagReq == 0) btagWeight = 1.;
       
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
+
       if(btagWeight != btagWeight) continue;
       if(metCut > 0. && vars[1] >= metCut) continue;
       
@@ -4071,6 +4101,9 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 	btagWeightDown = 1.;
       }
 
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
+
       if(btagWeight != btagWeight) continue;
       if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
 
@@ -4167,6 +4200,9 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 	btagWeightDown = 1.;
       }
 
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
+
       if(btagWeight != btagWeight) continue;
       if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
 
@@ -4201,6 +4237,9 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 	btagWeightDown = 1.;
       }
 
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
+
       if(btagWeight != btagWeight) continue;
       if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
 
@@ -4233,6 +4272,9 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
       if(nBtagReq == 0) {
 	btagWeight = 1.;
       }
+
+      if(btagWeightUp < 0) btagWeightUp = 0.;
+      if(btagWeightDown < 0) btagWeightDown = 0;
 
       if(btagWeight != btagWeight) continue;
 
