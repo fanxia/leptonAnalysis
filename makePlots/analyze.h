@@ -941,7 +941,6 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
     TH1D * h_bkg_puWeightDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_puWeightDown");
     mcHistograms_puWeightDown[i].push_back(h_bkg_puWeightDown);
 
-
     TH1D * h_bkg_scaleUp = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_scaleUp");
     mcHistograms_scaleUp[i].push_back(h_bkg_scaleUp);
 
@@ -1480,13 +1479,6 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	Double_t content = mcHistograms[i][j]->GetBinContent(k+1);
 	Double_t error = mcHistograms[i][j]->GetBinError(k+1);
 
-	if(fitScale[i] > 0) {
-	  error = fitScale[i]*fitScale[i]*error*error + fitScaleError[i]*fitScaleError[i]*content*content;
-	  error = sqrt(error);
-	  
-	  content *= fitScale[i];
-	}
-      
 	mcHistograms_scaleUp[i][j]->SetBinContent(k+1, content);
 	mcHistograms_scaleDown[i][j]->SetBinContent(k+1, content);
 	mcHistograms_pdfUp[i][j]->SetBinContent(k+1, content);
