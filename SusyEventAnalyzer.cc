@@ -1065,6 +1065,8 @@ void SusyEventAnalyzer::GeneratorInfo() {
   TH1D * h_genMET = new TH1D("genMET", "genMET", 400, 0, 2000);
   TH1D * h_top_invmass = new TH1D("top_invmass", "top_invmass", 400, 0, 2000);
 
+  TH1D * h_charm_pt = new TH1D("charm_pt", "charm_pt", 400, 0, 2000);
+
   TTree * tree_dalitz = new TTree("dalitzTree", "dalitzTree");
   Float_t mbw, mbBino;
   tree_dalitz->Branch("mbW", &mbw, "mbw/F");
@@ -1108,6 +1110,12 @@ void SusyEventAnalyzer::GeneratorInfo() {
 	else if(it->pdgId == -6 && !antitop) antitop = &*it;
       }
       if(top && antitop) break;
+    }
+
+    for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
+      if(abs(it->pdgId) == 4 && (it->mother == stop || it->mother == antistop)) {
+	h_charm_pt->Fill(it->momentum.Pt());
+      }
     }
 
     if(!top) {
@@ -1155,7 +1163,7 @@ void SusyEventAnalyzer::GeneratorInfo() {
 
       if(n_bW == 2 && n_bBino == 2) {
 	mbw = bW_pair.M();
-	mbBino = Wbino_pair.M();
+	mbBino = bBino_pair.M();
 	tree_dalitz->Fill();
       }
 
