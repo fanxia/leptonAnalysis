@@ -1065,7 +1065,9 @@ void SusyEventAnalyzer::GeneratorInfo() {
   TH1D * h_genMET = new TH1D("genMET", "genMET", 400, 0, 2000);
   TH1D * h_top_invmass = new TH1D("top_invmass", "top_invmass", 400, 0, 2000);
 
-  TH2D * h_stop_dalitz = new TH2D("stop_dalitz", "Dalitz:m^{2}_{bW} / m^{2}_{#tilde{t}}:m^2_{W#tilde{B}} / m^{2}_{#tilde{t}}", 200, 0, 1, 200, 0, 1);
+  TH2D * h_stop_dalitz = new TH2D("stop_dalitz", "Dalitz", 1000, 0, 1.2, 1000, 0, 1.2);
+  h_stop_dalitz->GetXaxis()->SetTitle("m^{2}_{bW}");
+  h_stop_dalitz->GetYaxis()->SetTitle("m^2_{W#tilde{B}}");
 
   TH1D * h_nPhotons = new TH1D("nPhotons", "nPhotons", 4, 0, 4);
 
@@ -1187,3 +1189,4 @@ void SusyEventAnalyzer::GeneratorInfo() {
   out->Close();
 
 }
+

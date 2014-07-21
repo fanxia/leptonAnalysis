@@ -201,7 +201,8 @@ class PlotMaker : public TObject {
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 			bool removeTTA, bool reweightTop,
-			int channel, int layer, int color, TString legendEntry, TString tableEntry);
+			int channel, int layer, int color, TString legendEntry, TString tableEntry,
+			Double_t fitScaling = -1.0, Double_t fitScalingError = 0.0);
   
   void SetPhotonMode(int pMode) { photonMode = pMode; }
 
@@ -302,6 +303,8 @@ class PlotMaker : public TObject {
   vector<TString> tableNames;
   vector<bool> removeTTAoverlap;
   vector<bool> reweightTopPt;
+  vector<Double_t> fitScale;
+  vector<Double_t> fitScaleError;
 
   vector< vector<TH1D*> > mcHistograms;
   vector< vector<TH1D*> > mcHistograms_btagWeightUp;
@@ -469,6 +472,8 @@ intLumi_int(lumi),
   tableNames.clear();
   removeTTAoverlap.clear();
   reweightTopPt.clear();
+  fitScale.clear();
+  fitScaleError.clear();
 
   mcHistograms.clear();
   mcHistograms_btagWeightUp.clear();
@@ -542,6 +547,8 @@ PlotMaker::~PlotMaker() {
   tableNames.clear();
   removeTTAoverlap.clear();
   reweightTopPt.clear();
+  fitScale.clear();
+  fitScaleError.clear();
 
   fLeptonSF->Close();
   fPhotonSF->Close();
@@ -630,7 +637,8 @@ void PlotMaker::LoadPhotonSFs(TString fileName) {
 bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
 				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 				 bool removeTTA, bool reweightTop,
-				 int channel, int layer, int color, TString legendEntry, TString tableEntry) {
+				 int channel, int layer, int color, TString legendEntry, TString tableEntry,
+				 Double_t fitScaling, Double_t fitScalingError) {
 
   mcFiles.push_back(new TFile(fileName, "READ"));
   if(!mcFiles.back()) {
@@ -695,6 +703,9 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   tableNames.push_back(tableEntry);
   removeTTAoverlap.push_back(removeTTA);
   reweightTopPt.push_back(reweightTop);
+
+  fitScale.push_back(fitScaling);
+  fitScaleError.push_back(fitScalingError);
 
   mcHistograms.resize(mcHistograms.size() + 1);
   mcHistograms_btagWeightUp.resize(mcHistograms_btagWeightUp.size() + 1);
@@ -1348,13 +1359,20 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+      if(fitScale[i] > 0) addError2 = fitScale[i]*fitScale[i]*puWeight*puWeight*btagWeightErr*btagWeightErr + 
+			    fitScale[i]*fitScale[i]*btagWeight*btagWeight*puWeightErr*puWeightErr +
+			    puWeight*puWeight*btagWeight*btagWeight*fitScaleError[i]*fitScaleError[i];
+
       Float_t addError2_puOnly = btagWeight*btagWeight*puWeightErr*puWeightErr;
+      if(fitScale[i] > 0) addError2_puOnly = fitScale[i]*fitScale[i]*btagWeight*btagWeight*puWeightErr*puWeightErr +
+			    puWeight*puWeight*btagWeight*btagWeight*fitScaleError[i]*fitScaleError[i];
 
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
 
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 
 	Float_t oldError = mcHistograms[i][k]->GetBinError(mcHistograms[i][k]->FindBin(vars[k]));
 	Float_t newerror = sqrt(oldError*oldError + addError2);
@@ -1373,6 +1391,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeight * btagWeightUp * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_btagWeightUp[i][k]->GetBinError(mcHistograms_btagWeightUp[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_btagWeightUp[i][k]->Fill(vars[k], totalWeight);
@@ -1380,6 +1399,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeight * btagWeightDown * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_btagWeightDown[i][k]->GetBinError(mcHistograms_btagWeightDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_btagWeightDown[i][k]->Fill(vars[k], totalWeight);
@@ -1387,6 +1407,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeightUp * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_puWeightUp[i][k]->GetBinError(mcHistograms_puWeightUp[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_puWeightUp[i][k]->Fill(vars[k], totalWeight);
@@ -1394,6 +1415,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeightDown * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_puWeightDown[i][k]->GetBinError(mcHistograms_puWeightDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2_puOnly);
 	mcHistograms_puWeightDown[i][k]->Fill(vars[k], totalWeight);
@@ -1401,6 +1423,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeight * btagWeight * leptonSFup * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_leptonSFup[i][k]->GetBinError(mcHistograms_leptonSFup[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_leptonSFup[i][k]->Fill(vars[k], totalWeight);
@@ -1408,6 +1431,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeight * btagWeight * leptonSFdown * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_leptonSFdown[i][k]->GetBinError(mcHistograms_leptonSFdown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_leptonSFdown[i][k]->Fill(vars[k], totalWeight);
@@ -1415,6 +1439,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeight * btagWeight * leptonSF * photonSFup;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_photonSFup[i][k]->GetBinError(mcHistograms_photonSFup[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_photonSFup[i][k]->Fill(vars[k], totalWeight);
@@ -1422,6 +1447,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeight * btagWeight * leptonSF * photonSFdown;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_photonSFdown[i][k]->GetBinError(mcHistograms_photonSFdown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_photonSFdown[i][k]->Fill(vars[k], totalWeight);
@@ -1429,12 +1455,14 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 
 	totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting * topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_topPtUp[i][k]->GetBinError(mcHistograms_topPtUp[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtUp[i][k]->Fill(vars[k], totalWeight);
 	mcHistograms_topPtUp[i][k]->SetBinError(mcHistograms[i][k]->FindBin(vars[k]), newerror);
 
 	totalWeight = puWeight * btagWeight * leptonSF * photonSF;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	oldError = mcHistograms_topPtDown[i][k]->GetBinError(mcHistograms_topPtDown[i][k]->FindBin(vars[k]));
 	newerror = sqrt(oldError*oldError + addError2);
 	mcHistograms_topPtDown[i][k]->Fill(vars[k], totalWeight);
@@ -1448,6 +1476,13 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       for(int k = 0; k < mcHistograms[i][j]->GetNbinsX(); k++) {
 	Double_t content = mcHistograms[i][j]->GetBinContent(k+1);
 	Double_t error = mcHistograms[i][j]->GetBinError(k+1);
+
+	if(fitScale[i] > 0) {
+	  error = fitScale[i]*fitScale[i]*error*error + fitScaleError[i]*fitScaleError[i]*content*content;
+	  error = sqrt(error);
+	  
+	  content *= fitScale[i];
+	}
       
 	mcHistograms_scaleUp[i][j]->SetBinContent(k+1, content);
 	mcHistograms_scaleDown[i][j]->SetBinContent(k+1, content);
@@ -1503,6 +1538,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	
 	for(unsigned int k = 0; k < vars.size(); k++) {
 	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -1534,6 +1570,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	
 	for(unsigned int k = 0; k < vars.size(); k++) {
 	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -1568,12 +1605,16 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(btagWeightErr > 20. || btagWeightErr != btagWeightErr) btagWeightErr = btagWeight;
 
       Float_t addError2 = puWeight*puWeight*btagWeightErr*btagWeightErr + btagWeight*btagWeight*puWeightErr*puWeightErr;
+      if(fitScale[i] > 0) addError2 = fitScale[i]*fitScale[i]*puWeight*puWeight*btagWeightErr*btagWeightErr + 
+			    fitScale[i]*fitScale[i]*btagWeight*btagWeight*puWeightErr*puWeightErr +
+			    puWeight*puWeight*btagWeight*btagWeight*fitScaleError[i]*fitScaleError[i];
 
       GetLeptonSF(vars, chan, leptonSF, leptonSFup, leptonSFdown);
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
       if(reweightTopPt[i]) totalWeight *= topPtReweighting;
+      if(fitScale[i] > 0) totalWeight *= fitScale[i];
 
       for(unsigned int k = 0; k < vars.size(); k++) {
 	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
@@ -2075,7 +2116,7 @@ void PlotMaker::NormalizeQCD() {
 
   double scale = (n_sig - n_mc) / n_qcd;
   
-  if(scale < 0) return;
+  if(scale < 0) scale = 1.e-6;
 
   for(unsigned int i = 0; i < h_qcd.size(); i++) {
     double newError_lowBins[endBin];
