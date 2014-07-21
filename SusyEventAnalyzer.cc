@@ -1066,9 +1066,9 @@ void SusyEventAnalyzer::GeneratorInfo() {
   TH1D * h_top_invmass = new TH1D("top_invmass", "top_invmass", 400, 0, 2000);
 
   TTree * tree_dalitz = new TTree("dalitzTree", "dalitzTree");
-  Float_t mbw, mWbino;
+  Float_t mbw, mbBino;
   tree_dalitz->Branch("mbW", &mbw, "mbw/F");
-  tree_dalitz->Branch("mWbino", &mWbino, "mWbino/F");
+  tree_dalitz->Branch("mbBino", &mbBino, "mbBino/F");
 
   TH1D * h_nPhotons = new TH1D("nPhotons", "nPhotons", 4, 0, 4);
 
@@ -1112,50 +1112,50 @@ void SusyEventAnalyzer::GeneratorInfo() {
 
     if(!top) {
       TLorentzVector bW_pair(0, 0, 0, 0);
-      TLorentzVector Wbino_pair(0, 0, 0, 0);
+      TLorentzVector bBino_pair(0, 0, 0, 0);
 
       int n_bW = 0;
-      int n_Wbino = 0;
+      int n_bBino = 0;
 
       for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
 	if(it->mother == stop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
 	  bW_pair += it->momentum;
 	  n_bW++;
 	}
-	if(it->mother == stop && (abs(it->pdgId) == 24 || abs(it->pdgId) == 1000022)) {
-	  Wbino_pair += it->momentum;
-	  n_Wbino++;
+	if(it->mother == stop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 1000022)) {
+	  bBino_pair += it->momentum;
+	  n_bBino++;
 	}
       }
 
-      if(n_bW == 2 && n_Wbino == 2) {
+      if(n_bW == 2 && n_bBino == 2) {
 	mbw = bW_pair.M();
-	mWbino = Wbino_pair.M();
+	mbBino = bBino_pair.M();
 	tree_dalitz->Fill();
       }
     }
 
     if(!antitop) {
       TLorentzVector bW_pair(0, 0, 0, 0);
-      TLorentzVector Wbino_pair(0, 0, 0, 0);
+      TLorentzVector bBino_pair(0, 0, 0, 0);
 
       int n_bW = 0;
-      int n_Wbino = 0;
+      int n_bBino = 0;
 
       for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
 	if(it->mother == antistop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
 	  bW_pair += it->momentum;
 	  n_bW++;
 	}
-	if(it->mother == antistop && (abs(it->pdgId) == 24 || abs(it->pdgId) == 1000022)) {
-	  Wbino_pair += it->momentum;
-	  n_Wbino++;
+	if(it->mother == antistop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 1000022)) {
+	  bBino_pair += it->momentum;
+	  n_bBino++;
 	}
       }
 
-      if(n_bW == 2 && n_Wbino == 2) {
+      if(n_bW == 2 && n_bBino == 2) {
 	mbw = bW_pair.M();
-	mWbino = Wbino_pair.M();
+	mbBino = Wbino_pair.M();
 	tree_dalitz->Fill();
       }
 
