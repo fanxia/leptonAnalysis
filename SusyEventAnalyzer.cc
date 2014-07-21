@@ -1065,9 +1065,10 @@ void SusyEventAnalyzer::GeneratorInfo() {
   TH1D * h_genMET = new TH1D("genMET", "genMET", 400, 0, 2000);
   TH1D * h_top_invmass = new TH1D("top_invmass", "top_invmass", 400, 0, 2000);
 
-  TH2D * h_stop_dalitz = new TH2D("stop_dalitz", "Dalitz", 1000, 0, 1.2, 1000, 0, 1.2);
-  h_stop_dalitz->GetXaxis()->SetTitle("m^{2}_{bW}");
-  h_stop_dalitz->GetYaxis()->SetTitle("m^2_{W#tilde{B}}");
+  TTree * tree_dalitz = new TTree("dalitzTree", "dalitzTree");
+  Float_t mbw, mWbino;
+  tree_dalitz->Branch("mbW", &mbw, "mbw/F");
+  tree_dalitz->Branch("mWbino", &mWbino, "mWbino/F");
 
   TH1D * h_nPhotons = new TH1D("nPhotons", "nPhotons", 4, 0, 4);
 
@@ -1128,10 +1129,9 @@ void SusyEventAnalyzer::GeneratorInfo() {
       }
 
       if(n_bW == 2 && n_Wbino == 2) {
-	char * tmp = getenv("CONDOR_SECTION");
-	int index = atoi(tmp);
-	double mstop = mst[int(index)/31];
-	h_stop_dalitz->Fill(bW_pair.M() * bW_pair.M() / (mstop*mstop), Wbino_pair.M() * Wbino_pair.M() / (mstop*mstop));
+	mbw = bW_pair.M();
+	mWbino = Wbino_pair.M();
+	tree_dalitz->Fill();
       }
     }
 
@@ -1154,10 +1154,9 @@ void SusyEventAnalyzer::GeneratorInfo() {
       }
 
       if(n_bW == 2 && n_Wbino == 2) {
-	char * tmp = getenv("CONDOR_SECTION");
-	int index = atoi(tmp);
-	double mstop = mst[int(index)/31];
-	h_stop_dalitz->Fill(bW_pair.M() * bW_pair.M() / (mstop*mstop), Wbino_pair.M() * Wbino_pair.M() / (mstop*mstop));
+	mbw = bW_pair.M();
+	mWbino = Wbino_pair.M();
+	tree_dalitz->Fill();
       }
 
     }

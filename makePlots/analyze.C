@@ -78,7 +78,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
       wjetsSF = 1.72425231185;
       wjetsSFerror = 0.0559969893916;
       ttjetsSF = -1.;
-      ttjetsSFerror = 0.
+      ttjetsSFerror = 0.;
       ttgammaSF = -1.;
       ttgammaSFerror = 0.;
     }
@@ -930,7 +930,7 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
       wjetsSF = 1.72425231185;
       wjetsSFerror = 0.0559969893916;
       ttjetsSF = -1.;
-      ttjetsSFerror = 0.
+      ttjetsSFerror = 0.;
       ttgammaSF = -1.;
       ttgammaSFerror = 0.;
     }

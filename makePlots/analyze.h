@@ -4086,6 +4086,9 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 		  photonSF, photonSFup, photonSFdown);
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
+
+      if(totalWeight < 0) continue;
+
       Float_t olderror = h->GetBinError(h->FindBin(met));
       Float_t newerror = sqrt(olderror*olderror + addError2);
       h->Fill(met, totalWeight);
@@ -4247,8 +4250,8 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
       contamination += totalWeight;
     }
 
-    h_acc->Fill(index1, index2, h->Integral() / (0.438/3.) / 15000.);
-    h_contamination->Fill(index1, index2, contamination / h->Integral());
+    h_acc->SetBinContent(h_acc->FindBin(index1, index2), h->Integral() / (0.438/3.) / 15000.);
+    h_contamination->SetBinContent(h_contamination->FindBin(index1, index2), contamination / h->Integral());
 
     // draw acc and shiz
     TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
