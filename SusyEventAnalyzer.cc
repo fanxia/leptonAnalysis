@@ -1066,6 +1066,9 @@ void SusyEventAnalyzer::GeneratorInfo() {
   TH1D * h_top_invmass = new TH1D("top_invmass", "top_invmass", 400, 0, 2000);
 
   TH1D * h_charm_pt = new TH1D("charm_pt", "charm_pt", 400, 0, 2000);
+  TH1D * h_strange_pt = new TH1D("strange_pt", "strange_pt", 400, 0, 2000);
+  TH1D * h_up_pt = new TH1D("up_pt", "up_pt", 400, 0, 2000);
+  TH1D * h_down_pt = new TH1D("down_pt", "down_pt", 400, 0, 2000);
 
   TTree * tree_dalitz = new TTree("dalitzTree", "dalitzTree");
   Float_t mbw, mbBino;
@@ -1110,12 +1113,6 @@ void SusyEventAnalyzer::GeneratorInfo() {
 	else if(it->pdgId == -6 && !antitop) antitop = &*it;
       }
       if(top && antitop) break;
-    }
-
-    for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-      if(abs(it->pdgId) == 4 && (it->mother == stop || it->mother == antistop)) {
-	h_charm_pt->Fill(it->momentum.Pt());
-      }
     }
 
     if(!top) {
@@ -1173,6 +1170,11 @@ void SusyEventAnalyzer::GeneratorInfo() {
 
     for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
 
+      if(abs(it->pdgId) == 4 && (it->mother == stop || it->mother == antistop)) h_charm_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 3 && (it->mother == stop || it->mother == antistop)) h_strange_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 2 && (it->mother == stop || it->mother == antistop)) h_up_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 1 && (it->mother == stop || it->mother == antistop)) h_down_pt->Fill(it->momentum.Pt());
+      
       if(abs(it->pdgId) == 5 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_bottom_pt->Fill(it->momentum.Pt());
       if(abs(it->pdgId) == 24 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_w_pt->Fill(it->momentum.Pt());
       if(abs(it->pdgId) == 1000022 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_bino_pt->Fill(it->momentum.Pt());
