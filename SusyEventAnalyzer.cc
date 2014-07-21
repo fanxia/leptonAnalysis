@@ -1096,7 +1096,7 @@ void SusyEventAnalyzer::GeneratorInfo() {
     susy::Particle * antitop = 0;
 
     for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-      if(abs(it->pdgId) == 1000006) {
+      if(abs(it->pdgId) == 1000006 && it->status == 3 ) {
 	h_stop_pt->Fill(it->momentum.Pt());
 	if(it->pdgId == 1000006 && !stop) stop = &*it;
 	else if(it->pdgId == -1000006 && !antistop) antistop = &*it;
@@ -1106,7 +1106,7 @@ void SusyEventAnalyzer::GeneratorInfo() {
     if(!stop || !antistop) continue;
 
     for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-      if(abs(it->pdgId) == 6) {
+      if(abs(it->pdgId) == 6 && it->status == 3) {
 	h_top_pt->Fill(it->momentum.Pt());
 	h_top_invmass->Fill(it->momentum.M());
 	if(it->pdgId == 6 && !top) top = &*it;
@@ -1123,11 +1123,11 @@ void SusyEventAnalyzer::GeneratorInfo() {
       int n_bBino = 0;
 
       for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-	if(it->mother == stop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
+	if(it->mother == stop && it->status == 3 && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
 	  bW_pair += it->momentum;
 	  n_bW++;
 	}
-	if(it->mother == stop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 1000022)) {
+	if(it->mother == stop && it->status == 3 && (abs(it->pdgId) == 5 || abs(it->pdgId) == 1000022)) {
 	  bBino_pair += it->momentum;
 	  n_bBino++;
 	}
@@ -1148,11 +1148,11 @@ void SusyEventAnalyzer::GeneratorInfo() {
       int n_bBino = 0;
 
       for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
-	if(it->mother == antistop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
+	if(it->mother == antistop && it->status == 3 && (abs(it->pdgId) == 5 || abs(it->pdgId) == 24)) {
 	  bW_pair += it->momentum;
 	  n_bW++;
 	}
-	if(it->mother == antistop && (abs(it->pdgId) == 5 || abs(it->pdgId) == 1000022)) {
+	if(it->mother == antistop && it->status == 3 && (abs(it->pdgId) == 5 || abs(it->pdgId) == 1000022)) {
 	  bBino_pair += it->momentum;
 	  n_bBino++;
 	}
@@ -1170,20 +1170,20 @@ void SusyEventAnalyzer::GeneratorInfo() {
 
     for(vector<susy::Particle>::iterator it = event.genParticles.begin(); it != event.genParticles.end(); it++) {
 
-      if(abs(it->pdgId) == 4 && (it->mother == stop || it->mother == antistop)) h_charm_pt->Fill(it->momentum.Pt());
-      if(abs(it->pdgId) == 3 && (it->mother == stop || it->mother == antistop)) h_strange_pt->Fill(it->momentum.Pt());
-      if(abs(it->pdgId) == 2 && (it->mother == stop || it->mother == antistop)) h_up_pt->Fill(it->momentum.Pt());
-      if(abs(it->pdgId) == 1 && (it->mother == stop || it->mother == antistop)) h_down_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 4 && it->status == 3 && (it->mother == stop || it->mother == antistop)) h_charm_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 3 && it->status == 3 && (it->mother == stop || it->mother == antistop)) h_strange_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 2 && it->status == 3 && (it->mother == stop || it->mother == antistop)) h_up_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 1 && it->status == 3 && (it->mother == stop || it->mother == antistop)) h_down_pt->Fill(it->momentum.Pt());
       
-      if(abs(it->pdgId) == 5 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_bottom_pt->Fill(it->momentum.Pt());
-      if(abs(it->pdgId) == 24 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_w_pt->Fill(it->momentum.Pt());
-      if(abs(it->pdgId) == 1000022 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_bino_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 5 && it->status == 3 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_bottom_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 24 && it->status == 3 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_w_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 1000022 && it->status == 3 && (it->mother == top || it->mother == stop || it->mother == antitop || it->mother == antistop)) h_bino_pt->Fill(it->momentum.Pt());
       if(abs(it->pdgId) == 22 && abs(it->mother->pdgId) == 1000022) {
 	nPhotons++;
 	h_photon_pt->Fill(it->momentum.Pt());
       }
-      if(abs(it->pdgId) == 11 && abs(it->mother->pdgId) == 24) h_ele_pt->Fill(it->momentum.Pt());
-      if(abs(it->pdgId) == 13 && abs(it->mother->pdgId) == 24) h_muon_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 11 && it->status == 3 && abs(it->mother->pdgId) == 24) h_ele_pt->Fill(it->momentum.Pt());
+      if(abs(it->pdgId) == 13 && it->status == 3 && abs(it->mother->pdgId) == 24) h_muon_pt->Fill(it->momentum.Pt());
 
     }
 
