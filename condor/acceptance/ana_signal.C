@@ -3,14 +3,13 @@ void ana_signal(TString scan = "stop-bino", TString discriminant = "CSVM", bool 
   gROOT->Reset();
   gSystem->Load("libSusyEvent.so");
   
-  gROOT->LoadMacro("SusyEventAnalyzer.cc+");
-
-  TChain chain("susyTree");
-
+  gSystem->Load("SusyEventAnalyzer_cc.so");
+  
   char* tmp = getenv("CONDOR_SECTION");
-  cout << "tmp = " << tmp << endl;
   int index = atoi ( tmp );
   cout << "index = " << index << endl;
+
+  TChain chain("susyTree");
 
   //int index1 = int(index)/17*100 + 400;
   //int index2 = int(index)%17*100 + 420;
@@ -41,7 +40,7 @@ void ana_signal(TString scan = "stop-bino", TString discriminant = "CSVM", bool 
 
   char input_file[500];
 
-  if(scan == "stop-bino") sprintf(input_file, "dcap:///pnfs/cms/WAX/resilient/bfrancis/SusyNtuples/cms538v1/naturalBinoNLSP/tree_naturalBinoNLSPout_mst_%d_M3_5050_M1_%d.root", index1, index2);
+  if(scan == "stop-bino") sprintf(input_file, "/eos/uscms/store/user/bfrancis/SusyNtuples/cms538v1/naturalBinoNLSP_try5/tree_naturalBinoNLSPout_mst_%d_M3_5050_M1_%d.root", index1, index2);
   else if(scan == "stop-bino extended") sprintf(input_file, "/eos/uscms/store/user/lpcpjm/PrivateMC/FastSim/533p3_full/naturalBinoNLSP_try3/SusyNtuple/cms533v1_v1/tree_naturalBinoNLSPout_mst_%d_M3_5025_M1_%d.root", index1, index2);
 
   cout << "input_file = " << input_file << endl;
@@ -126,4 +125,3 @@ void ana_signal(TString scan = "stop-bino", TString discriminant = "CSVM", bool 
   std::cout << "CPUTime  : " << ts.CpuTime()/60.0 << " minutes" << std::endl;
 
 }
-

@@ -1,0 +1,30 @@
+# R_firstguess = rfirstguessval
+imax 1 number of channels
+jmax 2 number of backgrounds
+kmax 16 number of nuisance parameters
+--------------
+bin             ele
+observation     dataval
+--------------
+bin			ele		ele			ele
+process			susy		ttbar			ttgamma
+process			0		1			2
+rate			sigaval		ttInclusiveval		ttgammaval
+--------------
+u_lumi lnN		1.026		1.026			1.026
+u_btag lnN		sigabtag	ttInclusivebtag		ttgammabtag
+u_pileup lnN		sigapu		ttInclusivepu		ttgammapu
+u_susy_xsec lnN		sigaxsec	-			-
+u_ttbar_ele_fit lnN	-		1.160			-
+u_ttgamma_ele_fit lnN	-		-			1.156
+u_ttbar_scale lnN	-		ttInclusivescale 	-
+u_ttbar_pdf lnN		-		ttInclusivepdf	 	-
+u_ttgamma_scale lnN	-		-			ttgammascale
+u_ttgamma_pdf lnN	-		-			ttgammapdf
+u_topPt lnN   		sigatopPt	ttInclusivetopPt	ttgammatopPt
+u_JEC lnN		sigaJEC		ttInclusiveJEC		ttgammaJEC
+u_ele_bjjID lnN		sigaele_bjjSF	ttInclusiveele_bjjSF	ttgammaele_bjjSF
+u_photonID lnN		sigaphotonSF	ttInclusivephotonSF	ttgammaphotonSF
+stat_ele_susy lnN	sigastat	-			-
+stat_ele_ttbar lnN	-		ttInclusivestat		-
+stat_ele_ttgamma lnN	-		-			ttgammastat

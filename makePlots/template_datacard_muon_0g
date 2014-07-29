@@ -1,0 +1,40 @@
+# R_firstguess = rfirstguessval
+imax 1 number of channels
+jmax 7 number of backgrounds
+kmax 26 number of nuisance parameters
+--------------
+bin             muon
+observation     dataval
+--------------
+bin			muon		muon		muon			muon		muon			muon	 	        muon		muon
+process			susy		muonqcd		ttbar			vjets		singletop		diboson		 	ttv		ttgamma
+process			0		1		2			3		4			5		 	6		7
+rate			sigaval		muonqcdval	ttInclusiveval		vJetsval	singleTopval		dibosonval	 	ttVval		ttgammaval
+--------------
+u_lumi lnN		1.026		-		1.026			1.026		1.026			1.026		        1.026		1.026
+u_btag lnN		sigabtag	-		ttInclusivebtag		vJetsbtag	singleTopbtag		dibosonbtag		ttVbtag		ttgammabtag
+u_pileup lnN		sigapu		-		ttInclusivepu		vJetspu		singleToppu		dibosonpu		ttVpu		ttgammapu
+u_susy_xsec lnN		sigaxsec	-		-			-		-			-			-		-
+u_ttbar_scale lnN	-		-		ttInclusivescale 	-		-			-			-		-
+u_ttbar_pdf lnN		-		-		ttInclusivepdf	 	-		-			-			-		-
+u_vjets_scale lnN	-		-		-		 	vJetsscale	-			-			-		-
+u_vjets_pdf lnN		-		-		-		 	vJetspdf	-			-			-		-
+u_singleTop_scale lnN	-		-		-			-		singleTopscale		-			-		- 
+u_singleTop_pdf lnN	-		-		-			-		singleToppdf		-			-		-
+u_diboson_scale lnN	-		-		-			-		-			dibosonscale		-		-
+u_diboson_pdf lnN	-		-		-			-		-			dibosonpdf		-		-
+u_ttv_scale lnN		-		-		-			-		-			-			ttVscale	-
+u_ttv_pdf lnN		-		-		-			-		-			-			ttVpdf		-
+u_ttgamma_scale lnN	-		-		-			-		-			-			-		ttgammascale
+u_ttgamma_pdf lnN	-		-		-			-		-			-			-		ttgammapdf
+u_topPt lnN   		sigatopPt	-		ttInclusivetopPt	-		-			-			ttVtopPt	ttgammatopPt
+u_JEC lnN		sigaJEC		-		ttInclusiveJEC		vJetsJEC	singleTopJEC		dibosonJEC		ttVJEC		ttgammaJEC
+u_muon_bjjID lnN	sigamuon_bjjSF	-		ttInclusivemuon_bjjSF	vJetsmuon_bjjSF	singleTopmuon_bjjSF	dibosonmuon_bjjSF	ttVmuon_bjjSF	ttgammamuon_bjjSF
+stat_muon_susy lnN	sigastat	-		-			-		-			-			-		-		
+stat_muon_muonqcd lnN	-		muonqcdstat	-			-		-			-			-		-
+stat_muon_ttbar lnN	-		-		ttInclusivestat		-		-			-			-		-
+stat_muon_vjets lnN	-		-		-			vJetsstat	-			-			-		-
+stat_muon_singleTop lnN	-		-		-			-		singleTopstat		-			-		-
+stat_muon_diboson lnN	-		-		-			-		-			dibosonstat		-		-
+stat_muon_ttv lnN 	-		-		-			-		-			-			ttVstat		-
+stat_muon_ttgamma lnN	-		-		-			-		-			-			-		ttgammastat

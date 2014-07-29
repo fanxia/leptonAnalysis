@@ -1,5 +1,6 @@
 void makePlots() {
 
+  gSystem->AddIncludePath("-I$ROOFITSYS/include"); 
   gROOT->LoadMacro("analyze.C+");
 
   TStopwatch ts;
@@ -16,6 +17,8 @@ void makePlots() {
   bool blinded = true;
   int nPhotons_req = NUM_PHOTONS_REQUIRED;
 
+  if(nPhotons_req > 0) metCut = 50.;
+
   const int nChannels = 4;
   TString channels[nChannels] = {"ele_jjj", "ele_bjj",
 				 "muon_jjj", "muon_bjj"};
@@ -24,8 +27,10 @@ void makePlots() {
 
   for(int i = 0; i < nChannels; i++) {
     if(i != 1 && i != 3) continue;
-    if(i < 2) analyze(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
-    else analyze(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded);
+
+    if(i < 2) analyze(input_ele, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 0);
+    else analyze(input_muon, addMC, i, intLumi, metCut, nPhotons_req, nBtagReq[i], displayKStest, blinded, 0);
+
   }  
 
   ts.Stop();

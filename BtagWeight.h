@@ -16,16 +16,16 @@ class BtagWeight {
  BtagWeight(int jmin) :
   minTags(jmin) {}
 
-  bool filter(int t) { return (t >= minTags); };
-  pair<float, float> weight(vector<BtagInfo> info, int tags, double scale, bool doScale);
+  bool filter(int t, bool inclusiveReq) { return ((inclusiveReq &&  t>= minTags) || (!inclusiveReq && t == minTags)); }
+  pair<float, float> weight(vector<BtagInfo> info, int tags, double scale, bool doScale, bool inclusiveReq);
 
  private:
   int minTags;
 };
 
-pair<float, float> BtagWeight::weight(vector<BtagInfo> info, int tags, double scale, bool doScale) {
+pair<float, float> BtagWeight::weight(vector<BtagInfo> info, int tags, double scale, bool doScale, bool inclusiveReq) {
   
-  if(!filter(tags)) return make_pair(0., 0.);
+  if(!filter(tags, inclusiveReq)) return make_pair(0., 0.);
 
   int njets = info.size();
   int comb = 1 << njets;
@@ -67,7 +67,7 @@ pair<float, float> BtagWeight::weight(vector<BtagInfo> info, int tags, double sc
 
     }
 
-    if(filter(ntagged)) {
+    if(filter(ntagged, inclusiveReq)) {
       pMC += mc;
       pMC_err2 += mc_err2;
       pData += data;

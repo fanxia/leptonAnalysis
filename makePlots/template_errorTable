@@ -86,6 +86,23 @@
         \hline
 	\hline
         
+	GMSB (460\_175) &
+	\begin{tabular}{@{}c@{}} sigaval1x \vspace{1 mm} \\ $^{+sigaerrorup1x}_{-sigaerrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} sigaval2x \vspace{1 mm} \\ $^{+sigaerrorup2x}_{-sigaerrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} sigaval3x \vspace{1 mm} \\ $^{+sigaerrorup3x}_{-sigaerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} sigaval4x \vspace{1 mm} \\ $^{+sigaerrorup4x}_{-sigaerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} sigaval5x \vspace{1 mm} \\ $^{+sigaerrorup5x}_{-sigaerrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+        \hline
+
+	GMSB (560\_325) &
+	\begin{tabular}{@{}c@{}} sigbval1x \vspace{1 mm} \\ $^{+sigberrorup1x}_{-sigberrordown1x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} sigbval2x \vspace{1 mm} \\ $^{+sigberrorup2x}_{-sigberrordown2x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} sigbval3x \vspace{1 mm} \\ $^{+sigberrorup3x}_{-sigberrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} sigbval4x \vspace{1 mm} \\ $^{+sigberrorup4x}_{-sigberrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
+        \begin{tabular}{@{}c@{}} sigbval5x \vspace{1 mm} \\ $^{+sigberrorup5x}_{-sigberrordown5x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+        \hline
+	\hline
+
 	Data & 
 	dataval1x &
 	dataval2x &
@@ -115,7 +132,9 @@
 	\hspace{3 mm} Jet Energy Scale & + bkgjecup5y & - bkgjecdown5y \\
 	\hspace{3 mm} top-quark $p_{T}$ & + bkgtopptup5y & - bkgtopptdown5y \\
 	\hspace{3 mm} b-tag & + bkgbtagup5y & - bkgbtagdown5y \\
-	\hspace{3 mm} Lepton ID/Iso/Trigger & + bkgleptonSFup5y & - bkgleptonSFdown5y \\
+	\hspace{3 mm} pileup & bkgpuup5y & - bkgpudown5y \\
+	\hspace{3 mm} Lepton ID/Trigger & + bkgleptonSFup5y & - bkgleptonSFdown5y \\
+	\hspace{3 mm} Photon ID & + bkgphotonSFup5y & - bkgphotonSFdown5y \\
 	\hline
 	\hline
     \end{tabular}
