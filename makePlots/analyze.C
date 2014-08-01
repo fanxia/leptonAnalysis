@@ -427,12 +427,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
 						0., 300., 7.e-4, 2.5e2,
-						0.5, 1.5,
+						0., 1.9,
 						true, true, true,
 						out);
   else if(nPhotons_req == 2) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
-						0., 300., 7.e-6, 9.,
-						0., 2.1,
+						0., 300., 7.e-6, 13.,
+						0., 1.9,
 						true, true, true,
 						out);
 
@@ -444,12 +444,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("Njets", false, needsQCD, "nJets", "Number of Events",
 						2, 14, 2.e-3, 9.e4,
-						0., 2.3,
+						0., 1.9,
 						true, true, false,
 						out);
   else if(nPhotons_req == 2) pMaker->CreatePlot("Njets", false, needsQCD, "nJets", "Number of Events",
 						2, 14, 2.e-4, 9.e2,
-						0., 2.3,
+						0., 1.9,
 						true, true, false,
 						out);
   
@@ -510,13 +510,13 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					   true, true, false,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (GeV/c^{2})", "Number of Events",
-						0, 2000, 2.e-5, 4.e1,
-						0., 2.5,
+						0, 1200, 2.e-5, 4.e1,
+						0., 1.9,
 						true, true, false,
 						out);
   else if(nPhotons_req == 2) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (GeV/c^{2})", "Number of Events",
-						0, 2000, 2.e-6, 4.e-1,
-						0., 2.5,
+						0, 1200, 2.e-6, 4.,
+						0., 1.9,
 						true, true, false,
 						out);
   
@@ -616,17 +616,17 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   else if(nPhotons_req == 1) pMaker->CreatePlot("w_mT",
 						true, needsQCD,
 						"Transverse Mass", "Number of Events",
-						0, 1000, 
+						0, 500, 
 						2.e-5, 1.2e2,
-						0., 2.8,
+						0., 1.9,
 						true, true, true,
 						out);
   else if(nPhotons_req == 2) pMaker->CreatePlot("w_mT",
 						true, needsQCD,
 						"Transverse Mass", "Number of Events",
-						0, 1000, 
-						2.e-6, 8.e-1,
-						0., 2.8,
+						0, 500, 
+						2.e-6, 4.,
+						0., 1.9,
 						true, true, true,
 						out);
 
@@ -643,7 +643,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 						"M3 (GeV/c^{2})", "Number of Events",
 						0, 2000, 
 						7.e-5, 2.e2,
-						0., 2.1,
+						0., 1.9,
 						true, true, false,
 						out);
   else if(nPhotons_req == 2) pMaker->CreatePlot("m3",
@@ -651,7 +651,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 						"M3 (GeV/c^{2})", "Number of Events",
 						0, 2000, 
 						2.e-5, 1.1e1,
-						0., 2.1,
+						0., 1.9,
 						true, true, false,
 						out);
   
@@ -714,7 +714,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     if(nPhotons_req == 1) pMaker->CreatePlot("leadPhotonEt",
 					     true, needsQCD,
 					     "Et of leading #gamma", "Number of Events",
-					     0, 1200, 
+					     0, 700, 
 					     2.e-4, 5.e2,
 					     0., 5.1,
 					     true, true, true,
@@ -723,8 +723,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     else if(nPhotons_req == 2) pMaker->CreatePlot("leadPhotonEt",
 						  true, needsQCD,
 						  "Et of leading #gamma", "Number of Events",
-						  0, 1200, 
-						  2.e-5, 2.,
+						  0, 700, 
+						  2.e-6, 2.,
 						  0., 5.1,
 						  true, true, true,
 						  out);
@@ -825,8 +825,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->CreatePlot("trailPhotonEt",
 		       true, needsQCD,
 		       "Et of trailing #gamma", "Number of Events",
-		       0, 1200, 
-		       2.e-5, .9,
+		       0, 500, 
+		       2.e-6, .9,
 		       0., 5.1,
 		       true, true, true,
 		       out);
