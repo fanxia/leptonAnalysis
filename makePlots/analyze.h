@@ -2037,6 +2037,7 @@ void PlotMaker::SubtractMCFromQCD() {
   vector<TH1D*> h_clones;
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
     h_clones.push_back((TH1D*)mcQCDHistograms[i][variableNumber]->Clone(TString(mcQCDHistograms[i][variableNumber]->GetName()) + "_clone"));
+    h_clones.back() = (TH1D*)DivideByBinWidth(h_clones.back());
     h_clones.back()->SetFillColor(mcLayerColors[i]);
   }
 
@@ -2046,19 +2047,24 @@ void PlotMaker::SubtractMCFromQCD() {
     }
   }
 
-  h_qcd[1]->GetXaxis()->SetTitle("#slash{E}_{T} (GeV)");
-  h_qcd[1]->GetYaxis()->SetTitle("Events");
+  TH1D * qcd_clone = (TH1D*)h_qcd[1]->Clone(TString(h_qcd[1]->GetName()) + "_clone");
+  qcd_clone = (TH1D*)DivideByBinWidth(qcd_clone);
 
-  h_qcd[1]->Draw("e1");
+  qcd_clone->GetXaxis()->SetTitle("#slash{E}_{T} (GeV)");
+  qcd_clone->GetYaxis()->SetTitle("Events");
+
+  qcd_clone->GetYaxis()->SetRangeUser(0.1, qcd_clone->GetMaximum() * 1.4);
+
+  qcd_clone->Draw("e1");
   h_clones[0]->Draw("hist same");
   for(unsigned int i = 1; i < h_clones.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_clones[i]->Draw("hist same");
   }
-  h_qcd[1]->Draw("e1 same");
-  h_qcd[1]->Draw("axis same");
+  qcd_clone->Draw("e1 same");
+  qcd_clone->Draw("axis same");
 
   TLegend * leg = new TLegend(0.45, 0.6, 0.85, 0.85, NULL, "brNDC");
-  leg->AddEntry(h_qcd[1], "QCD Data", "LP");
+  leg->AddEntry(qcd_clone, "QCD Data", "LP");
   leg->AddEntry((TObject*)0, "QCD Selection on MC:", "");
   leg->AddEntry(h_clones[0], legendNames[0], "F");
   for(unsigned int i = 1; i < h_clones.size(); i++) {
@@ -2066,8 +2072,14 @@ void PlotMaker::SubtractMCFromQCD() {
   }
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
-
   leg->Draw("same");
+
+  TPaveText * reqText = new TPaveText(0.45, 0.47, 0.85, 0.57, "NDC");
+  reqText->SetFillColor(0);
+  reqText->SetFillStyle(0);
+  reqText->SetLineColor(0);
+  reqText->AddText(req+" Requirement");
+  reqText->Draw("same");
 
   can->SaveAs("qcdSubtraction_"+req+".pdf");
 
@@ -3879,7 +3891,7 @@ void PlotMaker::CreateTable() {
       fprintf(tableFile, "bkgsysup5y:%.1f\nbkgsysdown5y:%.1f\n", 100. * sqrt(bkgsys2_up) / bkgval, 100. * sqrt(bkgsys2_down) / bkgval);
       fprintf(tableFile, "bkgscaleup5y:%.1f\nbkgscaledown5y:%.1f\n", 100. * sqrt(bkg_scaleUp2) / bkgval, 100. * sqrt(bkg_scaleDown2) / bkgval);
       fprintf(tableFile, "bkgpdfup5y:%.1f\nbkgpdfdown5y:%.1f\n", 100. * sqrt(bkg_pdfUp2) / bkgval, 100. * sqrt(bkg_pdfDown2) / bkgval);
-      fprintf(tableFile, "bkgjecup5y:%.1f\nbkgjecdown5y:%.1f\n", 100. * sqrt(bkg_JECup2) / bkgval, 100. * sqrt(bkg_JECdown2) / bkgval);
+      fprintf(tableFile, "bkgjecup5y:%.2f\nbkgjecdown5y:%.2f\n", 100. * sqrt(bkg_JECup2) / bkgval, 100. * sqrt(bkg_JECdown2) / bkgval);
       fprintf(tableFile, "bkgtopptup5y:%.1f\nbkgtopptdown5y:%.1f\n", 100. * sqrt(bkg_topPtUp2) / bkgval, 100. * sqrt(bkg_topPtDown2) / bkgval);
       fprintf(tableFile, "bkgbtagup5y:%.1f\nbkgbtagdown5y:%.1f\n", 100. * sqrt(bkg_btagUp2) / bkgval, 100. * sqrt(bkg_btagDown2) / bkgval);
       fprintf(tableFile, "bkgpuup5y:%.1f\nbkgpudown5y:%.1f\n", 100. * sqrt(bkg_puUp2) / bkgval, 100. * sqrt(bkg_puDown2) / bkgval);

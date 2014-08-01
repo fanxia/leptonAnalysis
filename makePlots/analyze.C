@@ -393,7 +393,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     }
     else {
       pMaker->ScaleFromFits(0.00993519916066, 0.00180912524239, -1., 0.,
-			    -1., 0., -1., 0.,
+			    -1,, 0., -1., 0.,
 			    -1., 0., -1., 0.);
     }
   }
@@ -422,7 +422,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // pfMET
   if(nPhotons_req == 0) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
 					   0., 300., 7.e-3, 2.5e4,
-					   0.7, 1.3,
+					   0., 1.9,
 					   true, true, true,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("pfMET", true, needsQCD, "#slash{E}_{T} (GeV)", "Number of Events",
@@ -439,7 +439,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // Njets
   if(nPhotons_req == 0) pMaker->CreatePlot("Njets", false, needsQCD, "nJets", "Number of Events",
 					   2, 14, 2.e-3, 9.e5,
-					   0.6, 2.3,
+					   0., 1.9,
 					   true, true, false,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("Njets", false, needsQCD, "nJets", "Number of Events",
@@ -506,7 +506,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // HT_jets
   if(nPhotons_req == 0) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (GeV/c^{2})", "Number of Events",
 					   0, 2000, 2.e-4, 4.e3,
-					   0.5, 1.6,
+					   0., 1.9,
 					   true, true, false,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("HT_jets", true, needsQCD, "HT (GeV/c^{2})", "Number of Events",
@@ -635,7 +635,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					   "M3 (GeV/c^{2})", "Number of Events",
 					   0, 2000, 
 					   2.e-4, 5.e3,
-					   0., 2.1,
+					   0., 1.9,
 					   true, true, false,
 					   out);
   else if(nPhotons_req == 1) pMaker->CreatePlot("m3",
@@ -1163,7 +1163,7 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
     }
     else {
       pMaker->ScaleFromFits(0.00993519916066, 0.00180912524239, -1., 0.,
-			    -1., 0., -1., 0.,
+			    -1,, 0., -1., 0.,
 			    -1., 0., -1., 0.);
     }
   }

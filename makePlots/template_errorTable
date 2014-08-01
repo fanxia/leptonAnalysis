@@ -132,7 +132,7 @@
 	\hspace{3 mm} Jet Energy Scale & + bkgjecup5y & - bkgjecdown5y \\
 	\hspace{3 mm} top-quark $p_{T}$ & + bkgtopptup5y & - bkgtopptdown5y \\
 	\hspace{3 mm} b-tag & + bkgbtagup5y & - bkgbtagdown5y \\
-	\hspace{3 mm} pileup & bkgpuup5y & - bkgpudown5y \\
+	\hspace{3 mm} pileup & + bkgpuup5y & - bkgpudown5y \\
 	\hspace{3 mm} Lepton ID/Trigger & + bkgleptonSFup5y & - bkgleptonSFdown5y \\
 	\hspace{3 mm} Photon ID & + bkgphotonSFup5y & - bkgphotonSFdown5y \\
 	\hline
