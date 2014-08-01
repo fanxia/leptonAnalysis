@@ -393,7 +393,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     }
     else {
       pMaker->ScaleFromFits(0.00993519916066, 0.00180912524239, -1., 0.,
-			    -1,, 0., -1., 0.,
+			    -1., 0., -1., 0.,
 			    -1., 0., -1., 0.);
     }
   }
@@ -1163,7 +1163,7 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
     }
     else {
       pMaker->ScaleFromFits(0.00993519916066, 0.00180912524239, -1., 0.,
-			    -1,, 0., -1., 0.,
+			    -1., 0., -1., 0.,
 			    -1., 0., -1., 0.);
     }
   }

@@ -2036,6 +2036,8 @@ void PlotMaker::SubtractMCFromQCD() {
 
   vector<TH1D*> h_clones;
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
+    if(mcLayerNumbers[i] > 1) continue;
+
     h_clones.push_back((TH1D*)mcQCDHistograms[i][variableNumber]->Clone(TString(mcQCDHistograms[i][variableNumber]->GetName()) + "_clone"));
     h_clones.back() = (TH1D*)DivideByBinWidth(h_clones.back());
     h_clones.back()->SetFillColor(mcLayerColors[i]);
@@ -2051,7 +2053,7 @@ void PlotMaker::SubtractMCFromQCD() {
   qcd_clone = (TH1D*)DivideByBinWidth(qcd_clone);
 
   qcd_clone->GetXaxis()->SetTitle("#slash{E}_{T} (GeV)");
-  qcd_clone->GetYaxis()->SetTitle("Events");
+  qcd_clone->GetYaxis()->SetTitle("Number of Events / GeV");
 
   qcd_clone->GetYaxis()->SetRangeUser(0.1, qcd_clone->GetMaximum() * 1.4);
 
