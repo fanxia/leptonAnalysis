@@ -1094,17 +1094,17 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 	leadPhotonEt_ = (photons.size() > 0) ? photons[0]->momentum.Et() : -1;
 	leadPhotonEta_ = (photons.size() > 0) ? photons[0]->momentum.Eta() : -1;
 	leadPhotonPhi_ = (photons.size() > 0) ? photons[0]->momentum.Phi() : -1;
-	leadPhoton_chHadIso_ = (photons.size() > 0) ? chargedHadronIso_corrected(*photons[0], event_.rho25) : -1;
+	leadPhoton_chHadIso_ = (photons.size() > 0) ? chargedHadronIso_corrected(*photons[0], event.rho25) : -1;
 	leadPhoton_sIetaIeta_ = (photons.size() > 0) ? photons[0]->sigmaIetaIeta : -1;
 
 	trailPhotonEt_ = (photons.size() > 1) ? photons[1]->momentum.Et() : -1;
 	trailPhotonEta_ = (photons.size() > 1) ? photons[1]->momentum.Eta() : -1;
 	trailPhotonPhi_ = (photons.size() > 1) ? photons[1]->momentum.Phi() : -1;
-	trailPhoton_chHadIso_ = (photons.size() > 1) ? chargedHadronIso_corrected(*photons[1], event_.rho25) : -1;
+	trailPhoton_chHadIso_ = (photons.size() > 1) ? chargedHadronIso_corrected(*photons[1], event.rho25) : -1;
 	trailPhoton_sIetaIeta_ = (photons.size() > 1) ? photons[1]->sigmaIetaIeta : -1;
 
-	photon_invmass_ = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).M();
-	photon_diempt_ = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).Pt();
+	photon_invmass_ = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).M() : -1;
+	photon_diempt_ = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).Pt() : -1;
 	
 	////////////////////
 
