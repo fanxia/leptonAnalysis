@@ -689,7 +689,7 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
   TTree * noSigmaIetaIetaTree = new TTree(channelName+"_noSigmaIetaIetaTree", "tree");
   TTree * noChHadIsoTree = new TTree(channelName+"_noChHadIsoTree", "tree");
 
-  TTree * QCDTree = new TTree(channelName+"_signalTree", "tree");
+  TTree * QCDTree = new TTree(channelName+"_QCDTree", "tree");
   TTree * QCDnoSigmaIetaIetaTree = new TTree(channelName+"_QCDnoSigmaIetaIetaTree", "tree");
   TTree * QCDnoChHadIsoTree = new TTree(channelName+"_QCDnoChHadIsoTree", "tree");
 
