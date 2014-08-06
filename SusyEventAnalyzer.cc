@@ -651,6 +651,538 @@ void SusyEventAnalyzer::Data() {
 
 }
 
+void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
+
+  TFile* out = new TFile("hist_"+outputName+"_"+btagger+".root", "RECREATE");
+  out->cd();
+
+  const int NCNT = 50;
+  int nCnt[NCNT][nChannels];
+  for(int i = 0; i < NCNT; i++) {
+    for(int j = 0; j < nChannels; j++) {
+      nCnt[i][j] = 0;
+    }
+  }
+
+  TH1D * h_dR_gamma_ele = new TH1D("dR_gamma_ele", "dR between photons and electrons (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_muon = new TH1D("dR_gamma_muon", "dR between photons and muons (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_jet = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
+  TH1D * h_dR_gamma_photon = new TH1D("dR_gamma_photon", "dR between photons and other photons (N-1)", 100, 0, 10);
+
+  /////////////////////////////////
+  // Reweighting trees
+  /////////////////////////////////
+
+  Float_t pfMET_, Njets_, Nbtags_, Nphotons_, HT_, HT_jets_, hadronic_pt_,
+    leadLeptonPt_, leadLeptonPhi_, leadLeptonEta_,
+    trailLeptonPt_, trailLeptonPhi_, trailLeptonEta_,
+    leadPhotonEt_, leadPhotonEta_, leadPhotonPhi_, leadPhoton_chHadIso_, leadPhoton_sIetaIeta_,
+    trailPhotonEt_, trailPhotonEta_, trailPhotonPhi_, trailPhoton_chHadIso_, trailPhoton_sIetaIeta_,
+    photon_invmass_, photon_diempt_,
+    z_invmass_, z_diempt_,
+    zg_invmass_, zgg_invmass_,
+    nPV_;
+
+  TString channelName = (runElectrons) ? "ele" : "muon";
+
+  TTree * signalTree = new TTree(channelName+"_signalTree", "tree");
+  TTree * noSigmaIetaIetaTree = new TTree(channelName+"_noSigmaIetaIetaTree", "tree");
+  TTree * noChHadIsoTree = new TTree(channelName+"_noChHadIsoTree", "tree");
+
+  TTree * QCDTree = new TTree(channelName+"_signalTree", "tree");
+  TTree * QCDnoSigmaIetaIetaTree = new TTree(channelName+"_QCDnoSigmaIetaIetaTree", "tree");
+  TTree * QCDnoChHadIsoTree = new TTree(channelName+"_QCDnoChHadIsoTree", "tree");
+
+  signalTree->Branch("pfMET", &pfMET_);
+  noSigmaIetaIetaTree->Branch("pfMET", &pfMET_);
+  noChHadIsoTree->Branch("pfMET", &pfMET_);
+  QCDTree->Branch("pfMET", &pfMET_);
+  QCDnoSigmaIetaIetaTree->Branch("pfMET", &pfMET_);
+  QCDnoChHadIsoTree->Branch("pfMET", &pfMET_);
+
+  signalTree->Branch("Njets", &Njets_);
+  noSigmaIetaIetaTree->Branch("Njets", &Njets_);
+  noChHadIsoTree->Branch("Njets", &Njets_);
+  QCDTree->Branch("Njets", &Njets_);
+  QCDnoSigmaIetaIetaTree->Branch("Njets", &Njets_);
+  QCDnoChHadIsoTree->Branch("Njets", &Njets_);
+
+  signalTree->Branch("HT", &HT_);
+  noSigmaIetaIetaTree->Branch("HT", &HT_);
+  noChHadIsoTree->Branch("HT", &HT_);
+  QCDTree->Branch("HT", &HT_);
+  QCDnoSigmaIetaIetaTree->Branch("HT", &HT_);
+  QCDnoChHadIsoTree->Branch("HT", &HT_);
+
+  signalTree->Branch("HT_jets", &HT_jets_);
+  noSigmaIetaIetaTree->Branch("HT_jets", &HT_jets_);
+  noChHadIsoTree->Branch("HT_jets", &HT_jets_);
+  QCDTree->Branch("HT_jets", &HT_jets_);
+  QCDnoSigmaIetaIetaTree->Branch("HT_jets", &HT_jets_);
+  QCDnoChHadIsoTree->Branch("HT_jets", &HT_jets_);
+
+  signalTree->Branch("hadronic_pt", &hadronic_pt_);
+  noSigmaIetaIetaTree->Branch("hadronic_pt", &hadronic_pt_);
+  noChHadIsoTree->Branch("hadronic_pt", &hadronic_pt_);
+  QCDTree->Branch("hadronic_pt", &hadronic_pt_);
+  QCDnoSigmaIetaIetaTree->Branch("hadronic_pt", &hadronic_pt_);
+  QCDnoChHadIsoTree->Branch("hadronic_pt", &hadronic_pt_);
+
+  signalTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  noSigmaIetaIetaTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  noChHadIsoTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  QCDTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  QCDnoSigmaIetaIetaTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  QCDnoChHadIsoTree->Branch("leadLeptonPt", &leadLeptonPt_);
+
+  signalTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  noSigmaIetaIetaTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  noChHadIsoTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  QCDTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  QCDnoSigmaIetaIetaTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  QCDnoChHadIsoTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+
+  signalTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  noSigmaIetaIetaTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  noChHadIsoTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  QCDTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  QCDnoSigmaIetaIetaTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  QCDnoChHadIsoTree->Branch("leadLeptonEta", &leadLeptonEta_);
+
+  signalTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  noSigmaIetaIetaTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  noChHadIsoTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  QCDTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  QCDnoSigmaIetaIetaTree->Branch("leadLeptonPt", &leadLeptonPt_);
+  QCDnoChHadIsoTree->Branch("leadLeptonPt", &leadLeptonPt_);
+
+  signalTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  noSigmaIetaIetaTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  noChHadIsoTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  QCDTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  QCDnoSigmaIetaIetaTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+  QCDnoChHadIsoTree->Branch("leadLeptonPhi", &leadLeptonPhi_);
+
+  signalTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  noSigmaIetaIetaTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  noChHadIsoTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  QCDTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  QCDnoSigmaIetaIetaTree->Branch("leadLeptonEta", &leadLeptonEta_);
+  QCDnoChHadIsoTree->Branch("leadLeptonEta", &leadLeptonEta_);
+
+  signalTree->Branch("leadPhotonEt", &leadPhotonEt_);
+  noSigmaIetaIetaTree->Branch("leadPhotonEt", &leadPhotonEt_);
+  noChHadIsoTree->Branch("leadPhotonEt", &leadPhotonEt_);
+  QCDTree->Branch("leadPhotonEt", &leadPhotonEt_);
+  QCDnoSigmaIetaIetaTree->Branch("leadPhotonEt", &leadPhotonEt_);
+  QCDnoChHadIsoTree->Branch("leadPhotonEt", &leadPhotonEt_);
+
+  signalTree->Branch("leadPhotonEta", &leadPhotonEta_);
+  noSigmaIetaIetaTree->Branch("leadPhotonEta", &leadPhotonEta_);
+  noChHadIsoTree->Branch("leadPhotonEta", &leadPhotonEta_);
+  QCDTree->Branch("leadPhotonEta", &leadPhotonEta_);
+  QCDnoSigmaIetaIetaTree->Branch("leadPhotonEta", &leadPhotonEta_);
+  QCDnoChHadIsoTree->Branch("leadPhotonEta", &leadPhotonEta_);
+
+  signalTree->Branch("leadPhotonPhi", &leadPhotonPhi_);
+  noSigmaIetaIetaTree->Branch("leadPhotonPhi", &leadPhotonPhi_);
+  noChHadIsoTree->Branch("leadPhotonPhi", &leadPhotonPhi_);
+  QCDTree->Branch("leadPhotonPhi", &leadPhotonPhi_);
+  QCDnoSigmaIetaIetaTree->Branch("leadPhotonPhi", &leadPhotonPhi_);
+  QCDnoChHadIsoTree->Branch("leadPhotonPhi", &leadPhotonPhi_);
+  
+  signalTree->Branch("leadPhoton_chHadIso", &leadPhoton_chHadIso_);
+  noSigmaIetaIetaTree->Branch("leadPhoton_chHadIso", &leadPhoton_chHadIso_);
+  noChHadIsoTree->Branch("leadPhoton_chHadIso", &leadPhoton_chHadIso_);
+  QCDTree->Branch("leadPhoton_chHadIso", &leadPhoton_chHadIso_);
+  QCDnoSigmaIetaIetaTree->Branch("leadPhoton_chHadIso", &leadPhoton_chHadIso_);
+  QCDnoChHadIsoTree->Branch("leadPhoton_chHadIso", &leadPhoton_chHadIso_);
+
+  signalTree->Branch("leadPhoton_sIetaIeta", &leadPhoton_sIetaIeta_);
+  noSigmaIetaIetaTree->Branch("leadPhoton_sIetaIeta", &leadPhoton_sIetaIeta_);
+  noChHadIsoTree->Branch("leadPhoton_sIetaIeta", &leadPhoton_sIetaIeta_);
+  QCDTree->Branch("leadPhoton_sIetaIeta", &leadPhoton_sIetaIeta_);
+  QCDnoSigmaIetaIetaTree->Branch("leadPhoton_sIetaIeta", &leadPhoton_sIetaIeta_);
+  QCDnoChHadIsoTree->Branch("leadPhoton_sIetaIeta", &leadPhoton_sIetaIeta_);
+
+  signalTree->Branch("trailPhotonEt", &trailPhotonEt_);
+  noSigmaIetaIetaTree->Branch("trailPhotonEt", &trailPhotonEt_);
+  noChHadIsoTree->Branch("trailPhotonEt", &trailPhotonEt_);
+  QCDTree->Branch("trailPhotonEt", &trailPhotonEt_);
+  QCDnoSigmaIetaIetaTree->Branch("trailPhotonEt", &trailPhotonEt_);
+  QCDnoChHadIsoTree->Branch("trailPhotonEt", &trailPhotonEt_);
+
+  signalTree->Branch("trailPhotonEta", &trailPhotonEta_);
+  noSigmaIetaIetaTree->Branch("trailPhotonEta", &trailPhotonEta_);
+  noChHadIsoTree->Branch("trailPhotonEta", &trailPhotonEta_);
+  QCDTree->Branch("trailPhotonEta", &trailPhotonEta_);
+  QCDnoSigmaIetaIetaTree->Branch("trailPhotonEta", &trailPhotonEta_);
+  QCDnoChHadIsoTree->Branch("trailPhotonEta", &trailPhotonEta_);
+
+  signalTree->Branch("trailPhotonPhi", &trailPhotonPhi_);
+  noSigmaIetaIetaTree->Branch("trailPhotonPhi", &trailPhotonPhi_);
+  noChHadIsoTree->Branch("trailPhotonPhi", &trailPhotonPhi_);
+  QCDTree->Branch("trailPhotonPhi", &trailPhotonPhi_);
+  QCDnoSigmaIetaIetaTree->Branch("trailPhotonPhi", &trailPhotonPhi_);
+  QCDnoChHadIsoTree->Branch("trailPhotonPhi", &trailPhotonPhi_);
+
+  signalTree->Branch("trailPhoton_chHadIso", &trailPhoton_chHadIso_);
+  noSigmaIetaIetaTree->Branch("trailPhoton_chHadIso", &trailPhoton_chHadIso_);
+  noChHadIsoTree->Branch("trailPhoton_chHadIso", &trailPhoton_chHadIso_);
+  QCDTree->Branch("trailPhoton_chHadIso", &trailPhoton_chHadIso_);
+  QCDnoSigmaIetaIetaTree->Branch("trailPhoton_chHadIso", &trailPhoton_chHadIso_);
+  QCDnoChHadIsoTree->Branch("trailPhoton_chHadIso", &trailPhoton_chHadIso_);
+
+  signalTree->Branch("trailPhoton_sIetaIeta", &trailPhoton_sIetaIeta_);
+  noSigmaIetaIetaTree->Branch("trailPhoton_sIetaIeta", &trailPhoton_sIetaIeta_);
+  noChHadIsoTree->Branch("trailPhoton_sIetaIeta", &trailPhoton_sIetaIeta_);
+  QCDTree->Branch("trailPhoton_sIetaIeta", &trailPhoton_sIetaIeta_);
+  QCDnoSigmaIetaIetaTree->Branch("trailPhoton_sIetaIeta", &trailPhoton_sIetaIeta_);
+  QCDnoChHadIsoTree->Branch("trailPhoton_sIetaIeta", &trailPhoton_sIetaIeta_);
+
+  signalTree->Branch("photon_invmass", &photon_invmass_);
+  noSigmaIetaIetaTree->Branch("photon_invmass", &photon_invmass_);
+  noChHadIsoTree->Branch("photon_invmass", &photon_invmass_);
+  QCDTree->Branch("photon_invmass", &photon_invmass_);
+  QCDnoSigmaIetaIetaTree->Branch("photon_invmass", &photon_invmass_);
+  QCDnoChHadIsoTree->Branch("photon_invmass", &photon_invmass_);
+
+  signalTree->Branch("photon_diempt", &photon_diempt_);
+  noSigmaIetaIetaTree->Branch("photon_diempt", &photon_diempt_);
+  noChHadIsoTree->Branch("photon_diempt", &photon_diempt_);
+  QCDTree->Branch("photon_diempt", &photon_diempt_);
+  QCDnoSigmaIetaIetaTree->Branch("photon_diempt", &photon_diempt_);
+  QCDnoChHadIsoTree->Branch("photon_diempt", &photon_diempt_);
+
+  signalTree->Branch("z_invmass", &z_invmass_);
+  noSigmaIetaIetaTree->Branch("z_invmass", &z_invmass_);
+  noChHadIsoTree->Branch("z_invmass", &z_invmass_);
+  QCDTree->Branch("z_invmass", &z_invmass_);
+  QCDnoSigmaIetaIetaTree->Branch("z_invmass", &z_invmass_);
+  QCDnoChHadIsoTree->Branch("z_invmass", &z_invmass_);
+
+  signalTree->Branch("z_diempt", &z_diempt_);
+  noSigmaIetaIetaTree->Branch("z_diempt", &z_diempt_);
+  noChHadIsoTree->Branch("z_diempt", &z_diempt_);
+  QCDTree->Branch("z_diempt", &z_diempt_);
+  QCDnoSigmaIetaIetaTree->Branch("z_diempt", &z_diempt_);
+  QCDnoChHadIsoTree->Branch("z_diempt", &z_diempt_);
+
+  signalTree->Branch("nPV", &nPV_);
+  noSigmaIetaIetaTree->Branch("nPV", &nPV_);
+  noChHadIsoTree->Branch("nPV", &nPV_);
+  QCDTree->Branch("nPV", &nPV_);
+  QCDnoSigmaIetaIetaTree->Branch("nPV", &nPV_);
+  QCDnoChHadIsoTree->Branch("nPV", &nPV_);
+
+  ScaleFactorInfo sf(btagger);
+
+  bool quitAfterProcessing = false;
+
+  Long64_t nEntries = fTree->GetEntries();
+  cout << "Total events in files : " << nEntries << endl;
+  cout << "Events to be processed : " << processNEvents << endl;
+
+  vector<susy::Muon*> tightMuons, looseMuons;
+  vector<susy::Electron*> tightEles, looseEles;
+  vector<susy::PFJet*> pfJets, btags;
+  vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
+  vector<susy::Photon*> photons;
+  vector<BtagInfo> tagInfos;
+
+  // start event looping
+  Long64_t jentry = 0;
+  while(jentry != processNEvents && event.getEntry(jentry++) != 0) {
+
+    if(printLevel > 0 || (printInterval > 0 && (jentry >= printInterval && jentry%printInterval == 0))) {
+      cout << int(jentry) << " events processed with run = " << event.runNumber << ", event = " << event.eventNumber << endl;
+    }
+    
+    nCnt[0][0]++; // events
+
+    if(useJson && event.isRealData && !IsGoodLumi(event.runNumber, event.luminosityBlockNumber)) continue;
+    nCnt[1][0]++;
+
+    if(event.isRealData) {
+      if(event.passMetFilters() != 1 ||
+	 event.passMetFilter(susy::kEcalLaserCorr) != 1 ||
+	 event.passMetFilter(susy::kManyStripClus53X) != 1 ||
+	 event.passMetFilter(susy::kTooManyStripClus53X) != 1) {
+	nCnt[21][0]++;
+	continue;
+      }
+    }
+
+    int nPVertex = GetNumberPV(event);
+    if(nPVertex == 0) {
+      nCnt[22][0]++;
+      continue;
+    }
+
+    for(int qcdMode = kSignal; qcdMode < kNumSearchModes; qcdMode++) {
+
+      if(runElectrons && qcdMode == kMuonQCD) continue;
+      if(!runElectrons && qcdMode == kElectronQCD) continue;
+
+      for(int photonMode = kSignalPhotons; photonMode < kNumPhotonModes; photonMode++) {
+
+	float HT = 0.;
+	
+	tightMuons.clear();
+	looseMuons.clear();
+	tightEles.clear();
+	looseEles.clear();
+	pfJets.clear();
+	btags.clear();
+	pfJets_corrP4.clear();
+	btags_corrP4.clear();
+	csvValues.clear();
+	photons.clear();
+	tagInfos.clear();
+	
+	findMuons(event, tightMuons, looseMuons, HT, qcdMode);
+	if(runElectrons && (tightMuons.size() > 0 || looseMuons.size() > 0)) continue;
+	if(!runElectrons && tightMuons.size() < 1) continue;
+
+	findElectrons(event, tightMuons, looseMuons, tightEles, looseEles, HT, qcdMode);
+	if(!runElectrons && (tightEles.size() > 0 || looseEles.size() > 0)) continue;
+	if(runElectrons && tightEles.size() < 1) continue;
+
+	if(runElectrons && (tightEles.size() + looseElese.size() != 2)) continue;
+	if(!runElectrons && (tightMuons.size() + looseMuons.size() != 2)) continue;
+	
+	bool passHLT = true;
+	if(useTrigger) {
+	  if(tightEles.size() >= 1) passHLT = PassTriggers(1);
+
+	  else if(tightMuons.size() >= 1) {
+	    if(qcdMode == kSignal) passHLT = PassTriggers(2);
+	    if(kSignal == kMuonQCD) passHLT = PassTriggers(3);
+	  }
+	}
+	if(!passHLT) {
+	  nCnt[25][qcdMode]++;
+	  continue;
+	}
+	
+	float HT_jets = 0.;
+	TLorentzVector hadronicSystem(0., 0., 0., 0.);
+	
+	findJets(event, 
+		 tightMuons, looseMuons,
+		 tightEles, looseEles,
+		 pfJets, btags,
+		 sf,
+		 tagInfos, csvValues, 
+		 pfJets_corrP4, btags_corrP4, 
+		 HT_jets, hadronicSystem);
+	
+	findPhotons(event, 
+		    photons,
+		    pfJets_corrP4,
+		    tightMuons, looseMuons,
+		    tightEles, looseEles,
+		    HT,
+		    h_dR_gamma_ele,
+		    h_dR_gamma_muon,
+		    h_dR_gamma_jet,
+		    h_dR_gamma_photon,
+		    (photonMode != kNoSigmaIetaIeta), (photonMode != kNoChHadIso));
+	
+	susy::MET* pfMet = &(event.metMap.find("pfMet")->second);
+	pfMET_ = pfMet->met();
+
+	Njets_ = pfJets.size();
+	Nbtags_ = btags.size();
+	Nphotons_ = photons.size();
+	HT_jets_ = HT_jets;
+	HT_ = HT + HT_jets;
+	hadronic_pt_ = hadronicSystem.Pt();
+	nPV_ = nPVertex;
+
+	if(runElectrons) {
+	  if(tightEles.size() == 2) {
+	    leadLeptonPt_ = tightEles[0]->momentum.Pt();
+	    leadLeptonPhi_ = tightEles[0]->momentum.Phi();
+	    leadLeptonEta_ = tightEles[0]->momentum.Eta();
+
+	    trailLeptonPt_ = tightEles[1]->momentum.Pt();
+	    trailLeptonPhi_ = tightEles[1]->momentum.Phi();
+	    trailLeptonEta_ = tightEles[1]->momentum.Eta();
+
+	    z_invmass_ = (tightEles[0]->momentum + tightEles[1]->momentum).M();
+	    z_diempt_ = (tightEles[0]->momentum + tightEles[1]->momentum).Pt();
+	    zg_invmass_ = (photons.size() > 0) ? (tightEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum).M();
+	    zgg_invmass_ = (photons.size() > 1) ? (tightEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	  }
+	  else if(tightEles[0]->momentum.Pt() >= looseEles[0]->momentum.Pt()) {
+	    leadLeptonPt_ = tightEles[0]->momentum.Pt();
+	    leadLeptonPhi_ = tightEles[0]->momentum.Phi();
+	    leadLeptonEta_ = tightEles[0]->momentum.Eta();
+
+	    trailLeptonPt_ = looseEles[1]->momentum.Pt();
+	    trailLeptonPhi_ = looseEles[1]->momentum.Phi();
+	    trailLeptonEta_ = looseEles[1]->momentum.Eta();
+
+	    z_invmass_ = (tightEles[0]->momentum + looseEles[1]->momentum).M();
+	    z_diempt_ = (tightEles[0]->momentum + looseEles[1]->momentum).Pt();
+	    zg_invmass_ = (photons.size() > 0) ? (tightEles[0]->momentum + looseEles[1]->momentum + photons[0]->momentum).M();
+	    zgg_invmass_ = (photons.size() > 1) ? (tightEles[0]->momentum + looseEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	  }
+	  else {
+	    leadLeptonPt_ = looseEles[0]->momentum.Pt();
+	    leadLeptonPhi_ = looseEles[0]->momentum.Phi();
+	    leadLeptonEta_ = looseEles[0]->momentum.Eta();
+
+	    trailLeptonPt_ = tightEles[1]->momentum.Pt();
+	    trailLeptonPhi_ = tightEles[1]->momentum.Phi();
+	    trailLeptonEta_ = tightEles[1]->momentum.Eta();
+
+	    z_invmass_ = (looseEles[0]->momentum + tightEles[1]->momentum).M();
+	    z_diempt_ = (looseEles[0]->momentum + tightEles[1]->momentum).Pt();
+	    zg_invmass_ = (photons.size() > 0) ? (looseEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum).M();
+	    zgg_invmass_ = (photons.size() > 1) ? (looseEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	  }
+	}
+
+	else {
+	  if(tightMuons.size() == 2) {
+	    leadLeptonPt_ = tightMuons[0]->momentum.Pt();
+	    leadLeptonPhi_ = tightMuons[0]->momentum.Phi();
+	    leadLeptonEta_ = tightMuons[0]->momentum.Eta();
+
+	    trailLeptonPt_ = tightMuons[1]->momentum.Pt();
+	    trailLeptonPhi_ = tightMuons[1]->momentum.Phi();
+	    trailLeptonEta_ = tightMuons[1]->momentum.Eta();
+
+	    z_invmass_ = (tightMuons[0]->momentum + tightMuons[1]->momentum).M();
+	    z_diempt_ = (tightMuons[0]->momentum + tightMuons[1]->momentum).Pt();
+	    zg_invmass_ = (photons.size() > 0) ? (tightMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum).M();
+	    zgg_invmass_ = (photons.size() > 1) ? (tightMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	  }
+	  else if(tightMuons[0]->momentum.Pt() >= looseMuons[0]->momentum.Pt()) {
+	    leadLeptonPt_ = tightMuons[0]->momentum.Pt();
+	    leadLeptonPhi_ = tightMuons[0]->momentum.Phi();
+	    leadLeptonEta_ = tightMuons[0]->momentum.Eta();
+
+	    trailLeptonPt_ = looseMuons[1]->momentum.Pt();
+	    trailLeptonPhi_ = looseMuons[1]->momentum.Phi();
+	    trailLeptonEta_ = looseMuons[1]->momentum.Eta();
+
+	    z_invmass_ = (tightMuons[0]->momentum + looseMuons[1]->momentum).M();
+	    z_diempt_ = (tightMuons[0]->momentum + looseMuons[1]->momentum).Pt();
+	    zg_invmass_ = (photons.size() > 0) ? (tightMuons[0]->momentum + looseMuons[1]->momentum + photons[0]->momentum).M();
+	    zgg_invmass_ = (photons.size() > 1) ? (tightMuons[0]->momentum + looseMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	  }
+	  else {
+	    leadLeptonPt_ = looseMuons[0]->momentum.Pt();
+	    leadLeptonPhi_ = looseMuons[0]->momentum.Phi();
+	    leadLeptonEta_ = looseMuons[0]->momentum.Eta();
+
+	    trailLeptonPt_ = tightMuons[1]->momentum.Pt();
+	    trailLeptonPhi_ = tightMuons[1]->momentum.Phi();
+	    trailLeptonEta_ = tightMuons[1]->momentum.Eta();
+
+	    z_invmass_ = (looseMuons[0]->momentum + tightMuons[1]->momentum).M();
+	    z_diempt_ = (looseMuons[0]->momentum + tightMuons[1]->momentum).Pt();
+	    zg_invmass_ = (photons.size() > 0) ? (looseMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum).M();
+	    zgg_invmass_ = (photons.size() > 1) ? (looseMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	  }
+	}
+
+	leadPhotonEt_ = (photons.size() > 0) ? photons[0]->momentum.Et() : -1;
+	leadPhotonEta_ = (photons.size() > 0) ? photons[0]->momentum.Eta() : -1;
+	leadPhotonPhi_ = (photons.size() > 0) ? photons[0]->momentum.Phi() : -1;
+	leadPhoton_chHadIso_ = (photons.size() > 0) ? chargedHadronIso_corrected(*photons[0], event_.rho25) : -1;
+	leadPhoton_sIetaIeta_ = (photons.size() > 0) ? photons[0]->sigmaIetaIeta : -1;
+
+	trailPhotonEt_ = (photons.size() > 1) ? photons[1]->momentum.Et() : -1;
+	trailPhotonEta_ = (photons.size() > 1) ? photons[1]->momentum.Eta() : -1;
+	trailPhotonPhi_ = (photons.size() > 1) ? photons[1]->momentum.Phi() : -1;
+	trailPhoton_chHadIso_ = (photons.size() > 1) ? chargedHadronIso_corrected(*photons[1], event_.rho25) : -1;
+	trailPhoton_sIetaIeta_ = (photons.size() > 1) ? photons[1]->sigmaIetaIeta : -1;
+
+	photon_invmass_ = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).M();
+	photon_diempt_ = (photons.size() > 1) ? (photons[0]->momentum + photons[1]->momentum).Pt();
+	
+	////////////////////
+
+	if(photonMode == kSignalPhotons) {
+	  if(qcdMode == kSignal) {
+	    nCnt[2][0]++;
+	    signalTree->Fill();
+	  }
+	  else {
+	    nCnt[3][0]++;
+	    QCDTree->Fill();
+	  }
+	}
+	  
+	if(photonMode == kNoSigmaIetaIeta) {
+	  if(qcdMode == kSignal) {
+	    nCnt[5][0]++;
+	    noSigmaIetaIetaTree->Fill();
+	  }
+	  else {
+	    nCnt[6][0]++;
+	    QCDnoSigmaIetaIetaTree->Fill();
+	  }
+	}
+
+	if(photonMode == kNoChHadIso) {
+	  if(qcdMode == kSignal) {
+	    nCnt[8][0]++;
+	    noChHadIsoTree->Fill();
+	  }
+	  else {
+	    nCnt[9][0]++;
+	    QCDnoChHadIsoTree->Fill();
+	  }
+	}
+
+	///////////////////////////////////
+    
+      } // for photon modes
+
+    } // for qcd modes
+    
+    if(quitAfterProcessing) break;
+  } // for entries
+  
+  cout << "-------------------Job Summary-----------------" << endl;
+  cout << "Total_events         : " << nCnt[0][0] << endl;
+  cout << "in_JSON              : " << nCnt[1][0] << endl;
+  cout << "-----------------------------------------------" << endl;
+  cout << endl;
+  for(int i = 0; i < nChannels; i++) {
+    cout << "--------------- " << channels[i] << " Requirement ----------------" << endl;
+    cout << "Signal               " << channels[i] << " events : " << nCnt[2][i] << endl;
+    cout << "eQCD                 " << channels[i] << " events : " << nCnt[3][i] << endl;
+    cout << "muQCD                " << channels[i] << " events : " << nCnt[4][i] << endl;
+    cout << "noSigmaIetaIeta      " << channels[i] << " events : " << nCnt[5][i] << endl;
+    cout << "eQCDnoSigmaIetaIeta  " << channels[i] << " events : " << nCnt[6][i] << endl;
+    cout << "muQCDnoSigmaIetaIeta " << channels[i] << " events : " << nCnt[7][i] << endl;
+    cout << "noChHadIso           " << channels[i] << " events : " << nCnt[8][i] << endl;
+    cout << "eQCDnoChHadIso       " << channels[i] << " events : " << nCnt[9][i] << endl;
+    cout << "muQCDnoChHadIso      " << channels[i] << " events : " << nCnt[10][i] << endl;
+  }
+  cout << "-----------------------------------------------" << endl;
+  cout << endl;
+  cout << "----------------Continues, info----------------" << endl;
+  cout << "fail MET filters         : " << nCnt[21][0] << endl;
+  cout << "No primary vertex        : " << nCnt[22][0] << endl;
+  cout << "Fail signal HLT          : " << nCnt[25][0] << endl;
+  cout << "Fail eQCD HLT            : " << nCnt[25][1] << endl;
+  cout << "Fail muQCD HLT           : " << nCnt[25][2] << endl;
+  cout << "-----------------------------------------------" << endl;
+  cout << endl;
+
+  out->cd();
+  out->Write();
+  out->Close();
+
+}
+
 void SusyEventAnalyzer::Acceptance() {
 
   const int NCNT = 50;
