@@ -888,6 +888,7 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
   vector<susy::PFJet*> pfJets, btags;
   vector<TLorentzVector> pfJets_corrP4, btags_corrP4;
   vector<susy::Photon*> photons;
+  vector<float> csvValues;
   vector<BtagInfo> tagInfos;
 
   // start event looping
@@ -948,7 +949,7 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 	if(!runElectrons && (tightEles.size() > 0 || looseEles.size() > 0)) continue;
 	if(runElectrons && tightEles.size() < 1) continue;
 
-	if(runElectrons && (tightEles.size() + looseElese.size() != 2)) continue;
+	if(runElectrons && (tightEles.size() + looseEles.size() != 2)) continue;
 	if(!runElectrons && (tightMuons.size() + looseMuons.size() != 2)) continue;
 	
 	bool passHLT = true;
@@ -1012,8 +1013,8 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 
 	    z_invmass_ = (tightEles[0]->momentum + tightEles[1]->momentum).M();
 	    z_diempt_ = (tightEles[0]->momentum + tightEles[1]->momentum).Pt();
-	    zg_invmass_ = (photons.size() > 0) ? (tightEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum).M();
-	    zgg_invmass_ = (photons.size() > 1) ? (tightEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	    zg_invmass_ = (photons.size() > 0) ? (tightEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum).M() : -1;
+	    zgg_invmass_ = (photons.size() > 1) ? (tightEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M() : -1;
 	  }
 	  else if(tightEles[0]->momentum.Pt() >= looseEles[0]->momentum.Pt()) {
 	    leadLeptonPt_ = tightEles[0]->momentum.Pt();
@@ -1026,8 +1027,8 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 
 	    z_invmass_ = (tightEles[0]->momentum + looseEles[1]->momentum).M();
 	    z_diempt_ = (tightEles[0]->momentum + looseEles[1]->momentum).Pt();
-	    zg_invmass_ = (photons.size() > 0) ? (tightEles[0]->momentum + looseEles[1]->momentum + photons[0]->momentum).M();
-	    zgg_invmass_ = (photons.size() > 1) ? (tightEles[0]->momentum + looseEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	    zg_invmass_ = (photons.size() > 0) ? (tightEles[0]->momentum + looseEles[1]->momentum + photons[0]->momentum).M() : -1;
+	    zgg_invmass_ = (photons.size() > 1) ? (tightEles[0]->momentum + looseEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M() : -1;
 	  }
 	  else {
 	    leadLeptonPt_ = looseEles[0]->momentum.Pt();
@@ -1040,8 +1041,8 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 
 	    z_invmass_ = (looseEles[0]->momentum + tightEles[1]->momentum).M();
 	    z_diempt_ = (looseEles[0]->momentum + tightEles[1]->momentum).Pt();
-	    zg_invmass_ = (photons.size() > 0) ? (looseEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum).M();
-	    zgg_invmass_ = (photons.size() > 1) ? (looseEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	    zg_invmass_ = (photons.size() > 0) ? (looseEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum).M() : -1;
+	    zgg_invmass_ = (photons.size() > 1) ? (looseEles[0]->momentum + tightEles[1]->momentum + photons[0]->momentum + photons[1]->momentum).M() : -1;
 	  }
 	}
 
@@ -1057,8 +1058,8 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 
 	    z_invmass_ = (tightMuons[0]->momentum + tightMuons[1]->momentum).M();
 	    z_diempt_ = (tightMuons[0]->momentum + tightMuons[1]->momentum).Pt();
-	    zg_invmass_ = (photons.size() > 0) ? (tightMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum).M();
-	    zgg_invmass_ = (photons.size() > 1) ? (tightMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	    zg_invmass_ = (photons.size() > 0) ? (tightMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum).M() : -1;
+	    zgg_invmass_ = (photons.size() > 1) ? (tightMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M() : -1;
 	  }
 	  else if(tightMuons[0]->momentum.Pt() >= looseMuons[0]->momentum.Pt()) {
 	    leadLeptonPt_ = tightMuons[0]->momentum.Pt();
@@ -1071,8 +1072,8 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 
 	    z_invmass_ = (tightMuons[0]->momentum + looseMuons[1]->momentum).M();
 	    z_diempt_ = (tightMuons[0]->momentum + looseMuons[1]->momentum).Pt();
-	    zg_invmass_ = (photons.size() > 0) ? (tightMuons[0]->momentum + looseMuons[1]->momentum + photons[0]->momentum).M();
-	    zgg_invmass_ = (photons.size() > 1) ? (tightMuons[0]->momentum + looseMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	    zg_invmass_ = (photons.size() > 0) ? (tightMuons[0]->momentum + looseMuons[1]->momentum + photons[0]->momentum).M() : -1;
+	    zgg_invmass_ = (photons.size() > 1) ? (tightMuons[0]->momentum + looseMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M() : -1;
 	  }
 	  else {
 	    leadLeptonPt_ = looseMuons[0]->momentum.Pt();
@@ -1085,8 +1086,8 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 
 	    z_invmass_ = (looseMuons[0]->momentum + tightMuons[1]->momentum).M();
 	    z_diempt_ = (looseMuons[0]->momentum + tightMuons[1]->momentum).Pt();
-	    zg_invmass_ = (photons.size() > 0) ? (looseMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum).M();
-	    zgg_invmass_ = (photons.size() > 1) ? (looseMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M();
+	    zg_invmass_ = (photons.size() > 0) ? (looseMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum).M() : -1;
+	    zgg_invmass_ = (photons.size() > 1) ? (looseMuons[0]->momentum + tightMuons[1]->momentum + photons[0]->momentum + photons[1]->momentum).M() : -1;
 	  }
 	}
 
