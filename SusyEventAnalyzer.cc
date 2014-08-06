@@ -700,6 +700,13 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
   QCDnoSigmaIetaIetaTree->Branch("pfMET", &pfMET_);
   QCDnoChHadIsoTree->Branch("pfMET", &pfMET_);
 
+  signalTree->Branch("Nphotons", &Nphotons_);
+  noSigmaIetaIetaTree->Branch("Nphotons", &Nphotons_);
+  noChHadIsoTree->Branch("Nphotons", &Nphotons_);
+  QCDTree->Branch("Nphotons", &Nphotons_);
+  QCDnoSigmaIetaIetaTree->Branch("Nphotons", &Nphotons_);
+  QCDnoChHadIsoTree->Branch("Nphotons", &Nphotons_);
+
   signalTree->Branch("Njets", &Njets_);
   noSigmaIetaIetaTree->Branch("Njets", &Njets_);
   noChHadIsoTree->Branch("Njets", &Njets_);
@@ -867,6 +874,20 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
   QCDTree->Branch("z_diempt", &z_diempt_);
   QCDnoSigmaIetaIetaTree->Branch("z_diempt", &z_diempt_);
   QCDnoChHadIsoTree->Branch("z_diempt", &z_diempt_);
+
+  signalTree->Branch("zg_invmass", &zg_invmass_);
+  noSigmaIetaIetaTree->Branch("zg_invmass", &zg_invmass_);
+  noChHadIsoTree->Branch("zg_invmass", &zg_invmass_);
+  QCDTree->Branch("zg_invmass", &zg_invmass_);
+  QCDnoSigmaIetaIetaTree->Branch("zg_invmass", &zg_invmass_);
+  QCDnoChHadIsoTree->Branch("zg_invmass", &zg_invmass_);
+
+  signalTree->Branch("zgg_invmass", &zgg_invmass_);
+  noSigmaIetaIetaTree->Branch("zgg_invmass", &zgg_invmass_);
+  noChHadIsoTree->Branch("zgg_invmass", &zgg_invmass_);
+  QCDTree->Branch("zgg_invmass", &zgg_invmass_);
+  QCDnoSigmaIetaIetaTree->Branch("zgg_invmass", &zgg_invmass_);
+  QCDnoChHadIsoTree->Branch("zgg_invmass", &zgg_invmass_);
 
   signalTree->Branch("nPV", &nPV_);
   noSigmaIetaIetaTree->Branch("nPV", &nPV_);
