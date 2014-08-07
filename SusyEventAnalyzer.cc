@@ -1623,15 +1623,6 @@ void SusyEventAnalyzer::ZGammaMC(bool runElectrons) {
   TH1D * h_dR_gamma_jet = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
   TH1D * h_dR_gamma_photon = new TH1D("dR_gamma_photon", "dR between photons and other photons (N-1)", 100, 0, 10);
 
-  TString varNames[nTreeVariables] = {
-    "nPV",
-    "pileupWeight", "pileupWeightErr", "pileupWeightUp", "pileupWeightDown",
-    "btagWeight", "btagWeightUp", "btagWeightDown", "btagWeightErr",
-    "metFilterBit",
-    "ttbarDecayMode",
-    "overlaps_ttA",
-    "TopPtReweighting"};
-
   Float_t pfMET_, Njets_, Nbtags_, Nphotons_, HT_, HT_jets_, hadronic_pt_,
     leadLeptonPt_, leadLeptonPhi_, leadLeptonEta_,
     trailLeptonPt_, trailLeptonPhi_, trailLeptonEta_,
@@ -1641,6 +1632,7 @@ void SusyEventAnalyzer::ZGammaMC(bool runElectrons) {
     z_invmass_, z_diempt_,
     zg_invmass_, zgg_invmass_,
     nPV_,
+    btagWeight_, btagWeightErr_, btagWeightUp_, btagWeightDown_,
     pileupWeight_, pileupWeightErr_, pileupWeightUp_, pileupWeightDown_,
     TopPtReweighting_;
 
@@ -1885,6 +1877,34 @@ void SusyEventAnalyzer::ZGammaMC(bool runElectrons) {
   QCDnoSigmaIetaIetaTree->Branch("pileupWeightDown", &pileupWeightDown_);
   QCDnoChHadIsoTree->Branch("pileupWeightDown", &pileupWeightDown_);
 
+  signalTree->Branch("btagWeight", &btagWeight_);
+  noSigmaIetaIetaTree->Branch("btagWeight", &btagWeight_);
+  noChHadIsoTree->Branch("btagWeight", &btagWeight_);
+  QCDTree->Branch("btagWeight", &btagWeight_);
+  QCDnoSigmaIetaIetaTree->Branch("btagWeight", &btagWeight_);
+  QCDnoChHadIsoTree->Branch("btagWeight", &btagWeight_);
+  
+  signalTree->Branch("btagWeightErr", &btagWeightErr_);
+  noSigmaIetaIetaTree->Branch("btagWeightErr", &btagWeightErr_);
+  noChHadIsoTree->Branch("btagWeightErr", &btagWeightErr_);
+  QCDTree->Branch("btagWeightErr", &btagWeightErr_);
+  QCDnoSigmaIetaIetaTree->Branch("btagWeightErr", &btagWeightErr_);
+  QCDnoChHadIsoTree->Branch("btagWeightErr", &btagWeightErr_);
+
+  signalTree->Branch("btagWeightUp", &btagWeightUp_);
+  noSigmaIetaIetaTree->Branch("btagWeightUp", &btagWeightUp_);
+  noChHadIsoTree->Branch("btagWeightUp", &btagWeightUp_);
+  QCDTree->Branch("btagWeightUp", &btagWeightUp_);
+  QCDnoSigmaIetaIetaTree->Branch("btagWeightUp", &btagWeightUp_);
+  QCDnoChHadIsoTree->Branch("btagWeightUp", &btagWeightUp_);
+
+  signalTree->Branch("btagWeightDown", &btagWeightDown_);
+  noSigmaIetaIetaTree->Branch("btagWeightDown", &btagWeightDown_);
+  noChHadIsoTree->Branch("btagWeightDown", &btagWeightDown_);
+  QCDTree->Branch("btagWeightDown", &btagWeightDown_);
+  QCDnoSigmaIetaIetaTree->Branch("btagWeightDown", &btagWeightDown_);
+  QCDnoChHadIsoTree->Branch("btagWeightDown", &btagWeightDown_);
+
   signalTree->Branch("TopPtReweighting", &TopPtReweighting_);
   noSigmaIetaIetaTree->Branch("TopPtReweighting", &TopPtReweighting_);
   noChHadIsoTree->Branch("TopPtReweighting", &TopPtReweighting_);
@@ -2032,6 +2052,16 @@ void SusyEventAnalyzer::ZGammaMC(bool runElectrons) {
 		      h_dR_gamma_photon,
 		      (photonMode != kNoSigmaIetaIeta), (photonMode != kNoChHadIso));
 	  
+	  if(btags.size() != 0) continue;
+
+	  BtagWeight * tagWeight = new BtagWeight(0);
+	  pair<float, float> weightResult = tagWeight->weight(tagInfos, btags.size(), 0., false, false);
+	  btagWeight_ = weightResult.first;
+	  btagWeightErr_ = weightResult.second;
+	  btagWeightUp_ = (tagWeight->weight(tagInfos, btags.size(), 1., true, false)).first;
+	  btagWeightDown_ = (tagWeight->weight(tagInfos, btags.size(), -1., true, false)).first;
+	  delete tagWeight;
+	
 	  susy::MET* pfMet = &(event.metMap.find("pfMet")->second);
 	  pfMET_ = pfMet->met();
 	  
