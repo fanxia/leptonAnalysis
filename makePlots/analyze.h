@@ -3940,7 +3940,6 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
   TH2D * h_xsec_errors = (TH2D*)f_xsec->Get("real_errors");
 
   TFile * fSignalOut = new TFile("limitInputs.root", "UPDATE");
-  fSignalOut->cd();
 
   TH2D * h_acc = new TH2D("acc_"+req, "acc_"+req, 30, xbins, 32, ybins);
   TH2D * h_contamination = new TH2D("contamination_"+req, "contamination_"+req, 30, xbins, 32, ybins);
@@ -4087,7 +4086,6 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     tree_contam->SetBranchAddress("pileupWeightDown", &puWeightDown);
     tree_contam->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
-    fSignalOut->cd();
     if(req.Contains("ele")) fSignalOut->cd("ele");
     else fSignalOut->cd("muon");
 
@@ -4359,12 +4357,6 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     h_photonSFup->Scale(xsec * 19712. / 15000.);
     h_photonSFdown->Scale(xsec * 19712. / 15000.);
 
-    f->Close();
-
-    fSignalOut->cd();
-    if(req.Contains("ele")) fSignalOut->cd("ele");
-    else fSignalOut->cd("muon");
-
     h->Write("signal"+code_t);
     h_btagWeightUp->Write("signal"+code_t+"_btagWeightUp");
     h_btagWeightDown->Write("signal"+code_t+"_btagWeightDown");
@@ -4379,11 +4371,11 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     h_photonSFup->Write("signal"+code_t+"_photonSFUp");
     h_photonSFdown->Write("signal"+code_t+"_photonSFDown");
 
+    f->Close();
+
   }
 
   fSignalOut->cd();
-
-  h_acc->Write();
 
   fSignalOut->Write();
   fSignalOut->Close();
