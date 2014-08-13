@@ -4383,128 +4383,128 @@ void PlotMaker::SaveBackgroundOutput() {
 
   h_gg[variableNumber]->Write(req+"/data_obs");
 
-  TH1D * h = mcHistograms[0][variableNumber]->Clone("clone_"+tableNames[0]);
+  TH1D * h = (TH1D*)mcHistograms[0][variableNumber]->Clone("clone_"+tableNames[0]);
   for(unsigned int i = 1; i < mcHistograms.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]);
-      h = mcHistograms[i][variableNumber]->Clone("clone_"+tableNames[i]);
+      h = (TH1D*)mcHistograms[i][variableNumber]->Clone("clone_"+tableNames[i]);
     }
     else h->Add(mcHistograms[i][variableNumber]);
   }
 
-  h = mcHistograms_btagWeightUp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_btagWeightUp");
+  h = (TH1D*)mcHistograms_btagWeightUp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_btagWeightUp");
   for(unsigned int i = 1; i < mcHistograms_btagWeightUp.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_btagWeightUp");
-      h = mcHistograms_btagWeightUp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_btagWeightUp");
+      h = (TH1D*)mcHistograms_btagWeightUp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_btagWeightUp");
     }
     else h->Add(mcHistograms_btagWeightUp[i][variableNumber]);
   }
 
-  h = mcHistograms_durp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_durp");
+  h = (TH1D*)mcHistograms_durp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_durp");
   for(unsigned int i = 1; i < mcHistograms_durp.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_durp");
-      h = mcHistograms_durp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_durp");
+      h = (TH1D*)mcHistograms_durp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_durp");
     }
     else h->Add(mcHistograms_durp[i][variableNumber]);
   }
 
-  h = mcHistograms_btagWeightDown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_btagWeightDown");
+  h = (TH1D*)mcHistograms_btagWeightDown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_btagWeightDown");
   for(unsigned int i = 1; i < mcHistograms_btagWeightDown.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_btagWeightDown");
-      h = mcHistograms_btagWeightDown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_btagWeightDown");
+      h = (TH1D*)mcHistograms_btagWeightDown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_btagWeightDown");
     }
     else h->Add(mcHistograms_btagWeightDown[i][variableNumber]);
   }
 
-  h = mcHistograms_puWeightUp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_puWeightUp");
+  h = (TH1D*)mcHistograms_puWeightUp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_puWeightUp");
   for(unsigned int i = 1; i < mcHistograms_puWeightUp.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_puWeightUp");
-      h = mcHistograms_puWeightUp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_puWeightUp");
+      h = (TH1D*)mcHistograms_puWeightUp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_puWeightUp");
     }
     else h->Add(mcHistograms_puWeightUp[i][variableNumber]);
   }
 
-  h = mcHistograms_puWeightDown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_puWeightDown");
+  h = (TH1D*)mcHistograms_puWeightDown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_puWeightDown");
   for(unsigned int i = 1; i < mcHistograms_puWeightDown.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_puWeightDown");
-      h = mcHistograms_puWeightDown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_puWeightDown");
+      h = (TH1D*)mcHistograms_puWeightDown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_puWeightDown");
     }
     else h->Add(mcHistograms_puWeightDown[i][variableNumber]);
   }
 
-  h = mcHistograms_topPtUp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_topPtUp");
+  h = (TH1D*)mcHistograms_topPtUp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_topPtUp");
   for(unsigned int i = 1; i < mcHistograms_topPtUp.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_topPtUp");
-      h = mcHistograms_topPtUp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_topPtUp");
+      h = (TH1D*)mcHistograms_topPtUp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_topPtUp");
     }
     else h->Add(mcHistograms_topPtUp[i][variableNumber]);
   }
 
-  h = mcHistograms_topPtDown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_topPtDown");
+  h = (TH1D*)mcHistograms_topPtDown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_topPtDown");
   for(unsigned int i = 1; i < mcHistograms_topPtDown.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_topPtDown");
-      h = mcHistograms_topPtDown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_topPtDown");
+      h = (TH1D*)mcHistograms_topPtDown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_topPtDown");
     }
     else h->Add(mcHistograms_topPtDown[i][variableNumber]);
   }
 
-  h = mcHistograms_JECup[0][variableNumber]->Clone("clone_"+tableNames[0]+"_JECUp");
+  h = (TH1D*)mcHistograms_JECup[0][variableNumber]->Clone("clone_"+tableNames[0]+"_JECUp");
   for(unsigned int i = 1; i < mcHistograms_JECup.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_JECUp");
-      h = mcHistograms_JECup[i][variableNumber]->Clone("clone_"+tableNames[i]+"_JECUp");
+      h = (TH1D*)mcHistograms_JECup[i][variableNumber]->Clone("clone_"+tableNames[i]+"_JECUp");
     }
     else h->Add(mcHistograms_JECup[i][variableNumber]);
   }
 
-  h = mcHistograms_JECdown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_JECDown");
+  h = (TH1D*)mcHistograms_JECdown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_JECDown");
   for(unsigned int i = 1; i < mcHistograms_JECdown.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_JECDown");
-      h = mcHistograms_JECdown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_JECDown");
+      h = (TH1D*)mcHistograms_JECdown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_JECDown");
     }
     else h->Add(mcHistograms_JECdown[i][variableNumber]);
   }
 
-  h = mcHistograms_leptonSFup[0][variableNumber]->Clone("clone_"+tableNames[0]+"_leptonSFUp");
+  h = (TH1D*)mcHistograms_leptonSFup[0][variableNumber]->Clone("clone_"+tableNames[0]+"_leptonSFUp");
   for(unsigned int i = 1; i < mcHistograms_leptonSFup.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_leptonSFUp");
-      h = mcHistograms_leptonSFup[i][variableNumber]->Clone("clone_"+tableNames[i]+"_leptonSFUp");
+      h = (TH1D*)mcHistograms_leptonSFup[i][variableNumber]->Clone("clone_"+tableNames[i]+"_leptonSFUp");
     }
     else h->Add(mcHistograms_leptonSFup[i][variableNumber]);
   }
 
-  h = mcHistograms_leptonSFdown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_leptonSFDown");
+  h = (TH1D*)mcHistograms_leptonSFdown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_leptonSFDown");
   for(unsigned int i = 1; i < mcHistograms_leptonSFdown.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_leptonSFDown");
-      h = mcHistograms_leptonSFdown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_leptonSFDown");
+      h = (TH1D*)mcHistograms_leptonSFdown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_leptonSFDown");
     }
     else h->Add(mcHistograms_leptonSFdown[i][variableNumber]);
   }
 
-  h = mcHistograms_photonSFup[0][variableNumber]->Clone("clone_"+tableNames[0]+"_photonSFUp");
+  h = (TH1D*)mcHistograms_photonSFup[0][variableNumber]->Clone("clone_"+tableNames[0]+"_photonSFUp");
   for(unsigned int i = 1; i < mcHistograms_photonSFup.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_photonSFUp");
-      h = mcHistograms_photonSFup[i][variableNumber]->Clone("clone_"+tableNames[i]+"_photonSFUp");
+      h = (TH1D*)mcHistograms_photonSFup[i][variableNumber]->Clone("clone_"+tableNames[i]+"_photonSFUp");
     }
     else h->Add(mcHistograms_photonSFup[i][variableNumber]);
   }
 
-  h = mcHistograms_photonSFdown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_photonSFDown");
+  h = (TH1D*)mcHistograms_photonSFdown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_photonSFDown");
   for(unsigned int i = 1; i < mcHistograms_photonSFdown.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
       h->Write(req+"/"+tableNames[i-1]+"_photonSFDown");
-      h = mcHistograms_photonSFdown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_photonSFDown");
+      h = (TH1D*)mcHistograms_photonSFdown[i][variableNumber]->Clone("clone_"+tableNames[i]+"_photonSFDown");
     }
     else h->Add(mcHistograms_photonSFdown[i][variableNumber]);
   }
