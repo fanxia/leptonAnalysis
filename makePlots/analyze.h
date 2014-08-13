@@ -3940,10 +3940,10 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
   TH2D * h_acc = new TH2D("acc_"+req, "acc_"+req, 30, xbins, 32, ybins);
   TH2D * h_contamination = new TH2D("contamination_"+req, "contamination_"+req, 30, xbins, 32, ybins);
 
-  for(int i = 0; i < 899; i++) {
+  for(int imass = 0; imass < 899; imass++) {
 
-    index1 = mst[int(i)/31];
-    index2 = mBino[int(i)%31];
+    index1 = mst[int(imass)/31];
+    index2 = mBino[int(imass)%31];
 
     if(index1 < index2) continue;
 
@@ -4399,15 +4399,6 @@ void PlotMaker::SaveBackgroundOutput() {
       h = (TH1D*)mcHistograms_btagWeightUp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_btagWeightUp");
     }
     else h->Add(mcHistograms_btagWeightUp[i][variableNumber]);
-  }
-
-  h = (TH1D*)mcHistograms_durp[0][variableNumber]->Clone("clone_"+tableNames[0]+"_durp");
-  for(unsigned int i = 1; i < mcHistograms_durp.size(); i++) {
-    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
-      h->Write(req+"/"+tableNames[i-1]+"_durp");
-      h = (TH1D*)mcHistograms_durp[i][variableNumber]->Clone("clone_"+tableNames[i]+"_durp");
-    }
-    else h->Add(mcHistograms_durp[i][variableNumber]);
   }
 
   h = (TH1D*)mcHistograms_btagWeightDown[0][variableNumber]->Clone("clone_"+tableNames[0]+"_btagWeightDown");
