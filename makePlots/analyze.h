@@ -4374,11 +4374,6 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 
   }
 
-  fSignalOut->cd();
-
-  fSignalOut->Write();
-  fSignalOut->Close();
-
   f_xsec->Close();
   
 }
