@@ -970,46 +970,46 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
 					  ttbar_hadronic_xsec, ttbar_hadronic_xsec * 0.025, ttbar_hadronic_xsec * 0.034, ttbar_hadronic_xsec * 0.026, ttbar_hadronic_xsec * 0.026,
 					  true, true,
-					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive",
+					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive", "ttjets",
 					  ttjetsSF, ttjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 
 					  ttbar_semiLep_xsec, ttbar_semiLep_xsec * 0.025, ttbar_semiLep_xsec * 0.034, ttbar_semiLep_xsec * 0.026, ttbar_semiLep_xsec * 0.026,
 					  true, true,
-					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive",
+					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive", "ttjets",
 					  ttjetsSF, ttjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 
 					  ttbar_fullLep_xsec, ttbar_fullLep_xsec * 0.025, ttbar_fullLep_xsec * 0.034, ttbar_fullLep_xsec * 0.026, ttbar_fullLep_xsec * 0.026,
 					  true, true,
-					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive",
+					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive", "ttjets",
 					  ttjetsSF, ttjetsSFerror);
 
   /*
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_WJetsToLNu.root", "WJetsToLNu", 
 					  12234.4 * 3, 79.0, 39.7, 414.7, 414.7,
 					  false, false,
-					  channel, 1, kOrange-3, "W + Jets", "vJets",
+					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   */
 
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W1JetsToLNu.root", "W1JetsToLNu", 
 					  12234.4 * 3 * 6662. / 37509., 79.0 * 6662. / 37509., 39.7 * 6662. / 37509., 414.7 * 6662. / 37509., 414.7 * 6662. / 37509.,
 					  false, false,
-					  channel, 1, kOrange-3, "W + Jets", "vJets",
+					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W2JetsToLNu.root", "W2JetsToLNu", 
 					  12234.4 * 3 * 2159. / 37509., 79.0 * 2159. / 37509., 39.7 * 2159. / 37509., 414.7 * 2159. / 37509., 414.7 * 2159. / 37509.,
 					  false, false,
-					  channel, 1, kOrange-3, "W + Jets", "vJets",
+					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W3JetsToLNu.root", "W3JetsToLNu", 
 					  12234.4 * 3 * 640. / 37509., 79.0 * 640. / 37509., 39.7 * 640. / 37509., 414.7 * 640. / 37509., 414.7 * 640. / 37509.,
 					  false, false,
-					  channel, 1, kOrange-3, "W + Jets", "vJets",
+					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W4JetsToLNu.root", "W4JetsToLNu", 
 					  12234.4 * 3 * 264. / 37509., 79.0 * 264. / 37509., 39.7 * 264. / 37509., 414.7 * 264. / 37509., 414.7 * 264. / 37509.,
 					  false, false,
-					  channel, 1, kOrange-3, "W + Jets", "vJets",
+					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
 
 
@@ -1017,85 +1017,85 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dyJetsToLL.root", "dyJetsToLL", 
                                           1177.3 * 3, 5.9, 3.6, 38.8, 38.8,
                                           false, false,
-                                          channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+                                          channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   */
   
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 
 					  666.7 * 1177.3 * 3 / 3503.71, 5.9, 3.6, 38.8, 38.8,
 					  false, false,
-					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy2JetsToLL.root", "dy2JetsToLL", 
 					  215.1 * 1177.3 * 3 / 3503.71, 5.9 * 215.1 / 666.7, 3.6 * 215.1 / 666.7, 38.8 * 215.1 / 666.7, 38.8 * 215.1 / 666.7,
 					  false, false,
-					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy3JetsToLL.root", "dy3JetsToLL", 
 					  66.07 * 1177.3 * 3 / 3503.71, 5.9 * 66.07 / 666.7, 3.6 * 66.07 / 666.7, 38.8 * 66.07 / 666.7, 38.8 * 66.07 / 666.7,
 					  false, false,
-					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy4JetsToLL.root", "dy4JetsToLL", 
 					  27.38 * 1177.3 * 3 / 3503.71, 5.9 * 27.38 / 666.7, 3.6 * 27.38 / 666.7, 38.8 * 27.38 / 666.7, 38.8 * 27.38 / 666.7,
 					  false, false,
-					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets");
+					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_TBar_s.root", "TBar_s", 
 					  1.76, 0.01, 0.01, 0.08, 0.08,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, 3, kRed, "Single Top", "singleTop", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_TBar_t.root", "TBar_t", 
 					  30.7, 0.7, 0.7, 0.9, 1.1,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, 3, kRed, "Single Top", "singleTop", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_TBar_tW.root", "TBar_tW", 
 					  11.1, 0.3, 0.3, 0.7, 0.7,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, 3, kRed, "Single Top", "singleTop", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_T_s.root", "T_s", 
 					  3.79, 0.07, 0.07, 0.13, 0.13,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, 3, kRed, "Single Top", "singleTop", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_T_t.root", "T_t", 
 					  56.4, 2.1, 0.3, 1.1, 1.1,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, 3, kRed, "Single Top", "singleTop", "singleTop");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_T_tW.root", "T_tW", 
 					  11.1, 0.3, 0.3, 0.7, 0.7,
 					  false, false,
-					  channel, 3, kRed, "Single Top", "singleTop");
+					  channel, 3, kRed, "Single Top", "singleTop", "singleTop");
 
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_WW.root", "WW",
 					  57.1097, 2.3, 2.3, 2.0, 2.0,
 					  false, false,
-					  channel, 4, kCyan, "Diboson", "diboson");
+					  channel, 4, kCyan, "Diboson", "diboson", "ww");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_WZ.root", "WZ",
 					  32.3161, 1.3, 1.3, 1.3, 1.3,
 					  false, false,
-					  channel, 4, kCyan, "Diboson", "diboson");
+					  channel, 4, kCyan, "Diboson", "diboson", "wz");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ZZ.root", "ZZ",
 					  8.25561, 0.3, 0.3, 0.3, 0.3,
 					  false, false,
-					  channel, 4, kCyan, "Diboson", "diboson");
+					  channel, 4, kCyan, "Diboson", "diboson", "zz");
   
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_TTWJets.root", "TTWJets", 
 					  0.232, 0.067, 0.067, 0.03, 0.03,
 					  false, false,
-					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
+					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV", "ttV");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_TTZJets.root", "TTZJets", 
 					  0.2057, 0., 0., 0.019, 0.024,
 					  false, false,
-					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV");
+					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV", "ttV");
 
   // http://arxiv.org/abs/1102.1967
   //loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttgjets.root", "ttgjets", 
   //2.166, 2.166 * .25, 2.166 * .25, 2.166 * 0.076, 2.166 * 0.099,
   //false, true,
-  //channel, 6, 8, "t#bar{t} + #gamma", "ttgamma",
+  //channel, 6, 8, "t#bar{t} + #gamma", "ttgamma", "ttgamma",
   //ttgammaSF, ttgammaSFerror);
 
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/WhizardMCTeeTeeGamma#2_to_5_All_ttbar_decay_channels
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttA_2to5.root", "ttA_2to5", 
 					  .9081 * 2, .9081 * .5, .9081 * .5, .9081 * 2 * 0.076, .9081 * 2 * 0.099, 
 					  false, true,
-					  channel, 6, 8, "t#bar{t} + #gamma", "ttgamma",
+					  channel, 6, 8, "t#bar{t} + #gamma", "ttgamma", "ttgamma",
 					  ttgammaSF, ttgammaSFerror);
   pMaker->SetUseWHIZARD(true);
 
