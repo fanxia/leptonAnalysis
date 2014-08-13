@@ -201,7 +201,7 @@ class PlotMaker : public TObject {
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 			bool removeTTA, bool reweightTop,
-			int channel, int layer, int color, TString legendEntry, TString tableEntry,
+			int channel, int layer, int color, TString legendEntry, TString tableEntry, TString limitEntry,
 			Double_t fitScaling = -1.0, Double_t fitScalingError = 0.0);
   
   void SetPhotonMode(int pMode) { photonMode = pMode; }
