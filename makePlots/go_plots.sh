@@ -16,7 +16,7 @@ NUM_PHOTONS_REQUIRED=$1
 ELE_FILE_TO_RUN=/eos/uscms/store/user/bfrancis/inputs/SingleElectron.root
 MUON_FILE_TO_RUN=/eos/uscms/store/user/bfrancis/inputs/SingleMu.root
 
-rm limitInputs.root
+rm *.root
 
 cat makePlots_template.C | sed s:ELE_FILE_TO_RUN:$ELE_FILE_TO_RUN: | sed s:MUON_FILE_TO_RUN:$MUON_FILE_TO_RUN: | sed s:NUM_PHOTONS_REQUIRED:$NUM_PHOTONS_REQUIRED: > makePlots.C
 root -b -q -l makePlots.C 2>&1 | sed '/does not exist/d' | sed '/has been created/d'
@@ -67,10 +67,6 @@ do
     sed -i "s/${code}/${value}/g" datacard_muon_bjj.dat
 done < datacard_muon_bjj.temp
 
-hadd contamination_stop.root signal_*.root
-rm signal_*.root
-mv contamination.root signal_contamination_stop.root
-	
 mkdir $file
 mv *.pdf *.txt *.tex $file
 cp *.root $file/
