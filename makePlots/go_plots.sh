@@ -24,10 +24,6 @@ rm makePlots.C
 
 file=`date +"%b%d"`
 
-rm signal_contamination_stop.root
-rm contamination_stop.root
-rm plots_*.root
-
 for x in ele_bjj muon_bjj
 do
     
@@ -48,24 +44,6 @@ do
     rm errorTable_$x.log errorTable_$x.dvi errorTable_$x.aux errorTable_$x.ps
     
 done
-
-cp template_datacard_ele_$NUM_PHOTONS_REQUIRED\g datacard_ele_bjj.dat
-while read line
-do
-    code=`echo $line | cut -d : -f 1`
-    value=`echo $line | cut -d : -f 2`
-    
-    sed -i "s/${code}/${value}/g" datacard_ele_bjj.dat
-done < datacard_ele_bjj.temp
-
-cp template_datacard_muon_$NUM_PHOTONS_REQUIRED\g datacard_muon_bjj.dat
-while read line
-do
-    code=`echo $line | cut -d : -f 1`
-    value=`echo $line | cut -d : -f 2`
-    
-    sed -i "s/${code}/${value}/g" datacard_muon_bjj.dat
-done < datacard_muon_bjj.temp
 
 mkdir $file
 mv *.pdf *.txt *.tex $file

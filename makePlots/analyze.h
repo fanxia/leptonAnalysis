@@ -4386,9 +4386,11 @@ void PlotMaker::SaveBackgroundOutput() {
   TFile * fLimits = new TFile("limitInputs.root", "UPDATE");
   fLimits->cd();
   if(req.Contains("ele")) {
+    fLimits->mkdir("ele");
     fLimits->cd("ele");
   }
   else {
+    fLimits->cd("muon");
     fLimits->cd("muon");
   }
 
