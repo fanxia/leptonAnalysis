@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
+if [ $# -ne 1 ]; then
 	echo
-	echo "Usage: ./go_plots.sh nPhotons electrons.root muons.root"
+	echo "Usage: ./go_plots.sh nPhotons"
 	echo
 	exit 0
 fi
