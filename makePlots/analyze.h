@@ -4361,6 +4361,24 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
 
     f->Close();
 
+    fSignalOut->cd();
+    if(req.Contains("ele")) fSignalOut->cd("ele");
+    else fSignalOut->cd("muon");
+
+    h->Write("signal"+code_t);
+    h_btagWeightUp->Write("signal"+code_t+"_btagWeightUp");
+    h_btagWeightDown->Write("signal"+code_t+"_btagWeightDown");
+    h_puWeightUp->Write("signal"+code_t+"_puWeightUp");
+    h_puWeightDown->Write("signal"+code_t+"_puWeightDown");
+    h_topPtUp->Write("signal"+code_t+"_topPtUp");
+    h_topPtDown->Write("signal"+code_t+"_topPtDown");
+    h_JECup->Write("signal"+code_t+"_JECUp");
+    h_JECdown->Write("signal"+code_t+"_JECDown");
+    h_leptonSFup->Write("signal"+code_t+"_leptonSFUp");
+    h_leptonSFdown->Write("signal"+code_t+"_leptonSFDown");
+    h_photonSFup->Write("signal"+code_t+"_photonSFUp");
+    h_photonSFdown->Write("signal"+code_t+"_photonSFDown");
+
   }
 
   fSignalOut->cd();
@@ -4524,7 +4542,7 @@ void PlotMaker::SaveBackgroundOutput() {
   h = (TH1D*)mcHistograms_scaleUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_scale_"+limitNames[0]+"Up");
   for(unsigned int i = 1; i < mcHistograms_scaleUp.size(); i++) {
     if(limitNames[i] != limitNames[i-1]) {
-      h->Write(limitNames[i-1]+"_scale_"+limitNames[i]+"Up");
+      h->Write(limitNames[i-1]+"_scale_"+limitNames[i-1]+"Up");
       h = (TH1D*)mcHistograms_scaleUp[i][variableNumber]->Clone("clone_"+limitNames[i]+"_scale_"+limitNames[i]+"Up");
     }
     else h->Add(mcHistograms_scaleUp[i][variableNumber]);
@@ -4534,7 +4552,7 @@ void PlotMaker::SaveBackgroundOutput() {
   h = (TH1D*)mcHistograms_scaleDown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_scale_"+limitNames[0]+"Down");
   for(unsigned int i = 1; i < mcHistograms_scaleDown.size(); i++) {
     if(limitNames[i] != limitNames[i-1]) {
-      h->Write(limitNames[i-1]+"_scale_"+limitNames[i]+"Down");
+      h->Write(limitNames[i-1]+"_scale_"+limitNames[i-1]+"Down");
       h = (TH1D*)mcHistograms_scaleDown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_scale_"+limitNames[i]+"Down");
     }
     else h->Add(mcHistograms_scaleDown[i][variableNumber]);
@@ -4544,7 +4562,7 @@ void PlotMaker::SaveBackgroundOutput() {
   h = (TH1D*)mcHistograms_pdfUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_pdf_"+limitNames[0]+"Up");
   for(unsigned int i = 1; i < mcHistograms_pdfUp.size(); i++) {
     if(limitNames[i] != limitNames[i-1]) {
-      h->Write(limitNames[i-1]+"_pdf_"+limitNames[i]+"Up");
+      h->Write(limitNames[i-1]+"_pdf_"+limitNames[i-1]+"Up");
       h = (TH1D*)mcHistograms_pdfUp[i][variableNumber]->Clone("clone_"+limitNames[i]+"_pdf_"+limitNames[i]+"Up");
     }
     else h->Add(mcHistograms_pdfUp[i][variableNumber]);
@@ -4554,7 +4572,7 @@ void PlotMaker::SaveBackgroundOutput() {
   h = (TH1D*)mcHistograms_pdfDown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_pdf_"+limitNames[0]+"Down");
   for(unsigned int i = 1; i < mcHistograms_pdfDown.size(); i++) {
     if(limitNames[i] != limitNames[i-1]) {
-      h->Write(limitNames[i-1]+"_pdf_"+limitNames[i]+"Down");
+      h->Write(limitNames[i-1]+"_pdf_"+limitNames[i-1]+"Down");
       h = (TH1D*)mcHistograms_pdfDown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_pdf_"+limitNames[i]+"Down");
     }
     else h->Add(mcHistograms_pdfDown[i][variableNumber]);
