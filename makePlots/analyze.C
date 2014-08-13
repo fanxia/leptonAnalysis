@@ -140,22 +140,22 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   */
 
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W1JetsToLNu.root", "W1JetsToLNu", 
-					  12234.4 * 3 * 6662. / 37509., 79.0 * 6662. / 37509., 39.7 * 6662. / 37509., 414.7 * 6662. / 37509., 414.7 * 6662. / 37509.,
+					  12234.4 * 3 * 6662. / 37509., 79.0 * 3 * 6662. / 37509., 39.7 * 3 * 6662. / 37509., 414.7 * 3 * 6662. / 37509., 414.7 * 3 * 6662. / 37509.,
 					  false, false,
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W2JetsToLNu.root", "W2JetsToLNu", 
-					  12234.4 * 3 * 2159. / 37509., 79.0 * 2159. / 37509., 39.7 * 2159. / 37509., 414.7 * 2159. / 37509., 414.7 * 2159. / 37509.,
+					  12234.4 * 3 * 2159. / 37509., 79.0 * 3 * 2159. / 37509., 39.7 * 3 * 2159. / 37509., 414.7 * 3 * 2159. / 37509., 414.7 * 3 * 2159. / 37509.,
 					  false, false,
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W3JetsToLNu.root", "W3JetsToLNu", 
-					  12234.4 * 3 * 640. / 37509., 79.0 * 640. / 37509., 39.7 * 640. / 37509., 414.7 * 640. / 37509., 414.7 * 640. / 37509.,
+					  12234.4 * 3 * 640. / 37509., 79.0 * 3 * 640. / 37509., 39.7 * 3 * 640. / 37509., 414.7 * 3 * 640. / 37509., 414.7 * 3 * 640. / 37509.,
 					  false, false,
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W4JetsToLNu.root", "W4JetsToLNu", 
-					  12234.4 * 3 * 264. / 37509., 79.0 * 264. / 37509., 39.7 * 264. / 37509., 414.7 * 264. / 37509., 414.7 * 264. / 37509.,
+					  12234.4 * 3 * 264. / 37509., 79.0 * 3 * 264. / 37509., 39.7 * 3 * 264. / 37509., 414.7 * 3 * 264. / 37509., 414.7 * 3 * 264. / 37509.,
 					  false, false,
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
@@ -169,19 +169,19 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   */
   
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 
-					  666.7 * 1177.3 * 3 / 3503.71, 5.9, 3.6, 38.8, 38.8,
+					  666.7 * 1177.3 * 3 / 3503.71, 5.9 * 3, 3.6 * 3, 38.8 * 3, 38.8 * 3,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy2JetsToLL.root", "dy2JetsToLL", 
-					  215.1 * 1177.3 * 3 / 3503.71, 5.9 * 215.1 / 666.7, 3.6 * 215.1 / 666.7, 38.8 * 215.1 / 666.7, 38.8 * 215.1 / 666.7,
+					  215.1 * 1177.3 * 3 / 3503.71, 5.9 * 3 * 215.1 / 666.7, 3.6 * 3 * 215.1 / 666.7, 38.8 * 3 * 215.1 / 666.7, 38.8 * 3 * 215.1 / 666.7,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy3JetsToLL.root", "dy3JetsToLL", 
-					  66.07 * 1177.3 * 3 / 3503.71, 5.9 * 66.07 / 666.7, 3.6 * 66.07 / 666.7, 38.8 * 66.07 / 666.7, 38.8 * 66.07 / 666.7,
+					  66.07 * 1177.3 * 3 / 3503.71, 5.9 * 3 * 66.07 / 666.7, 3.6 * 3 * 66.07 / 666.7, 38.8 * 3 * 66.07 / 666.7, 38.8 * 3 * 66.07 / 666.7,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy4JetsToLL.root", "dy4JetsToLL", 
-					  27.38 * 1177.3 * 3 / 3503.71, 5.9 * 27.38 / 666.7, 3.6 * 27.38 / 666.7, 38.8 * 27.38 / 666.7, 38.8 * 27.38 / 666.7,
+					  27.38 * 1177.3 * 3 / 3503.71, 5.9 * 3 * 27.38 / 666.7, 3.6 * 3 * 27.38 / 666.7, 38.8 * 3 * 27.38 / 666.7, 38.8 * 3 * 27.38 / 666.7,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   
@@ -226,11 +226,11 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_TTWJets.root", "TTWJets", 
 					  0.232, 0.067, 0.067, 0.03, 0.03,
 					  false, false,
-					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV", "ttV");
+					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV", "ttW");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_TTZJets.root", "TTZJets", 
 					  0.2057, 0., 0., 0.019, 0.024,
 					  false, false,
-					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV", "ttV");
+					  channel, 5, kAzure-2, "t#bar{t} + W/Z", "ttV", "ttZ");
 
   // http://arxiv.org/abs/1102.1967
   //loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttgjets.root", "ttgjets", 
@@ -992,22 +992,22 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   */
 
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W1JetsToLNu.root", "W1JetsToLNu", 
-					  12234.4 * 3 * 6662. / 37509., 79.0 * 6662. / 37509., 39.7 * 6662. / 37509., 414.7 * 6662. / 37509., 414.7 * 6662. / 37509.,
+					  12234.4 * 3 * 6662. / 37509., 79.0 * 3 * 6662. / 37509., 39.7 * 3 * 6662. / 37509., 414.7 * 3 * 6662. / 37509., 414.7 * 3 * 6662. / 37509.,
 					  false, false,
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W2JetsToLNu.root", "W2JetsToLNu", 
-					  12234.4 * 3 * 2159. / 37509., 79.0 * 2159. / 37509., 39.7 * 2159. / 37509., 414.7 * 2159. / 37509., 414.7 * 2159. / 37509.,
+					  12234.4 * 3 * 2159. / 37509., 79.0 * 3 * 2159. / 37509., 39.7 * 3 * 2159. / 37509., 414.7 * 3 * 2159. / 37509., 414.7 * 3 * 2159. / 37509.,
 					  false, false,
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W3JetsToLNu.root", "W3JetsToLNu", 
-					  12234.4 * 3 * 640. / 37509., 79.0 * 640. / 37509., 39.7 * 640. / 37509., 414.7 * 640. / 37509., 414.7 * 640. / 37509.,
+					  12234.4 * 3 * 640. / 37509., 79.0 * 3 * 640. / 37509., 39.7 * 3 * 640. / 37509., 414.7 * 3 * 640. / 37509., 414.7 * 3 * 640. / 37509.,
 					  false, false,
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W4JetsToLNu.root", "W4JetsToLNu", 
-					  12234.4 * 3 * 264. / 37509., 79.0 * 264. / 37509., 39.7 * 264. / 37509., 414.7 * 264. / 37509., 414.7 * 264. / 37509.,
+					  12234.4 * 3 * 264. / 37509., 79.0 * 3 * 264. / 37509., 39.7 * 3 * 264. / 37509., 414.7 * 3 * 264. / 37509., 414.7 * 3 * 264. / 37509.,
 					  false, false,
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
@@ -1021,19 +1021,19 @@ void fitPhotons(TString input, bool addMC, int channel, int intLumi_int, double 
   */
   
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 
-					  666.7 * 1177.3 * 3 / 3503.71, 5.9, 3.6, 38.8, 38.8,
+					  666.7 * 1177.3 * 3 / 3503.71, 5.9 * 3, 3.6 * 3, 38.8 * 3, 38.8 * 3,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy2JetsToLL.root", "dy2JetsToLL", 
-					  215.1 * 1177.3 * 3 / 3503.71, 5.9 * 215.1 / 666.7, 3.6 * 215.1 / 666.7, 38.8 * 215.1 / 666.7, 38.8 * 215.1 / 666.7,
+					  215.1 * 1177.3 * 3 / 3503.71, 5.9 * 3 * 215.1 / 666.7, 3.6 * 3 * 215.1 / 666.7, 38.8 * 215.1 / 666.7, 38.8 * 215.1 / 666.7,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy3JetsToLL.root", "dy3JetsToLL", 
-					  66.07 * 1177.3 * 3 / 3503.71, 5.9 * 66.07 / 666.7, 3.6 * 66.07 / 666.7, 38.8 * 66.07 / 666.7, 38.8 * 66.07 / 666.7,
+					  66.07 * 1177.3 * 3 / 3503.71, 5.9 * 3 * 66.07 / 666.7, 3.6 * 3 * 66.07 / 666.7, 38.8 * 66.07 / 666.7, 38.8 * 66.07 / 666.7,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy4JetsToLL.root", "dy4JetsToLL", 
-					  27.38 * 1177.3 * 3 / 3503.71, 5.9 * 27.38 / 666.7, 3.6 * 27.38 / 666.7, 38.8 * 27.38 / 666.7, 38.8 * 27.38 / 666.7,
+					  27.38 * 1177.3 * 3 / 3503.71, 5.9 * 3 * 27.38 / 666.7, 3.6 * 3 * 27.38 / 666.7, 38.8 * 27.38 / 666.7, 38.8 * 27.38 / 666.7,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   
