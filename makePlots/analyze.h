@@ -3939,16 +3939,8 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
   TH2D * h_xsec = (TH2D*)f_xsec->Get("real_xsec");
   TH2D * h_xsec_errors = (TH2D*)f_xsec->Get("real_errors");
 
-  TFile * fSignalOut = new TFile("limitInputs.root", "UPDATE");
-
   TH2D * h_acc = new TH2D("acc_"+req, "acc_"+req, 30, xbins, 32, ybins);
   TH2D * h_contamination = new TH2D("contamination_"+req, "contamination_"+req, 30, xbins, 32, ybins);
-
-  if(req.Contains("ele")) fSignalOut->mkdir("ele");
-  else fSignalOut->mkdir("muon");
-
-  fSignalOut->Write();
-  fSignalOut->Close();
 
   for(int imass = 0; imass < 899; imass++) {
 
@@ -4351,10 +4343,16 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     h_photonSFup->Scale(xsec * 19712. / 15000.);
     h_photonSFdown->Scale(xsec * 19712. / 15000.);
 
-    fSignalOut = new TFile("limitInputs.root", "UPDATE");
+    TFile * fSignalOut = new TFile("signalInputs"+code_t+".root", "UPDATE");
 
-    if(req.Contains("ele")) fSignalOut->cd("ele");
-    else fSignalOut->cd("muon");
+    if(req.Contains("ele")) {
+      fSignalOut->mkdir("ele");
+      fSignalOut->cd("ele");
+    }
+    else {
+      fSignalOut->mkdir("muon");
+      fSignalOut->cd("muon");
+    }
 
     h->Write("signal"+code_t);
     h_btagWeightUp->Write("signal"+code_t+"_btagWeightUp");
