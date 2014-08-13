@@ -16,6 +16,8 @@ NUM_PHOTONS_REQUIRED=$1
 ELE_FILE_TO_RUN=$2
 MUON_FILE_TO_RUN=$3
 
+rm limitInputs.root
+
 cat makePlots_template.C | sed s:ELE_FILE_TO_RUN:$ELE_FILE_TO_RUN: | sed s:MUON_FILE_TO_RUN:$MUON_FILE_TO_RUN: | sed s:NUM_PHOTONS_REQUIRED:$NUM_PHOTONS_REQUIRED: > makePlots.C
 root -b -q -l makePlots.C 2>&1 | sed '/does not exist/d' | sed '/has been created/d'
 rm makePlots.C
