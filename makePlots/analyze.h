@@ -3959,8 +3959,8 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     }
     
     TTree * tree = (TTree*)f->Get(req+"_signalTree");
-    TTree * tree_JECup = (TTree*)f->Get(req+"_signalTree_JECUp");
-    TTree * tree_JECdown = (TTree*)f->Get(req+"_signalTree_JECDown");
+    TTree * tree_JECup = (TTree*)f->Get(req+"_signalTree_JECup");
+    TTree * tree_JECdown = (TTree*)f->Get(req+"_signalTree_JECdown");
 
     TTree * tree_contam;
     if(req.Contains("ele")) tree_contam = (TTree*)f->Get("ele_jjj_veto_eQCDTree");
@@ -4075,7 +4075,17 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     tree_contam->SetBranchAddress("pileupWeightDown", &puWeightDown);
     tree_contam->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
-    TH1D * h = new TH1D("signal"+code_t, "signal"+code_t, 400, 0, 2000); h->Sumw2();
+    TFile * fSignalOut = new TFile("limitInputs.root", "UPDATE");
+    if(req.Contains("ele")) {
+      fSignalOut->mkdir("ele");
+      fSignalOut->cd("ele");
+    }
+    else {
+      fSignalOut->mkdir("muon");
+      fSignalOut->cd("muon");
+    }
+
+    TFile * h = new TH1D("signal"+code_t, "signal"+code_t, 400, 0, 2000); h->Sumw2();
 
     TH1D * h_btagWeightUp = new TH1D("signal"+code_t+"_btagWeightUp", "signal"+code_t+"_btagWeightUp", 400, 0, 2000); h_btagWeightUp->Sumw2();
     TH1D * h_btagWeightDown = new TH1D("signal"+code_t+"_btagWeightDown", "signal"+code_t+"_btagWeightDown", 400, 0, 2000); h_btagWeightDown->Sumw2();
@@ -4343,36 +4353,34 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     h_photonSFup->Scale(xsec * 19712. / 15000.);
     h_photonSFdown->Scale(xsec * 19712. / 15000.);
 
-    TFile * fSignalOut = new TFile("signalInputs"+code_t+".root", "UPDATE");
+    fSignalOut->cd();
 
     if(req.Contains("ele")) {
-      fSignalOut->mkdir("ele");
       fSignalOut->cd("ele");
     }
     else {
-      fSignalOut->mkdir("muon");
       fSignalOut->cd("muon");
     }
 
     h->Write("signal"+code_t);
-    h_btagWeightUp->Write("signal"+code_t+"_btagWeightUp");
-    h_btagWeightDown->Write("signal"+code_t+"_btagWeightDown");
-    h_puWeightUp->Write("signal"+code_t+"_puWeightUp");
-    h_puWeightDown->Write("signal"+code_t+"_puWeightDown");
-    h_topPtUp->Write("signal"+code_t+"_topPtUp");
-    h_topPtDown->Write("signal"+code_t+"_topPtDown");
-    h_JECup->Write("signal"+code_t+"_JECUp");
-    h_JECdown->Write("signal"+code_t+"_JECDown");
-    h_leptonSFup->Write("signal"+code_t+"_leptonSFUp");
-    h_leptonSFdown->Write("signal"+code_t+"_leptonSFDown");
-    h_photonSFup->Write("signal"+code_t+"_photonSFUp");
-    h_photonSFdown->Write("signal"+code_t+"_photonSFDown");
-
-    fSignalOut->Close();
+    h_btagWeightUp->Write("signal_btagWeightUp");
+    h_btagWeightDown->Write("signal_btagWeightDown");
+    h_puWeightUp->Write("signal_puWeightUp");
+    h_puWeightDown->Write("signal_puWeightDown");
+    h_topPtUp->Write("signal_topPtUp");
+    h_topPtDown->Write("signal_topPtDown");
+    h_JECup->Write("signal_JECUp");
+    h_JECdown->Write("signal_JECDown");
+    h_leptonSFup->Write("signal_leptonSFUp");
+    h_leptonSFdown->Write("signal_leptonSFDown");
+    h_photonSFup->Write("signal_photonSFUp");
+    h_photonSFdown->Write("signal_photonSFDown");
 
     f->Close();
 
   }
+
+  fSignalOut->Close();
 
   f_xsec->Close();
   
@@ -4386,11 +4394,9 @@ void PlotMaker::SaveBackgroundOutput() {
   TFile * fLimits = new TFile("limitInputs.root", "UPDATE");
   fLimits->cd();
   if(req.Contains("ele")) {
-    fLimits->mkdir("ele");
     fLimits->cd("ele");
   }
   else {
-    fLimits->cd("muon");
     fLimits->cd("muon");
   }
 
