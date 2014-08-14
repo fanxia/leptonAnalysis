@@ -4085,25 +4085,28 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     tree_contam->SetBranchAddress("pileupWeightDown", &puWeightDown);
     tree_contam->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
-    TH1D * h = new TH1D("signal"+code_t, "signal"+code_t, 400, 0, 2000); h->Sumw2();
+    const int nMetBins = 6;
+    Double_t xbins_met[nMetBins+1] = {0, 20, 50, 75, 100, 150, 300};
 
-    TH1D * h_btagWeightUp = new TH1D("signal"+code_t+"_btagWeightUp", "signal"+code_t+"_btagWeightUp", 400, 0, 2000); h_btagWeightUp->Sumw2();
-    TH1D * h_btagWeightDown = new TH1D("signal"+code_t+"_btagWeightDown", "signal"+code_t+"_btagWeightDown", 400, 0, 2000); h_btagWeightDown->Sumw2();
+    TH1D * h = new TH1D("signal"+code_t, "signal"+code_t, nMetBins, xbins_met); h->Sumw2();
 
-    TH1D * h_puWeightUp = new TH1D("signal"+code_t+"_puWeightUp", "signal"+code_t+"_puWeightUp", 400, 0, 2000); h_puWeightUp->Sumw2();
-    TH1D * h_puWeightDown = new TH1D("signal"+code_t+"_puWeightDown", "signal"+code_t+"_puWeightDown", 400, 0, 2000); h_puWeightDown->Sumw2();
+    TH1D * h_btagWeightUp = new TH1D("signal"+code_t+"_btagWeightUp", "signal"+code_t+"_btagWeightUp", nMetBins, xbins_met); h_btagWeightUp->Sumw2();
+    TH1D * h_btagWeightDown = new TH1D("signal"+code_t+"_btagWeightDown", "signal"+code_t+"_btagWeightDown", nMetBins, xbins_met); h_btagWeightDown->Sumw2();
 
-    TH1D * h_topPtUp = new TH1D("signal"+code_t+"_topPtUp", "signal"+code_t+"_topPtUp", 400, 0, 2000); h_topPtUp->Sumw2();
-    TH1D * h_topPtDown = new TH1D("signal"+code_t+"_topPtDown", "signal"+code_t+"_topPtDown", 400, 0, 2000); h_topPtDown->Sumw2();
+    TH1D * h_puWeightUp = new TH1D("signal"+code_t+"_puWeightUp", "signal"+code_t+"_puWeightUp", nMetBins, xbins_met); h_puWeightUp->Sumw2();
+    TH1D * h_puWeightDown = new TH1D("signal"+code_t+"_puWeightDown", "signal"+code_t+"_puWeightDown", nMetBins, xbins_met); h_puWeightDown->Sumw2();
 
-    TH1D * h_JECup = new TH1D("signal"+code_t+"_JECUp", "signal"+code_t+"_JECUp", 400, 0, 2000); h_JECup->Sumw2();
-    TH1D * h_JECdown = new TH1D("signal"+code_t+"_JECDown", "signal"+code_t+"_JECDown", 400, 0, 2000); h_JECdown->Sumw2();
+    TH1D * h_topPtUp = new TH1D("signal"+code_t+"_topPtUp", "signal"+code_t+"_topPtUp", nMetBins, xbins_met); h_topPtUp->Sumw2();
+    TH1D * h_topPtDown = new TH1D("signal"+code_t+"_topPtDown", "signal"+code_t+"_topPtDown", nMetBins, xbins_met); h_topPtDown->Sumw2();
 
-    TH1D * h_leptonSFup = new TH1D("signal"+code_t+"_leptonSFUp", "signal"+code_t+"_leptonSFUp", 400, 0, 2000); h_leptonSFup->Sumw2();
-    TH1D * h_leptonSFdown = new TH1D("signal"+code_t+"_leptonSFDown", "signal"+code_t+"_leptonSFDown", 400, 0, 2000); h_leptonSFdown->Sumw2();
+    TH1D * h_JECup = new TH1D("signal"+code_t+"_JECUp", "signal"+code_t+"_JECUp", nMetBins, xbins_met); h_JECup->Sumw2();
+    TH1D * h_JECdown = new TH1D("signal"+code_t+"_JECDown", "signal"+code_t+"_JECDown", nMetBins, xbins_met); h_JECdown->Sumw2();
 
-    TH1D * h_photonSFup = new TH1D("signal"+code_t+"_photonSFUp", "signal"+code_t+"_photonSFUp", 400, 0, 2000); h_photonSFup->Sumw2();
-    TH1D * h_photonSFdown = new TH1D("signal"+code_t+"_photonSFDown", "signal"+code_t+"_photonSFDown", 400, 0, 2000); h_photonSFdown->Sumw2();
+    TH1D * h_leptonSFup = new TH1D("signal"+code_t+"_leptonSFUp", "signal"+code_t+"_leptonSFUp", nMetBins, xbins_met); h_leptonSFup->Sumw2();
+    TH1D * h_leptonSFdown = new TH1D("signal"+code_t+"_leptonSFDown", "signal"+code_t+"_leptonSFDown", nMetBins, xbins_met); h_leptonSFdown->Sumw2();
+
+    TH1D * h_photonSFup = new TH1D("signal"+code_t+"_photonSFUp", "signal"+code_t+"_photonSFUp", nMetBins, xbins_met); h_photonSFup->Sumw2();
+    TH1D * h_photonSFdown = new TH1D("signal"+code_t+"_photonSFDown", "signal"+code_t+"_photonSFDown", nMetBins, xbins_met); h_photonSFdown->Sumw2();
 
     for(int i = 0; i < tree->GetEntries(); i++) {
       tree->GetEntry(i);
