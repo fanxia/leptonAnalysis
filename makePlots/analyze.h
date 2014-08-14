@@ -4363,18 +4363,18 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     }
 
     h->Write("signal"+code_t);
-    h_btagWeightUp->Write("signal_btagWeightUp");
-    h_btagWeightDown->Write("signal_btagWeightDown");
-    h_puWeightUp->Write("signal_puWeightUp");
-    h_puWeightDown->Write("signal_puWeightDown");
-    h_topPtUp->Write("signal_topPtUp");
-    h_topPtDown->Write("signal_topPtDown");
-    h_JECup->Write("signal_JECUp");
-    h_JECdown->Write("signal_JECDown");
-    h_leptonSFup->Write("signal_leptonSFUp");
-    h_leptonSFdown->Write("signal_leptonSFDown");
-    h_photonSFup->Write("signal_photonSFUp");
-    h_photonSFdown->Write("signal_photonSFDown");
+    h_btagWeightUp->Write("signal"+code_t+"_btagWeightUp");
+    h_btagWeightDown->Write("signal"+code_t+"_btagWeightDown");
+    h_puWeightUp->Write("signal"+code_t+"_puWeightUp");
+    h_puWeightDown->Write("signal"+code_t+"_puWeightDown");
+    h_topPtUp->Write("signal"+code_t+"_topPtUp");
+    h_topPtDown->Write("signal"+code_t+"_topPtDown");
+    h_JECup->Write("signal"+code_t+"_JECUp");
+    h_JECdown->Write("signal"+code_t+"_JECDown");
+    h_leptonSFup->Write("signal"+code_t+"_leptonSFUp");
+    h_leptonSFdown->Write("signal"+code_t+"_leptonSFDown");
+    h_photonSFup->Write("signal"+code_t+"_photonSFUp");
+    h_photonSFdown->Write("signal"+code_t+"_photonSFDown");
 
     f->Close();
 
