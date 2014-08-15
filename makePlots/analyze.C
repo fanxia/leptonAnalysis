@@ -263,12 +263,12 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   Double_t xbins_kinematic_0g[nKinematicBins_0g+1] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1250, 1500, 2000};
 
   const int nMetBins_1g = 10;
-  Double_t xbins_met_1g[nMetBins_1g+1] = {0, 10, 20, 30, 40, 50, 75, 100, 150, 300, 600};
+  Double_t xbins_met_1g[nMetBins_1g+1] = {0, 10, 20, 30, 40, 50, 75, 100, 150, 300, 650};
   const int nKinematicBins_1g = 20;
   Double_t xbins_kinematic_1g[nKinematicBins_1g+1] = {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 800, 1000, 1250, 1500, 2000};
 
-  const int nMetBins_2g = 6;
-  Double_t xbins_met_2g[nMetBins_2g+1] = {0, 20, 50, 75, 100, 150, 300};
+  const int nMetBins_2g = 7;
+  Double_t xbins_met_2g[nMetBins_2g+1] = {0, 20, 50, 75, 100, 150, 300, 650};
   const int nKinematicBins_2g = 10;
   Double_t xbins_kinematic_2g[nKinematicBins_2g+1] = {0, 25, 50, 100, 150, 200, 400, 600, 1000, 1500, 2000};
 
