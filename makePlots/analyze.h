@@ -4085,8 +4085,8 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     tree_contam->SetBranchAddress("pileupWeightDown", &puWeightDown);
     tree_contam->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
-    const int nMetBins = 7;
-    Double_t xbins_met[nMetBins+1] = {0, 20, 50, 75, 100, 150, 300, 650};
+    const int nMetBins = 2;
+    Double_t xbins_met[nMetBins+1] = {0, 100, 2000};
 
     TH1D * h = new TH1D("signal"+code_t, "signal"+code_t, nMetBins, xbins_met); h->Sumw2();
 

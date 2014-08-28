@@ -138,7 +138,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 					  channel, 1, kOrange-3, "W + Jets", "vJets", "wjets",
 					  wjetsSF, wjetsSFerror);
   */
-
+  
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_W1JetsToLNu.root", "W1JetsToLNu", 
 					  12234.4 * 3 * 6662. / 37509., 79.0 * 3 * 6662. / 37509., 39.7 * 3 * 6662. / 37509., 414.7 * 3 * 6662. / 37509., 414.7 * 3 * 6662. / 37509.,
 					  false, false,
@@ -169,7 +169,9 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   */
   
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy1JetsToLL.root", "dy1JetsToLL", 
-					  666.7 * 1177.3 * 3 / 3503.71, 5.9 * 3, 3.6 * 3, 38.8 * 3, 38.8 * 3,
+					  666.7 * 1177.3 * 3 / 3503.71, 
+					  5.9 * 3 * 1177.3 / 3503.71, 3.6 * 3, 
+					  38.8 * 3, 38.8 * 3,
 					  false, false,
 					  channel, 2, kYellow, "Z/#gamma* + Jets", "vJets", "zjets");
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_dy2JetsToLL.root", "dy2JetsToLL", 
