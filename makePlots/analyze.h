@@ -1290,7 +1290,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(blinded && vars[0] == 2) continue;
       if(blinded && vars[0] == 1 && variables[j] == "pfMET" && vars[1] > 50.) continue;
@@ -1317,7 +1317,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       for(unsigned int k = 0; k < variables_2d.size(); k++) {
 	if(variables[j] == variables_2d[k].first) {
@@ -1374,7 +1374,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 			    puWeight*puWeight*btagWeight*btagWeight*fitScaleError[i]*fitScaleError[i];
 
       for(unsigned int k = 0; k < vars.size(); k++) {
-	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
@@ -1543,7 +1543,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	
 	for(unsigned int k = 0; k < vars.size(); k++) {
-	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	  mcHistograms_JECup[i][k]->Fill(vars[k], totalWeight);
 	}
 	
@@ -1578,7 +1578,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	
 	for(unsigned int k = 0; k < vars.size(); k++) {
-	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	  mcHistograms_JECdown[i][k]->Fill(vars[k], totalWeight);
 	}
 	
@@ -1625,7 +1625,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(fitScale[i] > 0) totalWeight *= fitScale[i];
 
       for(unsigned int k = 0; k < vars.size(); k++) {
-	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
 	Float_t oldError = mcQCDHistograms[i][k]->GetBinError(mcQCDHistograms[i][k]->FindBin(vars[k]));
 	Float_t newerror = sqrt(oldError*oldError + addError2);
@@ -1678,7 +1678,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
       Float_t olderror = h_siga[j]->GetBinError(h_siga[j]->FindBin(vars[j]));
@@ -1793,7 +1793,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
       
       for(unsigned int j = 0; j < vars.size(); j++) {
-	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
 	h_siga_JECup[j]->Fill(vars[j], totalWeight);
@@ -1819,7 +1819,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
       
       for(unsigned int j = 0; j < vars.size(); j++) {
-	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
 	h_siga_JECdown[j]->Fill(vars[j], totalWeight);
@@ -1856,7 +1856,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
       Float_t olderror = h_sigb[j]->GetBinError(h_sigb[j]->FindBin(vars[j]));
@@ -1971,7 +1971,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
       
       for(unsigned int j = 0; j < vars.size(); j++) {
-	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
 	h_sigb_JECup[j]->Fill(vars[j], totalWeight);
@@ -1997,7 +1997,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
       
       for(unsigned int j = 0; j < vars.size(); j++) {
-	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
 	h_sigb_JECdown[j]->Fill(vars[j], totalWeight);
@@ -2245,7 +2245,7 @@ void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int n
     Float_t weightError = (chan < 2) ? weights->GetBinError(weights->FindBin(vars[16])) : weights->GetBinError(weights->FindBin(vars[18]));
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       for(unsigned int k = 0; k < variables_2d.size(); k++) {
 	if(variables[j] == variables_2d[k].first) {
@@ -4085,8 +4085,8 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     tree_contam->SetBranchAddress("pileupWeightDown", &puWeightDown);
     tree_contam->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
-    const int nMetBins = 2;
-    Double_t xbins_met[nMetBins+1] = {0, 100, 2000};
+    const int nMetBins = 7;
+    Double_t xbins_met[nMetBins+1] = {0, 20, 50, 75, 100, 150, 300, 650};
 
     TH1D * h = new TH1D("signal"+code_t, "signal"+code_t, nMetBins, xbins_met); h->Sumw2();
 
@@ -4111,7 +4111,7 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     for(int i = 0; i < tree->GetEntries(); i++) {
       tree->GetEntry(i);
 
-      if(nphotons != nPhotons_req) continue;
+      if(nphotons != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -4210,7 +4210,7 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     for(int i = 0; i < tree_JECup->GetEntries(); i++) {
       tree_JECup->GetEntry(i);
 
-      if(nphotons != nPhotons_req) continue;
+      if(nphotons != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -4247,7 +4247,7 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     for(int i = 0; i < tree_JECdown->GetEntries(); i++) {
       tree_JECdown->GetEntry(i);
 
-      if(nphotons != nPhotons_req) continue;
+      if(nphotons != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -4286,7 +4286,7 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     for(int i = 0; i < tree_contam->GetEntries(); i++) {
       tree_contam->GetEntry(i);
 
-      if(nphotons != nPhotons_req) continue;
+      if(nphotons != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -4314,7 +4314,7 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     h_acc->SetBinContent(h_acc->FindBin(index1, index2), h->Integral() / (0.438/3.) / 15000.);
     h_contamination->SetBinContent(h_contamination->FindBin(index1, index2), contamination / h->Integral());
 
-    // draw acc and shiz
+    // draw acc and etc
     TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
     h_acc->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
     h_acc->GetXaxis()->SetRangeUser(0, 1600);
