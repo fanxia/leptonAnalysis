@@ -316,6 +316,8 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
     pMaker->BookHistogram("muon_pt", nKinematicBins_0g, xbins_kinematic_0g); // 17
     pMaker->BookHistogram("muon_eta", 60, -2.5, 2.5);                  // 18
 
+    pMaker->BookHistogram("nPV", 70, 0., 70.);
+
     pMaker->BookHistogram2D("Nphotons", "pfMET", 3, 0., 3., 20, 0., 350., 1.e-2, 1.e5);
 
     /*
@@ -712,6 +714,15 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 		     0., 2.3,
 		     false, false, false,
 		     out);
+
+  if(nPhotons_req < 1) pMaker->CreatePlot("nPV",
+					  false, needsQCD,
+					  "nPV", "Number of Events",
+					  0., 70.,
+					  2.e-4, 8.e3,
+					  0., 2.3,
+					  false, true, true,
+					  out);
 
   if(nPhotons_req >= 1) {
     pMaker->CreatePlot("leadPhotonEta",
