@@ -45,8 +45,8 @@ const int nChannels = 4;
 TString channels[nChannels] = {"ele_jjj", "ele_bjj",
 			       "muon_jjj", "muon_bjj"};
 
-TString labels[nChannels] = {"e + XYZ #gamma", "e + XYZ #gamma",
-			     "#mu + XYZ #gamma", "#mu + XYZ #gamma"};
+TString channelLabels[nChannels] = {"e + XYZ #gamma", "e + XYZ #gamma",
+				    "#mu + XYZ #gamma", "#mu + XYZ #gamma"};
 
 TString qcdChannels[nChannels] = {"ele_jjj_eQCDTree", "ele_jjj_veto_eQCDTree",
 				  "muon_jjj_muQCDTree", "muon_jjj_veto_muQCDTree"};
@@ -407,10 +407,9 @@ class PlotMaker : public TObject {
   int photonMode;
 };
 
-PlotMaker::PlotMaker(Int_t lumi, TString requirement, TString channelName, bool blind) :
+PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
 intLumi_int(lumi),
   req(requirement),
-  channelLabel(channelName),
   blinded(blind)
 {
   char buffer[50];
@@ -2089,10 +2088,10 @@ void PlotMaker::SubtractMCFromQCD() {
   reqText->SetFillColor(0);
   reqText->SetFillStyle(0);
   reqText->SetLineColor(0);
-  if(nPhotons_req < 0) reqText->AddText(channelLabel[channel].ReplaceAll(" + XYZ #gamma", ""));
-  else if(nPhotons_req == 0) reqText->AddText(channelLabel[channel].ReplaceAll("XYZ", "0"));
-  else if(nPhotons_req == 1) reqText->AddText(channelLabel[channel].ReplaceAll("XYZ", "1"));
-  else reqText->AddText(channelLabel[channel].ReplaceAll("XYZ", "#geq2"));
+  if(nPhotons_req < 0) reqText->AddText(channelLabels[channel].ReplaceAll(" + XYZ #gamma", ""));
+  else if(nPhotons_req == 0) reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "0"));
+  else if(nPhotons_req == 1) reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "1"));
+  else reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "#geq2"));
   reqText->Draw("same");
 
   can->SaveAs("qcdSubtraction_"+req+".pdf");
@@ -3321,10 +3320,10 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   reqText->SetFillColor(0);
   reqText->SetFillStyle(0);
   reqText->SetLineColor(0);
-  if(nPhotons_req < 0) reqText->AddText(channelLabel[channel].ReplaceAll(" + XYZ #gamma", ""));
-  else if(nPhotons_req == 0) reqText->AddText(channelLabel[channel].ReplaceAll("XYZ", "0"));
-  else if(nPhotons_req == 1) reqText->AddText(channelLabel[channel].ReplaceAll("XYZ", "1"));
-  else reqText->AddText(channelLabel[channel].ReplaceAll("XYZ", "#geq2"));
+  if(nPhotons_req < 0) reqText->AddText(channelLabels[channel].ReplaceAll(" + XYZ #gamma", ""));
+  else if(nPhotons_req == 0) reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "0"));
+  else if(nPhotons_req == 1) reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "1"));
+  else reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "#geq2"));
 
   TPaveText * lumiHeader = new TPaveText(0.1, 0.901, 0.9, 0.94, "NDC");
   lumiHeader->SetFillColor(0);
