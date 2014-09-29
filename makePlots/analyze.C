@@ -61,7 +61,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
 
   TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
 
-  PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], blinded);
+  PlotMaker * pMaker = new PlotMaker(intLumi_int, channels[channel], channel, blinded);
   pMaker->LoadLeptonSFs("../data/lepton_SF_8TeV_53x_baseline.root");
   pMaker->LoadPhotonSFs("../data/Photon_ID_CSEV_SF_Jan22rereco_Full2012_S10_MC_V01.root");
 

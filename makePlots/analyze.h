@@ -194,6 +194,7 @@ class PlotMaker : public TObject {
  public:
   PlotMaker(Int_t lumi,
 	    TString requirement,
+	    int chanNo,
 	    bool blind);
 
   ~PlotMaker();
@@ -405,11 +406,14 @@ class PlotMaker : public TObject {
   bool useWHIZARD;
 
   int photonMode;
+
+  int channelNum;
 };
 
-PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
+PlotMaker::PlotMaker(Int_t lumi, TString requirement, int chanNo, bool blind) :
 intLumi_int(lumi),
   req(requirement),
+  channelNum(chanNo),
   blinded(blind)
 {
   char buffer[50];
@@ -2088,10 +2092,10 @@ void PlotMaker::SubtractMCFromQCD() {
   reqText->SetFillColor(0);
   reqText->SetFillStyle(0);
   reqText->SetLineColor(0);
-  if(nPhotons_req < 0) reqText->AddText(channelLabels[channel].ReplaceAll(" + XYZ #gamma", ""));
-  else if(nPhotons_req == 0) reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "0"));
-  else if(nPhotons_req == 1) reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "1"));
-  else reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "#geq2"));
+  if(nPhotons_req < 0) reqText->AddText(channelLabels[channelNum].ReplaceAll(" + XYZ #gamma", ""));
+  else if(nPhotons_req == 0) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "0"));
+  else if(nPhotons_req == 1) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "1"));
+  else reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "#geq2"));
   reqText->Draw("same");
 
   can->SaveAs("qcdSubtraction_"+req+".pdf");
@@ -3320,10 +3324,10 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   reqText->SetFillColor(0);
   reqText->SetFillStyle(0);
   reqText->SetLineColor(0);
-  if(nPhotons_req < 0) reqText->AddText(channelLabels[channel].ReplaceAll(" + XYZ #gamma", ""));
-  else if(nPhotons_req == 0) reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "0"));
-  else if(nPhotons_req == 1) reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "1"));
-  else reqText->AddText(channelLabels[channel].ReplaceAll("XYZ", "#geq2"));
+  if(nPhotons_req < 0) reqText->AddText(channelLabels[channelNum].ReplaceAll(" + XYZ #gamma", ""));
+  else if(nPhotons_req == 0) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "0"));
+  else if(nPhotons_req == 1) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "1"));
+  else reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "#geq2"));
 
   TPaveText * lumiHeader = new TPaveText(0.1, 0.901, 0.9, 0.94, "NDC");
   lumiHeader->SetFillColor(0);
