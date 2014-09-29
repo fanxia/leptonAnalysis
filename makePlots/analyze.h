@@ -412,8 +412,7 @@ class PlotMaker : public TObject {
 };
 
 PlotMaker::PlotMaker(Int_t lumi, int chanNo, bool blind, int photonsReq) :
-intLumi_int(lumi),
-  req(requirement),
+  intLumi_int(lumi),
   channelNum(chanNo),
   blinded(blind),
   photonReq(photonsReq)
@@ -2096,9 +2095,9 @@ void PlotMaker::SubtractMCFromQCD() {
   reqText->SetFillColor(0);
   reqText->SetFillStyle(0);
   reqText->SetLineColor(0);
-  if(photonsReq < 0) reqText->AddText(channelLabels[channelNum].ReplaceAll(" + XYZ #gamma", ""));
-  else if(photonsReq == 0) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "0"));
-  else if(photonsReq == 1) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "1"));
+  if(photonReq < 0) reqText->AddText(channelLabels[channelNum].ReplaceAll(" + XYZ #gamma", ""));
+  else if(photonReq == 0) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "0"));
+  else if(photonReq == 1) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "1"));
   else reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "#geq2"));
   reqText->Draw("same");
 
@@ -3328,9 +3327,9 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   reqText->SetFillColor(0);
   reqText->SetFillStyle(0);
   reqText->SetLineColor(0);
-  if(photonsReq < 0) reqText->AddText(channelLabels[channelNum].ReplaceAll(" + XYZ #gamma", ""));
-  else if(photonsReq == 0) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "0"));
-  else if(photonsReq == 1) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "1"));
+  if(photonReq < 0) reqText->AddText(channelLabels[channelNum].ReplaceAll(" + XYZ #gamma", ""));
+  else if(photonReq == 0) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "0"));
+  else if(photonReq == 1) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "1"));
   else reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "#geq2"));
 
   TPaveText * lumiHeader = new TPaveText(0.1, 0.901, 0.9, 0.94, "NDC");
