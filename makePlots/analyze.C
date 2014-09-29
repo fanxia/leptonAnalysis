@@ -134,19 +134,21 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   Double_t ttbar_semiLep_xsec  = 245.8 * 0.438;
   Double_t ttbar_fullLep_xsec  = 245.8 * 0.105;
 
+  bool reallyDoTopPt = true;
+
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttJetsHadronic.root", "ttJetsHadronic", 
 					  ttbar_hadronic_xsec, ttbar_hadronic_xsec * 0.025, ttbar_hadronic_xsec * 0.034, ttbar_hadronic_xsec * 0.026, ttbar_hadronic_xsec * 0.026,
-					  true, true,
+					  true, reallyDoTopPt,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive", "ttjets",
 					  ttjetsSF, ttjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttJetsSemiLep.root", "ttJetsSemiLep", 
 					  ttbar_semiLep_xsec, ttbar_semiLep_xsec * 0.025, ttbar_semiLep_xsec * 0.034, ttbar_semiLep_xsec * 0.026, ttbar_semiLep_xsec * 0.026,
-					  true, true,
+					  true, reallyDoTopPt,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive", "ttjets",
 					  ttjetsSF, ttjetsSFerror);
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttJetsFullLep.root", "ttJetsFullLep", 
 					  ttbar_fullLep_xsec, ttbar_fullLep_xsec * 0.025, ttbar_fullLep_xsec * 0.034, ttbar_fullLep_xsec * 0.026, ttbar_fullLep_xsec * 0.026,
-					  true, true,
+					  true, reallyDoTopPt,
 					  channel, 0, kGray, "t#bar{t} inclusive", "ttInclusive", "ttjets",
 					  ttjetsSF, ttjetsSFerror);
 
@@ -263,7 +265,7 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/WhizardMCTeeTeeGamma#2_to_5_All_ttbar_decay_channels
   loadSuccess |= pMaker->LoadMCBackground("/eos/uscms/store/user/bfrancis/inputs/signal_contamination_ttA_2to5.root", "ttA_2to5", 
 					  .9081 * 2, .9081 * .5, .9081 * .5, .9081 * 2 * 0.076, .9081 * 2 * 0.099, 
-					  false, true,
+					  false, reallyDoTopPt,
 					  channel, 6, 8, "t#bar{t} + #gamma", "ttgamma", "ttgamma",
 					  ttgammaSF, ttgammaSFerror);
   pMaker->SetUseWHIZARD(true);
