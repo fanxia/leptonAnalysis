@@ -3661,9 +3661,9 @@ void PlotMaker::CreateTable() {
   // pfMET
   int variableNumber = 1;
 
-  const int nBins = 5;
-  Double_t rangeLow[nBins] = {0, 0, 50, 80, 100};
-  Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
+  const int nBins = 6;
+  Double_t rangeLow[nBins] = {0, 0, 0, 50, 80, 100};
+  Double_t rangeHigh[nBins] = {-1, 20, 50, -1, -1, -1};
   
   FILE * tableFile = fopen("errorTable_"+req+".temp", "w");
   FILE * datacardFile = fopen("datacard_"+req+".temp", "w");
@@ -3811,14 +3811,16 @@ void PlotMaker::CreateTable() {
 
       TString fullTableLine = tableNames[j] + "val%%ux:%%.1f\n" + 
 	tableNames[j] + "errorup%%ux:%%.2f\n" + 
-	tableNames[j] + "errordown%%ux:%%.2f\n";
+	tableNames[j] + "errordown%%ux:%%.2f\n" +
+	tableNames[j] + "staterror%%ux:%%.2f\n";
       char buffer[200];
       sprintf(buffer, fullTableLine.Data());
 
       fprintf(tableFile, buffer,
 	      i+1, this_val, 
 	      i+1, sqrt(this_syserr2_up + this_staterr2),
-	      i+1, sqrt(this_syserr2_down + this_staterr2));
+	      i+1, sqrt(this_syserr2_down + this_staterr2),
+	      i+1, sqrt(this_staterr2));
 
       if(rangeLow[i] == 100 && rangeHigh[i] == -1 && this_val > 0.) {
 	Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
@@ -3861,7 +3863,7 @@ void PlotMaker::CreateTable() {
     }
 
     // total background
-    fprintf(tableFile, "bkgval%dx:%.1f\nbkgerrorup%dx:%.2f\nbkgerrordown%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgsys2_up + bkgstat2), i+1, sqrt(bkgsys2_down + bkgstat2));
+    fprintf(tableFile, "bkgval%dx:%.1f\nbkgerrorup%dx:%.2f\nbkgerrordown%dx:%.2f\nbkgstaterror%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgsys2_up + bkgstat2), i+1, sqrt(bkgsys2_down + bkgstat2), i+1, sqrt(bkgstat2));
 
     // Signal yields
     this_val = h_siga[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
@@ -3898,9 +3900,11 @@ void PlotMaker::CreateTable() {
       (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val) +
       (this_photonSFdown - this_val)*(this_photonSFdown - this_val);
     
-    fprintf(tableFile, "sigaval%dx:%.1f\nsigaerrorup%dx:%.2f\nsigaerrordown%dx:%.2f\n", i+1, this_val, 
+    fprintf(tableFile, "sigaval%dx:%.1f\nsigaerrorup%dx:%.2f\nsigaerrordown%dx:%.2f\nsigastaterror%dx:%.2f\n", 
+	    i+1, this_val, 
 	    i+1, sqrt(this_staterr2 + this_syserr2_up), 
-	    i+1, sqrt(this_staterr2 + this_syserr2_down));
+	    i+1, sqrt(this_staterr2 + this_syserr2_down),
+	    i+1, sqrt(this_staterr2));
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
       Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
@@ -3962,9 +3966,11 @@ void PlotMaker::CreateTable() {
       (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val) +
       (this_photonSFdown - this_val)*(this_photonSFdown - this_val);
     
-    fprintf(tableFile, "sigbval%dx:%.1f\nsigberrorup%dx:%.2f\nsigberrordown%dx:%.2f\n", i+1, this_val, 
+    fprintf(tableFile, "sigbval%dx:%.1f\nsigberrorup%dx:%.2f\nsigberrordown%dx:%.2f\nsigbstaterror%dx:.2f\n", 
+	    i+1, this_val, 
 	    i+1, sqrt(this_staterr2 + this_syserr2_up), 
-	    i+1, sqrt(this_staterr2 + this_syserr2_down));
+	    i+1, sqrt(this_staterr2 + this_syserr2_down),
+	    i+1, sqrt(this_staterr2));
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
       Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
