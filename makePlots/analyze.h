@@ -2175,6 +2175,50 @@ void PlotMaker::NormalizeQCD() {
   for(unsigned int i = 0; i < h_qcd.size(); i++) {
     double newError_lowBins[endBin];
 
+    if(i == 0) { // Nphotons
+      for(int j = 0; j < h_qcd[0]->GetNbinsX(); j++) {
+
+	double nphoton_qcd_scale, nphoton_qcd_error;
+	if(j == 0) {
+	  if(channelNum < 2) {
+	    nphoton_qcd_scale = 0.262103451738;
+	    nphoton_qcd_error = 0.0135331456284;
+	  }
+	  else {
+	    nphoton_qcd_scale = 0.00993519916066;
+	    nphoton_qcd_error = 0.00180912524239;
+	  }
+	}
+
+	else if(j == 1) {
+	  if(channelNum < 2) {
+	    nphoton_qcd_scale = 0.679335;
+	    nphoton_qcd_error = 0.0405333;
+	  }
+	  else {
+	    nphoton_qcd_scale = 0.;
+	    nphoton_qcd_error = 0.;
+	  }
+	}
+
+	else {
+	  nphoton_qcd_scale = 0.;
+	  nphoton_qcd_error = 0.;
+	}
+
+	double oldError_tmp = h_qcd[0]->GetBinError(j+1);
+	double oldValue_tmp = h_qcd[0]->GetBinContent(j+1);
+	double newError_tmp = (nphoton_qcd_scale != 0.) ? 
+	  nphoton_qcd_scale*oldValue_tmp*sqrt( (oldError_tmp*oldError_tmp/oldValue_tmp/oldValue_tmp) + (nphoton_qcd_error*nphoton_qcd_error/nphoton_qcd_scale/nphoton_qcd_scale)) :
+	  0.;
+
+	h_qcd[0]->SetBinContent(j+1, oldValue_tmp * nphoton_qcd_scale);
+	h_qcd[0]->SetBinContent(j+1, newError_tmp);
+      }
+
+      continue;
+    }
+
     if(i == 1) {
       for(int j = 0; j < endBin; j++) {
 	newError_lowBins[j] = h_qcd[1]->GetBinContent(j+1) * h_qcd[1]->GetBinContent(j+1);
@@ -2621,6 +2665,51 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
   
   if(qcdSF > 0) {
     for(unsigned int i = 0; i < h_qcd.size(); i++) {
+
+      if(i == 0) { // Nphotons
+	for(int j = 0; j < h_qcd[0]->GetNbinsX(); j++) {
+	  
+	  double nphoton_qcd_scale, nphoton_qcd_error;
+	  if(j == 0) {
+	    if(channelNum < 2) {
+	      nphoton_qcd_scale = 0.262103451738;
+	      nphoton_qcd_error = 0.0135331456284;
+	    }
+	    else {
+	      nphoton_qcd_scale = 0.00993519916066;
+	      nphoton_qcd_error = 0.00180912524239;
+	    }
+	  }
+	  
+	  else if(j == 1) {
+	    if(channelNum < 2) {
+	      nphoton_qcd_scale = 0.679335;
+	      nphoton_qcd_error = 0.0405333;
+	    }
+	    else {
+	      nphoton_qcd_scale = 0.;
+	      nphoton_qcd_error = 0.;
+	    }
+	  }
+	  
+	  else {
+	    nphoton_qcd_scale = 0.;
+	    nphoton_qcd_error = 0.;
+	  }
+	  
+	  double oldError_tmp = h_qcd[0]->GetBinError(j+1);
+	  double oldValue_tmp = h_qcd[0]->GetBinContent(j+1);
+	  double newError_tmp = (nphoton_qcd_scale != 0.) ? 
+	    nphoton_qcd_scale*oldValue_tmp*sqrt( (oldError_tmp*oldError_tmp/oldValue_tmp/oldValue_tmp) + (nphoton_qcd_error*nphoton_qcd_error/nphoton_qcd_scale/nphoton_qcd_scale)) :
+	    0.;
+	  
+	  h_qcd[0]->SetBinContent(j+1, oldValue_tmp * nphoton_qcd_scale);
+	  h_qcd[0]->SetBinContent(j+1, newError_tmp);
+	}
+	
+	continue;
+      }
+	  
       for(Int_t b = 0; b < h_qcd[i]->GetNbinsX(); b++) {
 	double olderr = h_qcd[i]->GetBinError(b+1);
 	double oldval = h_qcd[i]->GetBinContent(b+1);
@@ -3319,7 +3408,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   for(unsigned int i = 1; i < mcHistograms.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
   }
-  if(needsQCD) leg->AddEntry((TObject*)0, "", "");
+  if(!needsQCD) leg->AddEntry((TObject*)0, "", "");
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 

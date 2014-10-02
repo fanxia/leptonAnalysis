@@ -434,7 +434,9 @@ void analyze(TString input, bool addMC, int channel, int intLumi_int, double met
   // Now save the met plots out to file -- use these later for the limit-setting
   TFile * out = new TFile("mcPlots_"+channels[channel]+".root", "RECREATE");
 
-  bool needsQCD = true; // (channel < 2)
+  bool needsQCD = true;
+
+  if(nPhotons_req > 1 || (nPhotons_req > 0 && channel >= 2)) needsQCD = false;
 
   pMaker->Create2DPlots(needsQCD, true, out);
 
