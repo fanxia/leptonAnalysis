@@ -2213,7 +2213,7 @@ void PlotMaker::NormalizeQCD() {
 	  0.;
 
 	h_qcd[0]->SetBinContent(j+1, oldValue_tmp * nphoton_qcd_scale);
-	h_qcd[0]->SetBinContent(j+1, newError_tmp);
+	h_qcd[0]->SetBinError(j+1, newError_tmp);
       }
 
       continue;
@@ -2704,7 +2704,7 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
 	    0.;
 	  
 	  h_qcd[0]->SetBinContent(j+1, oldValue_tmp * nphoton_qcd_scale);
-	  h_qcd[0]->SetBinContent(j+1, newError_tmp);
+	  h_qcd[0]->SetBinError(j+1, newError_tmp);
 	}
 	
 	continue;
