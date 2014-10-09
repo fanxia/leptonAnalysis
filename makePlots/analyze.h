@@ -3234,7 +3234,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   if(needsQCD) h_qcd[variableNumber]->Write();
   for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) mcQCDHistograms[i][variableNumber]->Write();
-
+  
   TH1D *bkg, 
     *bkg_btagWeightUp, *bkg_btagWeightDown, 
     *bkg_puWeightUp, *bkg_puWeightDown, 
@@ -3661,9 +3661,9 @@ void PlotMaker::CreateTable() {
   // pfMET
   int variableNumber = 1;
 
-  const int nBins = 6;
-  Double_t rangeLow[nBins] = {0, 0, 0, 50, 80, 100};
-  Double_t rangeHigh[nBins] = {-1, 20, 50, -1, -1, -1};
+  const int nBins = 7;
+  Double_t rangeLow[nBins] = {0, 0, 20, 50, 75, 100, 150};
+  Double_t rangeHigh[nBins] = {-1, 20, 50, 75, 100, 150, -1};
   
   FILE * tableFile = fopen("errorTable_"+req+".temp", "w");
   FILE * datacardFile = fopen("datacard_"+req+".temp", "w");
@@ -4521,7 +4521,23 @@ void PlotMaker::SaveBackgroundOutput() {
   TH1D * h = (TH1D*)mcHistograms[0][variableNumber]->Clone("clone_"+limitNames[0]);
   for(unsigned int i = 1; i < mcHistograms.size(); i++) {
     if(limitNames[i] != limitNames[i-1]) {
+
       h->Write(limitNames[i-1]);
+
+      for(int j = 0; j < h->GetNbinsX(); j++) {
+	TH1D * h_flux_up = (TH1D*)h->Clone("clone_"+limitNames[i]+"_flux_up");
+	TH1D * h_flux_down = (TH1D*)h->Clone("clone_"+limitNames[i]+"_flux_down");
+
+	Double_t centralValue = h->GetBinContent(j+1);
+	Double_t statError = h->GetBinError(j+1);
+
+	if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
+	if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
+
+	h_flux_up->Write(limitNames[i-1]+"_stat_bin"+Form("%d", j+1)+"Up");
+	h_flux_down->Write(limitNames[i-1]+"_stat_bin"+Form("%d", j+1)+"Down");
+      }
+
       h = (TH1D*)mcHistograms[i][variableNumber]->Clone("clone_"+limitNames[i]);
     }
     else h->Add(mcHistograms[i][variableNumber]);

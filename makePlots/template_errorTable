@@ -9,15 +9,16 @@
   
   \begin{center}
     \resizebox{16cm}{!} {
-      \begin{tabular}{ | l | c | c | c | c | c | c | }
+      \begin{tabular}{ | l | c | c | c | c | c | c | c | }
         \hline
         Type & 
 	Total &
         MET $<$ 20 & 
-        MET $<$ 50 & 
-        MET $\ge$ 50 & 
-        MET $\ge$ 80 & 
-        MET $\ge$ 100 \\ 
+        20 $\leq$ MET $<$ 50 & 
+        50 $\leq$ MET $<$ 75 & 
+        75 $\leq$ MET $<$ 100 & 
+        100 $\leq$ MET $<$ 150 &
+	MET $\geq$ 150 \\
         \hline
         \hline
         
@@ -27,7 +28,8 @@
         \begin{tabular}{@{}c@{}} qcdval3x \vspace{1 mm} \\ $\pm$ qcdstat3x \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} qcdval4x \vspace{1 mm} \\ $\pm$ qcdstat4x \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} qcdval5x \vspace{1 mm} \\ $\pm$ qcdstat5x \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} qcdval6x \vspace{1 mm} \\ $\pm$ qcdstat6x \\ \end{tabular} \\
+	\begin{tabular}{@{}c@{}} qcdval6x \vspace{1 mm} \\ $\pm$ qcdstat6x \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} qcdval7x \vspace{1 mm} \\ $\pm$ qcdstat7x \\ \end{tabular} \\
         \hline
 
         $t\bar{t}+jets$ & 
@@ -36,7 +38,8 @@
         \begin{tabular}{@{}c@{}} ttInclusiveval3x \vspace{1 mm} \\ $^{+ttInclusiveerrorup3x}_{-ttInclusiveerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} ttInclusiveval4x \vspace{1 mm} \\ $^{+ttInclusiveerrorup4x}_{-ttInclusiveerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} ttInclusiveval5x \vspace{1 mm} \\ $^{+ttInclusiveerrorup5x}_{-ttInclusiveerrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} ttInclusiveval6x \vspace{1 mm} \\ $^{+ttInclusiveerrorup6x}_{-ttInclusiveerrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} ttInclusiveval6x \vspace{1 mm} \\ $^{+ttInclusiveerrorup6x}_{-ttInclusiveerrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} ttInclusiveval7x \vspace{1 mm} \\ $^{+ttInclusiveerrorup7x}_{-ttInclusiveerrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
 	$V+jets$ & 
@@ -45,7 +48,8 @@
         \begin{tabular}{@{}c@{}} vJetsval3x \vspace{1 mm} \\ $^{+vJetserrorup3x}_{-vJetserrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} vJetsval4x \vspace{1 mm} \\ $^{+vJetserrorup4x}_{-vJetserrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} vJetsval5x \vspace{1 mm} \\ $^{+vJetserrorup5x}_{-vJetserrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} vJetsval6x \vspace{1 mm} \\ $^{+vJetserrorup6x}_{-vJetserrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} vJetsval6x \vspace{1 mm} \\ $^{+vJetserrorup6x}_{-vJetserrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} vJetsval7x \vspace{1 mm} \\ $^{+vJetserrorup7x}_{-vJetserrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
 	Single $t$ & 
@@ -54,7 +58,8 @@
         \begin{tabular}{@{}c@{}} singleTopval3x \vspace{1 mm} \\ $^{+singleToperrorup3x}_{-singleToperrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} singleTopval4x \vspace{1 mm} \\ $^{+singleToperrorup4x}_{-singleToperrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} singleTopval5x \vspace{1 mm} \\ $^{+singleToperrorup5x}_{-singleToperrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} singleTopval6x \vspace{1 mm} \\ $^{+singleToperrorup6x}_{-singleToperrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} singleTopval6x \vspace{1 mm} \\ $^{+singleToperrorup6x}_{-singleToperrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} singleTopval7x \vspace{1 mm} \\ $^{+singleToperrorup7x}_{-singleToperrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
 	Di-boson & 
@@ -63,7 +68,8 @@
         \begin{tabular}{@{}c@{}} dibosonval3x \vspace{1 mm} \\ $^{+dibosonerrorup3x}_{-dibosonerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} dibosonval4x \vspace{1 mm} \\ $^{+dibosonerrorup4x}_{-dibosonerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} dibosonval5x \vspace{1 mm} \\ $^{+dibosonerrorup5x}_{-dibosonerrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} dibosonval6x \vspace{1 mm} \\ $^{+dibosonerrorup6x}_{-dibosonerrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} dibosonval6x \vspace{1 mm} \\ $^{+dibosonerrorup6x}_{-dibosonerrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} dibosonval7x \vspace{1 mm} \\ $^{+dibosonerrorup7x}_{-dibosonerrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
 	$t\bar{t}V$ & 
@@ -72,7 +78,8 @@
         \begin{tabular}{@{}c@{}} ttVval3x \vspace{1 mm} \\ $^{+ttVerrorup3x}_{-ttVerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} ttVval4x \vspace{1 mm} \\ $^{+ttVerrorup4x}_{-ttVerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} ttVval5x \vspace{1 mm} \\ $^{+ttVerrorup5x}_{-ttVerrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} ttVval6x \vspace{1 mm} \\ $^{+ttVerrorup6x}_{-ttVerrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} ttVval6x \vspace{1 mm} \\ $^{+ttVerrorup6x}_{-ttVerrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} ttVval7x \vspace{1 mm} \\ $^{+ttVerrorup7x}_{-ttVerrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
         $t\bar{t}\gamma$ & 
@@ -81,7 +88,8 @@
         \begin{tabular}{@{}c@{}} ttgammaval3x \vspace{1 mm} \\ $^{+ttgammaerrorup3x}_{-ttgammaerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} ttgammaval4x \vspace{1 mm} \\ $^{+ttgammaerrorup4x}_{-ttgammaerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} ttgammaval5x \vspace{1 mm} \\ $^{+ttgammaerrorup5x}_{-ttgammaerrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} ttgammaval6x \vspace{1 mm} \\ $^{+ttgammaerrorup6x}_{-ttgammaerrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} ttgammaval6x \vspace{1 mm} \\ $^{+ttgammaerrorup6x}_{-ttgammaerrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} ttgammaval7x \vspace{1 mm} \\ $^{+ttgammaerrorup7x}_{-ttgammaerrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
         \hline
 
@@ -91,7 +99,8 @@
         \begin{tabular}{@{}c@{}} bkgval3x \vspace{1 mm} \\ $^{+bkgerrorup3x}_{-bkgerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} bkgval4x \vspace{1 mm} \\ $^{+bkgerrorup4x}_{-bkgerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} bkgval5x \vspace{1 mm} \\ $^{+bkgerrorup5x}_{-bkgerrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} bkgval6x \vspace{1 mm} \\ $^{+bkgerrorup6x}_{-bkgerrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} bkgval6x \vspace{1 mm} \\ $^{+bkgerrorup6x}_{-bkgerrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} bkgval7x \vspace{1 mm} \\ $^{+bkgerrorup7x}_{-bkgerrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 	\hline
         
@@ -101,7 +110,8 @@
         \begin{tabular}{@{}c@{}} sigaval3x \vspace{1 mm} \\ $^{+sigaerrorup3x}_{-sigaerrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} sigaval4x \vspace{1 mm} \\ $^{+sigaerrorup4x}_{-sigaerrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} sigaval5x \vspace{1 mm} \\ $^{+sigaerrorup5x}_{-sigaerrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} sigaval6x \vspace{1 mm} \\ $^{+sigaerrorup6x}_{-sigaerrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} sigaval6x \vspace{1 mm} \\ $^{+sigaerrorup6x}_{-sigaerrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} sigaval7x \vspace{1 mm} \\ $^{+sigaerrorup7x}_{-sigaerrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 
 	GMSB (560\_325) &
@@ -110,7 +120,8 @@
         \begin{tabular}{@{}c@{}} sigbval3x \vspace{1 mm} \\ $^{+sigberrorup3x}_{-sigberrordown3x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} sigbval4x \vspace{1 mm} \\ $^{+sigberrorup4x}_{-sigberrordown4x}$ \vspace{1 mm} \\ \end{tabular} & 
         \begin{tabular}{@{}c@{}} sigbval5x \vspace{1 mm} \\ $^{+sigberrorup5x}_{-sigberrordown5x}$ \vspace{1 mm} \\ \end{tabular} &
-	\begin{tabular}{@{}c@{}} sigbval6x \vspace{1 mm} \\ $^{+sigberrorup6x}_{-sigberrordown6x}$ \vspace{1 mm} \\ \end{tabular} \\ 
+	\begin{tabular}{@{}c@{}} sigbval6x \vspace{1 mm} \\ $^{+sigberrorup6x}_{-sigberrordown6x}$ \vspace{1 mm} \\ \end{tabular} &
+	\begin{tabular}{@{}c@{}} sigbval7x \vspace{1 mm} \\ $^{+sigberrorup7x}_{-sigberrordown7x}$ \vspace{1 mm} \\ \end{tabular} \\ 
         \hline
 	\hline
 
@@ -120,7 +131,8 @@
 	dataval3x &
 	dataval4x &
 	dataval5x &
-	dataval6x \\
+	dataval6x &
+	dataval7x \\
         \hline
 
       \end{tabular}
