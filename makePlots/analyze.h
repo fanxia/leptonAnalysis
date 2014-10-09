@@ -4478,6 +4478,21 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     }
 
     h->Write("signal"+code_t);
+
+    for(int j = 0; j < h->GetNbinsX(); j++) {
+      TH1D * h_flux_up = (TH1D*)h->Clone("clone_signal_"+code_t+"_flux_up");
+      TH1D * h_flux_down = (TH1D*)h->Clone("clone_signal"+code_t+"_flux_down");
+      
+      Double_t centralValue = h->GetBinContent(j+1);
+      Double_t statError = h->GetBinError(j+1);
+      
+      if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
+      if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
+      
+      h_flux_up->Write("signal"+code_t+"_stat_bin"+Form("%d", j+1)+"Up");
+      h_flux_down->Write("signal"+code_t+"_stat_bin"+Form("%d", j+1)+"Down");
+    }
+    
     h_btagWeightUp->Write("signal"+code_t+"_btagWeightUp");
     h_btagWeightDown->Write("signal"+code_t+"_btagWeightDown");
     h_puWeightUp->Write("signal"+code_t+"_puWeightUp");
@@ -4525,8 +4540,8 @@ void PlotMaker::SaveBackgroundOutput() {
       h->Write(limitNames[i-1]);
 
       for(int j = 0; j < h->GetNbinsX(); j++) {
-	TH1D * h_flux_up = (TH1D*)h->Clone("clone_"+limitNames[i]+"_flux_up");
-	TH1D * h_flux_down = (TH1D*)h->Clone("clone_"+limitNames[i]+"_flux_down");
+	TH1D * h_flux_up = (TH1D*)h->Clone("clone_"+limitNames[i-1]+"_flux_up");
+	TH1D * h_flux_down = (TH1D*)h->Clone("clone_"+limitNames[i-1]+"_flux_down");
 
 	Double_t centralValue = h->GetBinContent(j+1);
 	Double_t statError = h->GetBinError(j+1);
@@ -4543,6 +4558,19 @@ void PlotMaker::SaveBackgroundOutput() {
     else h->Add(mcHistograms[i][variableNumber]);
   }
   h->Write(limitNames.back());
+  for(int j = 0; j < h->GetNbinsX(); j++) {
+    TH1D * h_flux_up = (TH1D*)h->Clone("clone_"+limitNames.back()+"_flux_up");
+    TH1D * h_flux_down = (TH1D*)h->Clone("clone_"+limitNames.back()+"_flux_down");
+    
+    Double_t centralValue = h->GetBinContent(j+1);
+    Double_t statError = h->GetBinError(j+1);
+    
+    if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
+    if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
+    
+    h_flux_up->Write(limitNames.back()+"_stat_bin"+Form("%d", j+1)+"Up");
+    h_flux_down->Write(limitNames.back()+"_stat_bin"+Form("%d", j+1)+"Down");
+  }
 
   h = (TH1D*)mcHistograms_btagWeightUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_btagWeightUp");
   for(unsigned int i = 1; i < mcHistograms_btagWeightUp.size(); i++) {
