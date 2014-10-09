@@ -4489,8 +4489,8 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
       if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
       if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
       
-      h_flux_up->Write("signal"+code_t+"_stat_bin"+Form("%d", j+1)+"Up");
-      h_flux_down->Write("signal"+code_t+"_stat_bin"+Form("%d", j+1)+"Down");
+      h_flux_up->Write("signal"+code_t+"_signal_stat_bin"+Form("%d", j+1)+"Up");
+      h_flux_down->Write("signal"+code_t+"_signal_stat_bin"+Form("%d", j+1)+"Down");
     }
     
     h_btagWeightUp->Write("signal"+code_t+"_btagWeightUp");
@@ -4549,8 +4549,8 @@ void PlotMaker::SaveBackgroundOutput() {
 	if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
 	if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
 
-	h_flux_up->Write(limitNames[i-1]+"_stat_bin"+Form("%d", j+1)+"Up");
-	h_flux_down->Write(limitNames[i-1]+"_stat_bin"+Form("%d", j+1)+"Down");
+	h_flux_up->Write(limitNames[i-1]+"_"+limitNames[i-1]+"_stat_bin"+Form("%d", j+1)+"Up");
+	h_flux_down->Write(limitNames[i-1]+"_"+limitNames[i-1]+"_stat_bin"+Form("%d", j+1)+"Down");
       }
 
       h = (TH1D*)mcHistograms[i][variableNumber]->Clone("clone_"+limitNames[i]);
@@ -4568,8 +4568,8 @@ void PlotMaker::SaveBackgroundOutput() {
     if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
     if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
     
-    h_flux_up->Write(limitNames.back()+"_stat_bin"+Form("%d", j+1)+"Up");
-    h_flux_down->Write(limitNames.back()+"_stat_bin"+Form("%d", j+1)+"Down");
+    h_flux_up->Write(limitNames.back()+"_"+limitNames.back()+"_stat_bin"+Form("%d", j+1)+"Up");
+    h_flux_down->Write(limitNames.back()+"_"+limitNames.back()+"_stat_bin"+Form("%d", j+1)+"Down");
   }
 
   h = (TH1D*)mcHistograms_btagWeightUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_btagWeightUp");
