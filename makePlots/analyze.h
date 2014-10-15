@@ -3017,10 +3017,10 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
   h_sigb_dR->SetLineColor(kBlue);
 
-  TLegend * leg = new TLegend(0.6, 0.8, 0.95, 0.95, NULL, "brNDC");
+  TLegend * leg = new TLegend(0.55, 0.8, 0.95, 0.95, NULL, "brNDC");
   leg->SetNColumns(2);
   leg->SetFillColor(0);
-  leg->SetTextSize(0.028);
+  leg->SetTextSize(0.023);
 
   vector<TH1D*> h_bkg_dR;
 
@@ -4470,32 +4470,6 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     h_acc->SetBinContent(h_acc->FindBin(index1, index2), h->Integral() / (0.438/3.) / 15000.);
     h_contamination->SetBinContent(h_contamination->FindBin(index1, index2), contamination / h->Integral());
 
-    // draw acc and etc
-    TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
-    h_acc->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
-    h_acc->GetXaxis()->SetRangeUser(0, 1600);
-    h_acc->GetXaxis()->SetLabelSize(0.03);
-    h_acc->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
-    h_acc->GetYaxis()->SetTitleOffset(1.3);
-    h_acc->GetYaxis()->SetLabelSize(0.03);
-    h_acc->GetYaxis()->SetRangeUser(0, 1600);
-    h_acc->GetZaxis()->SetLabelSize(0.02);
-    h_acc->Draw("colz");
-    can->SaveAs("acceptance_"+req+".pdf");
-
-    h_contamination->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
-    h_contamination->GetXaxis()->SetRangeUser(0, 1600);
-    h_contamination->GetXaxis()->SetLabelSize(0.03);
-    h_contamination->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
-    h_contamination->GetYaxis()->SetTitleOffset(1.3);
-    h_contamination->GetYaxis()->SetLabelSize(0.03);
-    h_contamination->GetYaxis()->SetRangeUser(0, 1600);
-    h_contamination->GetZaxis()->SetLabelSize(0.02);
-    h_contamination->Draw("colz");
-    can->SaveAs("contamination_"+req+".pdf");
-
-    delete can;
-
     double xsec = h_xsec->GetBinContent(h_xsec->FindBin(index1, index2));
     
     h->Scale(xsec * 19712. / 15000.);
@@ -4553,6 +4527,33 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     f->Close();
 
   }
+
+  // draw acc and etc
+  TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
+  fillPotHoles(h_acc);
+  h_acc->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
+  h_acc->GetXaxis()->SetRangeUser(0, 1600);
+  h_acc->GetXaxis()->SetLabelSize(0.03);
+  h_acc->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
+  h_acc->GetYaxis()->SetTitleOffset(1.3);
+  h_acc->GetYaxis()->SetLabelSize(0.03);
+  h_acc->GetYaxis()->SetRangeUser(0, 1600);
+  h_acc->GetZaxis()->SetLabelSize(0.02);
+  h_acc->Draw("colz");
+  can->SaveAs("acceptance_"+req+".pdf");
+  
+  h_contamination->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
+  h_contamination->GetXaxis()->SetRangeUser(0, 1600);
+  h_contamination->GetXaxis()->SetLabelSize(0.03);
+  h_contamination->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
+  h_contamination->GetYaxis()->SetTitleOffset(1.3);
+  h_contamination->GetYaxis()->SetLabelSize(0.03);
+  h_contamination->GetYaxis()->SetRangeUser(0, 1600);
+  h_contamination->GetZaxis()->SetLabelSize(0.02);
+  h_contamination->Draw("colz");
+  can->SaveAs("contamination_"+req+".pdf");
+  
+  delete can;
 
   fSignalOut->Close();
 
