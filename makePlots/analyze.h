@@ -3018,6 +3018,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->SetLineColor(kBlue);
 
   TLegend * leg = new TLegend(0.45, 0.6, 0.85, 0.85, NULL, "brNDC");
+  leg->SetNColumns(2);
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 
@@ -3040,6 +3041,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
   h_bkg_dR[0]->Draw("hist");
+  leg->AddEntry(h_bkg_dR[0], legendNames[0], "F");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
