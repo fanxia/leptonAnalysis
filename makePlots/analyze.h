@@ -3017,6 +3017,10 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
   h_sigb_dR->SetLineColor(kBlue);
 
+  TLegend * leg = new TLegend(0.45, 0.6, 0.85, 0.85, NULL, "brNDC");
+  leg->SetFillColor(0);
+  leg->SetTextSize(0.028);
+
   vector<TH1D*> h_bkg_dR;
 
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
@@ -3038,13 +3042,23 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
-    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
+      h_bkg_dR[i]->Draw("hist same");
+      leg->AddEntry(h_bkg_dR[i], legendNames[i], "F");
+    }
   }
 
   h_siga_dR->Draw("same");
   h_sigb_dR->Draw("same");
 
   h_sigb_dR->Draw("axis same");
+
+  TLine * cutLine = new TLine(0.5, h_bkg_dR[0]->GetYaxis()->GetMinimum(), 0.5, h_bkg_dR[0]->GetYaxis()->GetMaximum());
+  cutLine->SetLineColor(kRed);
+  cutLine->SetLineWidth(3);
+  cutLine->Draw("same");
+
+  leg->Draw("same");
 
   can->SaveAs("dR_gamma_ele_"+req+".pdf");
 
@@ -3082,6 +3096,13 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_sigb_dR->Draw("axis same");
 
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetYaxis()->GetMinimum(), 0.5, h_bkg_dR[0]->GetYaxis()->GetMaximum());
+  cutLine->SetLineColor(kRed);
+  cutLine->SetLineWidth(3);
+  cutLine->Draw("same");
+
+  leg->Draw("same");
+
   can->SaveAs("dR_gamma_muon_"+req+".pdf");
 
   h_bkg_dR.clear();
@@ -3118,6 +3139,13 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_sigb_dR->Draw("axis same");
 
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetYaxis()->GetMinimum(), 0.5, h_bkg_dR[0]->GetYaxis()->GetMaximum());
+  cutLine->SetLineColor(kRed);
+  cutLine->SetLineWidth(3);
+  cutLine->Draw("same");
+
+  leg->Draw("same");
+
   can->SaveAs("dR_gamma_jet_"+req+".pdf");
 	
   h_bkg_dR.clear();
@@ -3153,6 +3181,13 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Draw("same");
 
   h_sigb_dR->Draw("axis same");
+
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetYaxis()->GetMinimum(), 0.5, h_bkg_dR[0]->GetYaxis()->GetMaximum());
+  cutLine->SetLineColor(kRed);
+  cutLine->SetLineWidth(3);
+  cutLine->Draw("same");
+
+  leg->Draw("same");
 
   can->SaveAs("dR_gamma_photon_"+req+".pdf");
 
