@@ -3017,7 +3017,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
   h_sigb_dR->SetLineColor(kBlue);
 
-  TLegend * leg = new TLegend(0.45, 0.6, 0.85, 0.85, NULL, "brNDC");
+  TLegend * leg = new TLegend(0.55, 0.7, 0.95, 0.95, NULL, "brNDC");
   leg->SetNColumns(2);
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
@@ -3040,6 +3040,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   can->SetLogy(true);
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
+  h_bkg_dR[0]->GetXaxis()->SetTitle("#DeltaR(#gamma, e)");
   h_bkg_dR[0]->Draw("hist");
   leg->AddEntry(h_bkg_dR[0], legendNames[0], "F");
 
@@ -3087,6 +3088,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   }
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
+  h_bkg_dR[0]->GetXaxis()->SetTitle("#DeltaR(#gamma, #mu)");
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
@@ -3130,6 +3132,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   }
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
+  h_bkg_dR[0]->GetXaxis()->SetTitle("#DeltaR(#gamma, jet)");
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
@@ -3173,6 +3176,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   }
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
+  h_bkg_dR[0]->GetXaxis()->SetTitle("#DeltaR(#gamma_{1}, #gamma_{2})");
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
