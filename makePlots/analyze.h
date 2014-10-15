@@ -3017,7 +3017,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
   h_sigb_dR->SetLineColor(kBlue);
 
-  TLegend * leg = new TLegend(0.55, 0.7, 0.95, 0.95, NULL, "brNDC");
+  TLegend * leg = new TLegend(0.6, 0.8, 0.95, 0.95, NULL, "brNDC");
   leg->SetNColumns(2);
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
@@ -3050,6 +3050,9 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
       leg->AddEntry(h_bkg_dR[i], legendNames[i], "F");
     }
   }
+  leg->AddEntry((TObject*)0, "", "");
+  leg->AddEntry(h_siga_dR, "GGM (460_175)", "L");
+  leg->AddEntry(h_sigb_dR, "GGM (560_325)", "L");
 
   h_siga_dR->Draw("same");
   h_sigb_dR->Draw("same");
