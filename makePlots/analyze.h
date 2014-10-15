@@ -3053,7 +3053,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_sigb_dR->Draw("axis same");
 
-  TLine * cutLine = new TLine(0.5, h_bkg_dR[0]->GetYaxis()->GetMinimum(), 0.5, h_bkg_dR[0]->GetYaxis()->GetMaximum());
+  TLine * cutLine = new TLine(0.5, h_bkg_dR[0]->GetMinimum(), 0.5, h_bkg_dR[0]->GetMaximum());
   cutLine->SetLineColor(kRed);
   cutLine->SetLineWidth(3);
   cutLine->Draw("same");
@@ -3096,7 +3096,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_sigb_dR->Draw("axis same");
 
-  cutLine = new TLine(0.5, h_bkg_dR[0]->GetYaxis()->GetMinimum(), 0.5, h_bkg_dR[0]->GetYaxis()->GetMaximum());
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetMinimum(), 0.5, h_bkg_dR[0]->GetMaximum());
   cutLine->SetLineColor(kRed);
   cutLine->SetLineWidth(3);
   cutLine->Draw("same");
@@ -3139,7 +3139,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_sigb_dR->Draw("axis same");
 
-  cutLine = new TLine(0.5, h_bkg_dR[0]->GetYaxis()->GetMinimum(), 0.5, h_bkg_dR[0]->GetYaxis()->GetMaximum());
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetMinimum(), 0.5, h_bkg_dR[0]->GetMaximum());
   cutLine->SetLineColor(kRed);
   cutLine->SetLineWidth(3);
   cutLine->Draw("same");
@@ -3182,7 +3182,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
 
   h_sigb_dR->Draw("axis same");
 
-  cutLine = new TLine(0.5, h_bkg_dR[0]->GetYaxis()->GetMinimum(), 0.5, h_bkg_dR[0]->GetYaxis()->GetMaximum());
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetMinimum(), 0.5, h_bkg_dR[0]->GetMaximum());
   cutLine->SetLineColor(kRed);
   cutLine->SetLineWidth(3);
   cutLine->Draw("same");
