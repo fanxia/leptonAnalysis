@@ -1367,7 +1367,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     }
 
     double min_b_angle = 999.;
-    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, deltaR(btags_corrP4[i], photons[0]->caloPosition));
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, (double)deltaR(btags_corrP4[i], photons[0]->caloPosition));
     treeMap["dR_leadPhoton_b_min"] = min_b_angle;
 
     min_b_angle = 999.;
@@ -1408,7 +1408,7 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
     }
 
     double min_b_angle = 999.;
-    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, deltaR(btags_corrP4[i], photons[1]->caloPosition));
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, (double)deltaR(btags_corrP4[i], photons[1]->caloPosition));
     treeMap["dR_trailPhoton_b_min"] = min_b_angle;
 
     min_b_angle = 999.;
