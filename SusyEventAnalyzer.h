@@ -141,6 +141,7 @@ class SusyEventAnalyzer {
 		   vector<TLorentzVector> pfJets_corrP4,
 		   vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
 		   vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
+		   vector<susy::PFJet*> pfJets,
 		   float& HT, 
 		   TH1D*& h_dR_gamma_ele,
 		   TH1D*& h_dR_gamma_muon,
@@ -465,6 +466,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 				    vector<TLorentzVector> pfJets_corrP4,
 				    vector<susy::Muon*> tightMuons, vector<susy::Muon*> looseMuons,
 				    vector<susy::Electron*> tightEles, vector<susy::Electron*> looseEles,
+				    vector<susy::PFJet*> pfJets,
 				    float& HT, 
 				    TH1D*& h_dR_gamma_ele,
 				    TH1D*& h_dR_gamma_muon,
@@ -492,6 +494,7 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 	    // if loosening cut on dR(gamma, b) but not non-btagged jets, then only call it an overlap if the jet's not btagged
 	    if(useDeltaRCutsOnPhotons) overlap = true;
 	    else if(btagger == "CSVM" && pfJets[k]->bTagDiscriminators[susy::kCSV] <= 0.679) overlap = true;
+	  }
 	}
 
 	if(useDeltaRCutsOnPhotons) {
