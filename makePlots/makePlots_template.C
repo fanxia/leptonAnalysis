@@ -13,11 +13,9 @@ void makePlots() {
 
   double metCut = -1.;
 
-  bool displayKStest = true;
-  bool blinded = true;
+  bool displayKStest = false;
+  bool blinded = false;
   int nPhotons_req = NUM_PHOTONS_REQUIRED;
-
-  if(nPhotons_req > 0) metCut = 50.;
 
   const int nChannels = 4;
   TString channels[nChannels] = {"ele_jjj", "ele_bjj",

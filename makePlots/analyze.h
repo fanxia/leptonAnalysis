@@ -45,6 +45,9 @@ const int nChannels = 4;
 TString channels[nChannels] = {"ele_jjj", "ele_bjj",
 			       "muon_jjj", "muon_bjj"};
 
+TString channelLabels[nChannels] = {"e + XYZ #gamma", "e + XYZ #gamma",
+				    "#mu + XYZ #gamma", "#mu + XYZ #gamma"};
+
 TString qcdChannels[nChannels] = {"ele_jjj_eQCDTree", "ele_jjj_veto_eQCDTree",
 				  "muon_jjj_muQCDTree", "muon_jjj_veto_muQCDTree"};
 
@@ -190,8 +193,9 @@ class PlotMaker : public TObject {
 
  public:
   PlotMaker(Int_t lumi,
-	    TString requirement,
-	    bool blind);
+	    int chanNo,
+	    bool blind,
+	    int photonsReq);
 
   ~PlotMaker();
   
@@ -201,7 +205,7 @@ class PlotMaker : public TObject {
   bool LoadMCBackground(TString fileName, TString scanName,
 			Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 			bool removeTTA, bool reweightTop,
-			int channel, int layer, int color, TString legendEntry, TString tableEntry,
+			int channel, int layer, int color, TString legendEntry, TString tableEntry, TString limitEntry,
 			Double_t fitScaling = -1.0, Double_t fitScalingError = 0.0);
   
   void SetPhotonMode(int pMode) { photonMode = pMode; }
@@ -301,6 +305,7 @@ class PlotMaker : public TObject {
   vector<TString> mcNames;
   vector<TString> legendNames;
   vector<TString> tableNames;
+  vector<TString> limitNames;
   vector<bool> removeTTAoverlap;
   vector<bool> reweightTopPt;
   vector<Double_t> fitScale;
@@ -393,6 +398,7 @@ class PlotMaker : public TObject {
   Int_t intLumi_int;
   TString intLumi;
   TString req;
+  TString channelLabel;
 
   bool displayKStest;
   bool blinded;
@@ -400,13 +406,19 @@ class PlotMaker : public TObject {
   bool useWHIZARD;
 
   int photonMode;
+
+  int channelNum;
+  int photonReq;
 };
 
-PlotMaker::PlotMaker(Int_t lumi, TString requirement, bool blind) :
-intLumi_int(lumi),
-  req(requirement),
-  blinded(blind)
+PlotMaker::PlotMaker(Int_t lumi, int chanNo, bool blind, int photonsReq) :
+  intLumi_int(lumi),
+  channelNum(chanNo),
+  blinded(blind),
+  photonReq(photonsReq)
 {
+  req = channels[chanNo];
+
   char buffer[50];
   sprintf(buffer, "%.3f", (float)intLumi_int / 1000.);
   intLumi = buffer;
@@ -470,6 +482,7 @@ intLumi_int(lumi),
   mcNames.clear();
   legendNames.clear();
   tableNames.clear();
+  limitNames.clear();
   removeTTAoverlap.clear();
   reweightTopPt.clear();
   fitScale.clear();
@@ -545,6 +558,7 @@ PlotMaker::~PlotMaker() {
   mcNames.clear();
   legendNames.clear();
   tableNames.clear();
+  limitNames.clear();
   removeTTAoverlap.clear();
   reweightTopPt.clear();
   fitScale.clear();
@@ -637,7 +651,7 @@ void PlotMaker::LoadPhotonSFs(TString fileName) {
 bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
 				 Double_t xsec, Double_t scaleErrorUp, Double_t scaleErrorDown, Double_t pdfErrorUp, Double_t pdfErrorDown,
 				 bool removeTTA, bool reweightTop,
-				 int channel, int layer, int color, TString legendEntry, TString tableEntry,
+				 int channel, int layer, int color, TString legendEntry, TString tableEntry, TString limitEntry,
 				 Double_t fitScaling, Double_t fitScalingError) {
 
   mcFiles.push_back(new TFile(fileName, "READ"));
@@ -701,6 +715,7 @@ bool PlotMaker::LoadMCBackground(TString fileName, TString scanName,
   mcNames.push_back(scanName);
   legendNames.push_back(legendEntry);
   tableNames.push_back(tableEntry);
+  limitNames.push_back(limitEntry);
   removeTTAoverlap.push_back(removeTTA);
   reweightTopPt.push_back(reweightTop);
 
@@ -780,22 +795,22 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
     TH1D * h_bkg_topPtDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_topPtDown");
     mcHistograms_topPtDown[i].push_back(h_bkg_topPtDown);
 
-    TH1D * h_bkg_JECup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECup");
+    TH1D * h_bkg_JECup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECUp");
     mcHistograms_JECup[i].push_back(h_bkg_JECup);
 
-    TH1D * h_bkg_JECdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECdown");
+    TH1D * h_bkg_JECdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECDown");
     mcHistograms_JECdown[i].push_back(h_bkg_JECdown);
 
-    TH1D * h_bkg_leptonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFup");
+    TH1D * h_bkg_leptonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFUp");
     mcHistograms_leptonSFup[i].push_back(h_bkg_leptonSFup);
 
-    TH1D * h_bkg_leptonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFdown");
+    TH1D * h_bkg_leptonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFDown");
     mcHistograms_leptonSFdown[i].push_back(h_bkg_leptonSFdown);
 
-    TH1D * h_bkg_photonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_photonSFup");
+    TH1D * h_bkg_photonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_photonSFUp");
     mcHistograms_photonSFup[i].push_back(h_bkg_photonSFup);
 
-    TH1D * h_bkg_photonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_photonSFdown");
+    TH1D * h_bkg_photonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_photonSFDown");
     mcHistograms_photonSFdown[i].push_back(h_bkg_photonSFdown);
   }
 
@@ -833,27 +848,27 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
   sig_a_topPtDown->Sumw2();
   h_siga_topPtDown.push_back(sig_a_topPtDown);
   
-  TH1D * sig_a_JECup = new TH1D(variable+"_a_"+req+"_JECup", variable, nBins, xlo, xhi);
+  TH1D * sig_a_JECup = new TH1D(variable+"_a_"+req+"_JECUp", variable, nBins, xlo, xhi);
   sig_a_JECup->Sumw2();
   h_siga_JECup.push_back(sig_a_JECup);
 
-  TH1D * sig_a_JECdown = new TH1D(variable+"_a_"+req+"_JECdown", variable, nBins, xlo, xhi);
+  TH1D * sig_a_JECdown = new TH1D(variable+"_a_"+req+"_JECDown", variable, nBins, xlo, xhi);
   sig_a_JECdown->Sumw2();
   h_siga_JECdown.push_back(sig_a_JECdown);
 
-  TH1D * sig_a_leptonSFup = new TH1D(variable+"_a_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
+  TH1D * sig_a_leptonSFup = new TH1D(variable+"_a_"+req+"_leptonSFUp", variable, nBins, xlo, xhi);
   sig_a_leptonSFup->Sumw2();
   h_siga_leptonSFup.push_back(sig_a_leptonSFup);
 
-  TH1D * sig_a_leptonSFdown = new TH1D(variable+"_a_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
+  TH1D * sig_a_leptonSFdown = new TH1D(variable+"_a_"+req+"_leptonSFDown", variable, nBins, xlo, xhi);
   sig_a_leptonSFdown->Sumw2();
   h_siga_leptonSFdown.push_back(sig_a_leptonSFdown);
 
-  TH1D * sig_a_photonSFup = new TH1D(variable+"_a_"+req+"_photonSFup", variable, nBins, xlo, xhi);
+  TH1D * sig_a_photonSFup = new TH1D(variable+"_a_"+req+"_photonSFUp", variable, nBins, xlo, xhi);
   sig_a_photonSFup->Sumw2();
   h_siga_photonSFup.push_back(sig_a_photonSFup);
 
-  TH1D * sig_a_photonSFdown = new TH1D(variable+"_a_"+req+"_photonSFdown", variable, nBins, xlo, xhi);
+  TH1D * sig_a_photonSFdown = new TH1D(variable+"_a_"+req+"_photonSFDown", variable, nBins, xlo, xhi);
   sig_a_photonSFdown->Sumw2();
   h_siga_photonSFdown.push_back(sig_a_photonSFdown);
 
@@ -885,27 +900,27 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Float_t xlo, Float_
   sig_b_topPtDown->Sumw2();
   h_sigb_topPtDown.push_back(sig_b_topPtDown);
   
-  TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECup", variable, nBins, xlo, xhi);
+  TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECUp", variable, nBins, xlo, xhi);
   sig_b_JECup->Sumw2();
   h_sigb_JECup.push_back(sig_b_JECup);
 
-  TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECdown", variable, nBins, xlo, xhi);
+  TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECDown", variable, nBins, xlo, xhi);
   sig_b_JECdown->Sumw2();
   h_sigb_JECdown.push_back(sig_b_JECdown);
 
-  TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFup", variable, nBins, xlo, xhi);
+  TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFUp", variable, nBins, xlo, xhi);
   sig_b_leptonSFup->Sumw2();
   h_sigb_leptonSFup.push_back(sig_b_leptonSFup);
 
-  TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFdown", variable, nBins, xlo, xhi);
+  TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFDown", variable, nBins, xlo, xhi);
   sig_b_leptonSFdown->Sumw2();
   h_sigb_leptonSFdown.push_back(sig_b_leptonSFdown);
   
-  TH1D * sig_b_photonSFup = new TH1D(variable+"_b_"+req+"_photonSFup", variable, nBins, xlo, xhi);
+  TH1D * sig_b_photonSFup = new TH1D(variable+"_b_"+req+"_photonSFUp", variable, nBins, xlo, xhi);
   sig_b_photonSFup->Sumw2();
   h_sigb_photonSFup.push_back(sig_b_photonSFup);
 
-  TH1D * sig_b_photonSFdown = new TH1D(variable+"_b_"+req+"_photonSFdown", variable, nBins, xlo, xhi);
+  TH1D * sig_b_photonSFdown = new TH1D(variable+"_b_"+req+"_photonSFDown", variable, nBins, xlo, xhi);
   sig_b_photonSFdown->Sumw2();
   h_sigb_photonSFdown.push_back(sig_b_photonSFdown);
 
@@ -959,22 +974,22 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
     TH1D * h_bkg_topPtDown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_topPtDown");
     mcHistograms_topPtDown[i].push_back(h_bkg_topPtDown);
 
-    TH1D * h_bkg_JECup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECup");
+    TH1D * h_bkg_JECup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECUp");
     mcHistograms_JECup[i].push_back(h_bkg_JECup);
 
-    TH1D * h_bkg_JECdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECdown");
+    TH1D * h_bkg_JECdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_JECDown");
     mcHistograms_JECdown[i].push_back(h_bkg_JECdown);
 
-    TH1D * h_bkg_leptonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFup");
+    TH1D * h_bkg_leptonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFUp");
     mcHistograms_leptonSFup[i].push_back(h_bkg_leptonSFup);
 
-    TH1D * h_bkg_leptonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFdown");
+    TH1D * h_bkg_leptonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_leptonSFDown");
     mcHistograms_leptonSFdown[i].push_back(h_bkg_leptonSFdown);
 
-    TH1D * h_bkg_photonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_photonSFup");
+    TH1D * h_bkg_photonSFup = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_photonSFUp");
     mcHistograms_photonSFup[i].push_back(h_bkg_photonSFup);
 
-    TH1D * h_bkg_photonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_photonSFdown");
+    TH1D * h_bkg_photonSFdown = (TH1D*)h_bkg->Clone(variable+"_"+mcNames[i]+"_"+req+"_photonSFDown");
     mcHistograms_photonSFdown[i].push_back(h_bkg_photonSFdown);
   }
   
@@ -1012,27 +1027,27 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
   sig_a_topPtDown->Sumw2();
   h_siga_topPtDown.push_back(sig_a_topPtDown);
   
-  TH1D * sig_a_JECup = new TH1D(variable+"_a_"+req+"_JECup", variable, nBins, customBins);
+  TH1D * sig_a_JECup = new TH1D(variable+"_a_"+req+"_JECUp", variable, nBins, customBins);
   sig_a_JECup->Sumw2();
   h_siga_JECup.push_back(sig_a_JECup);
 
-  TH1D * sig_a_JECdown = new TH1D(variable+"_a_"+req+"_JECdown", variable, nBins, customBins);
+  TH1D * sig_a_JECdown = new TH1D(variable+"_a_"+req+"_JECDown", variable, nBins, customBins);
   sig_a_JECdown->Sumw2();
   h_siga_JECdown.push_back(sig_a_JECdown);
 
-  TH1D * sig_a_leptonSFup = new TH1D(variable+"_a_"+req+"_leptonSFup", variable, nBins, customBins);
+  TH1D * sig_a_leptonSFup = new TH1D(variable+"_a_"+req+"_leptonSFUp", variable, nBins, customBins);
   sig_a_leptonSFup->Sumw2();
   h_siga_leptonSFup.push_back(sig_a_leptonSFup);
 
-  TH1D * sig_a_leptonSFdown = new TH1D(variable+"_a_"+req+"_leptonSFdown", variable, nBins, customBins);
+  TH1D * sig_a_leptonSFdown = new TH1D(variable+"_a_"+req+"_leptonSFDown", variable, nBins, customBins);
   sig_a_leptonSFdown->Sumw2();
   h_siga_leptonSFdown.push_back(sig_a_leptonSFdown);
 
-  TH1D * sig_a_photonSFup = new TH1D(variable+"_a_"+req+"_photonSFup", variable, nBins, customBins);
+  TH1D * sig_a_photonSFup = new TH1D(variable+"_a_"+req+"_photonSFUp", variable, nBins, customBins);
   sig_a_photonSFup->Sumw2();
   h_siga_photonSFup.push_back(sig_a_photonSFup);
 
-  TH1D * sig_a_photonSFdown = new TH1D(variable+"_a_"+req+"_photonSFdown", variable, nBins, customBins);
+  TH1D * sig_a_photonSFdown = new TH1D(variable+"_a_"+req+"_photonSFDown", variable, nBins, customBins);
   sig_a_photonSFdown->Sumw2();
   h_siga_photonSFdown.push_back(sig_a_photonSFdown);
 
@@ -1064,27 +1079,27 @@ void PlotMaker::BookHistogram(TString variable, Int_t nBins, Double_t* customBin
   sig_b_topPtDown->Sumw2();
   h_sigb_topPtDown.push_back(sig_b_topPtDown);
   
-  TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECup", variable, nBins, customBins);
+  TH1D * sig_b_JECup = new TH1D(variable+"_b_"+req+"_JECUp", variable, nBins, customBins);
   sig_b_JECup->Sumw2();
   h_sigb_JECup.push_back(sig_b_JECup);
 
-  TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECdown", variable, nBins, customBins);
+  TH1D * sig_b_JECdown = new TH1D(variable+"_b_"+req+"_JECDown", variable, nBins, customBins);
   sig_b_JECdown->Sumw2();
   h_sigb_JECdown.push_back(sig_b_JECdown);
 
-  TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFup", variable, nBins, customBins);
+  TH1D * sig_b_leptonSFup = new TH1D(variable+"_b_"+req+"_leptonSFUp", variable, nBins, customBins);
   sig_b_leptonSFup->Sumw2();
   h_sigb_leptonSFup.push_back(sig_b_leptonSFup);
 
-  TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFdown", variable, nBins, customBins);
+  TH1D * sig_b_leptonSFdown = new TH1D(variable+"_b_"+req+"_leptonSFDown", variable, nBins, customBins);
   sig_b_leptonSFdown->Sumw2();
   h_sigb_leptonSFdown.push_back(sig_b_leptonSFdown);
 
-  TH1D * sig_b_photonSFup = new TH1D(variable+"_b_"+req+"_photonSFup", variable, nBins, customBins);
+  TH1D * sig_b_photonSFup = new TH1D(variable+"_b_"+req+"_photonSFUp", variable, nBins, customBins);
   sig_b_photonSFup->Sumw2();
   h_sigb_photonSFup.push_back(sig_b_photonSFup);
 
-  TH1D * sig_b_photonSFdown = new TH1D(variable+"_b_"+req+"_photonSFdown", variable, nBins, customBins);
+  TH1D * sig_b_photonSFdown = new TH1D(variable+"_b_"+req+"_photonSFDown", variable, nBins, customBins);
   sig_b_photonSFdown->Sumw2();
   h_sigb_photonSFdown.push_back(sig_b_photonSFdown);
   
@@ -1286,7 +1301,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(blinded && vars[0] == 2) continue;
       if(blinded && vars[0] == 1 && variables[j] == "pfMET" && vars[1] > 50.) continue;
@@ -1313,7 +1328,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     if(metCut > 0. && vars[1] >= metCut) continue;
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       for(unsigned int k = 0; k < variables_2d.size(); k++) {
 	if(variables[j] == variables_2d[k].first) {
@@ -1370,7 +1385,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 			    puWeight*puWeight*btagWeight*btagWeight*fitScaleError[i]*fitScaleError[i];
 
       for(unsigned int k = 0; k < vars.size(); k++) {
-	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF;
 	if(reweightTopPt[i]) totalWeight *= topPtReweighting;
@@ -1539,7 +1554,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	
 	for(unsigned int k = 0; k < vars.size(); k++) {
-	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	  mcHistograms_JECup[i][k]->Fill(vars[k], totalWeight);
 	}
 	
@@ -1574,7 +1589,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
 	if(fitScale[i] > 0) totalWeight *= fitScale[i];
 	
 	for(unsigned int k = 0; k < vars.size(); k++) {
-	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	  if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	  mcHistograms_JECdown[i][k]->Fill(vars[k], totalWeight);
 	}
 	
@@ -1621,7 +1636,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       if(fitScale[i] > 0) totalWeight *= fitScale[i];
 
       for(unsigned int k = 0; k < vars.size(); k++) {
-	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[k] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
 	Float_t oldError = mcQCDHistograms[i][k]->GetBinError(mcQCDHistograms[i][k]->FindBin(vars[k]));
 	Float_t newerror = sqrt(oldError*oldError + addError2);
@@ -1674,7 +1689,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
       Float_t olderror = h_siga[j]->GetBinError(h_siga[j]->FindBin(vars[j]));
@@ -1789,7 +1804,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
       
       for(unsigned int j = 0; j < vars.size(); j++) {
-	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
 	h_siga_JECup[j]->Fill(vars[j], totalWeight);
@@ -1815,7 +1830,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
       
       for(unsigned int j = 0; j < vars.size(); j++) {
-	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
 	h_siga_JECdown[j]->Fill(vars[j], totalWeight);
@@ -1852,7 +1867,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
     GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
       Float_t olderror = h_sigb[j]->GetBinError(h_sigb[j]->FindBin(vars[j]));
@@ -1967,7 +1982,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
       
       for(unsigned int j = 0; j < vars.size(); j++) {
-	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
 	h_sigb_JECup[j]->Fill(vars[j], totalWeight);
@@ -1993,7 +2008,7 @@ void PlotMaker::FillHistograms(double metCut, int nPhotons_req, int nBtagReq, in
       GetPhotonSF(vars, photonSF, photonSFup, photonSFdown);
       
       for(unsigned int j = 0; j < vars.size(); j++) {
-	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+	if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 	
 	double totalWeight = puWeight * btagWeight * leptonSF * photonSF * topPtReweighting;
 	h_sigb_JECdown[j]->Fill(vars[j], totalWeight);
@@ -2036,7 +2051,10 @@ void PlotMaker::SubtractMCFromQCD() {
 
   vector<TH1D*> h_clones;
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) {
+    if(mcLayerNumbers[i] > 1) continue;
+
     h_clones.push_back((TH1D*)mcQCDHistograms[i][variableNumber]->Clone(TString(mcQCDHistograms[i][variableNumber]->GetName()) + "_clone"));
+    h_clones.back() = (TH1D*)DivideByBinWidth(h_clones.back());
     h_clones.back()->SetFillColor(mcLayerColors[i]);
   }
 
@@ -2046,19 +2064,24 @@ void PlotMaker::SubtractMCFromQCD() {
     }
   }
 
-  h_qcd[1]->GetXaxis()->SetTitle("#slash{E}_{T} (GeV)");
-  h_qcd[1]->GetYaxis()->SetTitle("Events");
+  TH1D * qcd_clone = (TH1D*)h_qcd[1]->Clone(TString(h_qcd[1]->GetName()) + "_clone");
+  qcd_clone = (TH1D*)DivideByBinWidth(qcd_clone);
 
-  h_qcd[1]->Draw("e1");
+  qcd_clone->GetXaxis()->SetTitle("#slash{E}_{T} (GeV)");
+  qcd_clone->GetYaxis()->SetTitle("Number of Events / GeV");
+
+  qcd_clone->GetYaxis()->SetRangeUser(0.1, qcd_clone->GetMaximum() * 1.4);
+
+  qcd_clone->Draw("e1");
   h_clones[0]->Draw("hist same");
   for(unsigned int i = 1; i < h_clones.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_clones[i]->Draw("hist same");
   }
-  h_qcd[1]->Draw("e1 same");
-  h_qcd[1]->Draw("axis same");
+  qcd_clone->Draw("e1 same");
+  qcd_clone->Draw("axis same");
 
   TLegend * leg = new TLegend(0.45, 0.6, 0.85, 0.85, NULL, "brNDC");
-  leg->AddEntry(h_qcd[1], "QCD Data", "LP");
+  leg->AddEntry(qcd_clone, "QCD Data", "LP");
   leg->AddEntry((TObject*)0, "QCD Selection on MC:", "");
   leg->AddEntry(h_clones[0], legendNames[0], "F");
   for(unsigned int i = 1; i < h_clones.size(); i++) {
@@ -2066,8 +2089,17 @@ void PlotMaker::SubtractMCFromQCD() {
   }
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
-
   leg->Draw("same");
+
+  TPaveText * reqText = new TPaveText(0.45, 0.47, 0.85, 0.57, "NDC");
+  reqText->SetFillColor(0);
+  reqText->SetFillStyle(0);
+  reqText->SetLineColor(0);
+  if(photonReq < 0) reqText->AddText(channelLabels[channelNum].ReplaceAll(" + XYZ #gamma", ""));
+  else if(photonReq == 0) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "0"));
+  else if(photonReq == 1) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "1"));
+  else reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "#geq2"));
+  reqText->Draw("same");
 
   can->SaveAs("qcdSubtraction_"+req+".pdf");
 
@@ -2142,6 +2174,50 @@ void PlotMaker::NormalizeQCD() {
 
   for(unsigned int i = 0; i < h_qcd.size(); i++) {
     double newError_lowBins[endBin];
+
+    if(i == 0) { // Nphotons
+      for(int j = 0; j < h_qcd[0]->GetNbinsX(); j++) {
+
+	double nphoton_qcd_scale, nphoton_qcd_error;
+	if(j == 0) {
+	  if(channelNum < 2) {
+	    nphoton_qcd_scale = 0.262103451738;
+	    nphoton_qcd_error = 0.0135331456284;
+	  }
+	  else {
+	    nphoton_qcd_scale = 0.00993519916066;
+	    nphoton_qcd_error = 0.00180912524239;
+	  }
+	}
+
+	else if(j == 1) {
+	  if(channelNum < 2) {
+	    nphoton_qcd_scale = 0.679335;
+	    nphoton_qcd_error = 0.0405333;
+	  }
+	  else {
+	    nphoton_qcd_scale = 0.;
+	    nphoton_qcd_error = 0.;
+	  }
+	}
+
+	else {
+	  nphoton_qcd_scale = 0.;
+	  nphoton_qcd_error = 0.;
+	}
+
+	double oldError_tmp = h_qcd[0]->GetBinError(j+1);
+	double oldValue_tmp = h_qcd[0]->GetBinContent(j+1);
+	double newError_tmp = (nphoton_qcd_scale != 0.) ? 
+	  nphoton_qcd_scale*oldValue_tmp*sqrt( (oldError_tmp*oldError_tmp/oldValue_tmp/oldValue_tmp) + (nphoton_qcd_error*nphoton_qcd_error/nphoton_qcd_scale/nphoton_qcd_scale)) :
+	  0.;
+
+	h_qcd[0]->SetBinContent(j+1, oldValue_tmp * nphoton_qcd_scale);
+	h_qcd[0]->SetBinError(j+1, newError_tmp);
+      }
+
+      continue;
+    }
 
     if(i == 1) {
       for(int j = 0; j < endBin; j++) {
@@ -2227,7 +2303,7 @@ void PlotMaker::RefillQCD(TH1D * weights, double metCut, int nPhotons_req, int n
     Float_t weightError = (chan < 2) ? weights->GetBinError(weights->FindBin(vars[16])) : weights->GetBinError(weights->FindBin(vars[18]));
 
     for(unsigned int j = 0; j < vars.size(); j++) {
-      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req) continue;
+      if(variables[j] != "Nphotons" && (int)vars[0] != nPhotons_req && nPhotons_req >= 0) continue;
 
       for(unsigned int k = 0; k < variables_2d.size(); k++) {
 	if(variables[j] == variables_2d[k].first) {
@@ -2589,6 +2665,51 @@ void PlotMaker::ScaleFromFits(double qcdSF, double qcdSFerror, double mcSF, doub
   
   if(qcdSF > 0) {
     for(unsigned int i = 0; i < h_qcd.size(); i++) {
+
+      if(i == 0) { // Nphotons
+	for(int j = 0; j < h_qcd[0]->GetNbinsX(); j++) {
+	  
+	  double nphoton_qcd_scale, nphoton_qcd_error;
+	  if(j == 0) {
+	    if(channelNum < 2) {
+	      nphoton_qcd_scale = 0.262103451738;
+	      nphoton_qcd_error = 0.0135331456284;
+	    }
+	    else {
+	      nphoton_qcd_scale = 0.00993519916066;
+	      nphoton_qcd_error = 0.00180912524239;
+	    }
+	  }
+	  
+	  else if(j == 1) {
+	    if(channelNum < 2) {
+	      nphoton_qcd_scale = 0.679335;
+	      nphoton_qcd_error = 0.0405333;
+	    }
+	    else {
+	      nphoton_qcd_scale = 0.;
+	      nphoton_qcd_error = 0.;
+	    }
+	  }
+	  
+	  else {
+	    nphoton_qcd_scale = 0.;
+	    nphoton_qcd_error = 0.;
+	  }
+	  
+	  double oldError_tmp = h_qcd[0]->GetBinError(j+1);
+	  double oldValue_tmp = h_qcd[0]->GetBinContent(j+1);
+	  double newError_tmp = (nphoton_qcd_scale != 0.) ? 
+	    nphoton_qcd_scale*oldValue_tmp*sqrt( (oldError_tmp*oldError_tmp/oldValue_tmp/oldValue_tmp) + (nphoton_qcd_error*nphoton_qcd_error/nphoton_qcd_scale/nphoton_qcd_scale)) :
+	    0.;
+	  
+	  h_qcd[0]->SetBinContent(j+1, oldValue_tmp * nphoton_qcd_scale);
+	  h_qcd[0]->SetBinError(j+1, newError_tmp);
+	}
+	
+	continue;
+      }
+	  
       for(Int_t b = 0; b < h_qcd[i]->GetNbinsX(); b++) {
 	double olderr = h_qcd[i]->GetBinError(b+1);
 	double oldval = h_qcd[i]->GetBinContent(b+1);
@@ -2896,6 +3017,11 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Scale(intLumi_int * 0.0399591 / 15000.);
   h_sigb_dR->SetLineColor(kBlue);
 
+  TLegend * leg = new TLegend(0.55, 0.8, 0.95, 0.95, NULL, "brNDC");
+  leg->SetNColumns(2);
+  leg->SetFillColor(0);
+  leg->SetTextSize(0.023);
+
   vector<TH1D*> h_bkg_dR;
 
   for(unsigned int i = 0; i < mcFiles.size(); i++) {
@@ -2914,16 +3040,31 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   can->SetLogy(true);
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
+  h_bkg_dR[0]->GetXaxis()->SetTitle("#DeltaR(#gamma, e)");
   h_bkg_dR[0]->Draw("hist");
+  leg->AddEntry(h_bkg_dR[0], legendNames[0], "F");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
-    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) h_bkg_dR[i]->Draw("hist same");
+    if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) {
+      h_bkg_dR[i]->Draw("hist same");
+      leg->AddEntry(h_bkg_dR[i], legendNames[i], "F");
+    }
   }
+  leg->AddEntry((TObject*)0, "", "");
+  leg->AddEntry(h_siga_dR, "GGM (460_175)", "L");
+  leg->AddEntry(h_sigb_dR, "GGM (560_325)", "L");
 
   h_siga_dR->Draw("same");
   h_sigb_dR->Draw("same");
 
   h_sigb_dR->Draw("axis same");
+
+  TLine * cutLine = new TLine(0.5, h_bkg_dR[0]->GetMinimum(), 0.5, h_bkg_dR[0]->GetMaximum());
+  cutLine->SetLineColor(kRed);
+  cutLine->SetLineWidth(3);
+  cutLine->Draw("same");
+
+  leg->Draw("same");
 
   can->SaveAs("dR_gamma_ele_"+req+".pdf");
 
@@ -2950,6 +3091,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   }
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
+  h_bkg_dR[0]->GetXaxis()->SetTitle("#DeltaR(#gamma, #mu)");
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
@@ -2960,6 +3102,13 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Draw("same");
 
   h_sigb_dR->Draw("axis same");
+
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetMinimum(), 0.5, h_bkg_dR[0]->GetMaximum());
+  cutLine->SetLineColor(kRed);
+  cutLine->SetLineWidth(3);
+  cutLine->Draw("same");
+
+  leg->Draw("same");
 
   can->SaveAs("dR_gamma_muon_"+req+".pdf");
 
@@ -2986,6 +3135,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   }
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
+  h_bkg_dR[0]->GetXaxis()->SetTitle("#DeltaR(#gamma, jet)");
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
@@ -2996,6 +3146,13 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Draw("same");
 
   h_sigb_dR->Draw("axis same");
+
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetMinimum(), 0.5, h_bkg_dR[0]->GetMaximum());
+  cutLine->SetLineColor(kRed);
+  cutLine->SetLineWidth(3);
+  cutLine->Draw("same");
+
+  leg->Draw("same");
 
   can->SaveAs("dR_gamma_jet_"+req+".pdf");
 	
@@ -3022,6 +3179,7 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   }
 
   h_bkg_dR[0]->GetXaxis()->SetRangeUser(0, 5);
+  h_bkg_dR[0]->GetXaxis()->SetTitle("#DeltaR(#gamma_{1}, #gamma_{2})");
   h_bkg_dR[0]->Draw("hist");
 
   for(unsigned int i = 1; i < h_bkg_dR.size(); i++) {
@@ -3032,6 +3190,13 @@ void PlotMaker::CreateFSRPlot(TFile * siga, TFile * sigb) {
   h_sigb_dR->Draw("same");
 
   h_sigb_dR->Draw("axis same");
+
+  cutLine = new TLine(0.5, h_bkg_dR[0]->GetMinimum(), 0.5, h_bkg_dR[0]->GetMaximum());
+  cutLine->SetLineColor(kRed);
+  cutLine->SetLineWidth(3);
+  cutLine->Draw("same");
+
+  leg->Draw("same");
 
   can->SaveAs("dR_gamma_photon_"+req+".pdf");
 
@@ -3113,7 +3278,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   if(needsQCD) h_qcd[variableNumber]->Write();
   for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
   for(unsigned int i = 0; i < mcQCDHistograms.size(); i++) mcQCDHistograms[i][variableNumber]->Write();
-
+  
   TH1D *bkg, 
     *bkg_btagWeightUp, *bkg_btagWeightDown, 
     *bkg_puWeightUp, *bkg_puWeightDown, 
@@ -3137,12 +3302,12 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     bkg_pdfDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
     bkg_topPtUp = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_topPtUp");
     bkg_topPtDown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_topPtDown");
-    bkg_JECup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECup");
-    bkg_JECdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECdown");
-    bkg_leptonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFup");
-    bkg_leptonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFdown");
-    bkg_photonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFup");
-    bkg_photonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFdown");
+    bkg_JECup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECUp");
+    bkg_JECdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_JECDown");
+    bkg_leptonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFUp");
+    bkg_leptonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFDown");
+    bkg_photonSFup = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFUp");
+    bkg_photonSFdown = (TH1D*)h_qcd[variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFDown");
   }
 
   else {
@@ -3157,12 +3322,12 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
     bkg_pdfDown = (TH1D*)mcHistograms_pdfDown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_pdfDown");
     bkg_topPtUp = (TH1D*)mcHistograms_topPtUp[0][variableNumber]->Clone(variable+"_bkg_"+req+"_topPtUp");
     bkg_topPtDown = (TH1D*)mcHistograms_topPtDown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_topPtDown");
-    bkg_JECup = (TH1D*)mcHistograms_JECup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_JECup");
-    bkg_JECdown = (TH1D*)mcHistograms_JECdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_JECdown");
-    bkg_leptonSFup = (TH1D*)mcHistograms_leptonSFup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFup");
-    bkg_leptonSFdown = (TH1D*)mcHistograms_leptonSFdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFdown");
-    bkg_photonSFup = (TH1D*)mcHistograms_photonSFup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFup");
-    bkg_photonSFdown = (TH1D*)mcHistograms_photonSFdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFdown");
+    bkg_JECup = (TH1D*)mcHistograms_JECup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_JECUp");
+    bkg_JECdown = (TH1D*)mcHistograms_JECdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_JECDown");
+    bkg_leptonSFup = (TH1D*)mcHistograms_leptonSFup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFUp");
+    bkg_leptonSFdown = (TH1D*)mcHistograms_leptonSFdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_leptonSFDown");
+    bkg_photonSFup = (TH1D*)mcHistograms_photonSFup[0][variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFUp");
+    bkg_photonSFdown = (TH1D*)mcHistograms_photonSFdown[0][variableNumber]->Clone(variable+"_bkg_"+req+"_photonSFDown");
   }
 
   for(unsigned int i = 0; i < mcHistograms.size(); i++) {
@@ -3287,7 +3452,7 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   for(unsigned int i = 1; i < mcHistograms.size(); i++) {
     if(mcLayerNumbers[i] != mcLayerNumbers[i-1]) leg->AddEntry(mcHistograms[i][variableNumber], legendNames[i], "F");
   }
-  if(needsQCD) leg->AddEntry((TObject*)0, "", "");
+  if(!needsQCD) leg->AddEntry((TObject*)0, "", "");
   leg->SetFillColor(0);
   leg->SetTextSize(0.028);
 
@@ -3295,7 +3460,10 @@ void PlotMaker::DrawPlot(int variableNumber, TString variable, bool needsQCD,
   reqText->SetFillColor(0);
   reqText->SetFillStyle(0);
   reqText->SetLineColor(0);
-  reqText->AddText(req+" Requirement");
+  if(photonReq < 0) reqText->AddText(channelLabels[channelNum].ReplaceAll(" + XYZ #gamma", ""));
+  else if(photonReq == 0) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "0"));
+  else if(photonReq == 1) reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "1"));
+  else reqText->AddText(channelLabels[channelNum].ReplaceAll("XYZ", "#geq2"));
 
   TPaveText * lumiHeader = new TPaveText(0.1, 0.901, 0.9, 0.94, "NDC");
   lumiHeader->SetFillColor(0);
@@ -3537,9 +3705,9 @@ void PlotMaker::CreateTable() {
   // pfMET
   int variableNumber = 1;
 
-  const int nBins = 5;
-  Double_t rangeLow[nBins] = {0, 0, 50, 80, 100};
-  Double_t rangeHigh[nBins] = {20, 50, -1, -1, -1};
+  const int nBins = 7;
+  Double_t rangeLow[nBins] = {0, 0, 20, 50, 75, 100, 150};
+  Double_t rangeHigh[nBins] = {-1, 20, 50, 75, 100, 150, -1};
   
   FILE * tableFile = fopen("errorTable_"+req+".temp", "w");
   FILE * datacardFile = fopen("datacard_"+req+".temp", "w");
@@ -3687,14 +3855,16 @@ void PlotMaker::CreateTable() {
 
       TString fullTableLine = tableNames[j] + "val%%ux:%%.1f\n" + 
 	tableNames[j] + "errorup%%ux:%%.2f\n" + 
-	tableNames[j] + "errordown%%ux:%%.2f\n";
+	tableNames[j] + "errordown%%ux:%%.2f\n" +
+	tableNames[j] + "staterror%%ux:%%.2f\n";
       char buffer[200];
       sprintf(buffer, fullTableLine.Data());
 
       fprintf(tableFile, buffer,
 	      i+1, this_val, 
 	      i+1, sqrt(this_syserr2_up + this_staterr2),
-	      i+1, sqrt(this_syserr2_down + this_staterr2));
+	      i+1, sqrt(this_syserr2_down + this_staterr2),
+	      i+1, sqrt(this_staterr2));
 
       if(rangeLow[i] == 100 && rangeHigh[i] == -1 && this_val > 0.) {
 	Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
@@ -3737,7 +3907,7 @@ void PlotMaker::CreateTable() {
     }
 
     // total background
-    fprintf(tableFile, "bkgval%dx:%.1f\nbkgerrorup%dx:%.2f\nbkgerrordown%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgsys2_up + bkgstat2), i+1, sqrt(bkgsys2_down + bkgstat2));
+    fprintf(tableFile, "bkgval%dx:%.1f\nbkgerrorup%dx:%.2f\nbkgerrordown%dx:%.2f\nbkgstaterror%dx:%.2f\n", i+1, bkgval, i+1, sqrt(bkgsys2_up + bkgstat2), i+1, sqrt(bkgsys2_down + bkgstat2), i+1, sqrt(bkgstat2));
 
     // Signal yields
     this_val = h_siga[variableNumber]->IntegralAndError(binLow[i], binHigh[i], this_err);
@@ -3774,9 +3944,11 @@ void PlotMaker::CreateTable() {
       (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val) +
       (this_photonSFdown - this_val)*(this_photonSFdown - this_val);
     
-    fprintf(tableFile, "sigaval%dx:%.1f\nsigaerrorup%dx:%.2f\nsigaerrordown%dx:%.2f\n", i+1, this_val, 
+    fprintf(tableFile, "sigaval%dx:%.1f\nsigaerrorup%dx:%.2f\nsigaerrordown%dx:%.2f\nsigastaterror%dx:%.2f\n", 
+	    i+1, this_val, 
 	    i+1, sqrt(this_staterr2 + this_syserr2_up), 
-	    i+1, sqrt(this_staterr2 + this_syserr2_down));
+	    i+1, sqrt(this_staterr2 + this_syserr2_down),
+	    i+1, sqrt(this_staterr2));
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
       Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
@@ -3838,9 +4010,11 @@ void PlotMaker::CreateTable() {
       (this_leptonSFdown - this_val)*(this_leptonSFdown - this_val) +
       (this_photonSFdown - this_val)*(this_photonSFdown - this_val);
     
-    fprintf(tableFile, "sigbval%dx:%.1f\nsigberrorup%dx:%.2f\nsigberrordown%dx:%.2f\n", i+1, this_val, 
+    fprintf(tableFile, "sigbval%dx:%.1f\nsigberrorup%dx:%.2f\nsigberrordown%dx:%.2f\nsigbstaterror%dx:.2f\n", 
+	    i+1, this_val, 
 	    i+1, sqrt(this_staterr2 + this_syserr2_up), 
-	    i+1, sqrt(this_staterr2 + this_syserr2_down));
+	    i+1, sqrt(this_staterr2 + this_syserr2_down),
+	    i+1, sqrt(this_staterr2));
 
     if(rangeLow[i] == 100 && rangeHigh[i] == -1) {
       Float_t avg_error_stat = 1. + sqrt(this_staterr2) / this_val;
@@ -3879,7 +4053,7 @@ void PlotMaker::CreateTable() {
       fprintf(tableFile, "bkgsysup5y:%.1f\nbkgsysdown5y:%.1f\n", 100. * sqrt(bkgsys2_up) / bkgval, 100. * sqrt(bkgsys2_down) / bkgval);
       fprintf(tableFile, "bkgscaleup5y:%.1f\nbkgscaledown5y:%.1f\n", 100. * sqrt(bkg_scaleUp2) / bkgval, 100. * sqrt(bkg_scaleDown2) / bkgval);
       fprintf(tableFile, "bkgpdfup5y:%.1f\nbkgpdfdown5y:%.1f\n", 100. * sqrt(bkg_pdfUp2) / bkgval, 100. * sqrt(bkg_pdfDown2) / bkgval);
-      fprintf(tableFile, "bkgjecup5y:%.1f\nbkgjecdown5y:%.1f\n", 100. * sqrt(bkg_JECup2) / bkgval, 100. * sqrt(bkg_JECdown2) / bkgval);
+      fprintf(tableFile, "bkgjecup5y:%.2f\nbkgjecdown5y:%.2f\n", 100. * sqrt(bkg_JECup2) / bkgval, 100. * sqrt(bkg_JECdown2) / bkgval);
       fprintf(tableFile, "bkgtopptup5y:%.1f\nbkgtopptdown5y:%.1f\n", 100. * sqrt(bkg_topPtUp2) / bkgval, 100. * sqrt(bkg_topPtDown2) / bkgval);
       fprintf(tableFile, "bkgbtagup5y:%.1f\nbkgbtagdown5y:%.1f\n", 100. * sqrt(bkg_btagUp2) / bkgval, 100. * sqrt(bkg_btagDown2) / bkgval);
       fprintf(tableFile, "bkgpuup5y:%.1f\nbkgpudown5y:%.1f\n", 100. * sqrt(bkg_puUp2) / bkgval, 100. * sqrt(bkg_puDown2) / bkgval);
@@ -3921,15 +4095,23 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
   TH2D * h_xsec = (TH2D*)f_xsec->Get("real_xsec");
   TH2D * h_xsec_errors = (TH2D*)f_xsec->Get("real_errors");
 
-  TFile * fSignalOut = new TFile("signalLimits_"+req+".root", "RECREATE");
-
   TH2D * h_acc = new TH2D("acc_"+req, "acc_"+req, 30, xbins, 32, ybins);
   TH2D * h_contamination = new TH2D("contamination_"+req, "contamination_"+req, 30, xbins, 32, ybins);
 
-  for(int i = 0; i < 899; i++) {
+  TFile * fSignalOut = new TFile("limitInputs.root", "UPDATE");
+  if(req.Contains("ele")) {
+    fSignalOut->mkdir("ele");
+    fSignalOut->cd("ele");
+  }
+  else {
+    fSignalOut->mkdir("muon");
+    fSignalOut->cd("muon");
+  }
 
-    index1 = mst[int(i)/31];
-    index2 = mBino[int(i)%31];
+  for(int imass = 0; imass < 899; imass++) {
+
+    index1 = mst[int(imass)/31];
+    index2 = mBino[int(imass)%31];
 
     if(index1 < index2) continue;
 
@@ -4059,32 +4241,33 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     tree_contam->SetBranchAddress("pileupWeightDown", &puWeightDown);
     tree_contam->SetBranchAddress("TopPtReweighting", &topPtReweighting);
 
-    fSignalOut->cd();
+    const int nMetBins = 7;
+    Double_t xbins_met[nMetBins+1] = {0, 20, 50, 75, 100, 150, 300, 650};
 
-    TH1D * h = new TH1D("pfMET_gg_"+req+code_t, "pfMET_gg_"+req+code_t, 400, 0, 2000); h->Sumw2();
+    TH1D * h = new TH1D("signal"+code_t, "signal"+code_t, nMetBins, xbins_met); h->Sumw2();
 
-    TH1D * h_btagWeightUp = new TH1D("pfMET_gg_"+req+code_t+"_btagWeightUp", "pfMET_gg_"+req+code_t+"_btagWeightUp", 400, 0, 2000); h_btagWeightUp->Sumw2();
-    TH1D * h_btagWeightDown = new TH1D("pfMET_gg_"+req+code_t+"_btagWeightDown", "pfMET_gg_"+req+code_t+"_btagWeightDown", 400, 0, 2000); h_btagWeightDown->Sumw2();
+    TH1D * h_btagWeightUp = new TH1D("signal"+code_t+"_btagWeightUp", "signal"+code_t+"_btagWeightUp", nMetBins, xbins_met); h_btagWeightUp->Sumw2();
+    TH1D * h_btagWeightDown = new TH1D("signal"+code_t+"_btagWeightDown", "signal"+code_t+"_btagWeightDown", nMetBins, xbins_met); h_btagWeightDown->Sumw2();
 
-    TH1D * h_puWeightUp = new TH1D("pfMET_gg_"+req+code_t+"_puWeightUp", "pfMET_gg_"+req+code_t+"_puWeightUp", 400, 0, 2000); h_puWeightUp->Sumw2();
-    TH1D * h_puWeightDown = new TH1D("pfMET_gg_"+req+code_t+"_puWeightDown", "pfMET_gg_"+req+code_t+"_puWeightDown", 400, 0, 2000); h_puWeightDown->Sumw2();
+    TH1D * h_puWeightUp = new TH1D("signal"+code_t+"_puWeightUp", "signal"+code_t+"_puWeightUp", nMetBins, xbins_met); h_puWeightUp->Sumw2();
+    TH1D * h_puWeightDown = new TH1D("signal"+code_t+"_puWeightDown", "signal"+code_t+"_puWeightDown", nMetBins, xbins_met); h_puWeightDown->Sumw2();
 
-    TH1D * h_topPtUp = new TH1D("pfMET_gg_"+req+code_t+"_topPtUp", "pfMET_gg_"+req+code_t+"_topPtUp", 400, 0, 2000); h_topPtUp->Sumw2();
-    TH1D * h_topPtDown = new TH1D("pfMET_gg_"+req+code_t+"_topPtDown", "pfMET_gg_"+req+code_t+"_topPtDown", 400, 0, 2000); h_topPtDown->Sumw2();
+    TH1D * h_topPtUp = new TH1D("signal"+code_t+"_topPtUp", "signal"+code_t+"_topPtUp", nMetBins, xbins_met); h_topPtUp->Sumw2();
+    TH1D * h_topPtDown = new TH1D("signal"+code_t+"_topPtDown", "signal"+code_t+"_topPtDown", nMetBins, xbins_met); h_topPtDown->Sumw2();
 
-    TH1D * h_JECup = new TH1D("pfMET_gg_"+req+code_t+"_JECup", "pfMET_gg_"+req+code_t+"_JECup", 400, 0, 2000); h_JECup->Sumw2();
-    TH1D * h_JECdown = new TH1D("pfMET_gg_"+req+code_t+"_JECdown", "pfMET_gg_"+req+code_t+"_JECdown", 400, 0, 2000); h_JECdown->Sumw2();
+    TH1D * h_JECup = new TH1D("signal"+code_t+"_JECUp", "signal"+code_t+"_JECUp", nMetBins, xbins_met); h_JECup->Sumw2();
+    TH1D * h_JECdown = new TH1D("signal"+code_t+"_JECDown", "signal"+code_t+"_JECDown", nMetBins, xbins_met); h_JECdown->Sumw2();
 
-    TH1D * h_leptonSFup = new TH1D("pfMET_gg_"+req+code_t+"_leptonSFup", "pfMET_gg_"+req+code_t+"_leptonSFup", 400, 0, 2000); h_leptonSFup->Sumw2();
-    TH1D * h_leptonSFdown = new TH1D("pfMET_gg_"+req+code_t+"_leptonSFdown", "pfMET_gg_"+req+code_t+"_leptonSFdown", 400, 0, 2000); h_leptonSFdown->Sumw2();
+    TH1D * h_leptonSFup = new TH1D("signal"+code_t+"_leptonSFUp", "signal"+code_t+"_leptonSFUp", nMetBins, xbins_met); h_leptonSFup->Sumw2();
+    TH1D * h_leptonSFdown = new TH1D("signal"+code_t+"_leptonSFDown", "signal"+code_t+"_leptonSFDown", nMetBins, xbins_met); h_leptonSFdown->Sumw2();
 
-    TH1D * h_photonSFup = new TH1D("pfMET_gg_"+req+code_t+"_photonSFup", "pfMET_gg_"+req+code_t+"_photonSFup", 400, 0, 2000); h_photonSFup->Sumw2();
-    TH1D * h_photonSFdown = new TH1D("pfMET_gg_"+req+code_t+"_photonSFdown", "pfMET_gg_"+req+code_t+"_photonSFdown", 400, 0, 2000); h_photonSFdown->Sumw2();
+    TH1D * h_photonSFup = new TH1D("signal"+code_t+"_photonSFUp", "signal"+code_t+"_photonSFUp", nMetBins, xbins_met); h_photonSFup->Sumw2();
+    TH1D * h_photonSFdown = new TH1D("signal"+code_t+"_photonSFDown", "signal"+code_t+"_photonSFDown", nMetBins, xbins_met); h_photonSFdown->Sumw2();
 
     for(int i = 0; i < tree->GetEntries(); i++) {
       tree->GetEntry(i);
 
-      if(nphotons != nPhotons_req) continue;
+      if(nphotons != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -4183,7 +4366,7 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     for(int i = 0; i < tree_JECup->GetEntries(); i++) {
       tree_JECup->GetEntry(i);
 
-      if(nphotons != nPhotons_req) continue;
+      if(nphotons != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -4220,7 +4403,7 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     for(int i = 0; i < tree_JECdown->GetEntries(); i++) {
       tree_JECdown->GetEntry(i);
 
-      if(nphotons != nPhotons_req) continue;
+      if(nphotons != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -4259,7 +4442,7 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     for(int i = 0; i < tree_contam->GetEntries(); i++) {
       tree_contam->GetEntry(i);
 
-      if(nphotons != nPhotons_req) continue;
+      if(nphotons != nPhotons_req && nPhotons_req >= 0) continue;
 
       if(nBtagReq == 0) {
 	btagWeight = 1.;
@@ -4287,32 +4470,6 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     h_acc->SetBinContent(h_acc->FindBin(index1, index2), h->Integral() / (0.438/3.) / 15000.);
     h_contamination->SetBinContent(h_contamination->FindBin(index1, index2), contamination / h->Integral());
 
-    // draw acc and shiz
-    TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
-    h_acc->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
-    h_acc->GetXaxis()->SetRangeUser(0, 1600);
-    h_acc->GetXaxis()->SetLabelSize(0.03);
-    h_acc->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
-    h_acc->GetYaxis()->SetTitleOffset(1.3);
-    h_acc->GetYaxis()->SetLabelSize(0.03);
-    h_acc->GetYaxis()->SetRangeUser(0, 1600);
-    h_acc->GetZaxis()->SetLabelSize(0.02);
-    h_acc->Draw("colz");
-    can->SaveAs("acceptance_"+req+".pdf");
-
-    h_contamination->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
-    h_contamination->GetXaxis()->SetRangeUser(0, 1600);
-    h_contamination->GetXaxis()->SetLabelSize(0.03);
-    h_contamination->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
-    h_contamination->GetYaxis()->SetTitleOffset(1.3);
-    h_contamination->GetYaxis()->SetLabelSize(0.03);
-    h_contamination->GetYaxis()->SetRangeUser(0, 1600);
-    h_contamination->GetZaxis()->SetLabelSize(0.02);
-    h_contamination->Draw("colz");
-    can->SaveAs("contamination_"+req+".pdf");
-
-    delete can;
-
     double xsec = h_xsec->GetBinContent(h_xsec->FindBin(index1, index2));
     
     h->Scale(xsec * 19712. / 15000.);
@@ -4330,29 +4487,74 @@ void PlotMaker::CreateAllDatacards(int chan, int nPhotons_req, int nBtagReq) {
     h_photonSFdown->Scale(xsec * 19712. / 15000.);
 
     fSignalOut->cd();
-    h->Write();
-    h_btagWeightUp->Write();
-    h_btagWeightDown->Write();
-    h_puWeightUp->Write();
-    h_puWeightDown->Write();
-    h_topPtUp->Write();
-    h_topPtDown->Write();
-    h_JECup->Write();
-    h_JECdown->Write();
-    h_leptonSFup->Write();
-    h_leptonSFdown->Write();
-    h_photonSFup->Write();
-    h_photonSFdown->Write();
+
+    if(req.Contains("ele")) {
+      fSignalOut->cd("ele");
+    }
+    else {
+      fSignalOut->cd("muon");
+    }
+
+    h->Write("signal"+code_t);
+
+    for(int j = 0; j < h->GetNbinsX(); j++) {
+      TH1D * h_flux_up = (TH1D*)h->Clone("clone_signal_"+code_t+"_flux_up");
+      TH1D * h_flux_down = (TH1D*)h->Clone("clone_signal"+code_t+"_flux_down");
+      
+      Double_t centralValue = h->GetBinContent(j+1);
+      Double_t statError = h->GetBinError(j+1);
+      
+      if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
+      if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
+      
+      h_flux_up->Write("signal"+code_t+"_signal_stat_bin"+Form("%d", j+1)+"Up");
+      h_flux_down->Write("signal"+code_t+"_signal_stat_bin"+Form("%d", j+1)+"Down");
+    }
+    
+    h_btagWeightUp->Write("signal"+code_t+"_btagWeightUp");
+    h_btagWeightDown->Write("signal"+code_t+"_btagWeightDown");
+    h_puWeightUp->Write("signal"+code_t+"_puWeightUp");
+    h_puWeightDown->Write("signal"+code_t+"_puWeightDown");
+    h_topPtUp->Write("signal"+code_t+"_topPtUp");
+    h_topPtDown->Write("signal"+code_t+"_topPtDown");
+    h_JECup->Write("signal"+code_t+"_JECUp");
+    h_JECdown->Write("signal"+code_t+"_JECDown");
+    h_leptonSFup->Write("signal"+code_t+"_leptonSFUp");
+    h_leptonSFdown->Write("signal"+code_t+"_leptonSFDown");
+    h_photonSFup->Write("signal"+code_t+"_photonSFUp");
+    h_photonSFdown->Write("signal"+code_t+"_photonSFDown");
 
     f->Close();
 
   }
 
-  fSignalOut->cd();
+  // draw acc and etc
+  TCanvas * can = new TCanvas("canvas", "Plot", 10, 10, 2000, 2000);
+  fillPotHoles(h_acc);
+  h_acc->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
+  h_acc->GetXaxis()->SetRangeUser(0, 1600);
+  h_acc->GetXaxis()->SetLabelSize(0.03);
+  h_acc->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
+  h_acc->GetYaxis()->SetTitleOffset(1.3);
+  h_acc->GetYaxis()->SetLabelSize(0.03);
+  h_acc->GetYaxis()->SetRangeUser(0, 1600);
+  h_acc->GetZaxis()->SetLabelSize(0.02);
+  h_acc->Draw("colz");
+  can->SaveAs("acceptance_"+req+".pdf");
+  
+  h_contamination->GetXaxis()->SetTitle("#tilde{t} mass (GeV/c^{2})");
+  h_contamination->GetXaxis()->SetRangeUser(0, 1600);
+  h_contamination->GetXaxis()->SetLabelSize(0.03);
+  h_contamination->GetYaxis()->SetTitle("Bino mass (GeV/c^{2})");
+  h_contamination->GetYaxis()->SetTitleOffset(1.3);
+  h_contamination->GetYaxis()->SetLabelSize(0.03);
+  h_contamination->GetYaxis()->SetRangeUser(0, 1600);
+  h_contamination->GetZaxis()->SetLabelSize(0.02);
+  h_contamination->Draw("colz");
+  can->SaveAs("contamination_"+req+".pdf");
+  
+  delete can;
 
-  h_acc->Write();
-
-  fSignalOut->Write();
   fSignalOut->Close();
 
   f_xsec->Close();
@@ -4364,31 +4566,217 @@ void PlotMaker::SaveBackgroundOutput() {
   // save pfMET
   int variableNumber = 1;
 
-  TFile * fLimits = new TFile("limitInputs_"+req+".root", "RECREATE");
+  TFile * fLimits = new TFile("limitInputs.root", "UPDATE");
   fLimits->cd();
-  
-  h_gg[variableNumber]->Write();
-  h_qcd[variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms.size(); i++) mcHistograms[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_btagWeightUp.size(); i++) mcHistograms_btagWeightUp[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_btagWeightDown.size(); i++) mcHistograms_btagWeightDown[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_puWeightUp.size(); i++) mcHistograms_puWeightUp[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_puWeightDown.size(); i++) mcHistograms_puWeightDown[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_topPtUp.size(); i++) mcHistograms_topPtUp[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_topPtDown.size(); i++) mcHistograms_topPtDown[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_JECup.size(); i++) mcHistograms_JECup[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_JECdown.size(); i++) mcHistograms_JECdown[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_leptonSFup.size(); i++) mcHistograms_leptonSFup[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_leptonSFdown.size(); i++) mcHistograms_leptonSFdown[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_photonSFup.size(); i++) mcHistograms_photonSFup[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_photonSFdown.size(); i++) mcHistograms_photonSFdown[i][variableNumber]->Write();
-  
-  for(unsigned int i = 0; i < mcHistograms_scaleUp.size(); i++) mcHistograms_scaleUp[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_scaleDown.size(); i++) mcHistograms_scaleDown[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_pdfUp.size(); i++) mcHistograms_pdfUp[i][variableNumber]->Write();
-  for(unsigned int i = 0; i < mcHistograms_pdfDown.size(); i++) mcHistograms_pdfDown[i][variableNumber]->Write();
-  
-  fLimits->Write();
+  if(req.Contains("ele")) {
+    fLimits->cd("ele");
+  }
+  else {
+    fLimits->cd("muon");
+  }
+
+  h_gg[variableNumber]->Write("data_obs");
+  h_qcd[variableNumber]->Write("qcd");
+
+  TH1D * h = (TH1D*)mcHistograms[0][variableNumber]->Clone("clone_"+limitNames[0]);
+  for(unsigned int i = 1; i < mcHistograms.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+
+      h->Write(limitNames[i-1]);
+
+      for(int j = 0; j < h->GetNbinsX(); j++) {
+	TH1D * h_flux_up = (TH1D*)h->Clone("clone_"+limitNames[i-1]+"_flux_up");
+	TH1D * h_flux_down = (TH1D*)h->Clone("clone_"+limitNames[i-1]+"_flux_down");
+
+	Double_t centralValue = h->GetBinContent(j+1);
+	Double_t statError = h->GetBinError(j+1);
+
+	if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
+	if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
+
+	h_flux_up->Write(limitNames[i-1]+"_"+limitNames[i-1]+"_stat_bin"+Form("%d", j+1)+"Up");
+	h_flux_down->Write(limitNames[i-1]+"_"+limitNames[i-1]+"_stat_bin"+Form("%d", j+1)+"Down");
+      }
+
+      h = (TH1D*)mcHistograms[i][variableNumber]->Clone("clone_"+limitNames[i]);
+    }
+    else h->Add(mcHistograms[i][variableNumber]);
+  }
+  h->Write(limitNames.back());
+  for(int j = 0; j < h->GetNbinsX(); j++) {
+    TH1D * h_flux_up = (TH1D*)h->Clone("clone_"+limitNames.back()+"_flux_up");
+    TH1D * h_flux_down = (TH1D*)h->Clone("clone_"+limitNames.back()+"_flux_down");
+    
+    Double_t centralValue = h->GetBinContent(j+1);
+    Double_t statError = h->GetBinError(j+1);
+    
+    if(statError > 0.) h_flux_up->SetBinContent(j+1, centralValue + statError);
+    if(centralValue > statError && statError > 0.) h_flux_down->SetBinContent(j+1, centralValue - statError);
+    
+    h_flux_up->Write(limitNames.back()+"_"+limitNames.back()+"_stat_bin"+Form("%d", j+1)+"Up");
+    h_flux_down->Write(limitNames.back()+"_"+limitNames.back()+"_stat_bin"+Form("%d", j+1)+"Down");
+  }
+
+  h = (TH1D*)mcHistograms_btagWeightUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_btagWeightUp");
+  for(unsigned int i = 1; i < mcHistograms_btagWeightUp.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_btagWeightUp");
+      h = (TH1D*)mcHistograms_btagWeightUp[i][variableNumber]->Clone("clone_"+limitNames[i]+"_btagWeightUp");
+    }
+    else h->Add(mcHistograms_btagWeightUp[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_btagWeightUp");
+
+  h = (TH1D*)mcHistograms_btagWeightDown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_btagWeightDown");
+  for(unsigned int i = 1; i < mcHistograms_btagWeightDown.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_btagWeightDown");
+      h = (TH1D*)mcHistograms_btagWeightDown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_btagWeightDown");
+    }
+    else h->Add(mcHistograms_btagWeightDown[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_btagWeightDown");
+
+  h = (TH1D*)mcHistograms_puWeightUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_puWeightUp");
+  for(unsigned int i = 1; i < mcHistograms_puWeightUp.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_puWeightUp");
+      h = (TH1D*)mcHistograms_puWeightUp[i][variableNumber]->Clone("clone_"+limitNames[i]+"_puWeightUp");
+    }
+    else h->Add(mcHistograms_puWeightUp[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_puWeightUp");
+
+  h = (TH1D*)mcHistograms_puWeightDown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_puWeightDown");
+  for(unsigned int i = 1; i < mcHistograms_puWeightDown.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_puWeightDown");
+      h = (TH1D*)mcHistograms_puWeightDown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_puWeightDown");
+    }
+    else h->Add(mcHistograms_puWeightDown[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_puWeightDown");
+
+  h = (TH1D*)mcHistograms_topPtUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_topPtUp");
+  for(unsigned int i = 1; i < mcHistograms_topPtUp.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_topPtUp");
+      h = (TH1D*)mcHistograms_topPtUp[i][variableNumber]->Clone("clone_"+limitNames[i]+"_topPtUp");
+    }
+    else h->Add(mcHistograms_topPtUp[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_topPtUp");
+
+  h = (TH1D*)mcHistograms_topPtDown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_topPtDown");
+  for(unsigned int i = 1; i < mcHistograms_topPtDown.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_topPtDown");
+      h = (TH1D*)mcHistograms_topPtDown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_topPtDown");
+    }
+    else h->Add(mcHistograms_topPtDown[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_topPtDown");
+
+  h = (TH1D*)mcHistograms_JECup[0][variableNumber]->Clone("clone_"+limitNames[0]+"_JECUp");
+  for(unsigned int i = 1; i < mcHistograms_JECup.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_JECUp");
+      h = (TH1D*)mcHistograms_JECup[i][variableNumber]->Clone("clone_"+limitNames[i]+"_JECUp");
+    }
+    else h->Add(mcHistograms_JECup[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_JECUp");
+
+  h = (TH1D*)mcHistograms_JECdown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_JECDown");
+  for(unsigned int i = 1; i < mcHistograms_JECdown.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_JECDown");
+      h = (TH1D*)mcHistograms_JECdown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_JECDown");
+    }
+    else h->Add(mcHistograms_JECdown[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_JECDown");
+
+  h = (TH1D*)mcHistograms_leptonSFup[0][variableNumber]->Clone("clone_"+limitNames[0]+"_leptonSFUp");
+  for(unsigned int i = 1; i < mcHistograms_leptonSFup.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_leptonSFUp");
+      h = (TH1D*)mcHistograms_leptonSFup[i][variableNumber]->Clone("clone_"+limitNames[i]+"_leptonSFUp");
+    }
+    else h->Add(mcHistograms_leptonSFup[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_leptonSFUp");
+
+  h = (TH1D*)mcHistograms_leptonSFdown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_leptonSFDown");
+  for(unsigned int i = 1; i < mcHistograms_leptonSFdown.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_leptonSFDown");
+      h = (TH1D*)mcHistograms_leptonSFdown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_leptonSFDown");
+    }
+    else h->Add(mcHistograms_leptonSFdown[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_leptonSFDown");
+
+  h = (TH1D*)mcHistograms_photonSFup[0][variableNumber]->Clone("clone_"+limitNames[0]+"_photonSFUp");
+  for(unsigned int i = 1; i < mcHistograms_photonSFup.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_photonSFUp");
+      h = (TH1D*)mcHistograms_photonSFup[i][variableNumber]->Clone("clone_"+limitNames[i]+"_photonSFUp");
+    }
+    else h->Add(mcHistograms_photonSFup[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_photonSFUp");
+
+  h = (TH1D*)mcHistograms_photonSFdown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_photonSFDown");
+  for(unsigned int i = 1; i < mcHistograms_photonSFdown.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_photonSFDown");
+      h = (TH1D*)mcHistograms_photonSFdown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_photonSFDown");
+    }
+    else h->Add(mcHistograms_photonSFdown[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_photonSFDown");
+
+  h = (TH1D*)mcHistograms_scaleUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_scale_"+limitNames[0]+"Up");
+  for(unsigned int i = 1; i < mcHistograms_scaleUp.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_scale_"+limitNames[i-1]+"Up");
+      h = (TH1D*)mcHistograms_scaleUp[i][variableNumber]->Clone("clone_"+limitNames[i]+"_scale_"+limitNames[i]+"Up");
+    }
+    else h->Add(mcHistograms_scaleUp[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_scale_"+limitNames.back()+"Up");
+
+  h = (TH1D*)mcHistograms_scaleDown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_scale_"+limitNames[0]+"Down");
+  for(unsigned int i = 1; i < mcHistograms_scaleDown.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_scale_"+limitNames[i-1]+"Down");
+      h = (TH1D*)mcHistograms_scaleDown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_scale_"+limitNames[i]+"Down");
+    }
+    else h->Add(mcHistograms_scaleDown[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_scale_"+limitNames.back()+"Down");
+
+  h = (TH1D*)mcHistograms_pdfUp[0][variableNumber]->Clone("clone_"+limitNames[0]+"_pdf_"+limitNames[0]+"Up");
+  for(unsigned int i = 1; i < mcHistograms_pdfUp.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_pdf_"+limitNames[i-1]+"Up");
+      h = (TH1D*)mcHistograms_pdfUp[i][variableNumber]->Clone("clone_"+limitNames[i]+"_pdf_"+limitNames[i]+"Up");
+    }
+    else h->Add(mcHistograms_pdfUp[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_pdf_"+limitNames.back()+"Up");
+
+  h = (TH1D*)mcHistograms_pdfDown[0][variableNumber]->Clone("clone_"+limitNames[0]+"_pdf_"+limitNames[0]+"Down");
+  for(unsigned int i = 1; i < mcHistograms_pdfDown.size(); i++) {
+    if(limitNames[i] != limitNames[i-1]) {
+      h->Write(limitNames[i-1]+"_pdf_"+limitNames[i-1]+"Down");
+      h = (TH1D*)mcHistograms_pdfDown[i][variableNumber]->Clone("clone_"+limitNames[i]+"_pdf_"+limitNames[i]+"Down");
+    }
+    else h->Add(mcHistograms_pdfDown[i][variableNumber]);
+  }
+  h->Write(limitNames.back()+"_pdf_"+limitNames.back()+"Down");
+
   fLimits->Close();
 
 }

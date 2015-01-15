@@ -66,6 +66,8 @@ class SusyEventAnalyzer {
   virtual ~SusyEventAnalyzer();
 
   virtual void Data();
+  virtual void ZGammaData(bool runElectrons);
+  virtual void ZGammaMC(bool runElectrons);
   virtual void Acceptance();
   virtual void GeneratorInfo();
   virtual void CalculateBtagEfficiency();
