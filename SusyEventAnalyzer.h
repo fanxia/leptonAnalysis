@@ -119,6 +119,8 @@ class SusyEventAnalyzer {
 
   void SetUseDPhiCut(bool v) { useDPhiCut = v; }
 
+  void SetUseDeltaRCutsOnPhotons(bool v) { useDeltaRCutsOnPhotons = v; }
+
   void IncludeAJson(TString const&);
   void SetOutput(TString const& v) { outputName = v; }
   void SetPrintInterval(int v) { printInterval = v; }
@@ -233,6 +235,8 @@ class SusyEventAnalyzer {
 
   bool useDPhiCut;
 
+  bool useDeltaRCutsOnPhotons;
+
   TString scan;
 
 };
@@ -248,7 +252,8 @@ SusyEventAnalyzer::SusyEventAnalyzer(TTree& tree) :
   goodLumiList(),
   currentLumi(0, 0),
   currentLumiIsGood(true),
-  rejectFakeElectrons(false)  
+  rejectFakeElectrons(false),
+  useDeltaRCutsOnPhotons(true)  
 {
   event.setInput(tree);
 }
@@ -483,35 +488,40 @@ void SusyEventAnalyzer::findPhotons(susy::Event& ev,
 	for(unsigned int k = 0; k < pfJets_corrP4.size(); k++) {
 	  this_dR = deltaR(pfJets_corrP4[k], it->caloPosition);
 	  if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_jet->Fill(this_dR);
-	  if(this_dR < 0.5) overlap = true;
+	  if(this_dR < 0.5) {
+	    // if loosening cut on dR(gamma, b) but not non-btagged jets, then only call it an overlap if the jet's not btagged
+	    if(useDeltaRCutsOnPhotons) overlap = true;
+	    else if(btagger == "CSVM" && pfJets[k]->bTagDiscriminators[susy::kCSV] <= 0.679) overlap = true;
 	}
 
-	for(unsigned int i = 0; i < tightMuons.size(); i++) {
-	  this_dR = deltaR(tightMuons[i]->momentum, it->caloPosition);
-	  if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_muon->Fill(this_dR);
-	  if(this_dR < 0.5) overlap = true;
+	if(useDeltaRCutsOnPhotons) {
+	  for(unsigned int i = 0; i < tightMuons.size(); i++) {
+	    this_dR = deltaR(tightMuons[i]->momentum, it->caloPosition);
+	    if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_muon->Fill(this_dR);
+	    if(this_dR < 0.5) overlap = true;
+	  }
+	  
+	  for(unsigned int i = 0; i < looseMuons.size(); i++) {
+	    if(deltaR(looseMuons[i]->momentum, it->caloPosition) <= 0.5) overlap = true;
+	  }
+	  
+	  for(unsigned int i = 0; i < tightEles.size(); i++) {
+	    this_dR = deltaR(tightEles[i]->momentum, it->caloPosition);
+	    if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_ele->Fill(this_dR);
+	    if(this_dR < 0.5) overlap = true;
+	  }
+	  
+	  for(unsigned int i = 0; i < looseEles.size(); i++) {
+	    if(deltaR(looseEles[i]->momentum, it->caloPosition) <= 0.5) overlap = true;
+	  }
 	}
-
-	for(unsigned int i = 0; i < looseMuons.size(); i++) {
-	  if(deltaR(looseMuons[i]->momentum, it->caloPosition) <= 0.5) overlap = true;
-	}
-
-	for(unsigned int i = 0; i < tightEles.size(); i++) {
-	  this_dR = deltaR(tightEles[i]->momentum, it->caloPosition);
-	  if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_ele->Fill(this_dR);
-	  if(this_dR < 0.5) overlap = true;
-	}
-	
-	for(unsigned int i = 0; i < looseEles.size(); i++) {
-	  if(deltaR(looseEles[i]->momentum, it->caloPosition) <= 0.5) overlap = true;
-	}
-
+	  
 	for(unsigned int i = 0; i < photons.size(); i++) {
 	  this_dR = deltaR(photons[i]->caloPosition, it->caloPosition);
 	  if(!requireSigmaIetaIeta || !requireChHadIso) h_dR_gamma_photon->Fill(this_dR);
 	  if(this_dR < 0.5) overlap = true;
 	}
-
+	
 	if(overlap) continue;
 
 	photons.push_back(&*it);
@@ -1338,6 +1348,89 @@ void SusyEventAnalyzer::SetTreeValues(map<TString, float>& treeMap,
   treeMap["mLepGammaTrail"] = (photons.size() > 1) ? mLepGammaTrail : -1;
   treeMap["mLepGammaGamma"] = (photons.size() > 1) ? mLepGammaGamma : -1;
   
+  // Photon angles
+  if(photons.size() > 0) {
+    if(tightEles.size() == 1) {
+      treeMap["dR_leadPhoton_l"] = deltaR(tightEles[0]->momentum, photons[0]->caloPosition);
+      treeMap["dEta_leadPhoton_l"] = fabs(tightEles[0]->momentum.Eta() - photons[0]->caloPosition.Eta());
+      treeMap["dPhi_leadPhoton_l"] = TVector2::Phi_mpi_pi(tightEles[0]->momentum.Phi() - photons[0]->caloPosition.Phi());
+      treeMap["cosTheta_leadPhoton_l"] = TMath::Cos(tightEles[0]->momentum.Angle(photons[0]->caloPosition));
+    }
+    else if(tightMuons.size() == 1) {
+      treeMap["dR_leadPhoton_l"] = deltaR(tightMuons[0]->momentum, photons[0]->caloPosition);
+      treeMap["dEta_leadPhoton_l"] = fabs(tightMuons[0]->momentum.Eta() - photons[0]->caloPosition.Eta());
+      treeMap["dPhi_leadPhoton_l"] = TVector2::Phi_mpi_pi(tightMuons[0]->momentum.Phi() - photons[0]->caloPosition.Phi());
+      treeMap["cosTheta_leadPhoton_l"] = TMath::Cos(tightMuons[0]->momentum.Angle(photons[0]->caloPosition));
+    }
+
+    double min_b_angle = 999.;
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, deltaR(btags_corrP4[i], photons[0]->caloPosition));
+    treeMap["dR_leadPhoton_b_min"] = min_b_angle;
+
+    min_b_angle = 999.;
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, fabs(btags_corrP4[i].Eta() - photons[0]->caloPosition.Eta()));
+    treeMap["dEta_leadPhoton_b_min"] = min_b_angle;
+
+    min_b_angle = 999.;
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, TVector2::Phi_mpi_pi(btags_corrP4[i].Phi() - photons[0]->caloPosition.Phi()));
+    treeMap["dPhi_leadPhoton_b_min"] = min_b_angle;
+
+    min_b_angle = 999.;
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, TMath::Cos(btags_corrP4[i].Angle(photons[0]->caloPosition)));
+    treeMap["cosTheta_leadPhoton_b_min"] = min_b_angle;
+  }
+  else {
+    treeMap["dR_leadPhoton_l"] = -1.;
+    treeMap["dEta_leadPhoton_l"] = -1.;
+    treeMap["dPhi_leadPhoton_l"] = -100.;
+    treeMap["cosTheta_leadPhoton_l"] = -100.;
+    treeMap["dR_leadPhoton_l"] = -1.;
+    treeMap["dEta_leadPhoton_l"] = -1.;
+    treeMap["dPhi_leadPhoton_l"] = -100.;
+    treeMap["cosTheta_leadPhoton_l"] = -100.;
+  }
+
+  if(photons.size() > 1) {
+    if(tightEles.size() == 1) {
+      treeMap["dR_trailPhoton_l"] = deltaR(tightEles[0]->momentum, photons[1]->caloPosition);
+      treeMap["dEta_trailPhoton_l"] = fabs(tightEles[0]->momentum.Eta() - photons[1]->caloPosition.Eta());
+      treeMap["dPhi_trailPhoton_l"] = TVector2::Phi_mpi_pi(tightEles[0]->momentum.Phi() - photons[1]->caloPosition.Phi());
+      treeMap["cosTheta_trailPhoton_l"] = TMath::Cos(tightEles[0]->momentum.Angle(photons[1]->caloPosition));
+    }
+    else if(tightMuons.size() == 1) {
+      treeMap["dR_trailPhoton_l"] = deltaR(tightMuons[0]->momentum, photons[1]->caloPosition);
+      treeMap["dEta_trailPhoton_l"] = fabs(tightMuons[0]->momentum.Eta() - photons[1]->caloPosition.Eta());
+      treeMap["dPhi_trailPhoton_l"] = TVector2::Phi_mpi_pi(tightMuons[0]->momentum.Phi() - photons[1]->caloPosition.Phi());
+      treeMap["cosTheta_trailPhoton_l"] = TMath::Cos(tightMuons[0]->momentum.Angle(photons[1]->caloPosition));
+    }
+
+    double min_b_angle = 999.;
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, deltaR(btags_corrP4[i], photons[1]->caloPosition));
+    treeMap["dR_trailPhoton_b_min"] = min_b_angle;
+
+    min_b_angle = 999.;
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, fabs(btags_corrP4[i].Eta() - photons[1]->caloPosition.Eta()));
+    treeMap["dEta_trailPhoton_b_min"] = min_b_angle;
+
+    min_b_angle = 999.;
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, TVector2::Phi_mpi_pi(btags_corrP4[i].Phi() - photons[1]->caloPosition.Phi()));
+    treeMap["dPhi_trailPhoton_b_min"] = min_b_angle;
+
+    min_b_angle = 999.;
+    for(unsigned int i = 0; i < btags_corrP4.size(); i++) min_b_angle = min(min_b_angle, TMath::Cos(btags_corrP4[i].Angle(photons[1]->caloPosition)));
+    treeMap["cosTheta_trailPhoton_b_min"] = min_b_angle;
+  }
+  else {
+    treeMap["dR_trailPhoton_l"] = -1.;
+    treeMap["dEta_trailPhoton_l"] = -1.;
+    treeMap["dPhi_trailPhoton_l"] = -100.;
+    treeMap["cosTheta_trailPhoton_l"] = -100.;
+    treeMap["dR_trailPhoton_l"] = -1.;
+    treeMap["dEta_trailPhoton_l"] = -1.;
+    treeMap["dPhi_trailPhoton_l"] = -100.;
+    treeMap["cosTheta_trailPhoton_l"] = -100.;
+  }
+
   // Transverse W mass
 
   float metphi = (pfMet->mEt - sysShiftCorr).Phi();

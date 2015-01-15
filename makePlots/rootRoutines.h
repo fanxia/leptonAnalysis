@@ -183,6 +183,9 @@ void fillPotHoles(TH2D *h) {
 
   for(int ix=1; ix <= nbinsX; ix++) {
     for(int iy=1; iy <= nbinsY; iy++) {
+
+      if(h->GetXaxis()->GetBinCenter(ix) < h->GetYaxis()->GetBinCenter(iy)) continue;
+
       double val = h->GetBinContent(ix,iy);
       if(fabs(val) > epsilon) continue;
       int ncnt = 0;
