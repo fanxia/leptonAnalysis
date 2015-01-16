@@ -8,8 +8,9 @@ export CONDOR_SECTION=$1
 
 tar -xzf fileLists.tgz
 
-export VO_CMS_SW_DIR=/uscmst1/prod/sw/cms
-source $VO_CMS_SW_DIR/cmsset_default.sh
+#export VO_CMS_SW_DIR=/uscmst1/prod/sw/cms
+#source $VO_CMS_SW_DIR/cmsset_default.sh
+source /cvmfs/cms.cern.ch/cmsset_default.csh
 export SCRAM_ARCH=slc5_amd64_gcc462
 scramv1 project CMSSW CMSSW_5_3_8_patch3
 

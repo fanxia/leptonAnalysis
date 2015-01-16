@@ -7,8 +7,9 @@ if [ $# -ne 1 ]; then
 	exit 0
 fi
 
-export VO_CMS_SW_DIR=/uscmst1/prod/sw/cms
-source $VO_CMS_SW_DIR/cmsset_default.sh
+#export VO_CMS_SW_DIR=/uscmst1/prod/sw/cms
+#source $VO_CMS_SW_DIR/cmsset_default.sh
+source /cvmfs/cms.cern.ch/cmsset_default.csh
 export SCRAM_ARCH=slc5_amd64_gcc462
 eval `scramv1 runtime -sh`
 

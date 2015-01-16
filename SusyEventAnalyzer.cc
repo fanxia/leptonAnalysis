@@ -312,7 +312,7 @@ void SusyEventAnalyzer::Data() {
   // Reweighting trees
   /////////////////////////////////
 
-  const int nTreeVariables = 76;
+  const int nTreeVariables = 92;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
@@ -328,6 +328,14 @@ void SusyEventAnalyzer::Data() {
     "trailPhotonEt", "trailPhotonEta", "trailPhotonPhi", "trailChargedHadronIso", "trailSigmaIetaIeta", "trail_nPixelSeeds", "trailMVAregEnergy", "trailMVAregErr",
     "photon_invmass", "photon_dR", "photon_dPhi", "diEMpT", "diJetPt",
     "mLepGammaLead", "mLepGammaTrail", "mLepGammaGamma",
+    "dR_leadPhoton_l", "dR_leadPhoton_b_min",
+    "dEta_leadPhoton_l", "dEta_leadPhoton_b_min",
+    "dPhi_leadPhoton_l", "dPhi_leadPhoton_b_min",
+    "cosTheta_leadPhoton_l", "cosTheta_leadPhoton_b_min",
+    "dR_trailPhoton_l", "dR_trailPhoton_b_min",
+    "dEta_trailPhoton_l", "dEta_trailPhoton_b_min",
+    "dPhi_trailPhoton_l", "dPhi_trailPhoton_b_min",
+    "cosTheta_trailPhoton_l", "cosTheta_trailPhoton_b_min",
     "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
     "btag1_pt", "btag2_pt",
     "max_csv", "submax_csv", "min_csv",
@@ -531,6 +539,7 @@ void SusyEventAnalyzer::Data() {
 		    pfJets_corrP4,
 		    tightMuons, looseMuons,
 		    tightEles, looseEles,
+		    pfJets,
 		    HT,
 		    h_dR_gamma_ele,
 		    h_dR_gamma_muon,
@@ -677,7 +686,7 @@ void SusyEventAnalyzer::Acceptance() {
   TH1D * h_dR_gamma_jet = new TH1D("dR_gamma_jet", "dR between photons and jets (N-1)", 100, 0, 10);
   TH1D * h_dR_gamma_photon = new TH1D("dR_gamma_photon", "dR between photons and other photons (N-1)", 100, 0, 10);
 
-  const int nTreeVariables = 85;
+  const int nTreeVariables = 101;
 
   TString varNames[nTreeVariables] = {
     "pfMET", "pfMET_x", "pfMET_y", "pfMET_phi",
@@ -693,6 +702,14 @@ void SusyEventAnalyzer::Acceptance() {
     "trailPhotonEt", "trailPhotonEta", "trailPhotonPhi", "trailChargedHadronIso", "trailSigmaIetaIeta", "trail_nPixelSeeds", "trailMVAregEnergy", "trailMVAregErr",
     "photon_invmass", "photon_dR", "photon_dPhi", "diEMpT", "diJetPt",
     "mLepGammaLead", "mLepGammaTrail", "mLepGammaGamma",
+    "dR_leadPhoton_l", "dR_leadPhoton_b_min",
+    "dEta_leadPhoton_l", "dEta_leadPhoton_b_min",
+    "dPhi_leadPhoton_l", "dPhi_leadPhoton_b_min",
+    "cosTheta_leadPhoton_l", "cosTheta_leadPhoton_b_min",
+    "dR_trailPhoton_l", "dR_trailPhoton_b_min",
+    "dEta_trailPhoton_l", "dEta_trailPhoton_b_min",
+    "dPhi_trailPhoton_l", "dPhi_trailPhoton_b_min",
+    "cosTheta_trailPhoton_l", "cosTheta_trailPhoton_b_min",
     "jet1_pt", "jet2_pt", "jet3_pt", "jet4_pt",
     "btag1_pt", "btag2_pt",
     "max_csv", "submax_csv", "min_csv",
@@ -903,6 +920,7 @@ void SusyEventAnalyzer::Acceptance() {
 		      pfJets_corrP4,
 		      tightMuons, looseMuons,
 		      tightEles, looseEles,
+		      pfJets,
 		      HT,
 		      h_dR_gamma_ele,
 		      h_dR_gamma_muon,
@@ -1401,6 +1419,7 @@ void SusyEventAnalyzer::ZGammaData(bool runElectrons) {
 		    pfJets_corrP4,
 		    tightMuons, looseMuons,
 		    tightEles, looseEles,
+		    pfJets,
 		    HT,
 		    h_dR_gamma_ele,
 		    h_dR_gamma_muon,
@@ -2047,6 +2066,7 @@ void SusyEventAnalyzer::ZGammaMC(bool runElectrons) {
 		      pfJets_corrP4,
 		      tightMuons, looseMuons,
 		      tightEles, looseEles,
+		      pfJets,
 		      HT,
 		      h_dR_gamma_ele,
 		      h_dR_gamma_muon,
